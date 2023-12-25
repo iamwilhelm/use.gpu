@@ -4,6 +4,7 @@ import type { Keyframe } from '@use-gpu/workbench';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
+import { seq } from '@use-gpu/core';
 
 import {
   Loop, Pass, FlatCamera, Animate, LinearRGB,
@@ -38,8 +39,6 @@ const ROTATION_KEYFRAMES = [
   [14, [360, 0, 0]],
   [16, [360, 0, 0]],
 ] as Keyframe[];
-
-const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 export const SceneInstancesPage: LC = (props) => {
   const geometry = useOne(() => makeBoxGeometry({ width: 2 }));

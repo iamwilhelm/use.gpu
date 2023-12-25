@@ -16,12 +16,6 @@ export const alignSizeTo2 = (n: number, s: number) => {
   return f === 0 ? n : n + (s - f);
 };
 
-export const getUniformDims2 = (type: UniformType) => UNIFORM_ARRAY_DIMS[type];
-
-export const toArrayElementType2 = (type: string) => type.replace(/^array<(.*)>$/, '$1');
-
-export const isArrayUniform2 = (type: string) => !!type.match(/^array</);
-
 export const makeRawArray2 = (byteSize: number) => new ArrayBuffer(byteSize);
 
 export const makeDataArray2 = (type: UniformType, length: number) => {
@@ -84,10 +78,8 @@ export const makeCopyPipe = ({
         for (let j = 1; j < skip; ++j) to[t + j] = 0;
         t += step;
       }
-      return;
     }
-
-    if (dims4 === 1) {
+    else if (dims4 === 1) {
       for (let i = 0; i < n; ++i) {
         for (let j = 0; j < repeat; ++j) {
           let b = f + index(i);
@@ -171,20 +163,23 @@ export const makeCopyPipe = ({
     }
   }
   else {
-    const n = count != null ? count * dims : (from?.length ?? 1);
+    const nd = n * dims;
 
     if (typeof from === 'number') {
-      for (let i = 0; i < n; ++i) {
+      for (let i = 0; i < nd; ++i) {
         to[t] = map(from);
         t++;
       }
     }
-
-    for (let i = 0; i < n; ++i) {
-      to[t] = map(from[f + i]);
-      t++;
+    else {
+      for (let i = 0; i < nd; ++i) {
+        to[t] = map(from[f + i]);
+        t++;
+      }
     }
   }
+
+  return n * step;
 };
 
 export const copyNumberArray2 = makeCopyPipe();
@@ -229,7 +224,7 @@ export const offsetNumberArray2 = (() => {
 
 export const fillNumberArray2 = (() => {
   const index = (i: number) => 0;
-  const copyWithNoIndex = makeCopyPipe({index});
+  const copyWithZeroIndex = makeCopyPipe({index});
   return (
     from: NumberArray | number,
     to: NumberArray,
@@ -261,9 +256,11 @@ export const fillNumberArray2 = (() => {
           t += step;
         }
       }
+      
+      return count * step;
     }
     else {
-      return copyWithNoIndex(from, to, dims, fromIndex, toIndex, count, stride); 
+      return copyWithZeroIndex(from, to, dims, fromIndex, toIndex, count, stride); 
     }
   }
 })();
@@ -288,7 +285,49 @@ export const spreadNumberArray2 = (
     f++;
     t += l * step;
   }
+  return t - toIndex;
 }
+
+export const copyRecursiveNumberArray2 = (
+  from: number | any[],
+  to: TypedArray,
+  dims: number,
+  fromDepth: number = 0,
+  toIndex: number = 0,
+  w: number = 0,
+) => {
+  const fromDims = dims;
+  const toDims = Math.ceil(dims);
+
+  if (fromDepth === 0) {
+    if (typeof from === 'number') {
+      // Scalar
+      return fillNumberArray2(from, to, dims, 0, toIndex, 1);
+    }
+    else if (typeof from[0] === 'number') {
+      // Vector
+      return copyNumberArray2(from, to, dims, 0, toIndex, from.length / dims, w);
+    }
+  }
+  else if (fromDepth === 1) {
+    if (typeof from[0] === 'number') {
+      // Scalar array or flattened vectors
+      return copyNumberArray2(from, to, dims, 0, toIndex, from.length / dims, w);
+    }
+    if (typeof from[0][0] === 'number') {
+      // Vector array or flattened multivectors
+      return copyNestedNumberArray2(from, to, dims, dims, 0, toIndex, from.length, w);
+    }
+  }
+  else if (fromDepth >= 2) {
+    let b = 0;
+    for (let i = 0; i < n; ++i) {
+      const l = copyRecursiveNumberArray2(from, to, dims, fromDepth - 1, b, w);
+      b += l;
+    }
+    return b;
+  }
+};
 
 // read from 1d/2d/3d/4d number[][] into 1d/2d/3d/4d typed array
 export const copyNestedNumberArray2 = (
@@ -298,9 +337,9 @@ export const copyNestedNumberArray2 = (
   toDims: number,
   fromIndex: number = 0,
   toIndex: number = 0,
-  count: number,
+  count?: number,
   w: number = 0,
-) => {
+): number => {
   const n = count ?? from.length;
 
   let s = fromIndex;
@@ -404,6 +443,8 @@ export const copyNestedNumberArray2 = (
   else {
     throw new Error(`Unsupported output dimension: ${toDims}`);
   }
+
+  return n * toDims;
 };
 
 export const makeCopyEmitter2 = (
@@ -629,25 +670,35 @@ export const generateConcaveIndices2 = (
   chunks: NumberArray,
   groups: NumberArray,
   positions: NumberArray,
+  dims: number,
 ) => {
   let g = groups.length;
 
   // Convert XYZ to dominant 2D plane
   const scratch = [];
 
-  const p1 = vec3.fromValues(positions[0], positions[1], positions[2]);
-  const p2 = vec3.fromValues(positions[4], positions[5], positions[6]);
-  const p3 = vec3.fromValues(positions[8], positions[9], positions[10]);
+  let axis = 0;
+  if (dims >= 3) {
+    const p1 = vec3.fromValues(positions[0], positions[1], positions[2]);
+    const p2 = vec3.fromValues(positions[4], positions[5], positions[6]);
+    const p3 = vec3.fromValues(positions[8], positions[9], positions[10]);
   
-  vec3.sub(p1, p2, p1);
-  vec3.sub(p2, p3, p1);
-  vec3.cross(p3, p1, p2);
+    vec3.sub(p1, p2, p1);
+    vec3.sub(p2, p3, p1);
+    vec3.cross(p3, p1, p2);
 
-  const nx = Math.abs(p3[0]);
-  const ny = Math.abs(p3[1]);
-  const nz = Math.abs(p3[2]);
+    const nx = Math.abs(p3[0]);
+    const ny = Math.abs(p3[1]);
+    const nz = Math.abs(p3[2]);
 
-  const max = Math.max(nx, ny, nz);
+    const max = Math.max(nx, ny, nz);
+    if (max === ny) axis = 1;
+    else if (max === nx) axis = 2;
+  }
+  else if (dims <= 1) {
+    throw new Error("Cannot triangulate 1D data");
+  }
+
   const holes: number[] = [];
 
   let baseChunk = 0;
@@ -662,18 +713,18 @@ export const generateConcaveIndices2 = (
     holes.pop();
 
     let o = 0;
-    if (max === nz) {
-      const n4 = n * 4;
-      for (let i = 0; i < n4; i += 4) {
+    if (axis === 0) {
+      const nd = n * dims;
+      for (let i = 0; i < nd; i += dims) {
         let f = baseVertex + i;
         scratch[o]     = positions[f];
         scratch[o + 1] = positions[f + 1];
         o += 2;
       }
     }
-    else if (max === ny) {
-      const n4 = n * 4;
-      for (let i = 0; i < n4; i += 4) {
+    else if (axis === 1) {
+      const nd = n * dims;
+      for (let i = 0; i < nd; i += dims) {
         let f = baseVertex + i;
         scratch[o]     = positions[f + 2];
         scratch[o + 1] = positions[f];
@@ -681,8 +732,8 @@ export const generateConcaveIndices2 = (
       }
     }
     else {
-      const n4 = n * 4;
-      for (let i = 0; i < n4; i += 4) {
+      const nd = n * dims;
+      for (let i = 0; i < nd; i += dims) {
         let f = baseVertex + i;
         scratch[o]     = positions[f + 1];
         scratch[o + 1] = positions[f + 2];

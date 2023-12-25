@@ -110,10 +110,11 @@ const Aggregate: LiveFunction<any> = (
   layerAggregator: LayerAggregator,
   items: LayerAggregate[],
 ) => {
+  const [item] = items;
+  const {transform, flags} = item;
   const {schema, component} = layerAggregator;
 
-  const {count, sources, item, uploadRefs} = useAggregator(schema, items);
-  const {transform, flags} = item;
+  const {count, sources, uploadRefs} = useAggregator(schema, items);
 
   return useMemo(() => {
     const {matrices, normalMatrices, ...rest} = sources;

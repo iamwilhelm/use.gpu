@@ -83,8 +83,8 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
   const context = useTransformContext();
   const {transform, nonlinear, matrix: refs} = context;
 
-  const archetype = schemaToArchetype(ARROW_SCHEMA, parsed, flags, refs);
   const attributes = schemaToEmitters(ARROW_SCHEMA, parsed);
+  const archetype = schemaToArchetype(ARROW_SCHEMA, attributes, flags, refs);
 
   console.log({count, attributes});
   if (!count || Number.isNaN(count)) debugger;

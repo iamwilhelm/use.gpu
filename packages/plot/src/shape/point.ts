@@ -68,8 +68,8 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
   const context = useTransformContext();
   const {transform, nonlinear, matrix: refs} = context;
 
-  const archetype = schemaToArchetype(POINT_SCHEMA, parsed, flags, refs);
   const attributes = schemaToAttributes(POINT_SCHEMA, parsed);
+  const archetype = schemaToArchetype(POINT_SCHEMA, attributes, flags, refs);
 
   const count = positions ? (attributes.positions?.length / 4) || 0 : 1;
   console.log({count, attributes});

@@ -5,6 +5,7 @@ import { GLTF, GLTFNodeData } from './types';
 import { use, gather, memo, useMemo, useOne } from '@use-gpu/live';
 import { GLTFNode } from './gltf-node';
 import { useMatrixContext } from '@use-gpu/workbench';
+import { seq, toArray } from '@use-gpu/core';
 
 export type GLTFModelProps = {
   gltf: GLTF,
@@ -15,9 +16,6 @@ export type GLTFModelProps = {
 };
 
 const NO_ROOTS: number[] = [];
-
-const toArray = <T>(t?: T | T[] | null) => Array.isArray(t) ? t : t != null ? [t] : [];
-const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
 export const GLTFModel: LC<GLTFModelProps> = memo((props: GLTFModelProps) => {
   const {

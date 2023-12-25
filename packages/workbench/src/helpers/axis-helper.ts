@@ -45,10 +45,7 @@ export const AxisHelper: LiveComponent<AxisHelperProps> = memo((props: AxisHelpe
   const positions = useRawSource(vertices, 'vec4<f32>');
   const colors    = useRawSource(COLORS, 'vec4<f32>');
 
-  return use(ArrowSegments, {
-    chunks: CHUNKS,
-    ends: ENDS,
-    render: (segments: StorageSource, anchors: StorageSource, trims: StorageSource) => 
-      use(ArrowLayer, {positions, colors, width, depth, segments, anchors, trims})
-  });
+  const {segments, anchors, trims} = useArrowSegmentsSource(CHUNKS, null, null, ENDS);
+
+  return use(ArrowLayer, {positions, colors, width, depth, segments, anchors, trims});
 }, 'AxisHelper');

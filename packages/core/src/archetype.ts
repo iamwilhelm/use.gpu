@@ -1,6 +1,7 @@
 import type { AggregateBuffer, ArchetypeSchema, ArchetypeField, UniformType } from './types';
 import type { VectorEmitter, VectorRefEmitter } from './data2';
 import { toMurmur53, scrambleBits53, mixBits53 } from '@use-gpu/state';
+import { isTypedArray } from './buffer';
 import {
   makeAggregateBuffer,
   makeMultiAggregateBuffer,
@@ -13,9 +14,6 @@ import {
   uploadStorage,
 } from './aggregate';
 import {
-  getUniformDims2,
-  isArrayUniform2,
-  toArrayElementType2,
   spreadNumberArray2,
   makeCopyEmitter2,
   makeSpreadEmitter2,
@@ -24,7 +22,10 @@ import {
   makeUnweldEmitter2,
 } from './data2';
 import {
-  getUniformAttributeAlign
+  getUniformAlign,
+  getUniformDims,
+  isUniformArrayType,
+  getUniformElementType,
 } from './uniform';
 
 type Item = Record<string, any>;
@@ -38,31 +39,6 @@ export const formatToArchetype = (
   const tokens = [];
   for (const k in formats) tokens.push(k, formats[k]);
   tokens.push(flags);
-
-  return toMurmur53(tokens);
-};
-
-export const schemaToArchetype = (
-  schema: ArchetypeSchema,
-  props: Record<string, any>,
-  flags: Record<string, any>,
-  refs?: Record<string, any>,
-) => {
-  const tokens = [];
-  for (const key in schema) {
-    const {format, spread} = schema[key];
-    const values = props[key];
-
-    if (values != null) {
-      // Providing an array to a non-array attribute triggers spread
-      const dims = getUniformDims2(format);
-      const isSpread = spread && !isArrayUniform2(format) && values.length > dims;
-
-      tokens.push(isSpread ? spread : key, format);
-    }
-  }
-  tokens.push(flags);
-  if (refs) for (const key in refs) tokens.push(key);
 
   return toMurmur53(tokens);
 };
@@ -86,7 +62,7 @@ export const schemaToAttributes = (
 
 export const schemaToEmitters = (
   schema: ArchetypeSchema,
-  props: Record<string, any>,
+  props: Record<string, number | TypedArray>,
   refs?: Record<string, RefObject<any>>,
 ): Record<string, TypedArray | VectorEmitter> => {
   const attributes: Record<string, any> = {};
@@ -107,8 +83,8 @@ export const schemaToEmitters = (
 
     const values = props[key];
     if (values != null) {
-      const dims = getUniformDims2(format);
-      const isArray = isArrayUniform2(format);
+      const dims = getUniformDims(format);
+      const isArray = isUniformArrayType(format);
 
       if (isArray) {
         if (!(unwelded || index) && unwelds) {
@@ -133,6 +109,31 @@ export const schemaToEmitters = (
     }
   }
   return attributes;
+};
+
+export const schemaToArchetype = (
+  schema: ArchetypeSchema,
+  attributes: Record<string, TypedArray | VectorEmitter>,
+  flags: Record<string, any>,
+  refs?: Record<string, any>,
+) => {
+  const tokens = [];
+  for (const key in schema) {
+    const {format, spread} = schema[key];
+    const values = attributes[key];
+
+    if (values != null) {
+      // Providing an array to a non-array attribute triggers spread
+      const dims = getUniformDims(format);
+      const isSpread = spread && !isUniformArrayType(format) && values.length > dims;
+
+      tokens.push(isSpread ? spread : key, format);
+    }
+  }
+  tokens.push(flags);
+  if (refs) for (const key in refs) tokens.push(key);
+
+  return toMurmur53(tokens);
 };
 
 export const schemaToAggregate = (
@@ -161,7 +162,7 @@ export const schemaToAggregate = (
     const hasRef = ref && refs && refs[key] != null;
 
     if (hasValues || hasRef) {
-      const isArray = isArrayUniform2(format);
+      const isArray = isUniformArrayType(format);
 
       // Allocation size per spread type
       const alloc = (
@@ -172,7 +173,7 @@ export const schemaToAggregate = (
       const attr = [key, alloc];
 
       // Separate emulated types like u8/u16
-      const align = getUniformAttributeAlign(format);
+      const align = getUniformAlign(format);
       const separate = !hasRef && (align === 0);
 
       if (hasRef) {
@@ -207,7 +208,7 @@ export const schemaToAggregate = (
   // Build stand-alone attribute
   const buildOne = (k: string, alloc: number) => {
     const {format, name} = schema[k];
-    const f = toArrayElementType2(format) as UniformType;
+    const f = getUniformElementType(format) as UniformType;
     const n = name ?? k;
     const ab = aggregateBuffers[n] = makeAggregateBuffer(device, f, alloc);
 
@@ -225,10 +226,10 @@ export const schemaToAggregate = (
     else {
       // Sort by descending alignment
       const uniforms = keys.map(k => ({
-        format: toArrayElementType2(schema[k].format) as UniformType,
+        format: getUniformElementType(schema[k].format) as UniformType,
         name: schema[k].name ?? k,
       }));
-      uniforms.sort((a, b) => getUniformAttributeAlign(b.format) - getUniformAttributeAlign(a.format));
+      uniforms.sort((a, b) => getUniformAlign(b.format) - getUniformAlign(a.format));
 
       // Make multi-aggregate
       const aggregateBuffer = makeMultiAggregateBuffer(device, uniforms, alloc, keys);

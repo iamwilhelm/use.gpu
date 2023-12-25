@@ -44,7 +44,7 @@ import {
   parsePointShape,
 } from '@use-gpu/parse';
 import { generateChunkSegments2 } from '@use-gpu/core';
-import { useArrowSegments, useFaceSegments, useNoFaceSegments, useLineSegments, useConcaveFaceSegments, useNoConcaveFaceSegments } from '@use-gpu/workbench';
+import { useArrowSegments, useFaceSegments, useNoFaceSegments, useLineSegments, useFaceSegmentsConcave, useNoFaceSegmentsConcave } from '@use-gpu/workbench';
 
 import { vec4 } from 'gl-matrix';
 
@@ -422,7 +422,9 @@ export const LineSegmentsTrait = combine(
     const {chunks, loop, loops} = parsed;
     if (!chunks) return;
 
-    const line = useLineSegments(chunks, loop || loops);
+    const l = loop || loops;
+
+    const line = useMemo(() => getLineSegments(chunks, l), [chunks, l]);
     for (const k in line) parsed[k] = line[k];
   },
 );
@@ -453,7 +455,11 @@ export const ArrowSegmentsTrait = combine(
     const {chunks, loop, loops, start, starts, end, ends} = parsed;
     if (!chunks) return;
 
-    const arrow = useArrowSegments(chunks, loop || loops, start || starts, end || ends);
+    const l = loop || loops;
+    const s = start || starts;
+    const e = end || ends;
+
+    const arrow = useMemo(() => getArrowSegments(chunks, l, s, e), [chunks, l, s, e]);
     for (const k in arrow) parsed[k] = arrow[k];
   },
 );
@@ -480,16 +486,12 @@ export const FaceSegmentsTrait = combine(
     const {chunks, groups, concave, position, positions} = parsed;
     if (!chunks) return;
 
-    if (concave) {
-      const face = useConcaveFaceSegments(position ?? positions, chunks, groups);
+    if (concave && (position || positions)) {
+      const face = useProp(position ?? positions, (v) => getFaceSegmentsConcave(v, chunks, groups));
       for (const k in face) parsed[k] = face[k];
-
-      useNoFaceSegments();
     }
     else {
-      useNoConcaveFaceSegments();
-
-      const face = useFaceSegments(chunks);
+      const face = useProp(chunks, () => getFaceSegments({chunks}));
       for (const k in face) parsed[k] = face[k];
     }
   },

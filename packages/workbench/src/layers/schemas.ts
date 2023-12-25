@@ -1,5 +1,5 @@
 import type { ArchetypeSchema } from '@use-gpu/core';
-import { isArrayUniform2 } from '@use-gpu/core';
+import { isUniformArrayType } from '@use-gpu/core';
 
 type CompactSchema = {
   single?: string,     // singular prop
@@ -15,7 +15,8 @@ type CompactSchema = {
 const expandArrays = (schema: Record<string, CompactSchema>): ArchetypeSchema => {
   const out: ArchetypeSchema = {};
   for (const k in schema) {
-    const {format, single, ref, composite, ...rest} = schema[k];
+    const {format, single, ref, ...rest} = schema[k];
+    const composite = isUniformArrayType(format);
     const array = `array<${format}>`;
 
     if (ref) {
@@ -25,7 +26,7 @@ const expandArrays = (schema: Record<string, CompactSchema>): ArchetypeSchema =>
 
     out[k] = { format: array, ...rest };
     if (single) {
-      if (composite) out[single] = { ...out[k], name: k };
+      if (composite) out[single] = { format, name: k };
       else out[single] = { format, name: k, spread: k, ...rest };
     }
   }
@@ -62,7 +63,7 @@ export const LINE_SCHEMA = {
   ...SHAPE_SCHEMA,
   ...MATRIX_SCHEMA,
   ...expandArrays({
-    positions: {format: 'vec4<f32>', single: 'position', composite: true},
+    positions: {format: 'array<vec4<f32>>', single: 'position'},
     widths:    {format: 'f32', single: 'width'},
 
     segments:  {format: 'i8', unwelded: true},
@@ -73,7 +74,7 @@ export const ARROW_SCHEMA = {
   ...SHAPE_SCHEMA,
   ...MATRIX_SCHEMA,
   ...expandArrays({
-    positions: {format: 'vec4<f32>', single: 'position', composite: true},
+    positions: {format: 'array<vec4<f32>>', single: 'position'},
     widths:    {format: 'f32', single: 'width'},
     sizes:     {format: 'f32', single: 'size'},
 
@@ -87,8 +88,14 @@ export const FACE_SCHEMA = {
   ...SHAPE_SCHEMA,
   ...MATRIX_SCHEMA,
   ...expandArrays({
-    positions: {format: 'vec4<f32>', single: 'position', composite: true},
+    positions: {format: 'array<vec4<f32>>', single: 'position'},
     indices:   {format: 'u32', index: true},
     segments:  {format: 'i8', unwelded: true},
   }),
+};
+
+export const SEGMENT_SCHEMA = {
+  segments:  {format: 'i8', unwelded: true},
+  anchors:   {format: 'vec4<u32>', unwelded: true},
+  trims:     {format: 'vec4<u32>', unwelded: true},
 };

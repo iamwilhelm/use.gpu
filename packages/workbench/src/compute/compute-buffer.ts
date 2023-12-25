@@ -1,7 +1,7 @@
 import type { LiveFiber, LiveComponent, LiveElement, Task, PropsWithChildren } from '@use-gpu/live';
 import type { StorageSource, StorageTarget, UniformType } from '@use-gpu/core';
 
-import { getDataArrayByteLength, makeDataBuffer } from '@use-gpu/core';
+import { seq, getDataArrayByteLength, makeDataBuffer } from '@use-gpu/core';
 import { use, wrap, provide, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
@@ -10,8 +10,6 @@ import { ComputeContext } from '../providers/compute-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
 const NOP = () => {};
-
-const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
 export type ComputeBufferProps = {
   width?: number,

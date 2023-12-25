@@ -16,9 +16,8 @@ import {
   makeDepthStencilState,
   makeDepthStencilAttachment,
   BLEND_PREMULTIPLY,
+  seq,
 } from '@use-gpu/core';
-
-const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
 const NO_SAMPLER: Partial<GPUSamplerDescriptor> = {};
 

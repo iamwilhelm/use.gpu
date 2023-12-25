@@ -65,7 +65,7 @@ export const makeSwizzle = (
 ) => {
   const sz = (swizzle == null) ? makeAutoSwizzle(from, to) : swizzle;
 
-  const isFloat = !!from.match(/(^|<)f/);
+  const isFloat = !!from.match(/(^|<)f|(^|<)vec[0-9][fh]/);
   const isScalar = !from.match(/(vec[0-9]|mat[0-9]x[0-9])</);
 
   if (!isScalar && typeof sz === 'string' && sz.match(/^[xyzw]+$/)) {

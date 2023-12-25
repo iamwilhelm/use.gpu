@@ -2,6 +2,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { DataField, Emit, Time } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
+import { seq } from '@use-gpu/core';
 import { vec3 } from 'gl-matrix';
 
 import {
@@ -21,8 +22,6 @@ const lineDataFields = [
 ] as DataField[];
 
 // Generate a line voxel grid 
-
-const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 // Take random +/- X/Y/Z steps
 const vecSteps = [

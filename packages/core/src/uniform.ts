@@ -8,7 +8,7 @@ import type {
   TextureSource,
   Lazy,
 } from './types';
-import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
+import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS, UNIFORM_ARRAY_DIMS } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 
 import { getObjectKey, toMurmur53, mixBits53 } from '@use-gpu/state';
@@ -20,9 +20,18 @@ import { resolve } from './lazy';
 
 const NO_BINDINGS = {} as any;
 
-export const getUniformArrayDims = (format: UniformType): number => UNIFORM_ARRAY_DIMS[format];
-export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
-export const getUniformAttributeAlign = (format: UniformType): number => UNIFORM_ATTRIBUTE_ALIGNS[format];
+export const isUniformVecType = (type: string) => !!type.match(/^(vec[0-9])+/);
+export const isUniformArrayType = (type: string) => !!type.match(/^array</);
+
+export const getUniformArrayDepth = (type: string) => (type.match(/^(array<)+/)?.[0]?.length || 0) / 6;
+export const getUniformElementType = (type: string) =>
+  isUniformArrayType(type)
+  ? getUniformElementType(type.replace(/^array<(.*)>$/, '$1'))
+  : type;
+
+export const getUniformDims = (format: UniformType): number => UNIFORM_ARRAY_DIMS[format];
+export const getUniformSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
+export const getUniformAlign = (format: UniformType): number => UNIFORM_ATTRIBUTE_ALIGNS[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
 
 export const makeGlobalUniforms = (
@@ -309,7 +318,7 @@ export const makePackedLayout = (
   for (const {name, format} of uniforms) {
     if (typeof format === 'object') throw new Error(`Struct cannot be used as uniform member types`);
 
-    const s = getUniformAttributeSize(format);
+    const s = getUniformSize(format);
     const o = alignSizeTo(offset, align);
     out.push({name, offset: o, format});
 
@@ -331,8 +340,8 @@ export const makeUniformLayout = (
   for (const {name, format} of uniforms) {
     if (typeof format === 'object') throw new Error(`Struct cannot be used as uniform member types`);
 
-    const s = getUniformAttributeSize(format);
-    const a = getUniformAttributeAlign(format);
+    const s = getUniformSize(format);
+    const a = getUniformAlign(format);
     if (a === 0) throw new Error(`Type ${format} is not host-shareable or unimplemented`);
 
     const o = alignSizeTo(offset, a);

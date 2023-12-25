@@ -73,8 +73,8 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
 
   console.log('line', {parsed, flags, refs});
 
-  const archetype = schemaToArchetype(LINE_SCHEMA, parsed, flags, refs);
   const attributes = schemaToEmitters(LINE_SCHEMA, parsed);
+  const archetype = schemaToArchetype(LINE_SCHEMA, attributes, flags, refs);
 
   console.log({count, attributes});
   if (!count || Number.isNaN(count)) debugger;

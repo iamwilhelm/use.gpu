@@ -74,12 +74,21 @@ export const VERTEX_TO_UNIFORM = {
   "sint32x4": "vec4<i32>",
 };
 
+const shorthands = <A, B>(sizes: Record<A, B>): Record<A, B> => {
+  for (const k of Object.keys(sizes)) {
+    let match;
+    if (match = k.match(/^vec([0-9])<([iuf])32>$/)) sizes[`vec${match[1]}${match[2]}`] = sizes[k];
+    if (match = k.match(/^vec([0-9])<f16>$/)) sizes[`vec${match[1]}h`] = sizes[k];
+  }
+  return sizes;
+};
+
 const arrayify = <A, B>(sizes: Record<A, B>): Record<A, B> => {
   for (const k of Object.keys(sizes)) (sizes as any)[`array<${k}>` as any] = sizes[k];
   return sizes;
 };
 
-export const UNIFORM_ATTRIBUTE_SIZES = arrayify({
+export const UNIFORM_ATTRIBUTE_SIZES = arrayify(shorthands({
   "bool":         1,
   "vec2<bool>":   2,
   "vec3<bool>":   3,
@@ -188,9 +197,9 @@ export const UNIFORM_ATTRIBUTE_SIZES = arrayify({
   "vec3to4<u32>": 12,
   "vec3to4<i32>": 12,
   "vec3to4<f32>": 12,
-} as Record<UniformType, number>);
+})) as Record<UniformType, number>;
 
-export const UNIFORM_ATTRIBUTE_ALIGNS = arrayify({
+export const UNIFORM_ATTRIBUTE_ALIGNS = arrayify(shorthands({
   ...UNIFORM_ATTRIBUTE_SIZES,
 
   "bool":         0, // Not host-shareable
@@ -285,9 +294,9 @@ export const UNIFORM_ATTRIBUTE_ALIGNS = arrayify({
   "vec3to4<u32>": 0,
   "vec3to4<i32>": 0,
   "vec3to4<f32>": 0,
-} as Record<UniformType, number>);
+})) as Record<UniformType, number>;
 
-export const UNIFORM_ARRAY_DIMS = arrayify({
+export const UNIFORM_ARRAY_DIMS = arrayify(shorthands({
   "bool":         1,
   "vec2<bool>":   2,
   "vec3<bool>":   3.5,
@@ -396,9 +405,9 @@ export const UNIFORM_ARRAY_DIMS = arrayify({
   "vec3to4<u32>": 3,
   "vec3to4<i32>": 3,
   "vec3to4<f32>": 3,
-} as Record<UniformType, number>);
+})) as Record<UniformType, number>;
 
-export const UNIFORM_ARRAY_TYPES = arrayify({
+export const UNIFORM_ARRAY_TYPES = arrayify(shorthands({
   "bool":         Uint32Array,
   "vec2<bool>":   Uint32Array,
   "vec3<bool>":   Uint32Array,
@@ -507,7 +516,7 @@ export const UNIFORM_ARRAY_TYPES = arrayify({
   "vec3to4<u32>": Uint32Array,
   "vec3to4<i32>": Int32Array,
   "vec3to4<f32>": Float32Array,
-} as Record<UniformType, TypedArrayConstructor>);
+})) as Record<UniformType, TypedArrayConstructor>;
 
 export const TEXTURE_FORMAT_SIZES = {
   // 8-bit formats

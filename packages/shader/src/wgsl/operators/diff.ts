@@ -21,7 +21,7 @@ export const makeDiffAccessor = (
   type: string,
   offsets: (number | string | null)[],
 ) => {
-  const isFloat = (type: string) => !!type.match(/(^|<)f/);
+  const isFloat = !!from.match(/(^|<)f|(^|<)vec[0-9][fh]/);
   const toSigned = (type: string) => type.replace('u', 'i');
 
   const symbols = args.map((t, i) => `${arg(i)}`);

@@ -4,6 +4,8 @@ export const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.
 export const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 export const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
+export const toArray = <T>(t?: T | T[] | null) => Array.isArray(t) ? t : t != null ? [t] : [];
+
 export const makeTuples = <N extends number, T = number>(array: TypedArray | T[], dims: N): Tuples<N, T> => {
   const n = array.length / dims;
   const t: T[] = [];

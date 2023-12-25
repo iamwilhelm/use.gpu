@@ -7,6 +7,7 @@ import {
   makeDataArray, copyNumberArray, emitIntoNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
   getBoundingBox, toDataBounds,
+  seq,
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -18,8 +19,6 @@ import { getShader } from '../hooks/useShader';
 
 import { chainTo } from '@use-gpu/shader/wgsl';
 import { getIndex } from '@use-gpu/wgsl/instance/interleave.wgsl';
-
-const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
 export type RawDataProps = {
   /** Set/override input length */

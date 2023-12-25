@@ -1,4 +1,5 @@
 import type { DomainOptions } from '../types';
+import { seq } from '@use-gpu/core';
 
 // Generate equally spaced ticks in a range at sensible positions.
 //
@@ -11,8 +12,6 @@ import type { DomainOptions } from '../types';
 // @param end - Whether to include a tick at the end
 // @param zero - Whether to include zero as a tick
 // @param nice - Whether to round to a more reasonable interval
-
-const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 export const linear = (
   min: number,

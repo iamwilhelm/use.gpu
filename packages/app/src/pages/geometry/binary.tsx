@@ -1,12 +1,12 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { DataField, StorageSource } from '@use-gpu/core';
+import type { DataSchema, StorageSource } from '@use-gpu/core';
 
 import React, { Gather, yeet, use, useMemo } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 import { clamp } from '@use-gpu/core';
 
 import {
-  Loop, Pass, FlatCamera, ArrayData, Data, DataShader, RawData,
+  Loop, Pass, FlatCamera, ArrayData, Data2, DataShader, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor, Fetch,
   PointLayer,
@@ -93,10 +93,16 @@ const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
     level,
     range: [min, max],
     count: bins,
-    fields: [
-      ['vec4<u8>', positions],
-      ['u32', counts],
-    ] as DataField[],
+    values: {
+      schema: {
+        positions: {format: 'array<vec4<u8>>'},
+        counts: {format: 'array<u32>'},
+      } as DataSchema,
+      data: {
+        positions,
+        counts,
+      },
+    },
   };
 };
 
@@ -175,9 +181,9 @@ export const GeometryBinaryPage: LC = () => {
         const data = useMemo(() => buffer ? arrayBufferToXYZ(buffer) : null, [buffer]);
 
         const viz = useMemo(() => data ? (
-          <Data
-            fields={data.fields}
-            render={(positions, counts) => (
+          <Data2
+            {...data.values}
+            render={({positions, counts}) => (
               <Gather
                 children={[
                   <DataShader

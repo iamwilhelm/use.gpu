@@ -3,7 +3,7 @@ import type { AggregateValue } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../providers/device-provider';
-import { useMemo } from '@use-gpu/live';
+import { useMemo, useOne } from '@use-gpu/live';
 import {
   schemaToAggregate,
   updateAggregateFromSchema,
@@ -22,7 +22,7 @@ export const useAggregator = (
   items: Record<string, AggregateValue>[],
 ) => {
   const device = useDeviceContext();
-  const {archetype, count, indexed, offsets} = getAggregateSummary(items);
+  const {archetype, count, indexed, offsets} = useOne(() => getAggregateSummary(items), items);
 
   const allocItems = useBufferedSize(items.length);
   const allocVertices = useBufferedSize(count);
@@ -33,7 +33,7 @@ export const useAggregator = (
     [archetype, allocItems, allocVertices, allocIndices]
   );
 
-  return aggregate(items, count, indexed, offsets);
+  return useOne(() => aggregate(items, count, indexed, offsets), items);
 };
 
 export const makeAggregator = (
@@ -69,11 +69,10 @@ export const makeAggregator = (
   } : null;
 
   return (items: ArrowAggregate[], count: number, indexed: number, offsets: number[]) => {
-    const [item] = items;
     itemCount = items.length;
 
     updateAggregateFromSchema(device, schema, aggregate, items, count, indexed, offsets);
 
-    return {count: indexed, sources, item, uploadRefs};
+    return {count: indexed, sources, uploadRefs};
   };
 };

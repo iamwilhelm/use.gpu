@@ -2,6 +2,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { DataField } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
+import { seq } from '@use-gpu/core';
 
 import { PickingOverlay } from '../../ui/picking-overlay';
 import earcut from 'earcut';
@@ -35,8 +36,6 @@ const lineDataFields = [
 ] as DataField[];
 
 // Generate some random polygons
-
-const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 const randomColor = () => [Math.random(), Math.random(), Math.random()];
 const randomInt = (min: number, max: number) => min + Math.round(Math.random() * (max - min));

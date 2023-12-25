@@ -72,8 +72,8 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
   const context = useTransformContext();
   const {transform, nonlinear, matrix: refs} = context;
 
-  const archetype = schemaToArchetype(FACE_SCHEMA, parsed, flags, refs);
   const attributes = schemaToEmitters(FACE_SCHEMA, parsed);
+  const archetype = schemaToArchetype(FACE_SCHEMA, attributes, flags, refs);
 
   console.log({count, attributes});
   if (!count || Number.isNaN(count)) debugger;

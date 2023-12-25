@@ -51,11 +51,7 @@ export const VectorHelper: LC<VectorHelperProps> = memo((props: VectorHelperProp
   }, [position, tangent, length]);
 
   const positions = useRawSource(ps, 'vec4<f32>');
+  const {segments, anchors, trims} = useArrowSegmentsSource(CHUNKS, null, null, ENDS);
 
-  return use(ArrowSegments, {
-    chunks: CHUNKS,
-    ends: ENDS,
-    render: (segments: StorageSource, anchors: StorageSource, trims: StorageSource) => 
-      use(ArrowLayer, { positions, segments, anchors, trims, color, width })
-  });
+  return use(ArrowLayer, { positions, segments, anchors, trims, color, width });
 }, 'VectorHelper');

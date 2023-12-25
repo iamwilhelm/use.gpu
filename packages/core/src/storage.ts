@@ -94,14 +94,20 @@ export const checkStorageType = (
     f = f.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, '');
     t = t.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, ''); 
 
+    // Shorthand
+    if (f.match(/^uif$/)) f += '32';
+    if (f.match(/^h$/))   f = 'f16';
+    if (t.match(/^uif$/)) t += '32';
+    if (t.match(/^h$/))   t = 'f16';
+
     if (f !== t) {
       // Remove bit size to allow for automatic widening/narrowing
       const fromScalar = f.replace(/([uif])([0-9]+)/, '$1__');
       const toScalar   = t.replace(/([uif])([0-9]+)/, '$1__');
 
       if (fromScalar !== toScalar) {
-        // uppercase = struct type, allow any (u)int
-        if (fromName.match(/[A-Z]/) && toName.match(/^[ui]/)) return;
+        // uppercase = struct type, allow any
+        if (fromName.match(/[A-Z]/) && toName) return;
 
         console.warn(`Invalid format ${to} bound for ${from} "${name}" (${fromScalar} != ${toScalar})`);
       }

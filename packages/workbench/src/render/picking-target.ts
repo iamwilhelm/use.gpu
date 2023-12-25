@@ -23,9 +23,8 @@ import {
   makeTextureReadbackBuffer,
   TEXTURE_ARRAY_TYPES,
   TEXTURE_FORMAT_SIZES,
+  seq,
 } from '@use-gpu/core';
-
-const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 type OnPick = (index: number) => void;
 

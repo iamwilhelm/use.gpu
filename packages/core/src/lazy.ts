@@ -28,15 +28,17 @@ export const lazy = <T extends object>(target: T, overrideRef: Lazy<Record<strin
   }) as T;
 };
 
-export const pick = <A, B>(
-  items: A[],
-  accessor: (a: A) => B,
+export const pick = <T>(
+  count: number,
+  accessor: (a: number) => T,
+  skip: number = 0,
 ) => {
-  return proxy(items, {
-    get: (target, prop) => {
-      if (typeof prop === 'number') return accessor(items[i]);
-      return target[prop];
-    },
+  return new Proxy([], {
+    get: (target, s) => {
+      if (typeof s === 'number') return accessor(i + skip);
+      if (s === 'length') return count;
+      return target[s];
+    }
   });
 };
 

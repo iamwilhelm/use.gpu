@@ -330,20 +330,19 @@ export interface Emitter<T = Time> {
 */
 
 export type Emit = (...args: number[]) => void;
-export type Accessor = (o: any) => any;
+export type Accessor = (i: number) => any;
 export type Time = {
   timestamp: number,
   elapsed: number,
   delta: number,
 };
 
-export type AccessorSpec = string | Accessor | TypedArray | number[];
-export type AccessorType = 'index' | 'unwelded';
+export type AccessorSpec = string | Accessor;
 
 export type DataSchema = Record<string, DataField>;
 export type DataField = {
   format: string,
-  accessor: AccessorSpec,
+  prop?: string,
   spread?: string,
   ref?: boolean,
   index?: boolean,

@@ -1,4 +1,4 @@
-const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
+import { seq } from '@use-gpu/core';
 
 const randomColor = () => [Math.random(), Math.random(), Math.random(), 1];
 

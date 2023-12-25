@@ -3,6 +3,7 @@ import type { StorageSource, TextureSource, UniformType } from '@use-gpu/core';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
+import { seq } from '@use-gpu/core';
 
 import {
   Loop, Pass, FlatCamera, Animate, LinearRGB,
@@ -32,8 +33,6 @@ const SHADOW_MAP_POINT = {
   bias: [1/128, 1/64, 1/16],
   blur: 4,
 };
-
-const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 const sampler = {
   addressModeU: 'repeat',

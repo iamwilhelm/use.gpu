@@ -25,6 +25,7 @@ export * from './layer/surface';
 export * from './view/cartesian';
 export * from './view/embedded';
 export * from './view/polar';
+export * from './view/scissor';
 export * from './view/spherical';
 export * from './view/stereographic';
 export * from './view/transform';

@@ -7,4 +7,3 @@ export const RangeContext = makeContext<RangeContextProps>(DEFAULT_RANGE, 'Range
 
 export const useRangeContext = () => useContext<RangeContextProps>(RangeContext);
 export const useNoRangeContext = () => useNoContext(RangeContext);
-

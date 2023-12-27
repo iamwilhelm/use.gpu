@@ -10,7 +10,7 @@ import {
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Axis, Grid, Label, Line, RangeSampler, Scale, Surface, Tick, Transpose,
+  Plot, Cartesian, Axis, Grid, Label, Line, RangeSampler, Scale, Scissor, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
@@ -122,33 +122,37 @@ export const PlotCartesianPage: LC = () => {
                     depth={0.5}
                     end
                   />
-                  <RangeSampler
-                    axes='zx'
-                    format='vec4<f32>'
-                    size={[10, 20]}
-                    expr={(emit, z, x) => {
-                      const v = Math.cos(x) * Math.cos(z);
-                      emit(x, v * .4 + .5, z, 1);
-                    }}
-                  >
-                    <Surface
-                      color={[0.1, 0.3, 1, 1]}
-                    />
-                    <Line
-                      width={2}
-                      color={[0.5, 0.5, 1, 0.5]}
-                      depth={0.5}
-                      zBias={1}
-                    />
-                    <Transpose axes='yx'>
+
+                  <Scissor>
+                    <RangeSampler
+                      axes='zx'
+                      format='vec4<f32>'
+                      size={[10, 20]}
+                      origin={[0, 0, 0]}
+                      expr={(emit, z, x) => {
+                        const v = Math.cos(x) * Math.cos(z);
+                        emit(x, v * .4 + .5, z, 1);
+                      }}
+                    >
+                      <Surface
+                        color={[0.1, 0.3, 1, 1]}
+                      />
                       <Line
                         width={2}
                         color={[0.5, 0.5, 1, 0.5]}
                         depth={0.5}
                         zBias={1}
                       />
-                    </Transpose>
-                  </RangeSampler>
+                      <Transpose axes='yx'>
+                        <Line
+                          width={2}
+                          color={[0.5, 0.5, 1, 0.5]}
+                          depth={0.5}
+                          zBias={1}
+                        />
+                      </Transpose>
+                    </RangeSampler>
+                  </Scissor>
                 </Cartesian>
               </Animate>
             </Plot>

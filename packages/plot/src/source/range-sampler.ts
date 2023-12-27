@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataBounds, TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
+import type { DataBounds, TypedArray, StorageSource, VectorLike, UniformType, Emit, Emitter } from '@use-gpu/core';
 
 import { provide, yeet, signal, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
@@ -7,7 +7,8 @@ import {
   getBoundingBox, toDataBounds,
   toCPUDims, toGPUDims,
 } from '@use-gpu/core';
-import { parseAxis } from '@use-gpu/parse';
+import { parseAxis, parseVec4 } from '@use-gpu/parse';
+import { optional, useProp } from '@use-gpu/traits/live';
 import {
   useTimeContext, useNoTimeContext,
   useAnimationFrame, useNoAnimationFrame,
@@ -23,6 +24,8 @@ export type RangeSamplerProps = {
   axis?: string,
   /** Axes to sample on (2D+) */
   axes?: string,
+  /** Sample origin to maintain alignment to */
+  origin?: VectorLike,
 
   /** WGSL type per sample */
   format?: string,
@@ -73,6 +76,7 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
 
   const parentRange = props.range ? (useNoRangeContext(), props.range) : useRangeContext();
   const items = Math.max(1, Math.round(props.items) || 0);
+  const origin = useProp(props.origin, optional(parseVec4));
 
   const a = axis ?? axes;
   const range = useMemo(() => {
@@ -80,7 +84,8 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
     return basis.map(i => parentRange[i]);
   }, [parentRange, a]);
 
-  const padded = size.map(n => n + padding * 2);
+  const border = padding + +!!origin;
+  const padded = size.map(n => n + border * 2);
   const length = items * padded.reduce((a, b) => a * b, 1);
   const alloc = useBufferedSize(length);
 
@@ -101,16 +106,17 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
         const c = +!!(centered === true || (centered as any)[0]);
         let [min, max] = range[0];
         let step = (max - min) / (size[0] - 1 + c);
+        let align = origin ? (min - origin[0]) % step : 0;
         if (c) min += step / 2;
-        min -= step * padding;
+        min -= step * border + align;
 
         if (index) {
           sampled = (<T>(emit: Emit, i: number, t: T) =>
-            expr(emit, min + i * step, i - padding, t)) as any;
+            expr(emit, min + i * step, i - border, t)) as any;
         }
         else {
           sampled = (<T>(emit: Emit, i: number, t: T) =>
-            expr(emit, min + i * step, i - padding, t)) as any;
+            expr(emit, min + i * step, i - border, t)) as any;
         }
       }
       else if (n === 2) {
@@ -121,10 +127,12 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
         let [minY, maxY] = range[1];
         let stepX = (maxX - minX) / (size[0] - 1 + cx);
         let stepY = (maxY - minY) / (size[1] - 1 + cy);
+        let alignX = origin ? (minX - origin[0]) % stepX : 0;
+        let alignY = origin ? (minY - origin[1]) % stepY : 0;
         if (cx) minX += stepX / 2;
         if (cy) minY += stepY / 2;
-        minX -= stepX * padding;
-        minY -= stepY * padding;
+        minX -= stepX * border + alignX;
+        minY -= stepY * border + alignY;
 
         if (index) {
           sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
@@ -132,8 +140,8 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
               emit,
               minX + i * stepX,
               minY + j * stepY,
-              i - padding,
-              j - padding,
+              i - border,
+              j - border,
               t,
             )) as any;
         }
@@ -161,9 +169,9 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
         if (cx) minX += stepX / 2;
         if (cy) minY += stepY / 2;
         if (cz) minZ += stepZ / 2;
-        minX -= stepX * padding;
-        minY -= stepY * padding;
-        minZ -= stepZ * padding;
+        minX -= stepX * border;
+        minY -= stepY * border;
+        minZ -= stepZ * border;
 
         if (index) {
           sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
@@ -172,9 +180,9 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
               minX + i * stepX,
               minY + j * stepY,
               minZ + k * stepZ,
-              i - padding,
-              j - padding,
-              k - padding,
+              i - border,
+              j - border,
+              k - border,
               t,
             )) as any;
         }
@@ -207,10 +215,10 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
         if (cy) minY += stepY / 2;
         if (cz) minZ += stepZ / 2;
         if (cw) minW += stepW / 2;
-        minX -= stepX * padding;
-        minY -= stepY * padding;
-        minZ -= stepZ * padding;
-        minW -= stepW * padding;
+        minX -= stepX * border;
+        minY -= stepY * border;
+        minZ -= stepZ * border;
+        minW -= stepW * border;
 
         if (index) {
           sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
@@ -220,10 +228,10 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
               minY + j * stepY,
               minZ + k * stepZ,
               minW + l * stepW,
-              i - padding,
-              j - padding,
-              k - padding,
-              l - padding,
+              i - border,
+              j - border,
+              k - border,
+              l - border,
               t,
             )) as any;
         }

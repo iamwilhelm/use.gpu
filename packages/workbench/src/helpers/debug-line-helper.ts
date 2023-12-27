@@ -46,9 +46,9 @@ export const DebugLineHelper: LC<DebugLineHelperProps> = (props: DebugLineHelper
   allocatePositions(count);
   allocateColors(count);
   allocateSegments(count);
-  
+
   const device = useDeviceContext();
-  
+
   const helper = useMemo(() => {
     const swap = () => {
       clearBuffer(device, debugPositions.buffer);

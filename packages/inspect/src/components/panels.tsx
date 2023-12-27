@@ -47,17 +47,17 @@ export const StyledTab = styled('button', {
 
 export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
   const {fiber, selectFiber, fullSize, tab, onTab } = props;
-  
+
   const addIns = useAddIns();
   const {fibers} = usePingContext();
-  
+
   const {props: panels} = addIns;
   const [first] = panels;
   if (!first) return null;
 
   usePingTracker();
   const {tabs} = useAppearance();
-  
+
   const active = panels.filter((panel) => panel.enabled(fiber, fibers));
   const currentTab = active.find((panel) => panel.id === tab) ?? active[0];
   if (!currentTab) return null;

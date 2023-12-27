@@ -138,7 +138,7 @@ export const UNIFORM_ATTRIBUTE_SIZES = arrayify(arrayify(shorthands({
   "mat3x4<i32>":  48,
   "mat4x3<i32>":  64,
   "mat4x4<i32>":  64,
-  
+
   "mat2x2<f16>":  8,
   "mat3x2<f16>":  12,
   "mat2x3<f16>":  12,
@@ -235,7 +235,7 @@ export const UNIFORM_ATTRIBUTE_ALIGNS = arrayify(arrayify(shorthands({
   "mat3x4<i32>":  16,
   "mat4x3<i32>":  16,
   "mat4x4<i32>":  16,
-  
+
   "mat2x2<f16>":  4,
   "mat3x2<f16>":  4,
   "mat2x3<f16>":  8,
@@ -778,7 +778,7 @@ export const TEXTURE_SHADER_TYPES = {
   "rg16uint": 'vec2<u32>',        // u16
   "rg16sint": 'vec2<i32>',        // i16
   "rg16float": 'vec2<f32>',       // f32
-  "rgba8unorm": 'vec4<f32>', 
+  "rgba8unorm": 'vec4<f32>',
   "rgba8unorm-srgb": 'vec4<f32>',
   "rgba8snorm": 'vec4<f32>',
   "rgba8uint": 'vec4<u32>',       // u8
@@ -826,7 +826,7 @@ export const BLEND_ALPHA = {
   alpha: {
     operation: "add",
     srcFactor: "one",
-    dstFactor: "one-minus-src-alpha",      
+    dstFactor: "one-minus-src-alpha",
   },
 } as any as GPUBlendState;
 
@@ -839,7 +839,7 @@ export const BLEND_PREMULTIPLY = {
   alpha: {
     operation: "add",
     srcFactor: "one",
-    dstFactor: "one-minus-src-alpha",      
+    dstFactor: "one-minus-src-alpha",
   },
 } as any as GPUBlendState;
 
@@ -852,7 +852,7 @@ export const BLEND_ADD = {
   alpha: {
     operation: "add",
     srcFactor: "one",
-    dstFactor: "one-minus-src-alpha",      
+    dstFactor: "one-minus-src-alpha",
   },
 } as any as GPUBlendState;
 
@@ -865,7 +865,7 @@ export const BLEND_SUBTRACT = {
   alpha: {
     operation: "add",
     srcFactor: "one",
-    dstFactor: "one-minus-src-alpha",      
+    dstFactor: "one-minus-src-alpha",
   },
 } as any as GPUBlendState;
 
@@ -878,6 +878,6 @@ export const BLEND_MULTIPLY = {
   alpha: {
     operation: "add",
     srcFactor: "one",
-    dstFactor: "one-minus-src-alpha",      
+    dstFactor: "one-minus-src-alpha",
   },
 } as any as GPUBlendState;

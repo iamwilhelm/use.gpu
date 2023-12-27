@@ -53,9 +53,9 @@ export const DebugAtlasPage: LC = () => {
       </Pass>
     </LinearRGB>
   );
-  
+
   const root = document.querySelector('#use-gpu .canvas');
-  
+
   return (
     <GlyphControls
       container={root}

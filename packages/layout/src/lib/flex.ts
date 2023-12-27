@@ -110,7 +110,7 @@ export const fitFlex = (
   const flowEls = [] as LayoutElement[];
 
   const cursor = makeFlexCursor(spaceMain, alignMain, wrap);
-  
+
   for (const el of els) if (!el.absolute) {
     const {margin, sizing, prefit, grow, shrink, ratioX, ratioY} = el;
     const [ml, mt, mr, mb] = margin;
@@ -142,10 +142,10 @@ export const fitFlex = (
     cursor.push(basis!, m, gapMain, grow || 0, shrink || 0);
     flowEls.push(el);
   }
-  
+
   let caretCross = 0;
   let crossIndex = 0;
-  const maxMain = cursor.gather((flexed, start, end, gap, lead) => {    
+  const maxMain = cursor.gather((flexed, start, end, gap, lead) => {
     let caretMain = lead;
     let maxCross = 0;
 
@@ -193,7 +193,7 @@ export const fitFlex = (
 
       rowIndex[i] = crossIndex;
     }
-    
+
     caretCross += maxCross + gapCross;
     crossIndex++;
   });
@@ -229,7 +229,7 @@ export const fitFlex = (
     absolute[3] = absolute[1];
 
     const {render, pick, size: fitted} = fit(absolute);
-    
+
     if (under) {
       sizes.unshift(fitted);
       renders.unshift(render);

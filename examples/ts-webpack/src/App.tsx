@@ -40,7 +40,7 @@ export const App: LC = hot(() => {
           samples={4}
         >
           <FontLoader fonts={FONTS}>
-      
+
             {/* 2D pan controls + view */}
             <PanControls
               render={(x, y, zoom) =>
@@ -52,7 +52,7 @@ export const App: LC = hot(() => {
                     {/* 2D Layout */}
                     <UI>
                       <Layout>
-        
+
                         {/* Flex box */}
                         <Flex width="100%" height="100%" align="center">
                           <Flex width={500} height={150} fill="#3090ff" align="center" direction="y">
@@ -72,7 +72,7 @@ export const App: LC = hot(() => {
                         </Flex>
 
                       </Layout>
-                    </UI>            
+                    </UI>
 
                   </Pass>
 
@@ -80,7 +80,7 @@ export const App: LC = hot(() => {
               }
             />
 
-          </FontLoader>      
+          </FontLoader>
         </AutoCanvas>
       </WebGPU>
 

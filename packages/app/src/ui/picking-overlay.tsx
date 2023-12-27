@@ -34,7 +34,7 @@ export const PickingOverlay: LC = () => {
       return sqrt(vec4<f32>(a, c, b, 1.0));
     }
   `;
-  
+
   const size = useOne(() => () => source.size, source);
 
   const boundShader = useShader(colorizeShader, [size, source]);

@@ -16,7 +16,7 @@ import { useRenderProp } from '../hooks/useRenderProp';
 export type StructDataProps = {
   /** Set/override input length */
   length?: number,
-  
+
   /** Struct WGSL type */
   format?: ShaderModule,
 
@@ -40,11 +40,11 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
   const {
     length,
     data,
-    
+
     sparse,
     expr,
     time,
-    
+
     format,
     live,
   } = props;
@@ -59,11 +59,11 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
     const layout = makeUniformLayout(bindings.format);
     return [bindings, layout];
   }, format);
-  
+
   // Get size
   const count = (length ?? (data?.length || 0));
   const l = useBufferedSize(count);
-  
+
   const device = useDeviceContext();
 
   // Make storage buffer

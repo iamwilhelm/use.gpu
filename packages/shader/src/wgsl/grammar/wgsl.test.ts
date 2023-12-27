@@ -6,12 +6,12 @@ import { addASTSerializer } from '../../test/snapshot';
 addASTSerializer(expect);
 
 describe("WGSL grammar snapshots", () => {
-  
+
   it("parses a test program", () => {
     for (const program of PROGRAMS) {
       const parsed = parser.parse(program);
       parsed.text = program;
-      
+
       const compact = formatASTNode(parsed.topNode);
       const hasError = compact.indexOf('⚠') >= 0;
       if (hasError) {
@@ -22,7 +22,7 @@ describe("WGSL grammar snapshots", () => {
       expect(parsed).toMatchSnapshot();
     }
   });
-  
+
 });
 
 const PROGRAMS = [

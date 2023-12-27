@@ -348,7 +348,7 @@ export const getUpdateKeys = <T>(update: T): string[] => {
       keys.push(path ?? '');
     }
   }
-  
+
   recurse(update, null);
   return keys;
 }

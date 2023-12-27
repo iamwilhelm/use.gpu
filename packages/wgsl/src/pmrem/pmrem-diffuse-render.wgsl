@@ -19,7 +19,7 @@ use '@use-gpu/wgsl/codec/octahedral'::{ decodeOctahedral };
   let ray = decodeOctahedral(uv * 2.0 - 1.0);
 
   let sample = (
-    shCoefficients[0] + 
+    shCoefficients[0] +
     shCoefficients[1] * ray.y +
     shCoefficients[2] * ray.z +
     shCoefficients[3] * ray.x +

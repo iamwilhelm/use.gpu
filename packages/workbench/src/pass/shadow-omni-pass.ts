@@ -36,8 +36,8 @@ export type ShadowOmniPassProps = {
 };
 
 const NO_OPS: any[] = [];
-const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
-const τ = Math.PI * 2; 
+const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
+const τ = Math.PI * 2;
 
 const VIEW_MATRICES = [
   mat4.fromValues(
@@ -127,7 +127,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
     shadowUV,
     shadowBlur,
   } = map;
-  
+
   const {
     depth, depth: [near, far],
     size, size: [width, height],
@@ -220,7 +220,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
       drawToPass(cull, shadows, passEncoder, countGeometry, uniforms, 1, true);
 
       passEncoder.end();
-      
+
       blit(commandEncoder);
 
       const command = commandEncoder.finish();

@@ -17,7 +17,7 @@ export type AmbientLightProps = {
 };
 
 export const AmbientLight = memo((props: AmbientLightProps) => {
-  
+
   const color = useProp(props.color, parseColor, WHITE);
   const intensity = useProp(props.intensity, parseNumber, 1);
 

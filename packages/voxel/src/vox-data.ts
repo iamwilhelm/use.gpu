@@ -45,7 +45,7 @@ export const VoxData: LC<VoxDataProps> = (props) => {
 
       return s.map((shape: VoxShape) => {
         const sources: TextureSource[] = [];
-        
+
         // Voxel mips are rounded up instead of down, so handle each as a separate texture.
         let mipShape = shape;
         for (let i = 0; i < mips; ++i) {

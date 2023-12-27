@@ -74,7 +74,7 @@ export const LayoutAlignPage: LC = () => {
                     <Element width={160} height={30} fill={FILL} flex="end" />
                     <Element width={180} height={100} fill={FILL} flex="center" />
                     <Element width={120} height={50} fill={FILL} flex="start" />
-                  
+
                   </Flex>
                   <Block fill={[1, 1, 1, 0.5]} height={2} />
 
@@ -104,7 +104,7 @@ export const LayoutAlignPage: LC = () => {
                         <Inline align="center"><Text color={[1, 1, 1, 1]}>Minim veniam</Text></Inline>
                       </Block>
                     </Block>
-                    
+
                     <Block width={10} />
 
                     <Block direction='y'>
@@ -133,7 +133,7 @@ export const LayoutAlignPage: LC = () => {
                   </Block>
 
                   <Block fill={[1, 1, 1, 0.5]} height={2} />
-                
+
                   <Label>Flex / Block X / Inline</Label>
                   <Flex margin={10}>
                     <Element width={200} height={50} grow={0} fill={FILL} />
@@ -173,7 +173,7 @@ export const LayoutAlignPage: LC = () => {
   return (
     <LayoutControls
       container={root}
-      render={(mode) => 
+      render={(mode) =>
         <PanControls
           active={mode !== 'inspect'}
           render={(x, y, zoom) =>

@@ -54,7 +54,7 @@ export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
   let out = [];
 
   const prefix = '  '.repeat(depth);
-  
+
   out.push(prefix + '<' + formatNodeName(root) +' '+ formatSnapshot(root.args) + '>');
 
   if (mount) {
@@ -78,7 +78,7 @@ export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
 export const formatNodeName = <F extends Function>(_node: LiveElement<F>): string => {
   const node = reactInterop(_node) as DeferredCall<F> | null;
   if (!node) return 'null';
-  
+
   const {f, arg, args} = node;
 
   // @ts-ignore
@@ -211,7 +211,7 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
     for (const k in x) if (hasOwnProperty.call(x, k)) {
       out.push(`${k}: ${formatShortValue(x[k], seen)}`);
     }
-    
+
     const proto = x.__proto__ !== Object.prototype ? x.__proto__.constructor.name : '';
     const label = x.label;
     return proto + (label?.length ? ':' + label : '') + '{' + out.join(', ') + '}';

@@ -37,7 +37,7 @@ export const ENVIRONMENTS = {
       ],
       format: "jpg",
     }),
-  
+
   pisa:
     use(ImageCubeTexture, {
       urls: [
@@ -50,7 +50,7 @@ export const ENVIRONMENTS = {
       ],
       format: 'rgbm16',
     }),
-  
+
   road:
     use(ImageTexture, {
       url: '/textures/equi/rural_asphalt_road_1k.hdr',

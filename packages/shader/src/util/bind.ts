@@ -1,4 +1,4 @@
-import { ParsedBundle, ParsedModule, ShaderModule, ShaderDefine, DataBinding } from '../types';
+import { ParsedBundle, ParsedModule, ShaderModule, ShaderDefine, DataBinding, VirtualTable, SymbolTableT } from '../types';
 
 import { parseLinkAliases } from '../util/link';
 import { toHash, formatMurmur53, toMurmur53, scrambleBits53, mixBits53 } from '../util/hash';
@@ -70,23 +70,23 @@ export const bindBundle = (
     ...defines,
   } : defines ?? bundle.defines ?? undefined;
 
-  let rebound = new Set();
+  let rebound = new Set<ParsedModule>();
   mergeBindings(rebound, bundle);
 
   const {module: {table: {linkable}}} = bundle;
   if (links && linkable) for (const k in links) {
     if (relinks[k]) {
       throw new Error(`${getBundleName(bundle)}.${k} already linked`);
-    } else if (links[k]) {
-      const link = links[k];
-
-      // Ensure link exists in module
-      let check = k.indexOf(':') > 0 ? k.split(':')[0] : k;
-      if (!linkable[check]) continue;
-
-      mergeBindings(rebound, link);
-      relinks[k] = link;
     }
+    const link = links[k];
+    if (!link) continue;
+
+    // Ensure link exists in module
+    let check = k.indexOf(':') > 0 ? k.split(':')[0] : k;
+    if (!linkable[check]) continue;
+
+    mergeBindings(rebound, link);
+    relinks[k] = link;
   }
 
   return {
@@ -102,14 +102,16 @@ export const bindBundle = (
 
 export const bindModule = bindBundle;
 
-export const mergeBindings = (into: Set<ParsedModule>, chunk: ParsedBundle | ParsedModule) => {
+export const mergeBindings = <T extends SymbolTableT>(into: Set<ParsedModule<T>>, chunk: ParsedBundle | ParsedModule) => {
+  const c = chunk as any;
+
   // Copy bundle's sub-bindings
-  if (chunk.bound) for (const v of chunk.bound) into.add(v);
+  if (c.bound) for (const v of c.bound) into.add(v);
 
   // Gather virtual tables of modules with bindings
-  const v = chunk.module?.virtual ?? chunk.virtual;
+  const v = c.module?.virtual ?? c.virtual;
   if (v && (v.uniforms || v.storages || v.textures)) {
-    into.add(chunk.module ?? chunk);
+    into.add(c.module ?? c);
   }
 };
 
@@ -175,7 +177,7 @@ export const makeResolveBindings = (
         // May have multiple copies of the same binding source
         const v = allVirtuals.get(key);
         if (v && m.virtual !== v) m.virtual = v;
-                
+
         if (visibles.has(key)) continue;
         visibles.add(key);
 
@@ -197,14 +199,14 @@ export const makeResolveBindings = (
         allVirtuals.set(key, m.virtual);
 
         // Mutate virtual modules as they are ephemeral
-        const namespace = uniforms.length ? `${PREFIX_VIRTUAL}${++index}_` : undefined;
+        const namespace = uniforms?.length ? `${PREFIX_VIRTUAL}${++index}_` : undefined;
         if (!lazy) {
-          if (uniforms.length) m.virtual.namespace = namespace;
+          if (uniforms?.length) m.virtual.namespace = namespace;
           m.virtual.bindingBase = bindingBase;
           m.virtual.volatileBase = volatileBase;
         }
 
-        if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
+        if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace!, u));
         if (storages) for (const b of storages) addBinding(b, 1, visibility);
         if (textures) for (const b of textures) addBinding(b, 1 + +!!(b.texture!.sampler && (b.uniform!.args !== null)), visibility);
       }

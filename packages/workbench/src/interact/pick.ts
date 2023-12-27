@@ -134,7 +134,7 @@ export const Pick: LiveComponent<PickProps> = ({
   const dx = move ? moveX : 0;
   const dy = move ? moveY : 0;
 
-  if (move && countRef.current === 1) return null; 
+  if (move && countRef.current === 1) return null;
 
   return useHooks(() =>
     render ? render({id, index, hovered, pressed, presses, clicks, x: px, y: py, moveX: dx, moveY: dy}) : (children ? extend(children, {id}) : null),

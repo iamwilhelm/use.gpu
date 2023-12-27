@@ -34,7 +34,7 @@ export const getAggregateSummary = (items: AggregateItem[]) => {
     allIndexed += indexed ?? count;
     allInstanced += instanced ?? 1;
   }
-  
+
   return {archetype, count: allCount, indexed: allIndexed, instanced: allInstanced, offsets: indexOffsets};
 };
 
@@ -115,7 +115,7 @@ export const updateAggregateBuffer = (
   offsets?: number[],
 ) => {
   const {buffer, array, source, dims, base, stride} = aggregate;
-  
+
   // vec3/mat3 to vec4/mat4 extension
   // 3.5 = 3to4, 7.5 = 6to8, 11.5 = 9to12, 15.5 = 12to16
   const dimsIn = toCPUDims(dims);

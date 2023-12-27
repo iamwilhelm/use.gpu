@@ -180,7 +180,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const indexReadout     = useDerivedSource(indexStorage, READ_ONLY_SOURCE);
   const vertexReadout    = useDerivedSource(vertexStorage, READ_ONLY_SOURCE);
   const normalReadout    = useDerivedSource(normalStorage, READ_ONLY_SOURCE);
-  
+
   const boundScan = useShader(
     scanVolume,
     [
@@ -216,7 +216,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     const sx = s[0] || 1;
     const sy = s[1] || 1;
     const sz = s[2] || 1;
-    
+
     const d = sx * sy * sz;
 
     allocateEdges(d * 3);

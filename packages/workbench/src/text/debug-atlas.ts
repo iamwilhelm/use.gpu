@@ -110,12 +110,12 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
     transform,
   } = props;
 
-  const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate, debugUploads} = atlas as any;  
+  const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate, debugUploads} = atlas as any;
   const {id} = useFiber();
 
   const yeets = [];
   const pos = [] as number[];
-  
+
   const width = size;
   const height = size * h / w;
   const sx = width / w;
@@ -161,7 +161,7 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
       clip, mask, transform,
     });
   }
-  
+
   const fix = ([l, t, r, b]: Rectangle): Rectangle =>
     [Math.min(l, r), Math.min(t, b), Math.max(l, r), Math.max(t, b)];
 
@@ -205,7 +205,7 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
       clip, mask, transform,
     });
   }
-  
+
   for (const anchor of debugValidate()) {
     const {x, y, dx, dy} = anchor;
     yeets.push({
@@ -234,6 +234,6 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
       clip, mask, transform,
     });
   }
-  
+
   return yeet(yeets);
 }, 'DebugAtlasShape');

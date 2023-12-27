@@ -38,7 +38,7 @@ const makeComposeTransform = () => {
 
     if (scale != null) vec3.copy(s, scale as any);
     else vec3.set(s, 1, 1, 1);
-    
+
     mat4.fromRotationTranslationScale(transform, q, p, s);
     return transform;
   }

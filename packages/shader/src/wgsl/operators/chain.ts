@@ -17,15 +17,15 @@ export const makeChainAccessor = (
   if (type === 'void') {
     return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) {
   ${from}(${symbols.join(', ')});
-  ${to}(${tail.join(', ')});
+  ${to}(${tail?.join(', ') ?? ''});
 }
-`;   
+`;
   }
 
   return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) -> ${type} {
   return ${to}(${from}(${symbols.join(', ')})${tail?.length ? ['', ...tail].join(', ') : ''});
 }
-`;   
+`;
 }
 
 export const chainTo = makeChainTo(makeChainAccessor, bundleToAttribute);

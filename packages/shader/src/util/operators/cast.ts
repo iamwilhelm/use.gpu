@@ -1,4 +1,4 @@
-import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../../types';
+import { ParsedModule, ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../../types';
 import { loadVirtualModule } from '../shader';
 import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleHash, getBundleKey } from '../bundle';
@@ -22,14 +22,14 @@ export type MakeCastAccessor = (
   args: string[],
   from: string,
   to: string,
-  swizzle: string | CastTo,
+  swizzle: string | CastTo | null,
 ) => string;
 
 export type MakeSwizzleAccessor = (
   name: string,
   from: string,
   to: string,
-  swizzle: string | CastTo,
+  swizzle: string | CastTo | null,
 ) => string;
 
 const SWIZZLE_SYMBOLS = ['swizzle'];
@@ -86,7 +86,7 @@ export const makeCastTo = (
 ) => (
   source: ShaderModule,
   type: string,
-  swizzle: string | CastTo,
+  swizzle: string | CastTo | null = null
 ): ParsedBundle => {
   const bundle = toBundle(source);
   const {name, format, args} = bundleToAttribute(bundle);
@@ -121,7 +121,7 @@ export const makeCastTo = (
   );
 
   // Don't reuse bundle.bindings because source may be virtual
-  const rebound = new Set();
+  const rebound = new Set<ParsedModule>();
   mergeBindings(rebound, bundle);
 
   return {

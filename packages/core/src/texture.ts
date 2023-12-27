@@ -201,7 +201,7 @@ export const resizeTextureSource = (
     mipLevel,
     aspect,
   }
-  
+
   const [w, h, d] = source.size;
   const commandEncoder = device.createCommandEncoder();
   commandEncoder.copyTextureToTexture(src, dst, [w, h, d || 1]);

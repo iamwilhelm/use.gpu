@@ -12,7 +12,7 @@
     let mappedIndex = getMappedIndex(instanceIndex);
     elementIndex = mappedIndex.x;
 
-    let uniformIndex = mappedIndex.y * INSTANCE_STRIDE;
+    let uniformIndex = mappedIndex.y;
     loadInstance(uniformIndex);
   }
   else {

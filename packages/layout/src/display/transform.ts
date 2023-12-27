@@ -56,7 +56,7 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
           ),
         };
       };
-      
+
       return {
         ...item,
         fit: memoFit(fit),
@@ -100,7 +100,7 @@ const TransformLayout = (
     ) : (parentClip ?? clip) ?? null,
     [parentClip, clip],
   );
-  
+
   const xclip = useMemo(
     () => inverse ? (
       bindBundle(

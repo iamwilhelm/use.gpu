@@ -32,7 +32,7 @@ use '@use-gpu/wgsl/codec/octahedral'::{ wrapOctahedral, decodeOctahedral };
     /* {
       let uv1 = uv2 / vec2<f32>(size);
 
-      let xy = round(uv1 * 4.0) / 4.0;      
+      let xy = round(uv1 * 4.0) / 4.0;
       let ray1 = decodeOctahedral(vec2<f32>(xy * 2.0 - 1.0));
       let ray2 = decodeOctahedral(vec2<f32>(uv1 * 2.0 - 1.0));
       let ray3 = normalize(sign(ray2));

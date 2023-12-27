@@ -31,12 +31,12 @@ const SCROLLBAR = use(ScrollBar, {});
 export type OverflowProps = {
   x?: OverflowMode,
   y?: OverflowMode,
-  
+
   scrollX?: number,
   scrollY?: number,
 
   scrollBar?: LiveElement,
-  
+
   direction?: Direction,
 };
 
@@ -53,7 +53,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
 
   const x = useProp(props.x, parseOverflow);
   const y = useProp(props.y, parseOverflow);
-  
+
   const isX = isHorizontal(direction);
 
   const hasScrollX = x === 'scroll' || x === 'auto';
@@ -102,7 +102,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
       const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;
       return [outerWidth < innerWidth, outerHeight < innerHeight];
     };
-    
+
     const updateScrollRange = (layout: Rectangle, size: XY, scrollBarWidth: number, scrollBarHeight: number) => {
       const before = shouldScroll();
       const [l, t, r, b] = layout;
@@ -119,7 +119,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
 
       const [x, y] = scrollRef;
       scrollTo(x, y);
-      
+
       return (isX && before[0] !== after[0]) || (!isX && before[1] !== after[1]);
     };
 
@@ -136,7 +136,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
 
     return {clip, transform, inverse, sizeRef, scrollRef, shouldScroll, updateScrollRange, scrollTo, scrollBy};
   });
-  
+
   const {clip, transform, inverse, sizeRef, scrollRef, shouldScroll, updateScrollRange, scrollTo, scrollBy} = api;
 
   useOne(() => scrollTo(scrollX, null), scrollX);
@@ -159,29 +159,29 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
         const offsets = [] as XY[];
         const renders = [] as (LayoutRenderer[]);
         const pickers = [] as (LayoutPicker | null | undefined)[];
-          
+
         const fit = () => {
           sizes.length = 0;
           offsets.length = 0;
           renders.length = 0;
           pickers.length = 0;
-          
+
           const [shouldScrollX, shouldScrollY] = shouldScroll();
-          
+
           const padX = (shouldScrollY ? scrollBarWidth  : 0);
           const padY = (shouldScrollX ? scrollBarHeight : 0);
-          
+
           const resolved: FitInto = isX
             ? [null, into[1] != null ? into[1] - padX : null, into[2] - padX, into[3] - padY]
             : [into[0] != null ? into[0] - padX : null, null, into[2] - padX, into[3] - padY];
-          
+
           const {render, pick, size} = fitBlock(resolved);
-          
+
           sizes.push(size);
           offsets.push([ml, mt]);
           renders.push(render);
           pickers.push(pick);
-          
+
           for (const {fit} of scrollBars) {
             const {render, pick, size} = fit(into);
             sizes.push(size);
@@ -189,7 +189,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
             renders.push(render);
             pickers.push(null);
           }
-          
+
           inspect({
             layout: {
               into,
@@ -198,16 +198,16 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
               offsets,
             },
           });
-          
+
           const outer = size.slice() as XY;
           if (shouldScrollY) outer[0] += scrollBarWidth;
           if (shouldScrollX) outer[1] += scrollBarHeight;
-          
+
           return [outer, size];
         };
-        
+
         const [outer, size] = fit();
-          
+
         return {
           size: outer,
           render: memoLayout((
@@ -217,7 +217,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
             parentMask: ShaderModule | null,
             parentTransform: ShaderModule | null,
           ) => {
-          
+
             // If scrollbar must appear/disappear, re-fit.
             if (updateScrollRange(box, size, scrollBarWidth, scrollBarHeight) && (hasScrollX || hasScrollY)) {
               const [o, s] = fit();

@@ -61,7 +61,7 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
   if (zIndex && !zBias) parsed.zBias = zIndex;
 
   console.log('point', {parsed, flags});
-  
+
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 

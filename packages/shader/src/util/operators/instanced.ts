@@ -1,4 +1,4 @@
-import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../../types';
+import { ShaderModule, ParsedBundle, ParsedModule, UniformAttribute, RefFlags as RF } from '../../types';
 import { loadVirtualModule } from '../shader';
 import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleHash, getBundleKey } from '../bundle';
@@ -46,7 +46,7 @@ export const makeInstanceWith = (
 
   let hash = getBundleHash(iBundle);
   let key = getBundleKey(iBundle);
-  
+
   const symbols = [...INDEX_SYMBOLS];
   const externals = [...INDEX_EXTERNALS];
   const links: Record<string, ParsedBundle> = {[INDEX_LINK]: iBundle};
@@ -55,7 +55,7 @@ export const makeInstanceWith = (
   const arg = i.args?.[0] ?? 'u32';
   const exports = makeDeclarations(entry, 'void', [arg]);
 
-  const rebound = new Set();
+  const rebound = new Set<ParsedModule>();
   mergeBindings(rebound, iBundle);
 
   const keys = Object.keys(values);

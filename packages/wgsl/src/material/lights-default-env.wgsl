@@ -55,7 +55,7 @@ fn sampleSpecular(
 
   let sample = max(
     vec3<f32>(0.0),
-    SH_SPECULAR[ 0] + 
+    SH_SPECULAR[ 0] +
     SH_SPECULAR[ 1] * r.y +
     SH_SPECULAR[ 2] * r.z +
     SH_SPECULAR[ 3] * r.x +

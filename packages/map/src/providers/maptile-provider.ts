@@ -21,7 +21,7 @@ export const MapTileProvider: LC<MapTileProviderProps> = (props: PropsWithChildr
     url = `/tiles/:zoom-:x-:y.mvt`,
     children,
   } = props;
-  
+
   const context = useMemo(() => ({
     getMVT: makeMVTSource(url),
   }), [url]);

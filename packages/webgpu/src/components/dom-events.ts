@@ -307,7 +307,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
       e.preventDefault();
       e.stopPropagation();
     };
-    
+
     const onWindowBlur = () => {
       setKeyboard((state) => {
         return {

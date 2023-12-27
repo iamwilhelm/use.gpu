@@ -43,7 +43,7 @@ const useInspector = () => {
 };
 
 export const App: LC = hot(() => {
-  
+
   const root = document.querySelector('#use-gpu')!;
   const inner = document.querySelector('#use-gpu .canvas')!;
 
@@ -53,7 +53,7 @@ export const App: LC = hot(() => {
       <Routes routes={makePicker(root)} />
     </Router>
   ), root);
-  
+
   const fonts = useOne(() => [
     {
       family: 'Lato',

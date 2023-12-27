@@ -68,19 +68,19 @@ export const MaterialEnvMapPage: LC = (props) => {
           <PrefilteredEnvMap
             texture={texture}
             gain={1}
-            render={(cubeMap, texture) =>          
+            render={(cubeMap, texture) =>
               <Loop>
                 <LinearRGB tonemap="aces" gain={3}>
                   <Cursor cursor='move' />
                   <Camera active={!zooming && !panning}>
                     <Pass lights>
-            
+
                       {/*<AxisHelper size={2} width={3} />*/}
 
                       <Environment map={cubeMap} preset={envPreset}>
                         <Scene>
                           {
-                            seq(8).flatMap(i => 
+                            seq(8).flatMap(i =>
                               seq(8).map(j => (
                                 <Node position={[i - 3.5, 0, j - 3.5]} scale={[0.35, 0.35, 0.35]}>
                                   <PBRMaterial

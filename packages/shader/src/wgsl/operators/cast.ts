@@ -16,7 +16,7 @@ const literal = (v: number, neg: boolean, isFloat: boolean) => {
 export const makeAutoSwizzle = (from: string, to: string) => {
   const mf = from.match(/vec([0-9])/);
   const mt = to.match(/vec([0-9])/);
-  
+
   const nf = mf ? +mf[1] : 1;
   const nt = mt ? +mt[1] : 1;
 
@@ -31,7 +31,7 @@ export const makeCastAccessor = (
   args: string[],
   from: string,
   to: string,
-  swizzle: string | CastTo,
+  swizzle: string | CastTo | null,
 ) => {
   const symbols = args.map((t, i) => `${arg(i)}`);
 
@@ -48,7 +48,7 @@ export const makeSwizzleAccessor = (
   name: string,
   from: string,
   to: string,
-  swizzle: string | CastTo,
+  swizzle: string | CastTo | null,
 ) => {
   const ret = makeSwizzle(from, to, arg(0), swizzle);
   return `fn ${name}(${arg(0)}: ${from}) -> ${to} {
@@ -75,7 +75,7 @@ export const makeSwizzle = (
   const {basis, signs, gain} = parseSwizzle(sz);
   const out: string[] = basis.split('').map((v, i) => {
     const neg = !!(signs && signs[i] === '-');
-    
+
     if (v.match(/[0-9]/)) return literal(+v, neg, isFloat);
     else return (neg ? '-' : '') + (isScalar ? `${name}` : `${name}.${v}`);
   });
@@ -92,7 +92,7 @@ export const makeSwizzle = (
       compat = simple;
     }
   }
-  
+
   let ret = `${to}(${compact.join(', ')})`;
   if (gain != null) ret = `${ret} * ${literal(gain, false, isFloat)}`;
 

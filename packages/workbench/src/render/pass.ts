@@ -45,12 +45,12 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
   }
   if (mode === 'forward') {
     if (!shadows && !picking) return use(ForwardRenderer, {buffers: NO_BUFFERS, lights, overlay, merge, children});
-    
+
     const buffers = useMemo(() => [
       shadows ? use(ShadowBuffer, {}) : null,
       picking ? use(PickingBuffer, {}) : null,
     ], [shadows, picking]);
-    
+
     return multiGather(buffers, (buffers: Record<string, UseGPURenderContext[]>) =>
       use(ForwardRenderer, {buffers, lights, overlay, merge, children})
     );

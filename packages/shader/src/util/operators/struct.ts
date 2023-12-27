@@ -58,7 +58,7 @@ export const makeStructType = (
     code,
     key,
   );
-  
+
   return {
     module: virtual,
   };

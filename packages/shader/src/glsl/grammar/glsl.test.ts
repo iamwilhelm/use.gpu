@@ -6,12 +6,12 @@ import { addASTSerializer } from '../../test/snapshot';
 addASTSerializer(expect);
 
 describe("GLSL grammar snapshots", () => {
-  
+
   it("parses a test program", () => {
     for (const program of PROGRAMS) {
       const parsed = parser.parse(program);
       parsed.text = program;
-      
+
       const compact = formatASTNode(parsed.topNode);
       const hasError = compact.indexOf('⚠') >= 0;
       if (hasError) {
@@ -22,7 +22,7 @@ describe("GLSL grammar snapshots", () => {
       expect(parsed).toMatchSnapshot();
     }
   });
-  
+
 });
 
 const PROGRAMS = [
@@ -270,7 +270,7 @@ vec3 PBR(vec3 N, vec3 L, vec3 V, vec3 albedo, float metalness, float roughness) 
   float G = smithGGXCorrelated(dotNL, dotNV, alpha);
   //float G2 = geometricGGX(dotNL, dotNV, alpha);
   //return vec3(abs(G - G2) / 100.0);
-  
+
   vec3 Fd = albedo * fdBurley(dotNL, dotNV, dotLH, alpha);
   vec3 Fs = F * D * G;
 
@@ -286,10 +286,10 @@ void main() {
   vec3 albedo = vec3(1.0);//fragColor.rgb;
   float metalness = 0.2;
   float roughness = 0.8;
-  
+
   float grid = getGrid(fragUV);
   vec3 color = PBR(N, L, V, albedo, metalness, roughness);
-  
+
   outColor = vec4(color * grid, fragColor.a);
 }
 

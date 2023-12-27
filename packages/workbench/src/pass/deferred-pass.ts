@@ -29,7 +29,7 @@ export type DeferredPassProps = {
 };
 
 const NO_OPS: any[] = [];
-const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
+const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 /** Deferred render pass.
 
@@ -90,7 +90,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
       merge: true,
     }),
     [renderContext, overlay]);
-  
+
   return quote(yeet(() => {
     let vs = 0;
     let ts = 0;

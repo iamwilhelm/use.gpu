@@ -41,7 +41,7 @@ use '@use-gpu/wgsl/use/array'::{ sizeToModulus3, packIndex3, unpackIndex3 }
   let modulus = sizeToModulus3(size);
 
   let xyd = unpackIndex3(index, modulus);
-  
+
   let left   = packIndex3(offsetIndex(xyd, size, vec2<i32>(-1, 0)), modulus);
   let right  = packIndex3(offsetIndex(xyd, size, vec2<i32>(1, 0)), modulus);
   let top    = packIndex3(offsetIndex(xyd, size, vec2<i32>(0, -1)), modulus);
@@ -74,6 +74,6 @@ fn offsetIndex(index: vec3<u32>, size: vec3<u32>, offset: vec2<i32>) -> vec3<u32
     if (sy < 0) { sy = 0; }
     if (sy >= i32(size.y)) { sy = i32(size.y) - 1; }
   }
-  
+
   return vec3<u32>(u32(sx), u32(sy), index.z);
 }

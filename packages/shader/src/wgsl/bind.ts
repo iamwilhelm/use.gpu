@@ -51,7 +51,7 @@ const BINDING_SAMPLE_TYPES = {
 type MaybeModule = ShaderModule | false | null | undefined;
 
 export const extractBindings = (stages: MaybeModule[][], pass: string) => {
-  
+
   const key = `group(${pass})`;
   const n = stages.length;
 
@@ -86,7 +86,7 @@ export const extractBindings = (stages: MaybeModule[][], pass: string) => {
         else if (qual?.match(/\buniform\b/)) {
           binding = {binding: index, visibility: 0, buffer: {type: 'uniform'}};
         }
-        
+
         else if (parts.includes('texture')) {
           const viewDimension = parts.filter((k: string) => k.match(/[1-3]d|array|cube/)).join('-');
           const multisampled = parts.includes('multisampled');
@@ -107,7 +107,7 @@ export const extractBindings = (stages: MaybeModule[][], pass: string) => {
             const sampleType = depth ? 'depth' : BINDING_SAMPLE_TYPES[type[0]];
             binding = {
               binding: index,
-              visibility: 0, 
+              visibility: 0,
               texture: {
                 viewDimension,
                 multisampled,

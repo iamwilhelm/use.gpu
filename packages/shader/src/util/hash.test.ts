@@ -53,13 +53,13 @@ describe('hash', () => {
       {f:1},
       {g:1},
     ];
-    
+
     const hashes = values.map(toHash);
-    
+
     expect(hashes).toMatchSnapshot();
     expect(uniq(hashes).length).toBe(hashes.length);
   });
-  
+
   it("doesn't collide 16-bit ints", () => {
 
     const seen = new Map<number, number>();

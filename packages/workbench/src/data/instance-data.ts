@@ -77,7 +77,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
   }, [device, fs]);
 
   // Produce instance sources
-  const Resume = () => {    
+  const Resume = () => {
     const size = Math.max(alloc, ids.max());
     const bufferLength = useBufferedSize(size);
 

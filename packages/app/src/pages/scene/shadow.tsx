@@ -134,7 +134,7 @@ export const SceneShadowPage: LC = (props) => {
                         </>)}
                       />
                     </PBRMaterial>
-              
+
                   </Scene>
                 </Environment>
 

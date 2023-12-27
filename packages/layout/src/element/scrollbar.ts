@@ -41,7 +41,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
   const {
     direction = 'y',
     size = 10,
-    
+
     overflow = 'scroll',
     scrollRef = NO_POINT,
     sizeRef = NO_POINT4,
@@ -118,7 +118,7 @@ const Render = (
     const w = isX ? outerWidth : size;
     const h = isX ? size : outerHeight;
 
-    const [l, t, r, b] = layout;        
+    const [l, t, r, b] = layout;
     const ll = isX ? l : r - w;
     const tt = isX ? b - h : t;
 

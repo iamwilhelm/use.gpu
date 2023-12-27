@@ -26,7 +26,7 @@ use '@use-gpu/wgsl/codec/octahedral'::{ wrapOctahedral, decodeOctahedral };
 
   let ray = decodeOctahedral(uvo);
   let sample = getCubeMap(ray, 0.0);
-  
+
   let xyi4 = xyi / 4;
   let index = xyi4.x + xyi4.y * 256;
   textureDump[index] = sample;

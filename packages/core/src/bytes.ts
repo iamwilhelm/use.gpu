@@ -156,7 +156,7 @@ export const UNIFORM_BYTE_SETTERS = {
   "mat3x4<f16>":      setUint16N(12),
   "mat4x3<f16>":      setUint16Nx3(12),
   "mat4x4<f16>":      setUint16N(16),
-  
+
   "mat2x2<f32>":      setFloat32N(4),
   "mat3x2<f32>":      setFloat32N(6),
   "mat2x3<f32>":      setFloat32Nx3(6),

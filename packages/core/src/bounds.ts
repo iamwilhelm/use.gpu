@@ -11,7 +11,7 @@ export const makeBoundingBox = (dims: number): DataBoundingBox => {
 
 export const getBoundingBox = (data: VectorLike, dims: number): DataBoundingBox => {
   const n = data.length / dims;
-  
+
   if (dims === 1) {
     let min = Infinity;
     let max = -Infinity;
@@ -120,7 +120,7 @@ export const getBoundingBox = (data: VectorLike, dims: number): DataBoundingBox 
 export const extendBoundingBox = (box: DataBoundingBox, data: VectorLike, dims: number) => {
   const n = data.length / dims;
   const {min, max} = box;
-  
+
   if (dims === 1) {
     for (let i = 0; i < n; ++i) {
       const d = data[i];
@@ -215,7 +215,7 @@ export const toDataBounds = (box: DataBoundingBox): DataBounds => {
     const dx = (max[0] - min[0]) / 2;
     const dy = (max[1] - min[1]) / 2;
     const d = Math.sqrt(dx*dx + dy*dy);
-    
+
     return {center: [cx, cy], radius: d, min, max};
   }
 
@@ -228,7 +228,7 @@ export const toDataBounds = (box: DataBoundingBox): DataBounds => {
     const dy = (max[1] - min[1]) / 2;
     const dz = (max[2] - min[2]) / 2;
     const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
-    
+
     return {center: [cx, cy, cz], radius: d, min, max};
   }
 
@@ -243,7 +243,7 @@ export const toDataBounds = (box: DataBoundingBox): DataBounds => {
     const dz = (max[2] - min[2]) / 2;
     const dw = (max[3] - min[3]) / 2;
     const d = Math.sqrt(dx*dx + dy*dy + dz*dz + dw*dw);
-    
+
     return {center: [cx, cy, cz, cw], radius: d, min, max};
   }
 

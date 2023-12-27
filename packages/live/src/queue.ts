@@ -23,7 +23,7 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
   const insert = (fiber: LiveFiber<any>) => {
     if (set.has(fiber)) return;
     set.add(fiber);
-    
+
     // Empty
     if (!queue) {
       tail = queue = {fiber, next: null};
@@ -92,7 +92,7 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
       q = q.next;
     }
   }
-  
+
   // Re-insert all fibers that descend from fiber
   const reorder = (fiber: LiveFiber<any>) => {
     const list: LiveFiber<any>[] = [];

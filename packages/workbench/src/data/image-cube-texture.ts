@@ -68,7 +68,7 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
       resources.forEach((resource, i: number) => {
         if ('bitmap' in resource) uploadExternalTexture(device, texture, resource.bitmap, [width, height, 1], [0, 0, i]);
         if ('data' in resource) uploadDataTexture(device, texture, resource.data, [width, height, 1], [0, 0, i]);
-      });        
+      });
 
       const source = {
         texture,

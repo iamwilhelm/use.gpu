@@ -83,12 +83,12 @@ export const centripetalCatmullRom = (
   const d1 = Math.sqrt(Math.abs(a - b));
   const d2 = Math.sqrt(Math.abs(b - c));
   const d3 = Math.sqrt(Math.abs(c - d));
-  
+
   const t0 = -d1;
   const t1 = 0;
   const t2 = d2;
   const t3 = d2 + d3;
-  
+
   return catmullRom(t * d2, t0, t1, t2, t3, a, b, c, d);
 }
 
@@ -126,7 +126,7 @@ export const makeDistanceMap = (
       data.push(accum);
     }
   };
-  
+
   range(0, 1, measure(0, 1), 2);
   data.push(1);
   data.push(accum + measure(1, 1 + eps));
@@ -144,18 +144,18 @@ export const makeDistanceMap = (
 
 export const queryDistanceMap = (dm: DistanceMap, value: number) => {
   const {map, count} = dm;
-  
+
   let a = 1;
   let b = count;
   let limit = 10;
-  
+
   while (b > a && limit-- > 0) {
     const m = b - ((b - a) >> 1);
     const d = map[m * 2];
     if (d > value) b = m - 1;
     else a = m;
   }
-  
+
   let a2 = a * 2;
 
   let d0 = map[a2 - 2];

@@ -1,4 +1,4 @@
-import { UniformAttribute, ShaderModule, ParsedBundle } from '../../types';
+import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule } from '../../types';
 import { loadVirtualModule } from '../shader';
 import { formatMurmur53, toMurmur53 } from '../hash';
 import { toBundle, toModule, getBundleHash, getBundleKey } from '../bundle';
@@ -78,7 +78,7 @@ export const makeDiffBy = (
     rekey,
   );
 
-  const rebound = new Set();
+  const rebound = new Set<ParsedModule>();
   mergeBindings(rebound, bundle);
 
   for (const m of sizes) if (m) {

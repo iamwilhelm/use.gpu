@@ -1,15 +1,15 @@
 import { bindBundle, bindingsToLinks, resolveBindings } from './bind';
 import { loadModule } from './shader';
 import { linkBundle } from './link';
-import { formatAST } from '../util/tree'; 
+import { formatAST } from '../util/tree';
 import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
 
 describe("bind", () => {
-  
+
   it("bind produces a bound bundle", () => {
-    
+
     const codeMain = `
     @link fn getColor() -> vec4<f32> {};
     fn main() {
@@ -50,9 +50,9 @@ describe("bind", () => {
 
     expect(bound.hash).toMatchSnapshot();
   });
-  
+
   it("binds an external", () => {
-    
+
     const codeMain = `
     @link fn getColor() -> vec4<f32> {};
     fn main() {

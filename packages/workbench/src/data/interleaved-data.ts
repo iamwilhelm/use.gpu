@@ -60,7 +60,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
 
   // Gather data layout/length
   const [packedLayout, dataCount, dataStride, bytesPerElement] = useMemo(() => {
-    
+
     const {length, byteLength, BYTES_PER_ELEMENT} = typedArray;
     const layout = makePackedLayout(uniforms);
 
@@ -70,7 +70,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
 
     return [layout, dataCount, dataStride, bytesPerElement];
   }, [typedArray, fs]);
-  
+
   const bufferLength = useBufferedSize(dataCount);
 
   // Make aggregate buffer

@@ -2,7 +2,7 @@
 export const WGSLModules = {
   "getQuadVertex": `
 use '@use-gpu/wgsl/use/types'::{ SolidVertex };
-use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }; 
+use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale };
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 
 @link fn getPosition(i: i32) -> vec4<f32> {};
@@ -50,7 +50,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 @fragment
 fn main(
   @location(0) fragColor: vec4<f32>,
-  @location(1) fragUV: vec2<f32>,  
+  @location(1) fragUV: vec2<f32>,
 ) -> @location(0) vec4<f32> {
   var outColor = fragColor;
 

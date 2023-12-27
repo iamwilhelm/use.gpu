@@ -66,7 +66,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
   const h = Math.abs(b - t);
   const into = [w, h, w, h] as XYZW;
 
-  const {id} = useFiber();  
+  const {id} = useFiber();
   const pickers: any[] = [];
   const sizes: XY[] = [];
   const offsets: XY[] = [];
@@ -98,7 +98,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
     const [w, h] = absolute ? into : size;
     const [ml, mt] = margin;
     const layout = [left + ml, top + mt, left + ml + w, top + mt + h] as Rectangle;
-    
+
     sizes.push([w, h]);
     offsets.push([left + ml, top + mt]);
 
@@ -127,7 +127,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
 
   // Add scroll listener
   out.push(keyed(Scroller, -2, pickers, flip, shift));
-  
+
   // Interactive inspect handler
   if (toggleInspect) out.push(keyed(Inspect, -1, pickers, flip, shift));
 
@@ -189,7 +189,7 @@ export const Inspect = (pickers: any[], flip: [number, number], shift: [number, 
     viewSize: { current: [width, height] },
     projectionMatrix: { current: matrix },
   } = viewUniforms;
-  
+
   const setHighlight = useInspectorSelect();
 
   const { mouse, pressed } = useMouse();

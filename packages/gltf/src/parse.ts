@@ -27,7 +27,7 @@ export const parseBinaryGLTF = (data: ArrayBuffer) => {
     if (type === 0x4E4F534A) {
       ({json} = parseTextGLTF(data));
     }
-    
+
     if (type === 0x004E4942) {
       bin = data;
     }

@@ -154,7 +154,7 @@ export const schemaToAggregate = (
 
   for (const key in schema) {
     const {format, name, unwelded, index, ref} = schema[key];
-  
+
     const hasValues = attributes[key] != null;
     const hasRef = ref && refs && refs[key] != null;
 

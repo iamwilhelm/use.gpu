@@ -117,7 +117,7 @@ const roundUp2 = (v: number) => {
 const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: GlyphViewProps) => {
   const device = useDeviceContext();
   const rustText = useFontContext();
-  
+
   glyph = glyph ?? '@';
   const [glyphId, loaded] = rustText.findGlyph(0, glyph);
   const glyphMetrics = rustText.measureGlyph(0, glyphId ?? 5, DETAIL * 1.5);
@@ -170,7 +170,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
 
   const {xo, yo, xi, yi} = sdf1;
   const {xo: xo2, yo: yo2, xi: xi2, yi: yi2} = sdf2;
-  
+
   const outerField = {
     xs: xo,
     ys: yo,
@@ -236,7 +236,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
         emit(x + dx, y + dy, 0, 1);
       }
     };
-  
+
   const debugFrame = (image: Image) => (
     image ? <TextureFrame texture={{
       data: image.data,
@@ -282,7 +282,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
       </Sampled> : null}
     </TextureFrame> : null
   );
-  
+
   return (
     <DebugProvider debug={{sdf2d: {subpixel, contours, preprocess, postprocess, solidify: true}}}>
       <LinearRGB backgroundColor={BACKGROUND}>
@@ -415,7 +415,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         </Sampled>
                         </> : null}
                       </TextureFrame>
-                    
+
                       <Label>Alpha{subpixel ? ' + Offsets' + (preprocess ? ' (Relaxed)' : '') : ''}</Label>
                     </Block>
 
@@ -428,16 +428,16 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         {debugFrame(debugs[1])}
                         {debugFrame(debugs[2])}
                         <Label>{subpixel ? "ESDT Outside" : "EDT Outside"}</Label>
-                      </Block>                
+                      </Block>
                       <Block>
                         {debugFrame(debugs[3])}
                         {debugFrame(debugs[4])}
                         <Label>{subpixel ? "ESDT Inside" : "EDT Inside"}</Label>
-                      </Block>                
+                      </Block>
                       <Block>
                         {debugFrame(debugs[5])}
                         <Label>{subpixel ? "X and Y Offsets" + (postprocess ? '\n(Relaxed)' : '') : "Squared Distance"}</Label>
-                      </Block>                
+                      </Block>
                     </> : null}
 
                     <RawTexture data={sdfTexture} render={(texture) =>
@@ -485,7 +485,7 @@ type TextureFrameProps = {
 const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFrameProps>) => {
   const {margin, texture, children} = props;
   const {size: [width, height]} = texture;
-  
+
   return (
     <RawTexture data={texture} render={(texture) =>
       <Block margin={margin} width={width} height={height} fill={[0.0, 0.0, 0.0, 1.0]} image={{

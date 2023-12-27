@@ -97,11 +97,11 @@ export const FlatCamera: LiveComponent<FlatCameraProps> = (props) => {
     const m = mat4.create();
     mat4.scale(m, m, vec3.fromValues(zoom, zoom, 1));
     mat4.translate(m, m, vec3.fromValues(x, y, 0));
-    
+
     mat4.multiply(m, matrix, m);
     return m;
   }, [matrix, x, y, zoom]);
-  
+
   const viewHeight = Math.abs(layout[3] - layout[1]);
 
   uniforms.projectionMatrix.current = panned;
@@ -128,7 +128,7 @@ export const FlatCamera: LiveComponent<FlatCameraProps> = (props) => {
   const frame = useOne(() => ({current: 0}));
   frame.current = incrementVersion(frame.current);
 
-  return provide(FrameContext, frame.current, 
+  return provide(FrameContext, frame.current,
     use(ViewProvider, {
       defs: VIEW_UNIFORMS,
       uniforms,

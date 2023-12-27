@@ -140,7 +140,7 @@ export const cutRingWith = (
       }
     }
   }
-  
+
   if (last) out[0] = [last, ...ring.slice(pos), ...(out[0] ?? [])];
   if (out[0] && !getRingArea(out[0])) out.shift();
   else if (out.length === 0 && ring.length) {
@@ -166,7 +166,7 @@ export const assembleCutRingWith = (
   segments: XY[][],
   getTangent: Field,
 ) => {
-  
+
   const score = segments.map(seg => {
     const start = seg[0];
     const end = seg[seg.length - 1];
@@ -255,13 +255,13 @@ export const pointInRing = (
   for (let i = 0; i < n; ++i) {
     const a = ring[i];
     const b = ring[i + 1] ?? ring[i + 1 - n];
-    
+
     const ax = b[0] - a[0];
     const ay = b[1] - a[1];
 
     const bx = x - a[0];
     const by = y - a[1];
-    
+
     const s = ax * by - ay * bx;
     if (a[1] <= y) {
       if (b[1] > y) if (s > 0) winding++;

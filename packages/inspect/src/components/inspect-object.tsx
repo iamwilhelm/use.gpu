@@ -64,7 +64,7 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
       object.push('…');
     }
   }
-  
+
   if (object instanceof Map) {
     const o = {} as Record<string, any>;
     let i = 0;
@@ -88,7 +88,7 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
 
     const icon = <IconItem height={16} top={2}>{expanded !== false ? <SVGChevronDown /> : <SVGChevronRight />}</IconItem>;
     const prefix = expandable ? icon : '';
-    
+
     const onClick = expandable ? (e: any) => {
       toggleState(key);
       e.preventDefault();
@@ -150,7 +150,7 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
       </div>
     );
   });
-  
+
   return <>{fields}</>;
 }
 

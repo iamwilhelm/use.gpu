@@ -1,6 +1,6 @@
-declare module "@use-gpu/wgsl/instance/instanced-index.wgsl" {
+declare module "@use-gpu/wgsl/instance/index/interleave.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getInstancedIndex: ParsedBundle;
+  export const getIndex: ParsedBundle;
   export default __module;
 }

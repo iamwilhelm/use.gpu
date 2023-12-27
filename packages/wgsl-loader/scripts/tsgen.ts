@@ -26,7 +26,7 @@ for (const {pattern, arg} of globs) {
     const core = readFileSync(file).toString();
     const module = loadModule(core, file);
     const symbols = (module.table.visibles ?? []).map((s: string) => `export declare const ${s}: ParsedBundle;`);
-    
+
     const abs = path.resolve(file);
     const dts = `type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
 declare const __module: ParsedBundle;

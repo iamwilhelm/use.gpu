@@ -179,9 +179,9 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
 }) => {
   const {fibers} = usePingContext();
   const by = fibers.get(fiber.by);
-  
+
   const Wrap = legend ? TreeWrapperWithLegend : TreeWrapper;
-  
+
   return (<>
     <Wrap>
       <FiberNode
@@ -299,14 +299,14 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         if (rect.left < container.left || rect.right > container.right) {
           parent.scrollLeft += rect.left - container.left - 50;
         }
-        
+
         if (rect.top < container.top || rect.bottom > container.bottom) {
           parent.scrollTop += rect.top - container.top - 150;
         }
       }
     }
   }, [selected]);
-  
+
   let ooo = false;
   if (mounts && order) {
     if (order.length !== mounts.size) {
@@ -338,7 +338,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   ) : null;
   if (shouldAbsolute) nodeRender = <div style={{position: 'absolute'}}>{nodeRender}</div>;
 
-  // Render single child   
+  // Render single child
   if (mount) {
     out.push(
       <FiberNode
@@ -393,7 +393,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   if (shouldRender && __inspect?.react) {
     const {react} = __inspect;
     const node = react.root?.current;
-    
+
     if (node) {
       out.push(
         <FiberReactNode
@@ -452,7 +452,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       {nextRender}
     </>);
   }
-  
+
   // Expandable node
   if (out.length) {
     const openIcon = continuation ? <SVGNextOpen /> : undefined;
@@ -511,7 +511,7 @@ export const FiberReactNode: React.FC<FiberReactNodeProps> = memo(({
   indent = 0,
 }) => {
   const nodeRender = <ReactNode reactNode={reactNode} root={first} />;
-  
+
   const {child, sibling, _debugID} = reactNode;
 
   const childRender = child ? <FiberReactNode reactNode={child} expandCursor={expandCursor} indent={indent + (sibling ? 1 : .1)} /> : null;
@@ -534,7 +534,7 @@ export const FiberReactNode: React.FC<FiberReactNodeProps> = memo(({
           {siblingRender}
         </>)
       }</Expandable>
-    );  
+    );
   }
 
   return (<>

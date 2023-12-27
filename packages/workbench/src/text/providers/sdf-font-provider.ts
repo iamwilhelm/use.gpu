@@ -138,7 +138,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
         ({data, width, height} = (rgba ? rgbaToSDF : glyphToSDF)(image, w, h, pad, radius, undefined, subpixel, solidify, preprocess, postprocess));
         glyph.outlineBounds = padRectangle(ob, pad);
         glyph.image = data;
-        
+
         try {
           mapping = atlas.place(key, width, height);
           bounds.push(mapping);
@@ -240,12 +240,12 @@ export const useSDFGlyphData = (
       t1: number,
       r1: number,
       b1: number,
-  
+
       l2: number,
       t2: number,
       r2: number,
       b2: number,
-    
+
       index: number
     ) => {
       rectangles[i4  ] = l1;
@@ -257,9 +257,9 @@ export const useSDFGlyphData = (
       uvs[i4+1] = t2;
       uvs[i4+2] = r2;
       uvs[i4+3] = b2;
-    
+
       indices[i] = index;
-    
+
       i4 += 4;
       i++;
     };
@@ -286,7 +286,7 @@ export const useSDFGlyphData = (
 
     const radius = context.getRadius();
     const scale = context.getScale(size);
-    
+
     return {
       id,
       indices,
@@ -302,7 +302,7 @@ export const emitGlyphSpans = (
   context: SDFFontContextProps,
   layout: Rectangle,
   currentIndex: number,
-  
+
   font: number[],
   spans: Tuples<3>,
   glyphs: Tuples<2>,
@@ -321,12 +321,12 @@ export const emitGlyphSpans = (
     t1: number,
     r1: number,
     b1: number,
-  
+
     l2: number,
     t2: number,
     r2: number,
     b2: number,
-    
+
     i: number
   ) => void,
 ) => {
@@ -368,7 +368,7 @@ export const emitGlyphSpans = (
             r * mapping[1],
             r * mapping[2],
             r * mapping[3],
-          
+
             currentIndex,
           );
         }

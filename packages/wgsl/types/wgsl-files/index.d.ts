@@ -253,17 +253,31 @@ declare module "@use-gpu/wgsl/instance/identity.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/instanced-index.wgsl" {
+declare module "@use-gpu/wgsl/instance/index/anchor.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getInstancedIndex: ParsedBundle;
+  export const getAnchorIndex: ParsedBundle;
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/interleave.wgsl" {
+declare module "@use-gpu/wgsl/instance/index/face.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getInstancedFaceIndex: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/index/interleave.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getIndex: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/index/repeat.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getInstanceRepeatIndex: ParsedBundle;
   export default __module;
 }
 
@@ -999,6 +1013,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const getViewSize: ParsedBundle;
   export const getViewNearFar: ParsedBundle;
   export const getViewPixelRatio: ParsedBundle;
+  export const getViewVector: ParsedBundle;
   export const to3D: ParsedBundle;
   export const worldToView: ParsedBundle;
   export const viewToClip: ParsedBundle;

@@ -81,9 +81,9 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
     debug,
     render,
   } = props;
-  
+
   if (!texture) return render ? render(null, null) : yeet(null);
-  
+
   const device = useDeviceContext();
   const inspect = useInspectable();
 
@@ -192,7 +192,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
       });
 
       const dispatches = useMemo(() => {
-    
+
         const out = [];
 
         const cubeMap = getDerivedSource(texture, {
@@ -232,7 +232,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
             MAX_SAMPLES,
           });
 
-        const makeDispatch = (shader: ShaderModule, i: number) => 
+        const makeDispatch = (shader: ShaderModule, i: number) =>
           use(Dispatch, {
             shader,
             size: [sizes[i], sizes[i]],
@@ -315,12 +315,12 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
           color: target,
         },
       });
-  
+
       return [
         debug ? use(DebugAtlas, {atlas}) : null,
         use(Queue, {nested: true, children: use(Compute, {children: dispatches}) }),
         render ? render(boundCubeMap, target) : yeet(boundCubeMap),
-      ];      
+      ];
     })
   );
 };

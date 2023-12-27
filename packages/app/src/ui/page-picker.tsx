@@ -33,7 +33,7 @@ export const PagePicker = (container: Element) => {
     const url = `https://gitlab.com/unconed/use.gpu/-/blob/master/packages/app/src/pages${location.pathname.replace(/^\/demo/, '')}.tsx`;
     window.open(url);
   };
-  
+
   const pages = makePages().filter(p => p.path !== '/');
   const n = pages.length;
 
@@ -41,7 +41,7 @@ export const PagePicker = (container: Element) => {
 
   const next = pages[(index + 1) % n];
   const prev = pages[(index + n - 1) % n];
-  
+
   const handlePrev = () => replace(prev.path);
   const handleNext = () => replace(next.path);
 

@@ -47,7 +47,7 @@ export const ComputeLoop: LC<ComputeLoopProps> = memo((props: PropsWithChildren<
             useMemo(() => {
               if (!continued) countRef.current = 0;
             }, [continued, ...fs]);
-            
+
             useResource((dispose) => {
               let running = live;
 

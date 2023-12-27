@@ -72,7 +72,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
   const view = lights ? use(LightMaterial, {
     shadows,
     children,
-    then: (light: LightEnv) => 
+    then: (light: LightEnv) =>
       useOne(() => yeet({ env: { light }}), light),
   }) : children;
 

@@ -4,7 +4,7 @@ import type { UIAggregate } from './types';
 
 import {
   DeviceContext, DebugContext,
-  SDFFontProvider, 
+  SDFFontProvider,
   useBufferedSize,
   UIRectangles,
 } from '@use-gpu/workbench';
@@ -22,7 +22,7 @@ export type UIProps = {
 };
 
 export type UILayersProps = {
-  items: (UIAggregate | null)[],        
+  items: (UIAggregate | null)[],
 };
 
 const allCount = (a: number, b: UIAggregate): number => a + b.count + ((b as any).isLoop ? 3 : 0);
@@ -178,7 +178,7 @@ type Partition = {
   bounds: Rectangle,
 };
 
-const makePartitioner = () => {  
+const makePartitioner = () => {
   const layers: Partition[] = [];
   const last = new Map<number, number>();
 

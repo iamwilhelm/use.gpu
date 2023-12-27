@@ -68,13 +68,13 @@ export const usePipelineOptions = (
     const multisample = {
       alphaToCoverageEnabled: alphaToCoverage && samples > 1,
     };
-  
+
     const fragment = {
       targets: {
         0: {blend: typeof blend === 'object' ? $set(blend) : (BLENDS[blend] ?? $delete())},
       } as any
     };
-  
+
     const depthStencil = {
       depthWriteEnabled: depthWrite != null ? depthWrite : undefined,
       depthCompare: depthTest === false ? 'always' as GPUCompareFunction : undefined,

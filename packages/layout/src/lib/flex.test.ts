@@ -9,7 +9,7 @@ import { getFlexMinMax, fitFlex } from './flex';
 import { makeBoxLayout } from './util';
 
 describe('flex layout', () => {
-  
+
   let ID = 0;
   const makeElement = (
     width: number,
@@ -32,7 +32,7 @@ describe('flex layout', () => {
       }),
     };
   };
-  
+
   it("gets flex min/max", () => {
     const els = [
       makeElement(50, 50),

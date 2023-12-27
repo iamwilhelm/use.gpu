@@ -70,7 +70,7 @@ export const getInlineMinMax = (
       caretMain = 0;
     }
   };
-  
+
   const n = els.length;
   for (const {spans, height, margin, absolute} of els) {
     const [ml, mt, mr, mb] = margin ?? NO_MARGIN;
@@ -181,14 +181,14 @@ export const fitInline = (
       const {spans, height, margin, inline, block, render, pick} = el;
       const {ascent: a, descent: d, lineHeight: lh} = height;
       const [ml, mt, mr, mb] = margin ?? NO_MARGIN;
-      
+
       const last = spans.length - span;
       const count = Math.min(n, last);
 
       const indentStart = span  === 0    ? (isX ? ml : mt) : 0;
       const indentEnd   = count === last ? (isX ? mr : mb) : 0;
       mainPos += indentStart;
-      
+
       const resolvedAnchor = inline ?? anchor;
 
       let crossPos = caretCross;
@@ -232,7 +232,7 @@ export const fitInline = (
 
       span += count;
       n -= count;
-      
+
       if (count === last) {
         if (block) anchors.push(offset as number[] as XY);
         i++;
@@ -243,9 +243,9 @@ export const fitInline = (
     maxMain = Math.max(maxMain, mainPos - deduct, 0);
     caretCross += lineHeight;
   });
-  
+
   const size = isX ? [into[0] ?? maxMain, caretCross] : [caretCross, into[1] ?? maxMain];
-  
+
   return {
     size,
     ranges,

@@ -25,7 +25,7 @@ export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>)
 
   const content = render ? render() : children;
   if (!content) return null;
-  
+
   const context = useMemo(() => targets ?? (target ? [target] : NO_TARGETS), [target, ...(targets ?? NO_TARGETS)]);
 
   return provide(ComputeContext, context, content);

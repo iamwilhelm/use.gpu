@@ -294,7 +294,7 @@ class Context {
       let pos = getLineAndCharacterOfPosition(maybeD.getSourceFile(), maybeD.pos)
       maybePath = ` at ${this.nodePath(maybeD)}:${pos.line - 1}:${pos.character - 1}`
     }
-    
+
     throw new Error(`Unsupported type ${this.tc.typeToString(type)} with flags ${type.flags}${maybePath}`)
   }
 

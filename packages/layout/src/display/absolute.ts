@@ -63,7 +63,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
             offsets,
           },
         });
-        
+
         const inside = {sizes, offsets, renders};
         return {
           size,

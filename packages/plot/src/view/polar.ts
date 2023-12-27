@@ -73,7 +73,7 @@ export const Polar: LiveComponent<PolarProps> = (props: PropsWithChildren<PolarP
     const fdx = dx + (ady * idx - dx) * bend;
     const sdx = fdx / sx;
     const sdy = dy  / sy;
-    
+
     const aspect = Math.abs(sdx / sdy);
     const focus = bend > 0 ? 1 / bend - 1 : 0;
 

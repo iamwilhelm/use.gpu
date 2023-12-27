@@ -167,7 +167,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((props: Eve
       return id;
     }),
   }));
-  
+
   const stopMouse    = useOne(() => (mouse    as any).stop = () => mouse.stopped    = true, mouse);
   const stopWheel    = useOne(() => (wheel    as any).stop = () => wheel.stopped    = true, wheel);
   const stopKeyboard = useOne(() => (keyboard as any).stop = () => keyboard.stopped = true, keyboard);

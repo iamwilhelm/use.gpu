@@ -78,7 +78,7 @@ try {
     const target = join(DOCS_PKG, pkg + '.readme');
     writeFileSync(target, readFileSync(file));
   }
-  
+
   console.log("✅ 📄")
 } catch (e) {
   console.log("❌")

@@ -19,7 +19,7 @@ let t = 0;
 const BACKGROUND = [0, 0, 0.09, 1];
 
 export const PlotCartesianPage: LC = () => {
-  
+
   return (
     <Loop>
       <LinearRGB backgroundColor={BACKGROUND} tonemap="aces" gain={2}>

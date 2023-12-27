@@ -49,7 +49,7 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
       {Object.keys(env).length ? (<>
         <Spacer />
         <div><b>Environment</b></div>
-        <div><InspectObject object={env} state={expanded} toggleState={toggleExpanded} /></div>        
+        <div><InspectObject object={env} state={expanded} toggleState={toggleExpanded} /></div>
       </>) : null}
       {hooks.length ? (<>
         <Spacer />

@@ -43,7 +43,7 @@ const ElementTrait = trait({
   width: optional(parseDimension),
   height: optional(parseDimension),
   aspect: optional(parseNumber),
-  
+
   radius: optional(parseMargin),
   border: optional(parseMargin),
   stroke: optional(parseColor),

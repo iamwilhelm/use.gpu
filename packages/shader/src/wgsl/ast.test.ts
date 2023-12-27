@@ -8,7 +8,7 @@ import { addASTSerializer } from '../test/snapshot';
 addASTSerializer(expect);
 
 describe('ast', () => {
-  
+
   const makeGuardedParser = (code: any, tree: any): ReturnType<typeof makeASTParser> => {
     let errorNode = hasErrorNode(tree);
     if (errorNode) {
@@ -16,10 +16,10 @@ describe('ast', () => {
       console.log(formatAST(errorNode, code));
       throw new Error("Error in AST");
     }
-    
+
     return makeASTParser(code, tree);
   }
-  
+
   it('gets test enables', () => {
     const code = `
     enable f16, f64;
@@ -287,7 +287,7 @@ describe('ast', () => {
     const symbolTable = getSymbolTable();
     expect(symbolTable).toMatchSnapshot();
   });
-  
+
   it('parses comment function', () => {
     const code = `
     // Append any X/Y/Z edge that crosses the level set
@@ -332,7 +332,7 @@ describe('ast', () => {
     const declarations = getDeclarations();
     expect(declarations).toMatchSnapshot();
   });
-  
+
   it('parses around comment lines with @attributes', () => {
     const code = `
 use '@use-gpu/wgsl/use/types'::{ LightVertex };
@@ -345,16 +345,16 @@ struct VertexOutput {
   @location(0) @interpolate(flat) lightIndex: u32,
 };
     `;
-    
+
     const tree = parseShader(code);
     const rename = new Map<string, string>();
     rename.set('VertexOutput', 'VertexT');
-    
+
     const output = rewriteUsingAST(code, tree, rename);
     expect(output).toMatchSnapshot();
-    
+
   })
-  
+
   it('rewrites code using the AST', () => {
     const code = `
     fn getValue(index: i32) -> f32;
@@ -370,7 +370,7 @@ struct VertexOutput {
     const rename = new Map<string, string>();
     rename.set('main', 'entryPoint');
     rename.set('getValue', '_zz_getValue');
-    
+
     const output = rewriteUsingAST(code, tree, rename);
     expect(output).toMatchSnapshot();
   });
@@ -391,7 +391,7 @@ struct VertexOutput {
     const rename = new Map<string, string>();
     rename.set('main', 'entryPoint');
     rename.set('getValue', '_zz_getValue');
-    
+
     const output = rewriteUsingAST(code, tree, rename);
     expect(output).toMatchSnapshot();
   });
@@ -411,7 +411,7 @@ struct VertexOutput {
     const rename = new Map<string, string>();
     rename.set('main', 'entryPoint');
     rename.set('getValue', '_zz_getValue');
-    
+
     const compressed = compressAST(code, tree);
     const decompressed = decompressAST(compressed);
     expect(compressed).toMatchSnapshot();
@@ -458,7 +458,7 @@ fn main(
     const rename = new Map<string, string>();
     rename.set('main', 'entryPoint');
     rename.set('getVertex', '_zz_getVertex');
-    
+
     const compressed = compressAST(code, tree);
     const decompressed = decompressAST(compressed);
     expect(compressed).toMatchSnapshot();
@@ -506,7 +506,7 @@ fn main(
     const recompressed = compressAST(code, decompressed);
     expect(compressed).toEqual(recompressed);
   });
-  
+
   it('shakes simple program', () => {
     const code = `
 const x: f32 = 1.0;
@@ -528,7 +528,7 @@ const x: f32 = 1.0;
     expect(shake).toBeTruthy();
     expect(shake).toMatchSnapshot();
     if (!shake) return;
-    
+
     const keep = new Set(['getA']);
     const ops = resolveShakeOps(shake, keep, symbols);
     expect(rewriteUsingAST(code, tree, new Map(), ops)).toMatchSnapshot();
@@ -551,12 +551,12 @@ struct VertexOutput {
     expect(shake).toBeTruthy();
     expect(shake).toMatchSnapshot();
     if (!shake) return;
-    
+
     const keep = new Set(['main']);
     const ops = resolveShakeOps(shake, keep, symbols);
     expect(rewriteUsingAST(code, tree, new Map(), ops)).toMatchSnapshot();
   });
-  
+
   it('shakes use/view AST', () => {
     const code = WGSLModules['@use-gpu/wgsl/use/view'];
 
@@ -568,7 +568,7 @@ struct VertexOutput {
     expect(shake).toBeTruthy();
     expect(shake).toMatchSnapshot();
     if (!shake) return;
-    
+
     const keep = new Set(['worldToClip']);
     const ops = resolveShakeOps(shake, keep, symbols);
     expect(rewriteUsingAST(code, tree, new Map(), ops)).toMatchSnapshot();
@@ -585,9 +585,9 @@ struct VertexOutput {
     expect(shake).toBeTruthy();
     expect(shake).toMatchSnapshot();
     if (!shake) return;
-    
+
     const keep = new Set(['worldToClip']);
-    const ops = resolveShakeOps(shake, keep, symbols);    
+    const ops = resolveShakeOps(shake, keep, symbols);
 
     const tree1 = tree;
     const tree2 = decompressAST(compressAST(code, tree1));
@@ -604,7 +604,7 @@ struct VertexOutput {
     const tree = parseShader(code);
     const table = makeGuardedParser(code, tree).getShakeTable();
     expect(table).toMatchSnapshot();
-    
+
   });
 
   it('gets shake information for geometry/quad AST', () => {
@@ -613,7 +613,7 @@ struct VertexOutput {
     const tree = parseShader(code);
     const table = makeGuardedParser(code, tree).getShakeTable();
     expect(table).toMatchSnapshot();
-    
+
   });
 
   it('gets shake information for use/types AST', () => {
@@ -622,7 +622,7 @@ struct VertexOutput {
     const tree = parseShader(code);
     const table = makeGuardedParser(code, tree).getShakeTable();
     expect(table).toMatchSnapshot();
-    
+
   });
 
 });

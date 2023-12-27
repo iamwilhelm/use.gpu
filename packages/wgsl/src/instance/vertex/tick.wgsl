@@ -43,6 +43,6 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getWorldScale, getViewScale };
 
   let adj = transformDifferential(offset, anchor, false).xyz;
   let normal = normalize(adj);
-  
+
   return center + vec4<f32>(normal * size * v * s, 0.0);
 }

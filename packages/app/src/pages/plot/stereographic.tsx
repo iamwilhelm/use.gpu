@@ -31,7 +31,7 @@ const thetaFormatter = (θ: number) => {
 };
 
 export const PlotStereographicPage: LC = () => {
-  
+
   const frames = [
     [0, 0],
     [1, 0],
@@ -140,7 +140,7 @@ export const PlotStereographicPage: LC = () => {
                     />
                   </Sampled>
                 </Spherical>
-              
+
                 <Spherical
                   rotation={[45, 22.5, 0]}
                   scale={[0.25, 0.25, 0.25]}
@@ -173,7 +173,7 @@ export const PlotStereographicPage: LC = () => {
     <PlotControls
       container={root}
       hasNormalize
-      render={({normalize}) => 
+      render={({normalize}) =>
         view(+normalize)
       }
     />

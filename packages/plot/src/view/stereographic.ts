@@ -104,7 +104,7 @@ export const Stereographic: LiveComponent<StereographicProps> = (props: PropsWit
   const b = useShaderRef(bend);
   const o = useShaderRef(+normalize);
   const e = useShaderRef(epsilon);
-  
+
   const bound = useShader(getStereographicPosition, [t, b, o]);
 
   // Apply input basis as a cast

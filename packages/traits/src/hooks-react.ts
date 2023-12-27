@@ -13,7 +13,7 @@ const useOne = <F extends ArrowFunction>(f: F, dep?: any) => {
 
 export const useProp = injectUseProp(useOne);
 
-const HOOKS = {useMemo, useOne, useProp}; 
+const HOOKS = {useMemo, useOne, useProp};
 
 export const useTrait = injectUseTrait(HOOKS);
 export const makeUseTrait = injectMakeUseTrait(HOOKS);

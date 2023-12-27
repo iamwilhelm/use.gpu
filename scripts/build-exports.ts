@@ -12,7 +12,7 @@ try {
   const PKG = JSON.parse(fs.readFileSync(PACKAGE_JSON).toString());
   const name = PKG.name.split('/')[1];
   const BUILD_TARGET = '../../build/packages/' + name + '/';
-  
+
   PKG.exports = {".": "./src/index.ts"};
   for (let path of paths) {
     const name = path.replace(/.[a-z]+$/, '');

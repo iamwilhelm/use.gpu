@@ -76,7 +76,7 @@ export const dispatch = (props: DispatchProps) => {
     [computeShader],
     defines,
   );
-  
+
   // Rendering pipeline
   const [pipeline, isStale] = useComputePipelineAsync(device, module);
   if (!pipeline) return suspense ? SUSPEND : NO_CALL;
@@ -100,7 +100,7 @@ export const dispatch = (props: DispatchProps) => {
       version: null,
     },
   });
-  
+
   let dispatchVersion: number | null = null;
 
   let compute = (passEncoder: GPUComputePassEncoder, countDispatch: (d: number, s: number) => void) => {
@@ -147,7 +147,7 @@ export const dispatch = (props: DispatchProps) => {
       passEncoder.dispatchWorkgroups(sx, sy, sz);
     }
   };
-  
+
   if (shouldDispatch) {
     return {
       compute: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
@@ -157,11 +157,11 @@ export const dispatch = (props: DispatchProps) => {
           if (dispatchVersion === d) return;
           dispatchVersion = d;
         }
-        
+
         return compute(passEncoder, countDispatch);
       },
     };
   }
- 
+
   return {compute};
 };

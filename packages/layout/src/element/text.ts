@@ -22,7 +22,7 @@ export type TextProps = {
   stroke?: XYZW,
   fill?: XYZW,
   */
-  
+
   opacity?: number,
   color?: ColorLike,
   expand?: number,
@@ -30,7 +30,7 @@ export type TextProps = {
   family?: string,
   style?: string,
   weight?: string | number,
-  
+
   lineHeight?: number,
   size?: number,
   detail?: number,

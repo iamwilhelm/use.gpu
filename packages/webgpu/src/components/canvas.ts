@@ -66,7 +66,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithCh
     : null,
     [device, width, height, format, samples]
   );
-  
+
   const colorStates      = useOne(() => [makeColorState(format, BLEND_PREMULTIPLY)], format);
   const colorAttachments = useMemo(() =>
     [makeColorAttachment(renderTexture, null, backgroundColor)],
@@ -89,13 +89,13 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithCh
     makePresentationContext(device, canvas, format),
     [device, canvas, format, width, height],
   );
-  
+
   const swap = useCallback((view?: GPUTextureView) => {
     view = view ?? gpuContext
       .getCurrentTexture()
       .createView();
 
-    if (samples > 1) colorAttachments[0].resolveTarget = view; 
+    if (samples > 1) colorAttachments[0].resolveTarget = view;
     else colorAttachments[0].view = view;
   }, [gpuContext, samples, colorAttachments])
 
@@ -134,7 +134,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithCh
 
     swap,
   ]);
-  
+
   const fiber = useFiber();
   fiber.__inspect = fiber.__inspect ?? {};
   fiber.__inspect.canvas = {

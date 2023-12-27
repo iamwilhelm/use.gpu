@@ -64,7 +64,7 @@ export const Transform: LiveComponent<TransformProps> = (props: PropsWithChildre
 
   const isArray = Array.isArray(children)
   const nested = isArray ? !children.find(c => c.f !== Transform) : children.f === Transform;
-  
+
   if (nested) {
     const combined = useCombinedMatrix(matrix);
     return provide(MatrixContext, combined, children);

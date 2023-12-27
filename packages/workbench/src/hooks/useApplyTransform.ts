@@ -25,7 +25,7 @@ export const useApplyTransform = (
 } => {
   const context = useTransformContext();
   const scissor = useScissorContext();
-  
+
   const {transform, bounds} = context;
   const version = useVersion(positions) + useVersion(transform) + useVersion(scissor) + useVersion(bounds);
 

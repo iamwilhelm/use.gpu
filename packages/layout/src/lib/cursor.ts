@@ -48,7 +48,7 @@ export const makeInlineCursor = (
 
   let start: number = 0;
   let end: number = 0;
-  
+
   let chunkAdvance = 0;
   let chunkIndex = 0;
   let chunkCross = 0;
@@ -122,7 +122,7 @@ export const makeInlineCursor = (
       chunkCross = 0;
     }
   };
-  
+
   const gather = (reduce: InlineReduce) => {
     spanCount++;
     flush(2);
@@ -234,7 +234,7 @@ export const makeFlexCursor = (
     spanMain = 0;
     spanTrim = 0;
   };
-  
+
   const gather = (reduce: FlexReduce): number => {
     flush();
 
@@ -248,15 +248,15 @@ export const makeFlexCursor = (
       index: number,
     ) => {
       let slack = (into ?? chunkMain) - main;
-      
+
       if (slack > 0 && growRow(slack, grows, sizes, start, end)) slack = 0;
       if (slack < 0 && shrinkRow(slack, shrinks, sizes, start, end)) slack = 0;
-      
+
       const [gap, lead] = getAlignmentSpacing(slack, end - start, index === l, align);
 
       reduce(sizes, start, end, gap, lead);
     });
-    
+
     return into ?? chunkMain;
   };
 

@@ -38,7 +38,7 @@ export const makeAABBGeometry = ({
   emitPosition(1, 0, 0);
   emitPosition(1, 1, 0);
   emitPosition(0, 1, 0);
-  
+
   emitSegment(0);
   emitSegment(3);
   emitSegment(3);
@@ -54,7 +54,7 @@ export const makeAABBGeometry = ({
   emitPosition(1, 0, 1);
   emitPosition(1, 1, 1);
   emitPosition(0, 1, 1);
-  
+
   emitSegment(0);
   emitSegment(3);
   emitSegment(3);
@@ -71,7 +71,7 @@ export const makeAABBGeometry = ({
   emitPosition(0, 1, 0);
   emitPosition(0, 1, 1);
   emitPosition(0, 0, 1);
-  
+
   emitSegment(0);
   emitSegment(3);
   emitSegment(3);
@@ -87,7 +87,7 @@ export const makeAABBGeometry = ({
   emitPosition(1, 1, 0);
   emitPosition(1, 1, 1);
   emitPosition(1, 0, 1);
-  
+
   emitSegment(0);
   emitSegment(3);
   emitSegment(3);
@@ -104,7 +104,7 @@ export const makeAABBGeometry = ({
   emitPosition(1, 0, 0);
   emitPosition(1, 0, 1);
   emitPosition(0, 0, 1);
-  
+
   emitSegment(0);
   emitSegment(3);
   emitSegment(3);
@@ -120,7 +120,7 @@ export const makeAABBGeometry = ({
   emitPosition(1, 1, 0);
   emitPosition(1, 1, 1);
   emitPosition(0, 1, 1);
-  
+
   emitSegment(0);
   emitSegment(3);
   emitSegment(3);

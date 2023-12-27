@@ -22,7 +22,7 @@ import { getFilledMask, getOutlinedMask } from '@use-gpu/wgsl/mask/point.wgsl';
 
 const MASK_SHADER = {
   'circle': circleSDF,
-  'diamond': diamondSDF, 
+  'diamond': diamondSDF,
   'square': squareSDF,
   'up': upSDF,
   'down': downSDF,

@@ -73,7 +73,7 @@ const getLoopedTime = (time: number, duration: number, pause: number, repeat: nu
   else {
     t = Math.min(duration, time % dp);
   }
-  
+
   return [t, max];
 }
 

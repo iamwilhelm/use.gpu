@@ -14,7 +14,7 @@ export type OptionsProps = {
 };
 
 export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
-  
+
   const {cursor, toggleInspect} = props;
 
   const [depthLimit, setDepthLimit] = cursor.depth();

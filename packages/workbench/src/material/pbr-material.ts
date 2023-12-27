@@ -28,7 +28,7 @@ export type PBRMaterialProps = {
   emissive?: VectorLike,
 
   albedoMap?: ShaderSource,
-  metalnessRoughnessMap?: ShaderSource,  
+  metalnessRoughnessMap?: ShaderSource,
   emissiveMap?: ShaderSource,
   occlusionMap?: ShaderSource,
   normalMap?: ShaderSource,

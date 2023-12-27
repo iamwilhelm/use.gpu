@@ -58,7 +58,7 @@ fn getZeroLevel(a: f32, b: f32) -> f32 {
   var nx = vec3<f32>(0.0);
   var ny = vec3<f32>(0.0);
   var nz = vec3<f32>(0.0);
-  
+
   if (p000 * p100 < 0.0) {
     var f = getZeroLevel(p000, p100);
 
@@ -71,7 +71,7 @@ fn getZeroLevel(a: f32, b: f32) -> f32 {
       else { f = 1; }
     }
     var pn = mix(n1, n2, f);
-    
+
     ata1 += pn * pn;
     ata2 += pn * pn.yzx;
     atb  += dot(pn, pb) * pn;
@@ -93,7 +93,7 @@ fn getZeroLevel(a: f32, b: f32) -> f32 {
       else { f = 1; }
     }
     var pn = mix(n1, n2, f);
-    
+
     ata1 += pn * pn;
     ata2 += pn * pn.yzx;
     atb  += dot(pn, pb) * pn;
@@ -329,7 +329,7 @@ fn getZeroLevel(a: f32, b: f32) -> f32 {
     ata2.z, ata2.y, ata1.z, atb.z,
   );
   let pos = approx3x3(system);
-  
+
   nx = normalize(nx);
   ny = normalize(ny);
   nz = normalize(nz);

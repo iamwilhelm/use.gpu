@@ -21,7 +21,7 @@ fn main(
   @location(3) fragNormal: vec4<f32>,
   @location(4) fragTangent: vec4<f32>,
   @location(5) fragPosition: vec4<f32>,
-  @location(6) fragScissor: vec4<f32>,  
+  @location(6) fragScissor: vec4<f32>,
 ) -> @location(0) vec4<f32> {
 
   var normal = fragNormal;
@@ -52,7 +52,7 @@ struct WithDepth {
   @location(3) fragNormal: vec4<f32>,
   @location(4) fragTangent: vec4<f32>,
   @location(5) fragPosition: vec4<f32>,
-  @location(6) fragScissor: vec4<f32>,  
+  @location(6) fragScissor: vec4<f32>,
 ) -> WithDepth {
 
   var normal = fragNormal;

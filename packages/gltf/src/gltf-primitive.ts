@@ -46,7 +46,7 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     mode,
   } = primitive;
 
-  const pbrMaterial = useGLTFMaterial(gltf, material);  
+  const pbrMaterial = useGLTFMaterial(gltf, material);
 
   const faces: Partial<FaceLayerProps> = {
     flat: NORMAL == null,

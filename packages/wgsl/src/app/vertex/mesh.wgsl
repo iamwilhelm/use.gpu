@@ -18,9 +18,9 @@ fn main(
   @location(2) color: vec4<f32>,
   @location(3) uv: vec2<f32>,
 ) -> VertexOutput {
-  
+
   var outPosition: vec4<f32> = worldToClip(position);
-  
+
   return VertexOutput(
     outPosition,
     toColorSpace(color),

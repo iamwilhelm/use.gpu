@@ -3,7 +3,7 @@ import { useOne, useNoOne } from '@use-gpu/live';
 // Return enough space to hold at least `size` items while resizing exponentially.
 export const useBufferedSize = (size: number, min: number = 0) => {
   const ref = useOne(() => ({alloc: Math.max(size, min)}));
-  return ref.alloc = adjustSize(size, ref.alloc);  
+  return ref.alloc = adjustSize(size, ref.alloc);
 };
 
 export const useNoBufferedSize = useNoOne;

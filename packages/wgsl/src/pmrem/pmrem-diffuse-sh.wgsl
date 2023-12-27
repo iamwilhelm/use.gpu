@@ -33,7 +33,7 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
   var band7 = vec4<f32>(0.0);
   var band8 = vec4<f32>(0.0);
   var bandW = 0.0;
-  
+
   let s1 = size - 1;
 
   let x = i32(globalId.x);
@@ -59,11 +59,11 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
         decodeOctahedral(uvo + vec2<f32>(0.0, 1e-4)) -
         decodeOctahedral(uvo + vec2<f32>(0.0, -1e-4))
       ) * 5e3;
-      
+
       let weight = length(cross(dx, dy));
       let s = sample * weight;
       //let s = weight * vec4<f32>(ray.x, ray.y, ray.z, 1.0);
-      
+
       // 0-2nd order specular (for capture)
       if (SPECULAR_SH == 1) {
         let ss = s;
@@ -118,21 +118,21 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
 
     let index = x * 10;
     shScratch[index + 0] = band0;
-    shScratch[index + 1] = band1; 
-    shScratch[index + 2] = band2; 
-    shScratch[index + 3] = band3; 
-    shScratch[index + 4] = band4; 
-    shScratch[index + 5] = band5; 
-    shScratch[index + 6] = band6; 
-    shScratch[index + 7] = band7; 
-    shScratch[index + 8] = band8; 
-    shScratch[index + 9] = vec4<f32>(bandW, 0.0, 0.0, 0.0); 
+    shScratch[index + 1] = band1;
+    shScratch[index + 2] = band2;
+    shScratch[index + 3] = band3;
+    shScratch[index + 4] = band4;
+    shScratch[index + 5] = band5;
+    shScratch[index + 6] = band6;
+    shScratch[index + 7] = band7;
+    shScratch[index + 8] = band8;
+    shScratch[index + 9] = vec4<f32>(bandW, 0.0, 0.0, 0.0);
   }
 
   workgroupBarrier();
 
   if (x > 0) { return; }
-  
+
   for (var x = 1; x < size.x - 1; x++) {
     let index = x * 10;
     band0 += shScratch[index + 0];
@@ -149,14 +149,14 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
 
   let norm = 1 / bandW;
   shCoefficients[0] = band0 * norm;
-  shCoefficients[1] = band1 * norm; 
-  shCoefficients[2] = band2 * norm; 
-  shCoefficients[3] = band3 * norm; 
-  shCoefficients[4] = band4 * norm; 
-  shCoefficients[5] = band5 * norm; 
-  shCoefficients[6] = band6 * norm; 
-  shCoefficients[7] = band7 * norm; 
-  shCoefficients[8] = band8 * norm; 
+  shCoefficients[1] = band1 * norm;
+  shCoefficients[2] = band2 * norm;
+  shCoefficients[3] = band3 * norm;
+  shCoefficients[4] = band4 * norm;
+  shCoefficients[5] = band5 * norm;
+  shCoefficients[6] = band6 * norm;
+  shCoefficients[7] = band7 * norm;
+  shCoefficients[8] = band8 * norm;
 }
 
 fn sqr(x: f32) -> f32 { return x * x; }

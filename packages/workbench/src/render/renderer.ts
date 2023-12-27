@@ -83,7 +83,7 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
           return variants.map(mode => getRender(mode, renderer));
         };
 
-    const useVariants = (virtual: VirtualDraw, hovered: boolean) => 
+    const useVariants = (virtual: VirtualDraw, hovered: boolean) =>
       useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
 
     return {useVariants, buffers, layout, bind, context: passContext};

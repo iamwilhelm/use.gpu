@@ -10,7 +10,7 @@ export type DispatchPassProps = {
 };
 
 const NO_OPS: any[] = [];
-const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
+const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 /** Dispatch pass.
 
@@ -27,7 +27,7 @@ export const DispatchPass: LC<DispatchPassProps> = memo((props: PropsWithChildre
 
   const run = () => {
     let ds = 0;
-    
+
     const countDispatch = (d: number) => { ds += d; };
 
     if (dispatches.length) {

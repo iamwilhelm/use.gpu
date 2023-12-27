@@ -30,7 +30,7 @@ export const LiveCanvas: React.FunctionComponent<LiveCanvasProps> = ({style, ren
         }
         return;
       }
-      
+
       const element = (typeof content === 'function') ? content(el.current) : content;
       const rootNode = resolveRootNode(element);
       fiber.current = renderLive(rootNode, fiber.current);

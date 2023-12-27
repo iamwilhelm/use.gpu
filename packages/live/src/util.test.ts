@@ -10,7 +10,7 @@ it("schedules actions", () => {
   let flush = () => {};
   let fibers: any[] = [];
 
-  const dispatch = (f: any) => { 
+  const dispatch = (f: any) => {
     flushed++;
     flush = f;
   };
@@ -85,7 +85,7 @@ it("tracks dependencies", () => {
 });
 
 it("resolves node ancestry", () => {
-  
+
   const n1  = {depth: 0, path: [0]} as any;
   const n11 = {depth: 1, path: [0, 0]} as any;
   const n12 = {depth: 1, path: [0, 1]} as any;

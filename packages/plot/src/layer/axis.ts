@@ -49,7 +49,7 @@ export const Axis: LiveComponent<AxisProps> = memo((props) => {
     origin,
     detail,
   } = props;
-  
+
   const parsed = useTraits(props);
 
   const {

@@ -64,7 +64,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
 
   return useMemo(() => {
     const st = origin ? getOriginProjection(layout, origin) : UV_SQUARE;
-    
+
     const sampledTexture = useMemo(() => {
       if (!image?.texture) return null;
 
@@ -90,7 +90,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         sampledTexture.size    = image!.texture!.size;
       }
     }
-  
+
     let boxW = layout[2] - layout[0];
     let boxH = layout[3] - layout[1];
     if (radius) {
@@ -117,7 +117,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         tr *= f;
         br *= f;
       }
-    
+
       radius[0] = tl;
       radius[1] = tr;
       radius[2] = br;
@@ -138,9 +138,9 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
       let uv = UV_SQUARE;
       if ('size' in texture) {
         const {size} = texture;
- 
+
         if (fit !== 'scale') {
- 
+
           let w = (width != null ? evaluateDimension(width, size[0], false) : size[0])!;
           let h = (height != null ? evaluateDimension(height, size[1], false) : size[1])!;
 
@@ -181,7 +181,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         border,
         stroke,
         fill,
-      
+
         texture: sampledTexture ?? image?.texture,
         repeat: (repeat != null ? REPEAT_FLAG[repeat] : repeat) ?? 0,
         uv,
@@ -201,7 +201,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         border,
         stroke,
         fill,
-        
+
         st,
 
         bounds: layout,

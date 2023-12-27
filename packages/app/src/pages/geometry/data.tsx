@@ -21,7 +21,7 @@ const lineDataFields = [
   ['f32', 'zBias'],
 ] as DataField[];
 
-// Generate a line voxel grid 
+// Generate a line voxel grid
 
 // Take random +/- X/Y/Z steps
 const vecSteps = [
@@ -42,7 +42,7 @@ const lineData = seq(20).map((i) => ({
     arr.push([next[0], next[1], next[2]]);
     return arr;
   }, [] as number[][]),
-  color: [Math.random()*Math.random(), Math.random(), Math.random()], 
+  color: [Math.random()*Math.random(), Math.random(), Math.random()],
   width: Math.random() * 20 + 1,
   zBias: i / 100,
   loop: false,
@@ -53,7 +53,7 @@ export const GeometryDataPage: LC = () => {
   return (
     <Loop>
       <Cursor cursor='move' />
-      
+
       <Camera>
         <Pass>
 

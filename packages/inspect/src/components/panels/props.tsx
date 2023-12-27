@@ -86,7 +86,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
 
   let yt = (yeeted?.value ?? yeeted?.reduced) != null ? (<>
     <div><b>Yeeted</b></div>
-    {yeeted?.value != null ? ( 
+    {yeeted?.value != null ? (
       <div><InspectObject
         object={{value: yeeted?.value}}
         state={state}
@@ -94,7 +94,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
         path={''}
       /></div>
     ) : null}
-    {yeeted?.reduced != null ? ( 
+    {yeeted?.reduced != null ? (
       <div><InspectObject
         object={{reduced: yeeted?.reduced}}
         state={state}

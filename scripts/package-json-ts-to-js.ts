@@ -21,7 +21,7 @@ for (const file of files) {
       statSync(types);
       json.types = types;
     } catch (e) {};
-    
+
     if (json.exports) {
       const convert = (value: string) => {
         value = value.replace(/(\.d)?\.ts$/, '.js');

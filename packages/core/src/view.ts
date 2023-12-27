@@ -63,7 +63,7 @@ export const makeOrthogonalMatrix = (
 
   const wx = -(right + left) / (right - left);
   const wy = -(bottom + top) / (bottom - top);
-  const wz = -(near) / (far - near);  
+  const wz = -(near) / (far - near);
 
   const matrix = mat4.create();
   mat4.set(matrix,
@@ -143,7 +143,7 @@ export const makeOrbitMatrix = (
 
   const t = [-target[0], -target[1], -target[2]] as any as vec3;
   mat4.translate(matrix, matrix, t);
-  
+
   return matrix;
 }
 

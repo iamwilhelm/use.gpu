@@ -46,7 +46,7 @@ export const HomePage: LiveComponent<HomePageProps> = (props) => {
       style: PANEL_STYLE,
       children: (<>
         <Title>Use.GPU Demos</Title>
-        
+
         <ul>
           {PAGES.slice(0, -1).map(({title, path}) => (
             <li key={path}>

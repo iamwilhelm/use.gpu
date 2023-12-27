@@ -283,11 +283,11 @@ fn traceVolumeSteps(
     let origin = saturate(uv.xyz) * vec3<f32>(s);
     hit = traceOnVolume(origin, ray, s);
   }
-  
+
   var albedo: vec4<f32>;
   var emissive: vec4<f32>;
   var material: vec4<f32>;
-  
+
   if (DEBUG_STEPS) {
     let t = f32(hit.steps) / 64.0;
     albedo = vec4<f32>(0.0, 0.0, 0.0, 1.0);
@@ -300,7 +300,7 @@ fn traceVolumeSteps(
 
     let palette = getPalette(hit.index, 0u);
     let pbr = getPBR(hit.index - 1);
-  
+
     albedo = palette * (1.0 - pbr.z);
     emissive = palette * pbr.z;
     material = vec4<f32>(pbr.x, pbr.y, 0.0, 0.0);
@@ -347,7 +347,7 @@ fn traceVolumeSteps(
     let origin = saturate(uv.xyz) * vec3<f32>(s);
     hit = traceOnVolume(origin, ray, s);
   }
-  
+
   if (hit.index == 0u) { discard; }
 
   let m = getMatrix();
@@ -391,7 +391,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
       const parent = useMatrixContext();
       const [matrix, inverse, ray, normal] = useOne(() => {
         if (!parent) return [mat4.create(), mat4.create(), mat3.create(), mat3.create()];
-        
+
         const m = mat4.clone(parent);
         const i = mat4.clone(m);
         mat4.invert(i, i);

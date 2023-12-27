@@ -14,7 +14,7 @@ import {
   AmbientLight, DirectionalLight, PointLight, DomeLight,
   PBRMaterial, GeometryData,
   Loop, Animate, DebugProvider, Environment,
-  makePlaneGeometry, 
+  makePlaneGeometry,
 } from '@use-gpu/workbench';
 
 import { VoxData, VoxModel } from '@use-gpu/voxel';

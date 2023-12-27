@@ -23,7 +23,7 @@ export type DomeLightProps = {
 const DEFAULT_DIRECTION = vec3.fromValues(0, -1, 0);
 
 export const DomeLight = memo((props: DomeLightProps) => {
-  
+
   const direction = useProp(props.direction, parsePosition, DEFAULT_DIRECTION);
   const horizon = useProp(props.horizon, parseColor, [1, 1, 1, 1]);
   const zenith = useProp(props.zenith, parseColor, [.5, .5, .5, 1]);

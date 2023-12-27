@@ -25,7 +25,7 @@ const thetaFormatter = (θ: number) => {
 };
 
 export const PlotPolarPage: LC = () => {
-  
+
   return (
     <Loop>
       <FlatCamera relative>

@@ -64,7 +64,7 @@ export const checkStorageTypes = (
     const link = links[u.name];
     checkStorageType(u, link)
   }
-} 
+}
 
 export const checkStorageType = (
   uniform: UniformAttribute,
@@ -86,12 +86,12 @@ export const checkStorageType = (
     // Remove array<atomic<..>>
     f = f.replace(/array?/, '').replace(/^<|>$/g, '');
     f = f.replace(/atomic?/, '').replace(/^<|>$/g, '');
-    t = t.replace(/array?/, '').replace(/^<|>$/g, ''); 
-    t = t.replace(/atomic?/, '').replace(/^<|>$/g, ''); 
+    t = t.replace(/array?/, '').replace(/^<|>$/g, '');
+    t = t.replace(/atomic?/, '').replace(/^<|>$/g, '');
 
     // Remove vec<..> to allow for automatic widening/narrowing
     f = f.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, '');
-    t = t.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, ''); 
+    t = t.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, '');
 
     // Shorthand
     if (f.match(/^uif$/)) f += '32';
@@ -112,4 +112,4 @@ export const checkStorageType = (
       }
     }
   }
-} 
+}

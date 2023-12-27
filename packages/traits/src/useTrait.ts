@@ -5,7 +5,7 @@ import {
   TraitDefinition, Trait, TraitCombinator,
   InputTypes, OutputTypes,
   UseHooks, UseMemo, UseOne, UseProp, UseTrait,
-} from './types'; 
+} from './types';
 
 const makeObject = () => ({});
 

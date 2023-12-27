@@ -14,6 +14,8 @@ import {
 
 import { lineData, zigzagData, arrowData } from './line-data';
 
+import { InfoBox } from '../../ui/info-box';
+
 // Line data fields
 
 const lineSchema = {
@@ -25,13 +27,15 @@ const lineSchema = {
   widths: {format: 'f32', prop: 'width'},
 };
 
-const isLoop  = (i: number) => lineData[i].loop;
-const isStart = (i: number) => lineData[i].start;
-const isEnd   = (i: number) => lineData[i].end;
+const isLineLoop  = (i: number) => lineData[i].loop;
+const isArrowLoop  = (i: number) => arrowData[i].loop;
+
+const isStart = (i: number) => arrowData[i].start;
+const isEnd   = (i: number) => arrowData[i].end;
 
 export const GeometryLinesPage: LC = () => {
-
-  return (
+  return (<>
+    <InfoBox>Drive &lt;LineLayer&gt; and &lt;ArrowLayer&gt; directly using &lt;CompositeData&gt;.</InfoBox>
     <Camera>
       <Cursor cursor='move' />
       <Pass>
@@ -39,7 +43,7 @@ export const GeometryLinesPage: LC = () => {
         <CompositeData
           schema={lineSchema}
           data={lineData}
-          loop={isLoop}
+          loop={isLineLoop}
           segments={getLineSegments}
         >{
           (props) => <LineLayer {...props} depth={0.5} />
@@ -56,7 +60,7 @@ export const GeometryLinesPage: LC = () => {
         <CompositeData
           schema={lineSchema}
           data={arrowData}
-          loop={isLoop}
+          loop={isArrowLoop}
           start={isStart}
           end={isEnd}
           segments={getArrowSegments}
@@ -70,7 +74,7 @@ export const GeometryLinesPage: LC = () => {
 
       </Pass>
     </Camera>
-  );
+  </>);
 };
 
 const Camera = ({children}: PropsWithChildren<object>) => (

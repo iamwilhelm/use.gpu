@@ -31,7 +31,7 @@ export const getBlockMinMax = (
     if (!absolute) {
       const [minX, minY, maxX, maxY] = sizing;
       const [ml, mt, mr, mb] = margin;
-    
+
       allMinX = allMinX != null && minX !== null ? allMinX + minX : null;
       allMinY = allMinY != null && minY !== null ? Math.max(allMinY, minY + mt + mb) : null;
 
@@ -134,7 +134,7 @@ export const fitBlock = (
 
   // Resolved fit size
   const resolved = fixed.slice() as XY;
-  
+
   if (shrinkWrap) {
     if (!isX && fixed[0] == null) resolved[0] = Math.min(into[0] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[2]), 0));
     if ( isX && fixed[1] == null) resolved[1] = Math.min(into[1] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[3]), 0));
@@ -197,7 +197,7 @@ export const fitBlock = (
     }
     ++i;
   }
-  
+
   if (contain && m) {
     if (isX) w += m;
     else h += m;
@@ -244,7 +244,7 @@ export const fitBlock = (
     size[3] = size[1];
 
     const {render, pick, size: fitted} = fit(size);
-    
+
     if (under) {
       sizes.unshift(fitted);
       renders.unshift(render);
@@ -258,7 +258,7 @@ export const fitBlock = (
       offsets.push([ml, mt]);
     }
   }
-  
+
   return {
     size: resolved,
     sizes,

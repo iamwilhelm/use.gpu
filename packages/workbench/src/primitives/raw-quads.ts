@@ -60,7 +60,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     depthWrite,
     blend,
     mode = 'opaque',
-    
+
     instance,
     instances,
 
@@ -80,7 +80,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const s = useShaderRef(props.st, props.sts);
 
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
-  
+
   const ps = p ? useSource(POSITION, p) : useNoSource();
   const ss = props.sts == null ? ps : s;
 
@@ -98,7 +98,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const boundVertex = useShader(getQuadVertex, [
     positions, scissor,
-    r, 
+    r,
     c, d, z, u, s,
     instanceCount,
   ]);

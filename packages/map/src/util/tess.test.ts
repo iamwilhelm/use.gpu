@@ -1,44 +1,44 @@
 import { cutPolygon, cutRing, assembleCutRing, getRingArea, pointInRing } from './tess';
 
 describe("tesselate", () => {
-  
+
   it("cuts ring left", () => {
-    
+
     const ring = [
       [  0,   0],
       [100,   0],
       [100, 100],
       [  0, 100],
     ];
-    
+
     const nx = 1;
     const ny = 0;
     const d = 50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
     expect(cut).toMatchSnapshot();
   });
-  
+
   it("cuts ring right", () => {
-    
+
     const ring = [
       [  0,   0],
       [100,   0],
       [100, 100],
       [  0, 100],
     ];
-    
+
     const nx = -1;
     const ny = 0;
     const d = -50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
     expect(cut).toMatchSnapshot();
-    
+
   });
-  
+
   it("cuts ring on vertex left", () => {
-    
+
     const ring = [
       [  0,   0],
       [ 50,   0],
@@ -47,17 +47,17 @@ describe("tesselate", () => {
       [ 50, 100],
       [  0, 100],
     ];
-    
+
     const nx = 1;
     const ny = 0;
     const d = 50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
     expect(cut).toMatchSnapshot();
   });
-  
+
   it("cuts ring on vertex right", () => {
-    
+
     const ring = [
       [  0,   0],
       [ 50,   0],
@@ -66,17 +66,17 @@ describe("tesselate", () => {
       [ 50, 100],
       [  0, 100],
     ];
-    
+
     const nx = -1;
     const ny = 0;
     const d = -50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
     expect(cut).toMatchSnapshot();
   });
-  
+
   it("cuts U", () => {
-    
+
     const ring = [
       [  0,   0],
       [100,   0],
@@ -87,18 +87,18 @@ describe("tesselate", () => {
       [100, 100],
       [  0, 100],
     ];
-    
+
     const nx = 1;
     const ny = 0;
     const d = 50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
     expect(cut).toMatchSnapshot();
-    
+
   });
 
   it("cuts U left with multiple vertices on edge", () => {
-    
+
     const ring = [
       [  0,   0],
       [ 50,   0],
@@ -110,18 +110,18 @@ describe("tesselate", () => {
       [100, 100],
       [  0, 100],
     ];
-    
+
     const nx = 1;
     const ny = 0;
     const d = 50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
     expect(cut).toMatchSnapshot();
-    
+
   });
-  
+
   it("cuts U right with multiple vertices on edge", () => {
-    
+
     const ring = [
       [  0,   0],
       [ 50,   0],
@@ -133,18 +133,18 @@ describe("tesselate", () => {
       [100, 100],
       [  0, 100],
     ];
-    
+
     const nx = 1;
     const ny = 0;
     const d = 50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
     expect(cut).toMatchSnapshot();
-    
+
   });
-  
+
   it("assembles U pieces", () => {
-    
+
     const ring = [
       [  0,   0],
       [100,   0],
@@ -155,21 +155,21 @@ describe("tesselate", () => {
       [100, 100],
       [  0, 100],
     ];
-    
+
     const nx = 1;
     const ny = 0;
     const d = 50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
     const polygon = assembleCutRing(cut, nx, ny);
 
     expect(polygon.map(getRingArea)).toMatchSnapshot();
     expect(polygon).toMatchSnapshot();
-    
+
   });
 
   it("assembles U piece left", () => {
-    
+
     const ring = [
       [  0,   0],
       [100,   0],
@@ -180,21 +180,21 @@ describe("tesselate", () => {
       [100, 100],
       [  0, 100],
     ];
-    
+
     const nx = -1;
     const ny = 0;
     const d = -50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
 
     const polygon = assembleCutRing(cut, nx, ny);
     expect(polygon.map(getRingArea)).toMatchSnapshot();
     expect(polygon).toMatchSnapshot();
-    
+
   });
 
   it("assembles U piece right", () => {
-    
+
     const ring = [
       [100,   0],
       [  0,   0],
@@ -205,21 +205,21 @@ describe("tesselate", () => {
       [  0, 100],
       [100, 100],
     ];
-    
+
     const nx = 1;
     const ny = 0;
     const d = 50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
 
     const polygon = assembleCutRing(cut, nx, ny);
     expect(polygon.map(getRingArea)).toMatchSnapshot();
     expect(polygon).toMatchSnapshot();
-    
+
   });
 
   it("assembles spiral piece", () => {
-    
+
     const ring = [
       [  0,   0],
       [100,   0],
@@ -246,17 +246,17 @@ describe("tesselate", () => {
     const nx = 1;
     const ny = 0;
     const d = 50;
-    
+
     const cut = cutRing(ring, nx, ny, d);
 
     const polygon = assembleCutRing(cut, nx, ny);
     expect(polygon.map(getRingArea)).toMatchSnapshot();
     expect(polygon).toMatchSnapshot();
-    
+
   });
-  
+
   it("assembles complex piece", () => {
-    
+
     const rings = [
       [
         [  0,   0],
@@ -309,15 +309,15 @@ describe("tesselate", () => {
     const nx = 1;
     const ny = 0;
     const d = 50;
-    
+
     const cut = rings.flatMap(r => cutRing(r, nx, ny, d));
     const polygon = assembleCutRing(cut, nx, ny);
 
     expect(polygon.map(getRingArea)).toMatchSnapshot();
     expect(polygon).toMatchSnapshot();
-    
+
   });
-  
+
   it('cut polygon', () => {
     const rings = [
       [
@@ -333,18 +333,18 @@ describe("tesselate", () => {
         [25, 20],
       ],
     ];
-    
+
     const nx = 1;
     const ny = 0;
     const d = 22;
-    
+
     const polygons = cutPolygon(rings, nx, ny, d);
 
     expect(polygons.map(polygon => polygon.map(getRingArea))).toMatchSnapshot();
     expect(polygons).toMatchSnapshot();
 
   });
-  
+
   it('cut polygon beside hole', () => {
     const rings = [
       [
@@ -372,18 +372,18 @@ describe("tesselate", () => {
         [17, 20],
       ],
     ];
-    
+
     const nx = 1;
     const ny = 0;
     const d = 12;
-    
+
     const polygons = cutPolygon(rings, nx, ny, d);
 
     expect(polygons.map(polygon => polygon.map(getRingArea))).toMatchSnapshot();
     expect(polygons).toMatchSnapshot();
 
   });
-  
+
   it('point in ring', () => {
     const ring = [
       [1, 1],
@@ -391,7 +391,7 @@ describe("tesselate", () => {
       [3, 3],
       [1, 2],
     ];
-    
+
     expect(pointInRing(ring, [1.5, 1.5])).toBe(true);
     expect(pointInRing(ring, [-1.5, 1.5])).toBe(false);
   });

@@ -140,7 +140,7 @@ export const getMinBindingSize = (format: UniformType | UniformAttribute[] | Sha
     const align = (UNIFORM_ATTRIBUTE_ALIGNS as any)[format] ?? 0;
     return align ? Math.ceil(size / align) * align : size;
   }
-  
+
   if (Array.isArray(format)) {
     const layout = makeUniformLayout(format);
     return layout.length;

@@ -1,4 +1,4 @@
-import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../../types';
+import { ShaderModule, ParsedBundle, ParsedModule, UniformAttribute, RefFlags as RF } from '../../types';
 import { loadVirtualModule } from '../shader';
 import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleEntry, getBundleHash, getBundleKey, getBundleName } from '../bundle';
@@ -48,7 +48,7 @@ export const makeExplode = (
 
   const entry = getBundleEntry(source) ?? 'explode';
   if (!Array.isArray(fields)) throw new Error(`Cannot explode non-struct type '${entry}: ${fields}' of ${getBundleName(tBundle)}`);
-  if (tBundle.bindings?.length) throw new Error(`Cannot explode virtual '${entry}' of ${getBundleName(tBundle)}`);
+  if (tBundle.bound?.size) throw new Error(`Cannot explode virtual '${entry}' of ${getBundleName(tBundle)}`);
 
   let hash = getBundleHash(tBundle) ^ getBundleHash(sBundle);
   let key = getBundleKey(tBundle) ^ getBundleKey(sBundle);
@@ -77,7 +77,7 @@ export const makeExplode = (
       fields,
     );
   }
-  
+
   const exports = fields.map(({name, format}) => makeDeclaration(name, format, args));
 
   const exploded = loadVirtualModule(
@@ -89,7 +89,7 @@ export const makeExplode = (
     rekey,
   );
 
-  const rebound = new Set();
+  const rebound = new Set<ParsedModule>();
   mergeBindings(rebound, tBundle);
   mergeBindings(rebound, sBundle);
 

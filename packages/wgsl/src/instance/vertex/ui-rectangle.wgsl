@@ -1,6 +1,6 @@
 use '@use-gpu/wgsl/use/types'::{ UIVertex };
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
-use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolution, getViewSize }; 
+use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolution, getViewSize };
 
 @optional @link fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
 @optional @link fn getRadius(i: u32)    -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
@@ -44,7 +44,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
         0u,
       );
     }
-    
+
     if (rectangle.x < clip.x) {
       clipUV.x = (clip.x - rectangle.x) / (rectangle.z - rectangle.x);
     }
@@ -125,7 +125,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
 
   let textureUV = mix(uv4.xy, uv4.zw, uv1);
   let textureST = mix(st4.xy, st4.zw, uv1);
-  
+
   return UIVertex(
     vec4<f32>(conservative, 1.0) * center4.w,
     uv1,

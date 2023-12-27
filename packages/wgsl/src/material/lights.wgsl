@@ -29,6 +29,6 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
     let r = applyLight(N, V, light, surface);
     radiance += r * f;
   }
-  
+
   return radiance;
 }

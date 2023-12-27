@@ -219,7 +219,7 @@ export const TreeLegend = styled('div', {
   fontSize: '0.9em',
   background: '#000',
   zIndex: 10,
-  
+
   '& > div': {
     position: 'sticky',
     left: 0,

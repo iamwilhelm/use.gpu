@@ -6,7 +6,7 @@ import type {
   VoxNodeInfo,
   VoxNodeShape,
   VoxNodeGroup,
-  VoxNodeTransform,  
+  VoxNodeTransform,
   VoxMeta,
   VoxProps,
   VoxOptions,
@@ -66,7 +66,7 @@ export const parseVox = (
   for (const {id, children} of chunks) {
     if (id === 'MAIN') {
       if (children) for (const chunk of children) {
-        const {id} = chunk; 
+        const {id} = chunk;
 
         if (id === 'SIZE') {
           const size = parseSIZEChunk(view, chunk);
@@ -117,7 +117,7 @@ export const parseVox = (
       }
     }
   }
-  
+
   if (hasImap) for (let i = 0; i < 256; ++i) palette[imap[i]] = rgba[i];
   else for (let i = 0; i < 256; ++i) palette[i + 1] = rgba[i];
   for (const material of materials) decodeMaterial(material, pbr);
@@ -347,7 +347,7 @@ export const parseNGRPChunk = (view: DataView, chunk: RawChunk): VoxNodeGroup =>
   const n = getUint32(view, ptr);
   const children: number[] = [];
   for (let i = 0; i < n; ++i) children.push(getUint32(view, ptr));
-  
+
   return {
     type: 'group',
     id,
@@ -399,7 +399,7 @@ export const parseNSHPChunk = (view: DataView, chunk: RawChunk): VoxNodeShape =>
   const props = getDict(view, ptr);
 
   const n = getInt32(view, ptr);
-  
+
   let model: VoxMeta;
   let models: VoxMeta[] | undefined;
   if (n > 1) {

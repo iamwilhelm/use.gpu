@@ -26,7 +26,7 @@ export const glyphToESDT = (
 
   paintIntoStage(stage, data, w, h, pad);
   paintSubpixelOffsets(stage, data, w, h, pad, preprocess);
-  
+
   if (debug) {
     const sdfToDebugView = makeSDFToDebugView(wp, hp, np, radius, cutoff);
     debug(sdfToDebugView(xo, yo, xi, yi, outer, inner));
@@ -84,12 +84,12 @@ export const paintIntoStage = (
   const np = wp * hp;
 
   const {outer, inner} = stage;
-  
+
   outer.fill(INF, 0, np);
   inner.fill(0, 0, np);
 
   const getData = (x: number, y: number) => (data[y * w + x] ?? 0);
-  
+
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const a = getData(x, y);
@@ -127,7 +127,7 @@ export const paintIntoDistanceField = (
   const np = wp * hp;
 
   const getData = (x: number, y: number) => (data[y * w + x] ?? 0) / 255;
-  
+
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const a = getData(x, y);
@@ -155,13 +155,13 @@ export const paintSubpixelOffsets = (
   const np = wp * hp;
 
   const {outer, inner, xo, yo, xi, yi} = stage;
-  
+
   xo.fill(0, 0, np);
   yo.fill(0, 0, np);
   xi.fill(0, 0, np);
   yi.fill(0, 0, np);
 
-  const getData = (x: number, y: number) => 
+  const getData = (x: number, y: number) =>
     (x >= 0 && x < w && y >= 0 && y < h) ? (data[y * w + x] ?? 0) / 255 : 0;
 
   // Make vector from pixel center to nearest boundary
@@ -183,12 +183,12 @@ export const paintSubpixelOffsets = (
         const tr = getData(x + 1, y - 1);
         const bl = getData(x - 1, y + 1);
         const br = getData(x + 1, y + 1);
-        
+
         const ll = (tl + l*2 + bl) / 4;
         const rr = (tr + r*2 + br) / 4;
         const tt = (tl + t*2 + tr) / 4;
         const bb = (bl + b*2 + br) / 4;
-        
+
         const min = Math.min(l, r, t, b, tl, tr, bl, br);
         const max = Math.max(l, r, t, b, tl, tr, bl, br);
 
@@ -217,7 +217,7 @@ export const paintSubpixelOffsets = (
         const r = getData(x + 1, y);
         const t = getData(x, y - 1);
         const b = getData(x, y + 1);
-        
+
         if (isBlack(l)) {
           xo[j - 1] = 0.4999;
           outer[j - 1] = 0;
@@ -242,7 +242,7 @@ export const paintSubpixelOffsets = (
       }
     }
   }
-  
+
   // Blend neighboring offsets but preserve normal direction
   // Uses xo as input, xi as output
   // Improves quality slightly, but slows things down.
@@ -270,7 +270,7 @@ export const paintSubpixelOffsets = (
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         const j = (y + pad) * wp + x + pad;
-      
+
         const nx = xo[j];
         const ny = yo[j];
         if (!nx && !ny) continue;
@@ -348,13 +348,13 @@ export const paintSubpixelOffsets = (
             dw++;
           }
         }
-    
+
         const nn = Math.sqrt(nx*nx + ny*ny);
         const ll = (dx * nx + dy * ny) / nn;
 
         dx = nx * ll / dw / nn;
         dy = ny * ll / dw / nn;
-    
+
         xi[j] = dx;
         yi[j] = dy;
       }
@@ -362,9 +362,9 @@ export const paintSubpixelOffsets = (
     xs = xi;
     ys = yi;
   }
-  
+
   if (half) return;
-  
+
   // Produce zero points for positive and negative DF, at +0.5 / -0.5.
   // Splits xs into xo/xi
   for (let y = 0; y < h; y++) {
@@ -410,9 +410,9 @@ export const relaxSubpixelOffsets = (
   const wp = w + pad * 2;
   const hp = h + pad * 2;
   const np = wp * hp;
-  
+
   const {xo, yo, xi, yi} = stage;
-  
+
   const relax = (xs: Float32Array, ys: Float32Array) => {
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
@@ -451,7 +451,7 @@ export const relaxSubpixelOffsets = (
       xs[j] = dx2;
       ys[j] = dy2;
       return d2;
-    }    
+    }
     return d;
   };
 
@@ -474,7 +474,7 @@ const makeSDFToDebugView = (
   outer: any | null,
   inner: any | null,
 ): Image => {
-  
+
   const out: number[] = [];
   for (let i = 0; i < np; i++) {
     const d =
@@ -488,7 +488,7 @@ const makeSDFToDebugView = (
   rgba.yo = yo && yo.slice();
   rgba.xi = xi && xi.slice();
   rgba.yi = yi && yi.slice();
-  
+
   if (outer) for (let i = 0; i < np; ++i) {
     if (outer[i]) {
       rgba.data[i * 4 + 0] *= 0.35;
@@ -503,7 +503,7 @@ const makeSDFToDebugView = (
       rgba.data[i * 4 + 2] *= 0.90;
     }
   }
-  
+
   return rgba;
 }
 
@@ -552,7 +552,7 @@ export const paintIntoRGB = (
           const k = (ox + oy * wp) * 4;
           image[i]     = image[k];
           image[i + 1] = image[k + 1];
-          image[i + 2] = image[k + 2];        
+          image[i + 2] = image[k + 2];
           image[i + 3] = 1;
         }
         i += 4;
@@ -636,7 +636,7 @@ export const esdt1d = (
 
     // Perpendicular
     const dx = xs[o];
-    const dy = ys[o];    
+    const dy = ys[o];
     const fq = f[q] = mask[o] ? INF : dy * dy;
     t[q] = dy;
 

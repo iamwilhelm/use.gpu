@@ -176,7 +176,7 @@ export const makeBoxLayout = (
     const t = top + offset[1];
     const r = l + w;
     const b = t + h;
-    
+
     const layout = [l, t, r, b] as Rectangle;
     const el = morph(use(render, layout, origin, xclip, xmask, xform));
 
@@ -186,7 +186,7 @@ export const makeBoxLayout = (
     }
     else out.push(el);
   }
-  
+
   if (out.length === 1 && Array.isArray(out[0])) return out[0];
   return out;
 };
@@ -208,7 +208,7 @@ export const makeBoxInspectLayout = (
   parentTransform?: ShaderModule | null,
 ) => {
   let out = renders ? makeBoxLayout(sizes, offsets, renders, clip, mask, transform, inverse)(box, origin, parentClip, parentMask, parentTransform) : [];
-  
+
   const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
   /*
   const xmask = parentMask && mask ? chainTo(parentMask, mask) : parentMask ?? mask;
@@ -270,7 +270,7 @@ export const makeBoxInspectLayout = (
       ...INSPECT_STYLE.child,
     });
   }
-  
+
   out = [...out, yeet(yeets)];
   return out;
 }
@@ -307,7 +307,7 @@ export const makeInlineLayout = (
 
     lines = [];
   };
-  
+
   for (let i = 0; i < n; ++i) {
     const range = ranges[i];
     const size = sizes[i];
@@ -396,7 +396,7 @@ export const makeInlineInspectLayout = (
       ...INSPECT_STYLE.child
     });
   }
-  
+
   out = [...out, yeet(yeets)];
   return out;
 };
@@ -444,7 +444,7 @@ export const makeBoxPicker = (
 
     let rr = ll + w;
     let bb = tt + h;
-    
+
     const sub = pick && pick(x, y, ll, tt, rr, bb, scroll);
     if (sub) return sub;
   }
@@ -552,7 +552,7 @@ export const getOriginProjection = (box: Rectangle, origin: Rectangle): Rectangl
 
   const projX = (x: number) => (x - l) / (r - l);
   const projY = (y: number) => (y - t) / (b - t);
-  
+
   const [ll, tt, rr, bb] = box;
   return [projX(ll), projY(tt), projX(rr), projY(bb)];
 };

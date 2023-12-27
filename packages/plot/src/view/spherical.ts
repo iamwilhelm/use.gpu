@@ -77,7 +77,7 @@ export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildre
     const sdx = fdx / sx;
     const sdy = fdy / sy;
     const sdz = dz  / sz;
-    
+
     const aspectX = Math.abs(sdx / sdz);
     const aspectY = Math.abs(sdy / sdz / aspectX);
 
@@ -136,7 +136,7 @@ export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildre
       const min = Math.max(-focus / aspectX, from);
       range[2] = [min, max];
     }
-    
+
     return [focus, aspectX, aspectY, scaleY, matrix, swizzle, range, epsilon];
   }, [g, a, p, r, q, s, bend, helix]);
 

@@ -68,7 +68,7 @@ export const MVTStyle: LiveComponent<MVTStyleProps> = (props: PropsWithChildren<
       if (style.line.color) out.line.color = parseColor(style.line.color);
       return out;
     };
-    
+
     const out: MVTStyleContextProps = {
       default: parseStyle(styles.default ?? {}, DEFAULT_STYLE),
     };
@@ -81,6 +81,6 @@ export const MVTStyle: LiveComponent<MVTStyleProps> = (props: PropsWithChildren<
     }
     return out;
   }, styles);
-  
+
   return provide(MVTStyleContext, styles, children);
 };

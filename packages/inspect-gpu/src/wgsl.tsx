@@ -147,7 +147,7 @@ export const WGSL = (props: WGSLProps) => {
   useLayoutEffect(() => {
     const {current: view} = viewRef;
     if (!view) return;
-    
+
     const currentCode = view.state.doc.toString();
     if (code !== currentCode) {
       view.dispatch({
@@ -165,16 +165,16 @@ export const WGSL = (props: WGSLProps) => {
         onChange(v.state.doc.toString());
       }
     });
-    
+
     const handleCommit = (v: EditorView) => {
       try {
         if (onCommit) onCommit(v.state.doc.toString());
       } catch (e) {
         console.error(e);
-      } 
+      }
       return true;
     };
-    
+
     const commitKeys = [
       {
         key: 'Cmd-s',

@@ -18,7 +18,7 @@ describe("getGraphOrder", () => {
     const order = getGraphOrder(graph, A);
     expect(order).toMatchSnapshot();
   });
-  
+
   it("detects cycles", () => {
     const graph = new Map();
     graph.set(A, [B, C]);
@@ -45,7 +45,7 @@ describe("getGraphOrder", () => {
     expect(order[0]).toBe(F);
     expect(order).toMatchSnapshot();
   });
-  
+
   it("hoists inside graph", () => {
     const graph = new Map();
     graph.set(A, [F, B, C]);

@@ -318,7 +318,7 @@ Array [
 exports[`ast gets quad vertex declarations 1`] = `
 Array [
   Object {
-    "at": 183,
+    "at": 182,
     "flags": 2,
     "func": Object {
       "attr": Array [
@@ -339,7 +339,7 @@ Array [
     "symbol": "getPosition",
   },
   Object {
-    "at": 229,
+    "at": 228,
     "flags": 2,
     "func": Object {
       "attr": Array [
@@ -360,7 +360,7 @@ Array [
     "symbol": "getColor",
   },
   Object {
-    "at": 272,
+    "at": 271,
     "flags": 2,
     "func": Object {
       "attr": Array [
@@ -381,7 +381,7 @@ Array [
     "symbol": "getSize",
   },
   Object {
-    "at": 314,
+    "at": 313,
     "flags": 2,
     "func": Object {
       "attr": Array [
@@ -402,7 +402,7 @@ Array [
     "symbol": "getDepth",
   },
   Object {
-    "at": 352,
+    "at": 351,
     "flags": 1,
     "func": Object {
       "attr": Array [
@@ -509,7 +509,7 @@ Object {
   "bindings": undefined,
   "declarations": Array [
     Object {
-      "at": 183,
+      "at": 182,
       "flags": 2,
       "func": Object {
         "attr": Array [
@@ -530,7 +530,7 @@ Object {
       "symbol": "getPosition",
     },
     Object {
-      "at": 229,
+      "at": 228,
       "flags": 2,
       "func": Object {
         "attr": Array [
@@ -551,7 +551,7 @@ Object {
       "symbol": "getColor",
     },
     Object {
-      "at": 272,
+      "at": 271,
       "flags": 2,
       "func": Object {
         "attr": Array [
@@ -572,7 +572,7 @@ Object {
       "symbol": "getSize",
     },
     Object {
-      "at": 314,
+      "at": 313,
       "flags": 2,
       "func": Object {
         "attr": Array [
@@ -593,7 +593,7 @@ Object {
       "symbol": "getDepth",
     },
     Object {
-      "at": 352,
+      "at": 351,
       "flags": 1,
       "func": Object {
         "attr": Array [
@@ -627,7 +627,7 @@ Object {
   "enables": undefined,
   "exports": Array [
     Object {
-      "at": 352,
+      "at": 351,
       "flags": 1,
       "func": Object {
         "attr": Array [
@@ -660,7 +660,7 @@ Object {
   ],
   "externals": Array [
     Object {
-      "at": 183,
+      "at": 182,
       "flags": 2,
       "func": Object {
         "attr": Array [
@@ -681,7 +681,7 @@ Object {
       "symbol": "getPosition",
     },
     Object {
-      "at": 229,
+      "at": 228,
       "flags": 2,
       "func": Object {
         "attr": Array [
@@ -702,7 +702,7 @@ Object {
       "symbol": "getColor",
     },
     Object {
-      "at": 272,
+      "at": 271,
       "flags": 2,
       "func": Object {
         "attr": Array [
@@ -723,7 +723,7 @@ Object {
       "symbol": "getSize",
     },
     Object {
-      "at": 314,
+      "at": 313,
       "flags": 2,
       "func": Object {
         "attr": Array [
@@ -845,35 +845,35 @@ Array [
 exports[`ast gets shake information for getQuadVertex AST 1`] = `
 Array [
   Array [
-    183,
+    182,
     Array [
       0,
       4,
     ],
   ],
   Array [
-    229,
+    228,
     Array [
       1,
       4,
     ],
   ],
   Array [
-    272,
+    271,
     Array [
       2,
       4,
     ],
   ],
   Array [
-    314,
+    313,
     Array [
       3,
       4,
     ],
   ],
   Array [
-    352,
+    351,
     Array [
       4,
     ],

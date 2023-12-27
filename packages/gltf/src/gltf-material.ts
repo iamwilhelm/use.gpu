@@ -18,7 +18,7 @@ export const useGLTFMaterial = (
   if (material == null || !gltf.materials?.[material]) {
     return {};
   }
-  
+
   const {
     pbrMetallicRoughness,
     normalTexture,
@@ -70,7 +70,7 @@ export const useGLTFMaterial = (
         if (roughnessFactor == null) props.roughness = 1.0;
       }
     }
-    
+
     if (normalTexture != null) {
       let map = gltf.bound.texture[normalTexture.index];
       if (map) {
@@ -98,7 +98,7 @@ export const useGLTFMaterial = (
       }
     }
   }
-    
+
   props.albedoMap = useNativeColorTexture(props.albedoMap);
   props.normalMap = useNativeColorTexture(props.normalMap);
   props.occlusionMap = useNativeColorTexture(props.occlusionMap);

@@ -86,7 +86,7 @@ const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
 
     bins++;
   }
-  
+
   if (min == max) min--;
 
   return {
@@ -151,7 +151,7 @@ const colorShader = wgsl`
       let g = sin(t * 4.0 + 2.09) * .5 + .5;
       let b = sin(t * 4.0 + 4.18) * .5 + .5;
 
-      let tint = vec3<f32>(r, g, b);      
+      let tint = vec3<f32>(r, g, b);
       let luma = max(0.0, t);
       color = vec4<f32>(luma * tint, 1.0);
     }

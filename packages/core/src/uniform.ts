@@ -176,11 +176,11 @@ export const makeVolatileUniforms = <T>(
     else if (b.texture?.volatile) depths.push(+b.texture.volatile);
   }
   let depth = depths.length > 1 ? lcm(depths) : depths[0];
-  
+
   if (depth === 1) {
     let lastKey = -1;
     let cached: GPUBindGroup | null = null;
-  
+
     const bindGroup = () => {
 
       let key = 0;
@@ -217,7 +217,7 @@ export const makeVolatileUniforms = <T>(
     for (const b of bindings) {
       let v: any = undefined;
       if (b.texture) v = b.texture.view ?? b.texture.texture;
-      else if (b.storage) v = b.storage.buffer;      
+      else if (b.storage) v = b.storage.buffer;
 
       ids.push(getObjectKey(v));
     }
@@ -256,7 +256,7 @@ export const makeDataBindingsEntries = <T>(
   binding: number = 0,
 ): GPUBindGroupEntry[] => {
   const entries = [] as any[];
-  
+
   for (const b of bindings) {
     if (b.storage) {
       const {storage} = b;

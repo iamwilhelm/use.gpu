@@ -98,7 +98,7 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
     ...state,
     [id]: !state[id],
   }));
-  
+
   const toObject = (us: any[]) => {
     const out: Record<string, any> = {};
     for (let u of us) {

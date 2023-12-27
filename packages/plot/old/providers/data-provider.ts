@@ -15,7 +15,7 @@ export type ValuesContextProps = number[] | TypedArray;
 export const DataContext = makeContext<DataContextProps>(undefined, 'DataContext');
 
 /**
- * Provides a typed array for current data 
+ * Provides a typed array for current data
  * @category Providers
  */
 export const ValuesContext = makeContext<ValuesContextProps>(undefined, 'ValuesContext');

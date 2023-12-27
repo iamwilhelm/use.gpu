@@ -29,7 +29,7 @@ import {
 type OnPick = (index: number) => void;
 
 export type PickingProps = {
-  pickingFormat?: GPUTextureFormat, 
+  pickingFormat?: GPUTextureFormat,
   pickingColor?: GPUColor,
   depthStencilFormat?: GPUTextureFormat,
   resolution?: number,
@@ -120,7 +120,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
       const index = seq(itemDims).map(i => captured![offset + i]);
       return index;
     }
-    
+
     const pickingSource = {
       texture: pickingTexture,
       sampler: null,
@@ -148,7 +148,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
       captureTexture,
       sampleTexture,
     };
-    
+
     return context;
   }, [device, renderContext, colorStates, depthStencilState, resolution]);
 

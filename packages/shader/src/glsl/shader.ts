@@ -69,7 +69,7 @@ export const glsl = (literals: TemplateStringsArray, ...tokens: string[]) => {
 /** Format `number` as GLSL `float` */
 export const float = (x: number) => {
   const s = x.toString();
-  return (!s.match(/\./)) ? s + '.0' : 0;  
+  return (!s.match(/\./)) ? s + '.0' : 0;
 };
 /** Format `number` as GLSL `uint` */
 export const uint = (x: number) => Math.round(x).toString();

@@ -55,6 +55,6 @@ fn offsetIndex(index: vec4<u32>, size: vec4<u32>, offset: vec3<i32>) -> vec4<u32
     if (sz < 0) { sz = 0; }
     if (sz >= i32(size.z)) { sz = i32(size.z) - 1; }
   }
-  
+
   return vec4<u32>(u32(sx), u32(sy), u32(sz), index.w);
 }

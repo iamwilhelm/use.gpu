@@ -56,7 +56,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       if (n.from !== n.to) break;
       n = n.parent;
     }
-    
+
     let start = n.from;
     let end = n.to;
     while (start > 0 && code.charAt(start - 1) !== "\n") start--;
@@ -86,9 +86,9 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   const getTextAt = (from: number, to: number) => {
     return code.slice(from, to);
   }
-  
+
   ////////////////
-  
+
   const getIdentifiers = (node: SyntaxNode, symbol: string, exclude = NO_STRINGS): string[] | undefined => {
     const cursor = node.cursor();
     const {to} = node;
@@ -114,7 +114,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
     return ids.size ? Array.from(ids) : undefined;
   };
-    
+
   ////////////////
 
   const getImport = (node: SyntaxNode): ImportRef => {
@@ -129,7 +129,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
   const getAttribute = (node: SyntaxNode): AttributeRef => {
     return getTextAt(node.from + 1, node.to);
-    
+
     /*
     const [a, ...rest] = getNodes(node, 1);
 
@@ -158,11 +158,11 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   const getParameters = (node: SyntaxNode): ParameterRef[] | undefined => {
     const nodes = getNodes(node);
     return nodes.length ? nodes.map(getParameter) : undefined;
-  } 
+  }
 
   const getType = (node: SyntaxNode): TypeRef => {
     return getText(node);
-    
+
     /*
     const [a, ...rest] = getNodes(node, 1);
 
@@ -244,7 +244,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
     const attr = getAttributes(a);
     const {name, type, qual} = getVariableDeclaration(b);
-    const value = hasValue ? getText(c) : undefined; 
+    const value = hasValue ? getText(c) : undefined;
 
     let identifiers = hasValue ? getIdentifiers(c, name) : undefined;
     const typeName = getTypeName(type);
@@ -258,14 +258,14 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
   const getConstant = (node: SyntaxNode): VariableRef => {
     const nodes = getNodes(node, 2);
-    
+
     const [a, b, c,, d] = nodes;
     const hasAttributes = a.type.id === T.AttributeList;
     const attr = hasAttributes ? getAttributes(a) : undefined;
 
     const hasValue = !!d;
     const {name, type} = getVariableIdentifier(c);
-    const value = hasValue ? getText(d) : undefined; 
+    const value = hasValue ? getText(d) : undefined;
 
     let identifiers = hasValue ? getIdentifiers(d, name) : undefined;
     const typeName = getTypeName(type);
@@ -276,7 +276,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
     return {name, type, attr, value, identifiers};
   };
-  
+
   const getTypeAlias = (node: SyntaxNode): TypeAliasRef => {
     const [a,, b,, c] = getNodes(node, 3);
 
@@ -301,7 +301,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
   const getStruct = (node: SyntaxNode): StructRef => {
     const [a,, b, c] = getNodes(node, 3);
-    
+
     const attr = getAttributes(a);
     const name = getText(b);
     const members = c ? getStructMembers(c) : NO_MEMBERS;
@@ -416,7 +416,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       const symbol = struct.name;
       return {at, symbol, flags, struct};
     }
-    
+
     throw throwError('declaration', node);
   };
 
@@ -436,13 +436,13 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
       let module: string;
       let refs: ImportRef[];
-      
+
       let verb = getText(a);
       if (verb === 'import') {
         if (b.type.id === T.String) {
           refs = [];
           module = parseString(getText(b));
-        } 
+        }
         else {
           refs = getNodes(b).map(getImport);
           module = parseString(getText(c));
@@ -456,7 +456,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
       let items = modules[module];
       if (!items) items = modules[module] = [];
-    
+
       items.push(...refs);
     }
 
@@ -479,7 +479,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const children = tree.topNode.getChildren(T.EnableDirective);
     return children.flatMap(getEnable);
   };
-  
+
   ////////////////
 
   const getSymbolTable = (): SymbolTable => {
@@ -572,7 +572,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
     return out.length ? out : undefined;
   }
-  
+
   ////////////////
 
   const cursor = tree.cursor();
@@ -653,7 +653,7 @@ export const rewriteUsingAST = (
       const name = code.slice(from, to);
       const replace = rename.get(name);
 
-      if (replace) skip(from, to, replace);      
+      if (replace) skip(from, to, replace);
     }
 
     // Top level declaration (full AST only)
@@ -706,7 +706,7 @@ export const rewriteUsingAST = (
       }
       else {
         const replace = rename.get(name);
-        if (replace) skip(from, to, replace);      
+        if (replace) skip(from, to, replace);
       }
     }
     // Import declaration (full AST only)
@@ -751,7 +751,7 @@ export const compressAST = (
     if (type.name === 'PrivateIdentifier') {
       while (cursor.lastChild()) {};
     }
-    
+
     // Any identifier
     else if (type.name === 'Identifier') {
       ident(from, to);

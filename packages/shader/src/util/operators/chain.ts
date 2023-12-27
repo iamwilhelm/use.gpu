@@ -1,4 +1,4 @@
-import { UniformAttribute, ShaderModule, ParsedBundle, RefFlags as RF } from '../../types';
+import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, RefFlags as RF } from '../../types';
 import { loadVirtualModule } from '../shader';
 import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleHash, getBundleKey } from '../bundle';
@@ -47,7 +47,7 @@ export const makeChainTo = (
 ): ParsedBundle => {
   const fBundle = toBundle(from);
   const tBundle = toBundle(to);
-  
+
   const {name: fromName, format: fromFormat, args: fromArgs} = bundleToAttribute(from);
   const {name: toName, format: toFormat, args: toArgs} = bundleToAttribute(to);
 
@@ -62,7 +62,7 @@ export const makeChainTo = (
   if (!isVoid && toArgs?.[0] !== fromType) {
     throw new Error(`Type Error: ${fromName} -> ${toName}.\nCannot chain output ${fromType} to args (${toArgs?.join(', ')}).`);
   }
-  
+
   // Other arguments of `from` and `to` must match
   const toRest = toArgs?.slice(restIndex) ?? [];
   const fromRest = fromArgs?.slice(restIndex, restIndex + toRest.length) ?? [];
@@ -99,7 +99,7 @@ export const makeChainTo = (
     rekey,
   );
 
-  const rebound = new Set();
+  const rebound = new Set<ParsedModule>();
   mergeBindings(rebound, fBundle);
   mergeBindings(rebound, tBundle);
 

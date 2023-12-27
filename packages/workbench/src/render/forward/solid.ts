@@ -34,7 +34,7 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
 
   const {layout: globalLayout} = useViewContext();
   const {layout: passLayout} = usePassContext();
-  
+
   const vertexShader = instanceDrawVirtualSolid;
   const fragmentShader = instanceFragmentSolid;
 

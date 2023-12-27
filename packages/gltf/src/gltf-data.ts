@@ -110,7 +110,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         imageAssetIndices,
       };
     }, json);
-  
+
     // Resume after loading resources
     const Resume = (resources: (ArrayBuffer | ImageBitmap | null)[]) => {
       const n = bufferAssets.length;
@@ -177,7 +177,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
       const bufferSources = useMap<GLTFBufferViewData, GLTFStorageSource | null>(bufferViews,
         ({buffer, byteOffset, byteLength, byteStride}, index) => {
           if (byteStride != null && byteStride !== 1) throw new Error("byteStride != 1 not implemented");
-      
+
           let gpuBuffer = gpuBuffers[buffer];
           if (!gpuBuffer) return null;
 
@@ -274,7 +274,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         ({sampler, source}, index) => {
           const imageSource = imageSources[source as any];
           if (!imageSource) return null;
-      
+
           return {
             ...imageSource,
             sampler: samplerToDescriptor(samplers[sampler as any]),
@@ -340,7 +340,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
 const samplerToDescriptor = (sampler: any): GPUSamplerDescriptor => {
   const {magFilter, minFilter, wrapS, wrapT} = sampler;
-  
+
   const min =
     minFilter === 9728 ? 'nearest' :
     minFilter === 9729 ? 'linear'  :
@@ -348,7 +348,7 @@ const samplerToDescriptor = (sampler: any): GPUSamplerDescriptor => {
     minFilter === 9985 ? 'linear'  :
     minFilter === 9986 ? 'nearest' :
     minFilter === 9987 ? 'linear'  : 'linear';
-  
+
   const mag =
     magFilter === 9728 ? 'nearest' :
     magFilter === 9729 ? 'linear'  : 'linear';
@@ -358,7 +358,7 @@ const samplerToDescriptor = (sampler: any): GPUSamplerDescriptor => {
     minFilter === 9985 ? 'nearest' :
     minFilter === 9986 ? 'linear'  :
     minFilter === 9987 ? 'linear'  : 'linear';
-  
+
   const addressModeU =
     wrapS === 33071 ? 'clamp-to-edge' :
     wrapS === 33648 ? 'mirror-repeat' :
@@ -368,7 +368,7 @@ const samplerToDescriptor = (sampler: any): GPUSamplerDescriptor => {
     wrapT === 33071 ? 'clamp-to-edge' :
     wrapT === 33648 ? 'mirror-repeat' :
     wrapT === 10497 ? 'repeat' : 'repeat';
-  
+
   return {
     minFilter: min,
     magFilter: mag,
@@ -455,7 +455,7 @@ const useMap = <A, B>(
   key: (a: A, i: number) => any,
   deps: any[] = NO_DEPS,
 ): (B | null)[] => {
-  
+
   const values = useMemo(() => args?.map(() => null as B | null), deps);
   const keys = useMemo(() => args?.map(() => null as B | null), deps);
 

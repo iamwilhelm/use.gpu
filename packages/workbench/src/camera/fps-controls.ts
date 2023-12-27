@@ -40,7 +40,7 @@ export const FPSControls: LiveComponent<FPSControlsProps> = (props) => {
     bearingSpeed = 5,
     pitchSpeed   = 5,
     moveSpeed    = 15,
-    
+
     active = true,
     render,
   } = props;

@@ -179,7 +179,7 @@ export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRe
   const applyLight = useOne(() => {
     const applyDirectionalShadow = shadows ? bindBundle(applyDirectionalShadowWGSL, {sampleShadow}) : null;
     const applyPointShadow = shadows ? bindBundle(applyPointShadowWGSL, {sampleShadow}) : null;
-    
+
     return bindBundle(applyLightWGSL, {
       applyMaterial,
       applyDirectionalShadow,

@@ -13,7 +13,7 @@ exports[`bind binds an external 1`] = `
 
 
     vec4 _01_getColor();
-    
+
     vec4 colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
     vec4 getColor() {
       return _01_getColor() + colorUsed();
@@ -34,7 +34,7 @@ exports[`bind binds an external 2`] = `
 
 
     vec4 _01_getColor();
-    
+
     vec4 colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
     vec4 getColor() {
       return _01_getColor() + colorUsed();
@@ -55,7 +55,7 @@ exports[`bind binds an external 3`] = `
 
 
     vec4 _01_getColor();
-    
+
     vec4 _02_colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
     vec4 _02_getColor() {
       return _01_getColor() + _02_colorUsed();
@@ -100,7 +100,7 @@ vec2 _VT_1_getSize(int index) {
 
     vec4 _VT_1_getColor(int);
     vec2 _VT_1_getSize(int);
-    
+
     void main() {
       _VT_1_getColor(0);
       _VT_1_getSize(0);

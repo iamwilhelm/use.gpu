@@ -113,7 +113,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const z = useShaderRef(props.zBias, props.zBiases);
   const t = useShaderRef(props.trim, props.trims);
   const e = useShaderRef(props.size, props.sizes);
-  
+
   const i = useShaderRef(null, props.indices);
 
   const auto = useOne(() => props.segment != null ? getShader(getLineSegment, [props.segment]) : null, props.segment);
@@ -167,7 +167,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     LINE_JOIN_STYLE: style,
     LINE_JOIN_SIZE: segments,
   }), [defs, instanceDefs, style, segments]);
-  
+
   return use(Virtual, {
     vertexCount,
     instanceCount: totalCount,

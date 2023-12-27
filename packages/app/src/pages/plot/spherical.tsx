@@ -28,7 +28,7 @@ const thetaFormatter = (θ: number) => {
 };
 
 export const PlotSphericalPage: LC = () => {
-  
+
   return (
     <Loop>
       <LinearRGB>

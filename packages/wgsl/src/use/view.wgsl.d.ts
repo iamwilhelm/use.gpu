@@ -7,6 +7,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const getViewSize: ParsedBundle;
   export const getViewNearFar: ParsedBundle;
   export const getViewPixelRatio: ParsedBundle;
+  export const getViewVector: ParsedBundle;
   export const to3D: ParsedBundle;
   export const worldToView: ParsedBundle;
   export const viewToClip: ParsedBundle;

@@ -13,7 +13,7 @@ import { getSolidFragment } from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
 
 export type ShaderFlatMaterialProps = {
   /** Flat shader, for both lit and unlit passes (e.g. shadow map).
-  
+
   fn getFragment(color: vec4<f32>, uv: vec4<f32>, st: vec4<f32>) -> vec4<f32>
    */
   fragment: ShaderModule,

@@ -13,7 +13,7 @@ const STYLE: CSSProperties = {
   width: '300px',
   padding: '20px',
   background: 'rgba(0, 0, 0, .75)',
-  
+
   zIndex: 100,
 };
 
@@ -27,11 +27,11 @@ const NOTE: CSSProperties = {
 
   padding: '20px',
   background: 'rgba(0, 0, 0, .75)',
-  
+
   zIndex: 100,
   pointerEvents: 'none',
   textAlign: 'center',
-  
+
   transition: 'opacity 1s ease-out',
 };
 
@@ -115,7 +115,7 @@ export const BinaryControls: LC<BinaryControlsProps> = (props: BinaryControlsPro
     e.preventDefault();
     setDragging(false);
   }, []);
-  
+
   const handleDrop = useCallback((e: any) => {
     e.preventDefault();
     if (!e.dataTransfer.files) return;
@@ -159,7 +159,7 @@ export const BinaryControls: LC<BinaryControlsProps> = (props: BinaryControlsPro
     const buffer = await fetch(url).then(r => r.arrayBuffer());
     setBuffer(buffer);
   }, [fileId, customFile]);
-  
+
   useResource((dispose) => {
     const timer = setTimeout(() => setNote(false), 10000);
     dispose(() => clearTimeout(timer));
@@ -187,7 +187,7 @@ export const BinaryControls: LC<BinaryControlsProps> = (props: BinaryControlsPro
       children: (<>
         <div>
           <p><b>Consecutive bytes as (X,Y,Z) histogram</b></p>
-        
+
           <label>Show file:</label>
           <select style={{marginLeft: 20}} value={customFile ?? fileId} onChange={(e) => {
             setCustomFile(null);

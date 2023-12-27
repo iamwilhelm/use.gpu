@@ -33,7 +33,7 @@ export const fitAbsoluteBox = (
   const shrinkWrap = isX ? fixed[0] === null : fixed[1] === null;
 
   const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, NO_LAYOUT, direction, true, shrinkWrap);
-  
+
   if (left == null) left = right != null && size[0] != null ? right - size[0] : 0;
   if (top == null) top = bottom != null && size[1] != null ? bottom - size[1] : 0;
 
@@ -62,7 +62,7 @@ export const resolveAbsoluteBox = (
     right,
     bottom,
   ] = box;
-  
+
   let width = right - left;
   let height = bottom - top;
 

@@ -2,12 +2,12 @@ import { patch, $apply } from './patch';
 import { makeCursor, refinePair } from './cursor';
 
 describe('cursor', () => {
-  
+
   const makeUpdateState = (UPDATE: any = null) => [
     () => UPDATE,
     (update: any) => { UPDATE = update },
   ] as [() => any, (update: any) => void];
-  
+
   it('traverses and resolves', () => {
 
     const state = {
@@ -56,7 +56,7 @@ describe('cursor', () => {
       list: [2, 3, 4],
       obj: { hello: 'world' },
     };
-    
+
     const state2 = patch(state, {
       obj: {
         foo: true,

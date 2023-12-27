@@ -51,7 +51,7 @@ use '@use-gpu/wgsl/use/types'::{ Light, SurfaceFragment };
   else {
     s += sampleShadow(uvm, index, depth);
   }
-  
+
   return s;
 };
 

@@ -89,7 +89,7 @@ const resolveBundleType = (bundle: ShaderModule, attribute: UniformAttribute) =>
   const {format} = attribute;
   if (typeof format !== 'string') return attribute;
   if (!format.match(/[A-Z]/)) return attribute;
-  
+
   const {libs, module} = bundle as any as ParsedBundle;
   if (!libs || !module) return attribute;
 
@@ -193,7 +193,7 @@ export const getBundleSummary = (bundle: ShaderModule, maxDepth: number = Infini
     out.key   = getBundleKey(bundle);
     out.hash  = getBundleHash(bundle);
     out.depth = out.link ? depth : 0;
-    
+
     if (out.lib?.match(/^_VT_/)) out.lib = out.name;
 
     if (depth < maxDepth) {
@@ -211,7 +211,7 @@ export const getBundleSummary = (bundle: ShaderModule, maxDepth: number = Infini
       for (const k in links) if (links[k]) {
         const sub = {link: k};
         allLinks.push(sub);
-      
+
         recurse(links[k], sub, k, depth + 1);
       }
     }

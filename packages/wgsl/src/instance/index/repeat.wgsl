@@ -1,12 +1,12 @@
 @link fn getInstanceSize() -> u32 {};
 
-@export fn getInstancedIndex(instanceIndex: u32) -> vec2<u32> {
+@export fn getInstanceRepeatIndex(instanceIndex: u32) -> vec2<u32> {
   var geometryIndex: u32;
   var uniformIndex: u32;
 
   let size = getInstanceSize();
   elementIndex = instanceIndex % size;
   uniformIndex = instanceIndex / size;
-  
+
   return vec2<u32>(elementIndex, uniformIndex);
 };

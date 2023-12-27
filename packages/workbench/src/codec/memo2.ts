@@ -30,7 +30,7 @@ export const Memo2: LC<Memo2Props> = (props: Memo2Props) => {
   const [w, h] = size ?? [0, 0];
   const reserve = (shader as any)?.length ?? ((w * h) || 16);
   const [buffer] = useScratchSource(format, {readWrite: true, reserve});
-  
+
   const setter = useMemo(() =>
     getShader(wgsl`
       @link var<storage, read_write> memoBuffer: array<${format}>;
@@ -46,7 +46,7 @@ export const Memo2: LC<Memo2Props> = (props: Memo2Props) => {
     buffer,
     setter,
   ]);
-  
+
   return [
     use(Dispatch, {
       shader: bound,

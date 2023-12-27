@@ -41,7 +41,7 @@ const DEFAULT_SHADOW_MAP = {
 const parseOptionalPosition = optional(parsePosition);
 
 export const DirectionalLight: LC<DirectionalLightProps> = memo((props: DirectionalLightProps) => {
-  
+
   const position = useProp(props.position, parsePosition, DEFAULT_DIRECTION);
   const direction = useProp(props.direction, parseOptionalPosition);
   const color = useProp(props.color, parseColor);

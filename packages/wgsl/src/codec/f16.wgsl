@@ -66,7 +66,7 @@
 @export fn fromF16u4(value: vec2<u32>) -> vec4<f32> {
   let xz = value.xy & vec2<u32>(0xFFFFu);
   let yw = value.xy >> vec2<u32>(16u);
-  
+
   return vec4<f32>(
     fromF16u(xz.x),
     fromF16u(yw.x),

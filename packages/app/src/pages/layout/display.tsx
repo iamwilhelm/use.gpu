@@ -107,7 +107,7 @@ export const LayoutDisplayPage: LC = () => {
 
                       <Text size={16} color={WHITE} lineHeight={24}>{"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n"}</Text>
                     </Inline>
-                  
+
                     <Block margin={[0, 20, 0, 0]} height={2} fill={WHITE} />
 
                     <Inline margin={MARGIN_TOP}>
@@ -120,12 +120,12 @@ export const LayoutDisplayPage: LC = () => {
                     </Inline>
 
                     <Block margin={[0, 20, 0, 0]} height={2} fill={WHITE} />
-                    
+
                   </Block>
                 </Overflow>
               </Block>
             </Flex>
-                     
+
             <Absolute bottom={10} height={40} left={0} right={0}>
               <Flex width="100%" height="100%" align="center">
                 <Flex align="center">
@@ -149,7 +149,7 @@ export const LayoutDisplayPage: LC = () => {
   return (
     <LayoutControls
       container={root}
-      render={(mode) => 
+      render={(mode) =>
         <DebugProvider
           debug={{
             sdf2d: { contours: mode === 'sdf' },

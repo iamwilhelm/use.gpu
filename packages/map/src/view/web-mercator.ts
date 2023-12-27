@@ -104,11 +104,11 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props: PropsWithChi
       // Apply inverse spherical basis as part of view matrix (right multiply)
       swizzleMatrix(t, order);
       mat4.multiply(matrix, matrix, t);
-      
+
       const orderIndices = toOrder(order);
       range = range.map((_, i) => range[orderIndices[i]]);
     }
-    
+
     return [matrix, swizzle, origin, range, epsilon];
   }, [long, lat, zoom, native, a, g, p, r, q, s, bend]);
 
@@ -124,7 +124,7 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props: PropsWithChi
   const c = useShaderRef(centered);
   const n = useShaderRef(native);
   const e = useShaderRef(epsilon);
-  
+
   const bound = useShader(getWebMercatorPosition, [t, b, o, z, d, c, n]);
 
   // Apply input basis as a cast

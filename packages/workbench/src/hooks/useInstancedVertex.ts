@@ -5,7 +5,7 @@ import { useMemo, useNoMemo, useCallback, useNoCallback } from '@use-gpu/live';
 import { useShaderRef, useNoShaderRef } from '../hooks/useShaderRef';
 import { useShader, useNoShader, getShader } from '../hooks/useShader';
 
-import { getInstancedIndex } from '@use-gpu/wgsl/instance/instanced-index.wgsl';
+import { getInstanceRepeatIndex } from '@use-gpu/wgsl/instance/index/repeat.wgsl';
 import { getInstancedVertex } from '@use-gpu/wgsl/instance/vertex/instanced.wgsl';
 
 const INSTANCES = {HAS_INSTANCES: true};
@@ -17,7 +17,7 @@ export const useInstancedVertex = (
   instance?: Lazy<number>,
   instances?: ShaderSource,
   elementCount?: Lazy<number>,
-  instanceStride?: number,
+  mapIndex?: ShaderSource,
 ): [ShaderSource, Lazy<number>, Record<string, boolean>] => {
 
   if (!(instance != null || instances)) {
@@ -30,10 +30,10 @@ export const useInstancedVertex = (
   return useMemo(() => {
 
     const mappedIndex = instanceSize
-      ? getShader(getInstancedIndex, [instanceSize])
-      : null;
+      ? getShader(getInstanceRepeatIndex, [instanceSize])
+      : mapIndex;
 
-    const boundInstance = getShader(getInstancedVertex, [getVertex, instances, mappedIndex], {INSTANCE_STRIDE: instanceStride ?? 1});
+    const boundInstance = getShader(getInstancedVertex, [getVertex, instances, mappedIndex]);
 
     const totalCount = () => {
       const l = resolve(elementCount) || 0;

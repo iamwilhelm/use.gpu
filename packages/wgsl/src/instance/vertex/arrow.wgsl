@@ -24,13 +24,13 @@ const ARROW_ASPECT: f32 = 2.5;
 
 @export fn getArrowVertex(vertexIndex: u32, elementIndex: u32) -> SolidVertex {
   let meshPosition = getVertex(vertexIndex);
-  
+
   let anchor = getAnchor(elementIndex);
   let anchorIndex = anchor.x;
   let nextIndex = anchor.y;
   let endIndex = anchor.z;
   let both = i32(anchor.w);
-  
+
   let color = getColor(anchorIndex);
   let size = getSize(anchorIndex);
   let width = getWidth(anchorIndex);
@@ -72,7 +72,7 @@ const ARROW_ASPECT: f32 = 2.5;
 
   let offset = vec4<f32>(t.xyz, 0.0) * (ARROW_ASPECT * arrowSize);
   let cap = worldToClip(startPos + offset);
-  
+
   var arrowRadius = 1.0;
   if (cap.w > 0.0 && center.w > 0.0) {
     arrowRadius = getArrowCorrection(cap.w, center.w, depth);
@@ -90,7 +90,7 @@ const ARROW_ASPECT: f32 = 2.5;
   if (zBias != 0.0) {
     position = applyZBias(position, width * zBias);
   }
-  
+
   return SolidVertex(
     position,
     color,

@@ -86,7 +86,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
   });
 
   // Produce light/shadow sources
-  const Resume = () => {    
+  const Resume = () => {
 
     // Update light data in-place
     for (let {id, data} of queue) {
@@ -125,7 +125,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       const {size: [w, h]} = shadow!;
       shadowKey = mixBits53(mixBits53(mixBits53(shadowKey, key), w), h);
     }
-    
+
     const lightCount = lights.size;
     const size = useBufferedSize(Math.max(alloc, lightCount + 1));
     const device = useDeviceContext();
@@ -170,7 +170,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
         const {shadow} = light;
         if (shadow) {
           const {size: [w, h], depth: [near, far], bias, blur} = shadow;
-          
+
           let mapping;
           try {
             mapping = atlas.place(key, w, h);
@@ -229,7 +229,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
         comparison: true,
         version: 0,
       } as TextureSource;
-      
+
       return source;
     }, [device, shadows, shadowKey]);
 
@@ -259,7 +259,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
         ++j;
       }
-      
+
       return [map, order.map(i => keys[i]), subranges];
     }, lightKey);
 

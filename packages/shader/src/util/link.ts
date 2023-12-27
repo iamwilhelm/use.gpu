@@ -135,7 +135,7 @@ export const makeLinker = (
   // Namespace by module key
   const namespaces = new Map<number, string>();
 
-  // Track symbols in global namespace 
+  // Track symbols in global namespace
   const exists = new Set<string>();
   const visible = new Set<string>();
   const fixed = new Map<string, string>();

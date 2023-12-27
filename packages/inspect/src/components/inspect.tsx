@@ -110,7 +110,7 @@ export const Inspect: React.FC<InspectProps> = ({
   useLayoutEffect(() => {
     const el = document.querySelector('#use-gpu .canvas');
     if (!el || !open) return;
-    
+
     (el as any).style.left = splitLeft + '%';
     return () => {
       (el as any).style.left = '0';
@@ -120,11 +120,11 @@ export const Inspect: React.FC<InspectProps> = ({
   useLayoutEffect(() => {
     const setHovered = hoveredFiber?.__inspect?.setHovered;
     if (!setHovered || !highlight) return;
-    
+
     setHovered(true);
     return () => setHovered(false);
   }, [hoveredFiber, highlight])
-  
+
   const tree = (
     <InsetColumnFull>
       {(toolbar ?? true)  ? (
@@ -155,7 +155,7 @@ export const Inspect: React.FC<InspectProps> = ({
       e.preventDefault();
     }
   };
-  
+
   return (<div className="LiveInspect">
     {open ? (
       <PingProvider fiber={fiber}>

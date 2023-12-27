@@ -22,7 +22,7 @@ const makeArrowVertices = (detail: number, width: number = 2.5) => {
   const ring = [] as [number, number, number, number][];
   //const normals = [] as number[];
   const vertices = [] as number[];
-  
+
   const a = Math.atan2(1, width);
   const nx = -Math.sin(a);
   const ny = Math.cos(a);
@@ -56,6 +56,6 @@ const makeArrowVertices = (detail: number, width: number = 2.5) => {
     vertices.push(...ring[i]);
     vertices.push(...ring[i + 1]);
   }
-  
+
   return new Float32Array(vertices);
 };

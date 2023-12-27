@@ -58,7 +58,7 @@ const MAX_LAYERS_LOG = 8;
 
   let s1 = sampleCubeMapLevel(uv, level);
   let s2 = sampleCubeMapLevel(uv, level + 1);
-  
+
   return vec4<f32>(gain * mix(s1, s2, f), 1.0);
 }
 
@@ -67,7 +67,7 @@ fn sampleDiffuse(
 ) -> vec3<f32> {
   let sample = max(
     vec3<f32>(0.0),
-    shCoefficients[0].xyz + 
+    shCoefficients[0].xyz +
     shCoefficients[1].xyz * ray.y +
     shCoefficients[2].xyz * ray.z +
     shCoefficients[3].xyz * ray.x +
@@ -109,7 +109,7 @@ fn sampleCubeMapLevel(
       let tr = getTexture(uvb + vec2<f32>(1.0, 0.0) * signs + inv, 0.0).xyz;
       let bl = getTexture(uvb + vec2<f32>(0.0, 1.0) * signs + inv, 0.0).xyz;
       let br = getTexture(uvb + vec2<f32>(1.0, 1.0) * signs + inv, 0.0).xyz;
-    
+
       let x = xy.x;
       let y = xy.y;
       let sum = x + y;

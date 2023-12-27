@@ -15,9 +15,9 @@ struct GBufferSample {
 fn main(
   @builtin(position) fragCoord: vec4<f32>,
   @location(0) fragColor: vec4<f32>,
-  @location(1) fragUV: vec4<f32>,  
-  @location(2) fragST: vec4<f32>,  
-  @location(3) fragScissor: vec4<f32>,  
+  @location(1) fragUV: vec4<f32>,
+  @location(2) fragST: vec4<f32>,
+  @location(3) fragScissor: vec4<f32>,
 ) -> GBufferSample {
 
   var outColor = getFragment(fragColor, fragUV, fragST);

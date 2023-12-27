@@ -4,7 +4,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 
 import { provide, yeet, signal, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
 import {
-  makeDataArray, copyNumberArray, emitIntoNumberArray, 
+  makeDataArray, copyNumberArray, emitIntoNumberArray,
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
   getBoundingBox, toDataBounds,
   toCPUDims, toGPUDims,
@@ -20,7 +20,7 @@ import { useSource, useNoSource } from '../hooks/useSource';
 import { getShader } from '../hooks/useShader';
 
 import { chainTo } from '@use-gpu/shader/wgsl';
-import { getIndex } from '@use-gpu/wgsl/instance/interleave.wgsl';
+import { getInterleaveIndex } from '@use-gpu/wgsl/instance/index/interleave.wgsl';
 
 export type RawDataProps = {
   /** Set/override input length */
@@ -28,7 +28,7 @@ export type RawDataProps = {
 
   /** WGSL format per sample */
   format?: string,
-  
+
   /** Input data */
   data?: number[] | TypedArray,
   /** Input emitter expression */
@@ -93,7 +93,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     const getData = useSource(binding, source);
     sources = useMemo(() => (
       seq(t).map(i => ({
-        shader: chainTo(getShader(getIndex, [i, t]), getData),
+        shader: chainTo(getShader(getInterleaveIndex, [i, t]), getData),
         length: 0,
         size: [0],
         version: 0,

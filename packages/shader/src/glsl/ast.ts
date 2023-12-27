@@ -47,7 +47,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       if (n.from !== n.to) break;
       n = n.parent;
     }
-    
+
     let start = n.from;
     let end = n.to;
     while (start > 0 && code.charAt(start - 1) !== "\n") start--;
@@ -73,9 +73,9 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     if (!node) throwError('text');
     return code.slice(node.from, node.to);
   }
-  
+
   const getQualifier = getText;
-  
+
   const getQualifiedType = (node: SyntaxNode): TypeRef => {
     const [a, b] = getNodes(node);
 
@@ -87,7 +87,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
     return {name, qualifiers};
   }
-  
+
   const getTypeSpecifier = (node: SyntaxNode): TypeRef => {
     if (node.type.id === T.Identifier) {
       const name = getText(node);
@@ -104,7 +104,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
         return {name};
       }
     }
-    
+
     throw throwError('type specifier', node);
   }
 
@@ -159,7 +159,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
     return {name, type, parameters};
   };
-  
+
   const getVariable = (node: SyntaxNode): VariableRef => {
     const [a, ...rest] = getNodes(node, 1);
     const type = getQualifiedType(a);
@@ -167,10 +167,10 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
     return {type, locals};
   }
-  
+
   const getQualifiedStruct = (node: SyntaxNode): QualifiedStructRef => {
     const [a, b, c, d] = getNodes(node, 3);
-    
+
     const type = getQualifiedType(node);
     const name = getText(d ?? b);
     const struct = getStructMembers(c);
@@ -257,7 +257,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       const symbols = [type.name];
       return {at, symbols, flags};
     }
-    
+
     throw throwError('declaration', node);
   };
 
@@ -269,7 +269,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     );
   }
 
-  const isGlobal = (node: SyntaxNode): boolean => {  
+  const isGlobal = (node: SyntaxNode): boolean => {
     const pragma = node.prevSibling;
 
     if (!pragma || pragma.type.id !== T.Preprocessor) return false;
@@ -282,7 +282,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     return verb === 'global' || isGlobal(pragma);
   };
 
-  const isExported = (node: SyntaxNode): boolean => {  
+  const isExported = (node: SyntaxNode): boolean => {
     const pragma = node.prevSibling;
 
     if (!pragma || pragma.type.id !== T.Preprocessor) return false;
@@ -295,7 +295,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     return verb === 'export' || isExported(pragma);
   };
 
-  const isOptional = (node: SyntaxNode): boolean => {  
+  const isOptional = (node: SyntaxNode): boolean => {
     const pragma = node.prevSibling;
 
     if (!pragma || pragma.type.id !== T.Preprocessor) return false;
@@ -336,7 +336,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
     const children = tree.topNode.getChildren(T.Preprocessor);
     for (const child of children) {
-      const [a, b, c, d] = getNodes(child);    
+      const [a, b, c, d] = getNodes(child);
       const directive = getText(a);
       if (directive !== 'pragma') continue;
 
@@ -348,7 +348,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       if (c.type.id === T.String) {
         refs = [];
         module = parseString(getText(c));
-      } 
+      }
       else {
         refs = getNodes(c).map(getImport);
         module = parseString(getText(d));
@@ -356,7 +356,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
       let items = modules[module];
       if (!items) items = modules[module] = [];
-    
+
       items.push(...refs);
     }
 
@@ -503,7 +503,7 @@ export const rewriteUsingAST = (
 
     // Injected by compressed AST only: Skip, Shake
     if (type.name === 'Skip') skip(from, to);
-    
+
     // Top level declaration
     else if (type.name === 'GlobalDeclaration' || type.name === 'FunctionDefinition' || type.name === 'Shake') {
       if (cursor.node.parent?.type.name !== 'Program') continue;
@@ -518,7 +518,7 @@ export const rewriteUsingAST = (
       const name = code.slice(from, to);
       const replace = rename.get(name);
 
-      if (replace) skip(from, to, replace);      
+      if (replace) skip(from, to, replace);
     }
     // #version preprocessor
     else if (type.name === 'version') {

@@ -46,7 +46,7 @@ export const glyphToEDT = (
   for (let i = 0; i < np; i++) {
     const d = Math.sqrt(outer[i]) - Math.sqrt(inner[i]);
     out[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
-  } 
+  }
 
   return glyphToRGBA(out, wp, hp);
 };
@@ -65,12 +65,12 @@ export const paintIntoStage = (
   const np = wp * hp;
 
   const {outer, inner} = stage;
-  
+
   outer.fill(INF, 0, np);
   inner.fill(0, 0, np);
 
   const getData = (x: number, y: number) => (data[y * w + x] ?? 0) / 255;
-  
+
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const a = getData(x, y);
@@ -103,7 +103,7 @@ const makeSDFToDebugView = (
   inner: any | null,
   mask: boolean = false,
 ): Image => {
-  
+
   const out: number[] = [];
   for (let i = 0; i < np; i++) {
     const d = mask ? 0 : (outer ? Math.sqrt(outer[i]) : 0) - (inner ? Math.sqrt(inner[i]) : 0);
@@ -111,7 +111,7 @@ const makeSDFToDebugView = (
   }
 
   const rgba = glyphToRGBA(new Uint8Array(out), wp, hp);
-  
+
   if (mask) {
     if (outer) for (let i = 0; i < np; ++i) {
       if (outer[i] != INF) {

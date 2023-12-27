@@ -54,7 +54,7 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
   useOne(() => error && console.warn(error), error);
 
   const result = resolved !== undefined ? resolved : (error !== undefined ? fallback ?? loading : loading);
-  
+
   const render = getRenderFunc(props);
   return result !== undefined ? (render ? render(result) : yeet(result)) : (suspense ? suspend() : null);
 };

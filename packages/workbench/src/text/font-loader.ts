@@ -29,7 +29,7 @@ export const FontLoader: LiveComponent<FontLoaderProps> = ({fonts = NO_FONTS, ch
     () => fonts
       .map((source: FontSource) => {
         const key = toHash(source);
-        
+
         const {family, style, weight} = source;
         const props = {
           family,

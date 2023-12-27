@@ -16,6 +16,6 @@ export const PickingBuffer: LC = memo((props: PropsWithChildren<object>) => {
       picking: renderContext.source,
     },
   });
-  
+
   return yeet({ picking: renderContext });
 }, 'PickingBuffer');

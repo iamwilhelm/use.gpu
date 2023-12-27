@@ -28,7 +28,7 @@ export const GBuffer: LC = memo((props: PropsWithChildren<object>) => {
   // Set up GBuffer layout
   const formats = useMemo(() => [
     'rgba8unorm',
-    'rgba16float', 
+    'rgba16float',
     'rgba8unorm',
     hasFloat ? 'rg11b10ufloat' : 'rgb10a2unorm',
     format,

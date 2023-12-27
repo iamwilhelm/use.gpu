@@ -1,5 +1,5 @@
 use '@use-gpu/wgsl/use/types'::{ SolidVertex };
-use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveScale, getViewScale, applyZBias }; 
+use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveScale, getViewScale, applyZBias };
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
@@ -29,7 +29,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 
   var uv1 = getQuadUV(vertexIndex);
   var xy1 = uv1 * 2.0 - 1.0;
-  
+
   // Lerp between fixed size and full perspective.
   var pixelScale = getPerspectiveScale(center.w, depth);
 

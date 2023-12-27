@@ -37,7 +37,7 @@ import { CFDControls } from '../../ui/cfd-controls';
 // sample using UV coordinates.
 //
 // However, as float32 is not a filterable format, here we still have to manually
-// load 2x2 samples in the shaders to get bilinear filtering. 
+// load 2x2 samples in the shaders to get bilinear filtering.
 //
 
 const colorizeShader = wgsl`

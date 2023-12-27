@@ -189,7 +189,7 @@ const feedbackShader = wgsl`
     color.x += (getTexture(uv).x - getBlur3(uv).x) * 0.11; // reaction diffusion
 
     color.x -= ((1 - color.y) - 0.02) * 0.025;
-    
+
     if (paint > 0.0) {
       // Random paint splotch
       let xy = (uv - center) * vec2<f32>(1.0, aspect);

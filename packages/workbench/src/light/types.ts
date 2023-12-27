@@ -18,7 +18,7 @@ export type Light = {
   intensity?: number | null,
   cutoff?: number | null,
   kind: number,
-  
+
   shadow?: ShadowMapProps | null,
 };
 

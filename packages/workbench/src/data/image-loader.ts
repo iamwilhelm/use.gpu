@@ -75,7 +75,7 @@ export const ImageLoader: LiveComponent<ImageLoaderProps> = (props) => {
           const parsed = parseHDR(arrayBuffer);
           const {format, colorSpace} = resolveFormat(parsed.format);
           return patch({data: parsed}, {data: {format}, format, colorSpace});
-        } catch (e) { console.error(e); }        
+        } catch (e) { console.error(e); }
       }
       else if (format === 'rgbm16') {
         const arrayBuffer = await response.arrayBuffer();
@@ -85,7 +85,7 @@ export const ImageLoader: LiveComponent<ImageLoaderProps> = (props) => {
           data: arrayBuffer,
           type: mime,
           premultiplyAlpha: premultiply ? 'premultiply' : 'none',
-          colorSpaceConversion: 'none',            
+          colorSpaceConversion: 'none',
         });
 
         const {image} = await decoder.decode({ frameIndex: 0 });
@@ -93,7 +93,7 @@ export const ImageLoader: LiveComponent<ImageLoaderProps> = (props) => {
 
         const buffer = new Uint8Array(image.allocationSize());
         image.copyTo(buffer);
-        
+
         let decoded: GPUTextureFormat = 'rgba8unorm';
         if (image.format.slice(0, 3) === 'BGR') decoded = 'bgra8unorm';
 

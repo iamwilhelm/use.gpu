@@ -40,7 +40,7 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
   var a = getVertex(ia, i);
   var b = getVertex(ib, i);
   var c = getVertex(ic, i);
-  
+
   if (a.position.w < 0.0 || b.position.w < 0.0 || c.position.w < 0.0) {
     return SolidVertex(
       vec4<f32>(0.0),

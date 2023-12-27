@@ -44,7 +44,7 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
 
   const vertexShader = instanceDrawVirtualSolid;
   const fragmentShader = instanceFragmentSolid;
-  
+
   const pipeline = useOne(() => patch(propPipeline, {primitive: {topology: 'triangle-strip'}}), propPipeline);
 
   // Binds links into shader

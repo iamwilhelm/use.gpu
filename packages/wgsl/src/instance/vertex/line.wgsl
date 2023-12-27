@@ -15,7 +15,7 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
 @optional @link fn getWidth(i: u32) -> f32 { return 1.0; };
 @optional @link fn getDepth(i: u32) -> f32 { return 0.0; };
 @optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
-  
+
 @optional @link fn getTrim(i: u32) -> vec4<u32> { return vec4<u32>(0u, 0u, 0u, 0u); };
 @optional @link fn getSize(i: u32) -> f32 { return 3.0; };
 
@@ -103,7 +103,7 @@ fn trimAnchor(
   var width = getWidth(cornerIndex);
   let depth = getDepth(cornerIndex);
   let zBias = getZBias(cornerIndex);
-  
+
   var centerPos = getPosition(cornerIndex);
   var beforePos = centerPos;
   var afterPos = centerPos;
@@ -149,7 +149,7 @@ fn trimAnchor(
         centerPos = trimAnchor(maxLength, endPos.xyz, nextPos.xyz, centerPos.xyz, beforePos.xyz, width, size, both, end.w, depth);
       }
     }
-    
+
     if (centerPos.w == 0.0) {
       return SolidVertex(
         vec4<f32>(0.0),

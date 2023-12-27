@@ -138,7 +138,7 @@ export type UniformLayout = {
 
 export type InterleavedLayout = {
   length: number,
-  
+
   uniforms: UniformAttribute[],
   offsets: number[],
   groups: number[],
@@ -518,7 +518,7 @@ export type UniformType =
   | "mat3x4<f64>"
   | "mat4x3<f64>"
   | "mat4x4<f64>"
-  
+
   | "atomic<u32>"
   | "atomic<i32>"
 

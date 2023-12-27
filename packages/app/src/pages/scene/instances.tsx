@@ -85,7 +85,7 @@ export const SceneInstancesPage: LC = (props) => {
                             ))}
                           </Node>
                         </Animate>
-                        
+
                         <Node rotation={[90, 90, 0]} scale={[0.7, 0.7, 0.7]}>
                           <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
                             <Node>
@@ -104,7 +104,7 @@ export const SceneInstancesPage: LC = (props) => {
                       </>)}
                     />
                   </PBRMaterial>
-              
+
                 </Scene>
               </Pass>
             </Camera>

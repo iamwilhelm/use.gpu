@@ -15,7 +15,7 @@ import { BoxLayout, InlineLayout } from '../render';
 import { BoxTrait, useBoxTrait } from '../traits';
 import { parseAlignment, parseBaseline, parseDirectionX, parseMargin } from '../parse';
 
-export type InlineProps = 
+export type InlineProps =
   TraitProps<typeof BoxTrait> &
 {
   direction?: Direction,
@@ -73,7 +73,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
             blockRenders.push(render);
             blockPickers.push(pick);
           }
-      
+
           inspect({
             layout: {
               into,
@@ -82,7 +82,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
               offsets,
             },
           });
-      
+
           const pickSizes   = blockSizes.length ? [...sizes,   ...blockSizes] : sizes;
           const pickOffsets = blockSizes.length ? [...offsets, ...blockOffsets] : offsets;
           const pickPickers = blockSizes.length ? [...pickers, ...blockPickers] : pickers;
@@ -92,7 +92,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
             offsets: blockOffsets,
             renders: blockRenders,
           };
-          
+
           const inline = {ranges, sizes, offsets, renders, key};
 
           return {
@@ -133,6 +133,6 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
       });
     }, [props, els, hovered, ref]);
   };
-  
+
   return children ? gather(children, Resume) : null;
 }, 'Inline');

@@ -34,11 +34,11 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     let sdfRadius = sdfConfig.x;
     var expand = border.x;
     var bleed = border.y;
-    
+
     var d = (texture.a - 0.75) * sdfRadius;
     var s = (d + expand / sdfConfig.y) / scale + 0.5 + bleed;
     sdf = SDF(s, s);
-    
+
     if (mode == -2) {
       fillColor = vec4<f32>(texture.rgb, fillColor.a);
     }
@@ -63,7 +63,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     else {
       fillColor = premultiply(fillColor);
     }
-  
+
     // Get appropriate SDF
     if (mode == 0) {
       if (fillColor.a <= 0.0) { discard; }
@@ -96,12 +96,12 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     var m = (max(0.0, o + 0.5 + b) % 1.0) - 0.5;
     if (o < -b) { m = 1.0 + (o + b - 1.0); }
     mark = clamp(1.0 - abs(m / scale) * s, 0.0, 1.0);
-    
+
     if ((border.x != border.y) || (border.z != border.w) || (border.x != border.z)) {
       let o = (sdf.inner - 0.5) * scale / s;
       let m = ((o + 0.5 + b) % 1.0) - 0.5;
       let mark2 = 1.0 * clamp(1.0 - abs(m / scale) * s, 0.0, 1.0);
-      
+
       if (sdf.inner > -0.5) { mark = mark2 + mark * 0.5; }
     }
   }
@@ -133,6 +133,6 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
   if (DEBUG_SDF) {
     return vec4<f32>(mix(color.rgb, vec3<f32>(mark), 0.5), color.a);
   }
-  
+
   return color;
 }

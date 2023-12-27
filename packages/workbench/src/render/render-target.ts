@@ -96,7 +96,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
           format,
         )
       ) : null;
-      if (buffers) buffers.push(resolve ?? render);      
+      if (buffers) buffers.push(resolve ?? render);
 
       const views = buffers ? buffers.map(b => b.createView()) : undefined;
 
@@ -106,7 +106,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
     },
     [device, width, height, format, samples, history]
   );
-  
+
   const targetTexture = resolveTexture ?? renderTexture;
 
   const colorStates      = useOne(() => [makeColorState(format, BLEND_PREMULTIPLY)], format);
@@ -160,7 +160,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
 
       counter.current = (index + 1) % n;
     };
-    
+
     const makeSource = () => ({
       texture: targetTexture,
       view,

@@ -1,4 +1,4 @@
-import { ShaderModule, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
+import { ShaderModule, LambdaSource, UniformAttribute, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
 import { formatMurmur53, toMurmur53, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash, getBundleEntry, toBundle, toModule } from '../util/bundle';
@@ -34,10 +34,10 @@ const getTypeKey = (b: DataBinding) =>
   (+!!b.constant) +
   (+!!b.storage) * 2 +
   (+!!b.lambda) * 4 +
-  (+!!b.texture) * 8 + 
+  (+!!b.texture) * 8 +
   (+!!(b.storage?.volatile || b.texture?.volatile)) * 16;
 
-const getFormatKey = (b: DataBinding) => 
+const getFormatKey = (b: DataBinding) =>
   b.texture ? toMurmur53(b.texture?.format) ^
               toMurmur53(b.texture?.layout) ^
               toMurmur53(b.texture?.variant) ^
@@ -138,7 +138,7 @@ export const makeBindingAccessors = (
         typeof format === 'object' && !Array.isArray(format) ? format :
         null
       );
-      
+
       if (object) {
         const entry = getBundleEntry(object);
         const t = (entry ? rename.get(entry) : null) ?? entry ?? 'unknown';
@@ -220,9 +220,9 @@ export const makeBindingAccessors = (
   for (const {uniform} of storages)  links[uniform.name] = bundle;
   for (const {uniform} of textures)  links[uniform.name] = bundle;
   for (const {uniform, lambda} of lambdas)   {
-    const needsCast = !checkLambdaType(uniform, lambda);      
+    const needsCast = !checkLambdaType(uniform, lambda!);
     links[uniform.name] = needsCast
-      ? castTo(lambda!.shader, uniform.format)
+      ? castTo(lambda!.shader, toTypeString(uniform.format))
       : lambda!.shader;
   }
 
@@ -254,7 +254,7 @@ export const checkLambdaType = (
 
   // Remove vec<..> to allow for automatic widening/narrowing
   f = f.replace(/vec[0-9]/, '').replace(/^<|>$/g, '');
-  t = t.replace(/vec[0-9]/, '').replace(/^<|>$/g, ''); 
+  t = t.replace(/vec[0-9]/, '').replace(/^<|>$/g, '');
 
   // Shorthand
   if (f.match(/^vec[0-9]uif$/)) f += '32';
@@ -278,7 +278,7 @@ export const checkLambdaType = (
   return false;
 };
 
-export const toTypeString = (t: string | any) => {
+export const toTypeString = (t: string | any): string => {
   if (typeof t === 'string') return t;
   if (t.entry != null) return t.entry;
   if (t.module?.entry != null) return t.module.entry;
@@ -336,7 +336,7 @@ export const makeStorageAccessor = (
   args: string[] | null = INT_ARG,
 ) => {
   const access = readWrite ? 'storage, read_write' : 'storage';
-  
+
   if (args === null) {
     if (!type.match(/^array</)) type = `array<${type}>`;
     return `@group(${set}) @binding(${binding}) var<${access}> ${ns}${name}: ${type};\n`;
@@ -378,7 +378,7 @@ export const makeTextureAccessor = (
 
   const t = layout.match(/<([^>]+)>/)?.[1] ?? 'f32';
   const shaderType = (
-    layout.match(/depth/) ? 'f32' : 
+    layout.match(/depth/) ? 'f32' :
     `vec4<${t}>`
   );
 
@@ -418,7 +418,7 @@ export const makeVec3to4Accessor = (
   else if (f3 == 1u) { v = v1.yzw; }
   else if (f3 == 2u) { v = ${format}(v1.zw, v2.x); }
   else { v = ${format}(v1.w, v2.xy); }
-  
+
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `);
@@ -452,7 +452,7 @@ export const make16to32Accessor = (
   let f2 = i & 1u;
 
   let word = u32(${ns}${accessor}(b2));
-  var v: ${format} = ${format}((word >> (f2 << 4u)) & 0xFFFFu);  
+  var v: ${format} = ${format}((word >> (f2 << 4u)) & 0xFFFFu);
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `);

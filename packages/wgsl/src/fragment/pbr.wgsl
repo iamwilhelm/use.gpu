@@ -92,7 +92,7 @@ fn geometricGGX(dotNL: f32, dotNV: f32, alpha: f32) -> f32 {
   let D = ndfGGX(dotNH, alpha);
   let G = smithGGXCorrelated(dotNL, dotNV, alpha);
   //let G = geometricGGX(dotNL, dotNV, alpha);
-  
+
   let Fd = diffuseColor * fdBurley(dotNL, dotNV, dotLH, alpha) * (1.0 - F);
   let Fs = F * D * G;
 

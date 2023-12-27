@@ -22,7 +22,7 @@ export const useInspectHoverable = () => {
   if (!inspect.setHovered) {
     fiber.__inspect.setHovered = setHovered;
   }
-  
+
   return hovered;
 }
 

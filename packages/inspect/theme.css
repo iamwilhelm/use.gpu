@@ -123,7 +123,7 @@ html > body .LiveInspect ::-webkit-scrollbar {
 .LiveInspect div.fiber-tree-label {
   position: relative;
   z-Index: 1;
-  
+
   transition: 0.25s ease-in-out color;
 }
 
@@ -152,7 +152,7 @@ html > body .LiveInspect ::-webkit-scrollbar {
   color: var(--LiveInspect-colorTextLevel3);
   transition: none;
 }
-  
+
 .LiveInspect div.fiber-tree-node {
   white-space: nowrap;
   margin: -2px -5px;
@@ -181,7 +181,7 @@ html > body .LiveInspect ::-webkit-scrollbar {
 .LiveInspect div.fiber-tree-node.hovered {
   z-index: 3;
 }
-  
+
 .LiveInspect div.fiber-tree-node.builtin {
   color: var(--LiveInspect-colorTextMuted);
 }
@@ -208,7 +208,7 @@ html > body .LiveInspect ::-webkit-scrollbar {
 .LiveInspect div.fiber-tree-highlight.staticPing {
   background: rgba(10, 170, 85, 1.0);
 }
-  
+
 .LiveInspect div.fiber-tree-ping {
   transition: 0.25s ease-in-out opacity;
 }
@@ -224,7 +224,7 @@ html > body .LiveInspect ::-webkit-scrollbar {
 .LiveInspect div.fiber-tree-ping.mounted {
   background: rgba(120, 120, 120, 0.9);
 }
-    
+
 .LiveInspect div.fiber-tree-ping.mounted.cold {
   background: rgba(120, 120, 120, 0.0);
   animation-name: mountAnimation;

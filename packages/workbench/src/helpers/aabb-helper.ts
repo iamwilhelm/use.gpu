@@ -37,7 +37,7 @@ export const AABBHelper: LC<AABBHelperProps> = memo((props: AABBHelperProps) => 
   } = props;
 
   const geometry = useMemo(() => makeAABBGeometry({min, max}), [min, max]);
-  
+
   const combined = useMemo(() => {
     const m = mat4.create();
     if (into) mat4.invert(m, into as mat4);
@@ -51,7 +51,7 @@ export const AABBHelper: LC<AABBHelperProps> = memo((props: AABBHelperProps) => 
 
   return use(GeometryData, {
     ...geometry,
-    render: (mesh: Record<string, ShaderSource>) => 
+    render: (mesh: Record<string, ShaderSource>) =>
       provide(TransformContext, context,
         use(LineLayer, { ...mesh, color, width })
       ),

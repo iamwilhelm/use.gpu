@@ -3,17 +3,17 @@ import { linkBundle } from '../link';
 import { castTo, swizzleTo } from './cast';
 
 describe('cast', () => {
-  
+
   it('swizzles', () => {
 
-    const result = swizzleTo('vec3', 'vec3', 'xyx');    
+    const result = swizzleTo('vec3', 'vec3', 'xyx');
     const recode = linkBundle(result);
     expect(recode).toMatchSnapshot();
 
   });
-  
+
   it('casts', () => {
-    
+
     const code = `
     #pragma export
     vec2 getValue() { return vec2(1.0, 2.0); }
@@ -21,14 +21,14 @@ describe('cast', () => {
 
     const mod = loadModule(code, 'code', 'getValue');
     const result = castTo(mod, 'vec3', 'xyx');
-    
+
     const recode = linkBundle(result);
     expect(recode).toMatchSnapshot();
 
   });
 
   it('casts complex swizzle', () => {
-    
+
     const code = `
       #pragma export
       vec2 getValue() { return vec2(1.0, 2.0); }
@@ -40,14 +40,14 @@ describe('cast', () => {
       signs: '-+-+',
       gain: 2,
     });
-    
+
     const recode = linkBundle(result);
     expect(recode).toMatchSnapshot();
 
   });
 
   it('casts compact swizzle', () => {
-    
+
     const code = `
       #pragma export
       vec2 getValue() { return vec2(1.0, 2.0); }
@@ -59,14 +59,14 @@ describe('cast', () => {
       signs: '++-+',
       gain: 2,
     });
-    
+
     const recode = linkBundle(result);
     expect(recode).toMatchSnapshot();
 
   });
 
   it('casts and links', () => {
-    
+
     const code = `
     #pragma export
     vec2 getValue() { return vec2(1.0, 2.0); }

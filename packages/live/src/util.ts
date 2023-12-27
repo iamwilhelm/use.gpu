@@ -62,7 +62,7 @@ export const makeDependencyTracker = () => {
       let exist = list.has(root);
       if (!exist) list.add(root);
     }
-    
+
     let list = dependencies.get(root);
     if (!list) dependencies.set(root, list = new Set());
 
@@ -193,9 +193,9 @@ export const compareFibers = (a: LiveFiber<any>, b: LiveFiber<any>) => {
 
   const aks = a.keys;
   const bks = b.keys;
-  
+
   let aj = aks ? aks[0] : null;
-  let bj = bks ? bks[0] : null; 
+  let bj = bks ? bks[0] : null;
   let asi = 1;
   let bsi = 1;
 

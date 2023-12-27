@@ -18,7 +18,7 @@ import { inspectGPU } from '.';
 import { decodeOctahedral } from '@use-gpu/wgsl/codec/octahedral.wgsl';
 
 const NO_OPS: any[] = [];
-const toArray = <T,>(x?: T | T[]): T[] => Array.isArray(x) ? x : x ? [x] : NO_OPS; 
+const toArray = <T,>(x?: T | T[]): T[] => Array.isArray(x) ? x : x ? [x] : NO_OPS;
 
 const backgroundColor = [0, 0, 0, 0.1];
 const styled: any = _styled;
@@ -44,7 +44,7 @@ const depthCubeShader = wgsl`
 
     let a = abs(uvw);
     var b: vec2<f32>;
-    
+
     var tint = vec3<f32>(0.0, 0.0, 0.0);
     if (a.x > a.y) {
       if (a.x > a.z) {
@@ -95,7 +95,7 @@ const depthCubeShader = wgsl`
       }
     }
     let border = clamp(50.0 * (max(abs(b.x), abs(b.y)) - 0.9), 0.0, 1.0);
-    
+
     let depth = select(0.0, -log(t.x), t.x > 0.0);
     return mix(vec4<f32>(fract(depth), fract(depth * 16.0) * .75, fract(depth * 256.0), 1.0), vec4<f32>(tint, 1.0), border * 0.5);
   }
@@ -163,7 +163,7 @@ type TexturesProps = {
 export const renderTargets = (props: any) => <Targets {...props} />;
 
 export const Targets: React.FC<TargetsProps> = ({fiber}) => {
-  
+
   const {color, picking, depth} = fiber.__inspect?.output;
   const device = fiber.context.values.get(DeviceContext)?.current;
 

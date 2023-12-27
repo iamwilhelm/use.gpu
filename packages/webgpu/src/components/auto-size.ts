@@ -26,7 +26,7 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (props: PropsWithChildren<
     canvas.style.width = '100%';
     canvas.style.height = '100%';
   }, [canvas]);
- 
+
   const [size, setSize] = useState(() => getCanvasSize(window, canvas));
 
   const [width, height, pixelRatio] = size;

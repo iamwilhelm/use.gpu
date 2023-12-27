@@ -77,7 +77,7 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
   const view = use(LightMaterial, {
     shadows,
     children,
-    then: (light: LightEnv) => 
+    then: (light: LightEnv) =>
       useMemo(() => [
         yeet({ env: { light }}),
         use(LightRender, {...light, shadows}),

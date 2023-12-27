@@ -18,7 +18,7 @@ fn ramp(x: f32, t: f32, s: f32) -> f32 { return clamp(x * s + mix(-s, 1, t), 0.0
   else if (e == 2) {
     let direction = getDirection();
     let l = length(direction);
-    
+
     let coord = select(st, 1.0 - st, (direction * v) <= vec4<f32>(0.0));
     let line = dot(coord, abs(direction)) / (l + 1.0e-5);
 

@@ -56,7 +56,7 @@ export const toMurmur53 = (s: any) => {
   if (Array.isArray(s)) return getArrayHash(s);
   if (isTypedArray(s)) return getTypedArrayHash(s);
   if (s) return getObjectHash(s);
-  
+
   return scrambleBits53(mixBits53(HASH_KEY, -1));
 }
 
@@ -109,7 +109,7 @@ const isTypedArray = (() => {
   const TypedArray = Object.getPrototypeOf(Uint8Array);
   return (obj: any) => obj instanceof TypedArray;
 })();
-  
+
 const getTypedArrayHash = (t: TypedArray) => {
   let h = mixBits53(HASH_KEY + 16383, 0);
 
@@ -134,7 +134,7 @@ const getTypedArrayHash = (t: TypedArray) => {
 
 const integerArrayToMurmur53 = (list: number[] | TypedArray, seed: number = 0) => {
   const n = list.length;
-  
+
   let a = seed;
   let b = seed ^ C4;
 
@@ -168,7 +168,7 @@ const integerArrayToMurmur53 = (list: number[] | TypedArray, seed: number = 0) =
   a ^= a >>> 13;
   a = mul(a, C5);
   a ^= a >>> 16;
-  
+
   b ^= b >>> 16;
   b = mul(b, C4);
   b ^= b >>> 13;
@@ -213,7 +213,7 @@ const stringToMurmur53 = (s: string, seed: number = 0) => {
   a ^= a >>> 13;
   a = mul(a, C5);
   a ^= a >>> 16;
-  
+
   b ^= b >>> 16;
   b = mul(b, C4);
   b ^= b >>> 13;
@@ -242,7 +242,7 @@ export const mixBits = (x: number, d: number) => {
 /** Murmur3 32-bit hash whitening function */
 export const scrambleBits = (x: number, n: number = 0) => {
   x ^= n;
-  
+
   x ^= x >>> 16;
   x = mul(x, C4);
   x ^= x >>> 13;
@@ -292,7 +292,7 @@ export const scrambleBits53 = (x: number, n: number = 0) => {
   a ^= a >>> 13;
   a = mul(a, C5);
   a ^= a >>> 16;
-  
+
   b ^= b >>> 16;
   b = mul(b, C4);
   b ^= b >>> 13;

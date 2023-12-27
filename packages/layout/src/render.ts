@@ -44,7 +44,7 @@ export const BoxLayout = memoRender((
 ) => {
   const {sizes, offsets, renders, clip, mask, transform, inverse} = inside;
   const {box, origin, clip: parentClip, mask: parentMask, transform: parentTransform, ref} = outside;
-  
+
   const [left, top, right, bottom] = box;
   const out = [] as LiveElement[];
   const n = sizes.length;
@@ -74,7 +74,7 @@ export const BoxLayout = memoRender((
       )
     : (useNoMemo(), parentClip ?? null)
   ) : (useNoMemo(), clip ?? null);
-  
+
   const render = ref?.(box, origin);
   if (render) out.push(render);
 
@@ -90,7 +90,7 @@ export const BoxLayout = memoRender((
     const t = top + offset[1];
     const r = l + w;
     const b = t + h;
-    
+
     const layout = [l, t, r, b] as Rectangle;
     const el = render(layout, origin, xclip, xmask, xform);
 
@@ -159,7 +159,7 @@ export const InlineLayout = (
   const {box, origin, clip, mask, transform, ref} = outside;
 
   let [left, top, right, bottom] = box;
-  
+
   const n = ranges.length;
 
   let last: InlineRenderer | null = null;
@@ -243,7 +243,7 @@ export const InlineLayout = (
         ...INSPECT_STYLE.child
       });
     }
-  
+
     out.push(yeet(yeets));
   }
 

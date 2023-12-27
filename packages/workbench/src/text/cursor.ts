@@ -98,7 +98,7 @@ export const makeInlineCursor = (
 
   let start: number = 0;
   let end: number = 0;
-  
+
   let chunkAdvance = 0;
   let chunkIndex = 0;
   let chunkCross = 0;
@@ -172,7 +172,7 @@ export const makeInlineCursor = (
       chunkCross = 0;
     }
   };
-  
+
   const gather = (reduce: InlineReduce) => {
     flush(2);
 

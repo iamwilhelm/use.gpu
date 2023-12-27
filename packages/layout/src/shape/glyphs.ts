@@ -28,7 +28,7 @@ export type GlyphsProps = {
   breaks: Uint32Array,
   height: FontMetrics,
   lines: InlineLine[],
-  
+
   origin: Rectangle,
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
@@ -62,7 +62,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
   return useMemo(() => {
     const { getGlyph, getScale, getRadius, getTexture } = sdfFont;
-    
+
     const adjust = size / detail;
     const radius = getRadius();
     const scale = getScale(detail) * adjust;
@@ -70,7 +70,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
     const fill = color.slice();
     fill[3] *= opacity;
-  
+
     const rectangles = [] as number[];
     const uvs = [] as number[];
     const sts = [] as number[];
@@ -84,7 +84,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       const {ascent, lineHeight} = height;
       let x = snap ? Math.round(l) : l;
       let y = snap ? Math.round(t + ascent) : t + ascent;
-      
+
       let first = true;
 
       let sx = x;
@@ -92,7 +92,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
         glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: number, kerning: number) => {
           const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, detail);
           const {image, layoutBounds, outlineBounds, rgba, scale: glyphScale} = glyph;
-          const [ll, lt, lr, lb] = layoutBounds;      
+          const [ll, lt, lr, lb] = layoutBounds;
 
           const r = rgba ? -1 : 1;
           const s = scale * glyphScale;

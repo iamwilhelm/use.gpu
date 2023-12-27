@@ -250,7 +250,7 @@ export const deprecated = <F extends ArrowFunction>(
     }
     return f(props);
   };
-  
+
   return new Proxy(wrapped, {
     get: (target, s) => {
       if (s === 'name') return oldName;

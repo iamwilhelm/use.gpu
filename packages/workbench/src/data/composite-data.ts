@@ -164,6 +164,8 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
         ends,
     });
 
+    console.log({segmentData}, loops, starts, ends)
+
     const {count: total, indexed, sparse, schema: segmentSchema, ...rest} = segmentData;
     for (const k in rest) if (attributes[k]) throw new Error(`Attribute name '${k}' reserved for segment data.`);
 

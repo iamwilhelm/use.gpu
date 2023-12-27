@@ -26,7 +26,7 @@ export const getShader = (
 ) => {
   let attributes = (shader as any).attributes;
   if (!attributes) attributes = (shader as any).attributes = bundleToAttributes(shader);
-  
+
   const bindings = makeShaderBindings<ShaderModule>(attributes, values);
   const links = bindingsToLinks(bindings);
   return bindBundle(shader, links, defines);

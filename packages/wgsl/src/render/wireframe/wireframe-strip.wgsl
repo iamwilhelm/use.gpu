@@ -35,7 +35,7 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
       0u,
     );
   }
-  
+
   let lineWidth = getViewPixelRatio() * 2.0;
   var join: vec3<f32>;
   if (ij.x > 0u) {

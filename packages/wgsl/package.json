@@ -195,15 +195,25 @@
       "import": "./src/instance/identity.wgsl",
       "require": "./src/instance/identity.wgsl"
     },
-    "./instance/instanced-index.wgsl": {
-      "types": "./src/instance/instanced-index.wgsl.d.ts",
-      "import": "./src/instance/instanced-index.wgsl",
-      "require": "./src/instance/instanced-index.wgsl"
+    "./instance/index/anchor.wgsl": {
+      "types": "./src/instance/index/anchor.wgsl.d.ts",
+      "import": "./src/instance/index/anchor.wgsl",
+      "require": "./src/instance/index/anchor.wgsl"
     },
-    "./instance/interleave.wgsl": {
-      "types": "./src/instance/interleave.wgsl.d.ts",
-      "import": "./src/instance/interleave.wgsl",
-      "require": "./src/instance/interleave.wgsl"
+    "./instance/index/face.wgsl": {
+      "types": "./src/instance/index/face.wgsl.d.ts",
+      "import": "./src/instance/index/face.wgsl",
+      "require": "./src/instance/index/face.wgsl"
+    },
+    "./instance/index/interleave.wgsl": {
+      "types": "./src/instance/index/interleave.wgsl.d.ts",
+      "import": "./src/instance/index/interleave.wgsl",
+      "require": "./src/instance/index/interleave.wgsl"
+    },
+    "./instance/index/repeat.wgsl": {
+      "types": "./src/instance/index/repeat.wgsl.d.ts",
+      "import": "./src/instance/index/repeat.wgsl",
+      "require": "./src/instance/index/repeat.wgsl"
     },
     "./instance/surface/material.wgsl": {
       "types": "./src/instance/surface/material.wgsl.d.ts",

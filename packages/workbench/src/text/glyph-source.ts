@@ -19,7 +19,7 @@ export type GlyphSourceProps = {
   wrap?: number,
   snap?: boolean,
   size?: number,
-  
+
   render?: (data: SDFGlyphData) => void,
 };
 
@@ -37,7 +37,7 @@ export const GlyphSource: LiveComponent<GlyphSourceProps> = memo((props: GlyphSo
     size = 48,
     wrap = 0,
     snap,
-    
+
     render,
   } = props;
 
@@ -57,6 +57,6 @@ export const GlyphSource: LiveComponent<GlyphSourceProps> = memo((props: GlyphSo
     wrap,
     snap,
   );
-  
+
   return render ? render(data) : yeet(data);
 }, 'GlyphSource');

@@ -17,7 +17,7 @@ export const makeChainAccessor = (
   return `${type} ${name}(${symbols.map((s, i) => `${args[i]} ${s}`).join(', ')}) {
   return ${to}(${from}(${symbols.join(', ')})${tail?.length ? ['', ...tail].join(', ') : ''});
 }
-`;   
+`;
 }
 
 export const chainTo = makeChainTo(makeChainAccessor, bundleToAttribute);

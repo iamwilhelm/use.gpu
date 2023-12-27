@@ -77,7 +77,7 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
 
       const q = queue.slice();
       queue.length = 0;
-      
+
       const seen = new Set<number>();
       const mounts = new Set<number>();
 
@@ -104,7 +104,7 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
           const fs = s.values();
           for (const f of fs) f(v, false);
         }
-      
+
         for (const f of all) f(version, false);
       });
 
@@ -133,7 +133,7 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
         if (reset) clearTimeout(reset);
         reset = setTimeout(timeout, 100);
       }
-      
+
       if (fiber.bound) { if (!fibers.get(fiber.id)) fibers.set(fiber.id, fiber); }
       else { fibers.delete(fiber.id); }
     };
@@ -160,7 +160,7 @@ export const usePingTracker = (fiber?: LiveFiber<any>) => {
   const [live, setLive] = useState<boolean>(false);
 
   useLayoutEffect(() => {
-    const ping = (version: number, live: boolean) => {      
+    const ping = (version: number, live: boolean) => {
       if (live) setVersion(version);
       setLive(live);
       forceUpdate();

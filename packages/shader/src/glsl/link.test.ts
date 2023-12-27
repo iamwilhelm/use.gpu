@@ -1,7 +1,7 @@
 import { GLSLModules } from './glsl.test.data';
 import { linkCode, linkModule } from './link';
 import { loadModule, glsl } from './shader';
-import { formatAST } from '../util/tree'; 
+import { formatAST } from '../util/tree';
 import { addASTSerializer } from '../test/snapshot';
 import mapValues from 'lodash/mapValues';
 
@@ -10,9 +10,9 @@ const loadedModules = mapValues(GLSLModules, (v, k) => loadModule(v, k, k));
 addASTSerializer(expect);
 
 describe("link", () => {
-  
+
   it("links an external", () => {
-    
+
     const code = `
     vec4 getColor();
     void main() {
@@ -21,12 +21,12 @@ describe("link", () => {
       gl_FragColor = getColor();
     }
     `
-    
+
     const getColor = `
     #pragma export
     vec4 getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
     `
-    
+
     const linked = linkCode(code, {}, {getColor});
     expect(linked).toMatchSnapshot();
 
@@ -64,9 +64,9 @@ describe("link", () => {
     expect(linked).toMatchSnapshot();
 
   });
-  
+
   it("lifts recursive dependency", () => {
-    
+
     const code = `
     #pragma import {getLifted} from 'getLifted'
     #pragma import {getColor1} from 'getColor1'
@@ -86,19 +86,19 @@ describe("link", () => {
     #pragma export
     vec4 getColor1() { return getColor2(); }
     `
-    
+
     const getColor2 = `
     #pragma import {getLifted} from 'getLifted'
     #pragma export
     vec4 getColor2() { return vec4(1.0, 0.0, 1.0, 1.0); }
     `
-    
+
     const linked = linkCode(code, {getColor1, getColor2, getLifted});
     expect(linked.indexOf('// Lifted Code')).toBeLessThan(linked.indexOf('getColor2'));
     expect(linked).toMatchSnapshot();
 
   });
-  
+
   it("tree shakes constants", () => {
     const sub = `
     const vec4 colorUsed = vec4(0.0, 0.1, 0.2, 0.0);
@@ -128,14 +128,14 @@ describe("link", () => {
       expect(linked).toMatchSnapshot();
     }
   })
-  
+
   it("tree shakes around identifiers", () => {
 
     const sub = `
     float used() { return 1.0; }
 
     float unused() { return 1.0; }
-    
+
     #pragma export
     vec4 getPosition(int index) { return vec4(used(), 0.0, 1.0, 1.0); }
 
@@ -162,12 +162,12 @@ describe("link", () => {
     }
 
   });
-  
+
   it("links same module twice with different entry point", () => {
 
     const sub = `
     float used() { return 1.0; }
-    
+
     #pragma export
     vec4 getPosition(int index) { return vec4(used(), 0.0, 1.0, 1.0); }
 
@@ -205,7 +205,7 @@ describe("link", () => {
 
     const sub2 = `
     void getPosition() {};
-    
+
     #pragma export
     vec4 getColor(int index) {
       getPosition();

@@ -53,7 +53,7 @@ export const makeLoadModuleWithCache = (
   if (cached) {
     return bindEntryPoint(cached, entry);
   }
-  
+
   const module = loadModule(code, name, undefined, true);
   cache.set(hash, module);
   return bindEntryPoint(module, entry);

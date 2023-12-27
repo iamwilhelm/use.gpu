@@ -51,7 +51,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
 
-  const renderContext = initial ? useRenderContext() : useNoRenderContext(); 
+  const renderContext = initial ? useRenderContext() : useNoRenderContext();
   let first = useRef(true);
   initial ? useOne(() => { first.current = true; }, renderContext) : useNoOne();
 

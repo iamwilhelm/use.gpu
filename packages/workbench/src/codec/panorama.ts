@@ -28,7 +28,7 @@ export const PanoramaMap: LiveComponent<PanoramaMapProps> = (props) => {
     projection = 'equirectangular',
     render,
   } = props;
-  
+
   const shader = PROJECTIONS[projection];
   if (!shader) throw new Error(`Unsupported projection '${projection}'`);
 

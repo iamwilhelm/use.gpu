@@ -680,7 +680,7 @@ it("does not update context if value is the same", () => {
 });
 
 it("gathers yeeted values", () => {
-  
+
   const Root = () => {
     return gather([
       yeet(1),
@@ -694,18 +694,18 @@ it("gathers yeeted values", () => {
   };
 
   const Node = () => {};
-  
+
   const result = renderSync(use(Root));
   if (!result.host) return;
 
   const {host: {flush}} = result;
   if (flush) flush();
-  
+
   expect(formatTree(result)).toMatchSnapshot();
 });
 
 it("captures values", () => {
-  
+
   const context = makeCapture<number>();
 
   const Root = () => {
@@ -754,7 +754,7 @@ it("yeets from capture", () => {
 });
 
 it("renders quoted tree", () => {
-  
+
   const Root = () => {
     return reconcile([
       use(Node),
@@ -768,18 +768,18 @@ it("renders quoted tree", () => {
   const Node = (children) => {
     return children;
   };
-  
+
   const result = renderSync(use(Root));
   if (!result.host) return;
 
   const {host: {flush}} = result;
   if (flush) flush();
-  
+
   expect(formatTree(result)).toMatchSnapshot();
 });
 
 it("renders quoted/unquoted trees", () => {
-  
+
   const Root = () => {
     return [
       reconcile(quote(
@@ -794,18 +794,18 @@ it("renders quoted/unquoted trees", () => {
 
   const First = (children) => children;
   const Second = (children) => children;
-  
+
   const result = renderSync(use(Root));
   if (!result.host) return;
 
   const {host: {flush}} = result;
   if (flush) flush();
-  
+
   expect(formatTree(result)).toMatchSnapshot();
 });
 
 it("renders quote/unquote pairs", () => {
-  
+
   const Root = () => {
     return reconcile(use(First,
       quote(
@@ -824,13 +824,13 @@ it("renders quote/unquote pairs", () => {
 
   const First = (children) => children;
   const Second = (children) => children;
-  
+
   const result = renderSync(use(Root));
   if (!result.host) return;
 
   const {host: {flush}} = result;
   if (flush) flush();
-  
+
   expect(formatTree(result)).toMatchSnapshot();
 });
 
@@ -885,7 +885,7 @@ it("render reordering", () => {
   const {host: {flush}} = result;
   expect(formatTree(result)).toMatchSnapshot();
   expect(rendered.ids).toEqual([0, 1, 2]);
-  
+
   if (trigger) trigger();
   if (flush) flush();
 

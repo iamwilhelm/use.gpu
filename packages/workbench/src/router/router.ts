@@ -106,13 +106,13 @@ export const makeBrowserHistory = (base: string = '', hash?: boolean) => {
       if (location.pathname.indexOf(base) === 0) return '/' + location.pathname.slice(base.length);
       return location.pathname;
     },
-    
+
     query: () => {
       const out = {} as Record<string, string>;
-      
+
       let {search} = location;
       if (hash) search = location.hash.slice(2).split('?')[1] ?? '';
-      
+
       if (search.length) {
         const params = new URLSearchParams(search);
         for (const k of (params as any).keys()) out[k] = params.get(k)!;
@@ -143,6 +143,6 @@ export const makeBrowserHistory = (base: string = '', hash?: boolean) => {
       return {href, onClick};
     },
   };
-  
+
   return self;
 };

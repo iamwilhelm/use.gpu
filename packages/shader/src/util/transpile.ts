@@ -15,7 +15,7 @@ export const makeTranspile = (
   esModule: boolean = true,
   minify: boolean = false,
 ) => {
-  
+
   const makeImport = (symbol: string, from: string) => esModule
     ? `import ${symbol} from ${stringify(from)};`
     : `const ${symbol} = require(${stringify(from)});`;
@@ -52,10 +52,10 @@ export const makeTranspile = (
   const libs = `const libs = {${markers.join(', ')}};`
 
   // Export visible symbols
-  const exportSymbols = (table.visibles ?? []).map((s: string) => 
+  const exportSymbols = (table.visibles ?? []).map((s: string) =>
     `${esModule ? 'export const ' : 'exports.'}${s} = getSymbol(${stringify(s)});`
   );
-  
+
   let exportDefault;
   if (esModule) {
     exportDefault = 'export default getSymbol();';
@@ -68,7 +68,7 @@ Object.assign(exports, __default);
 exports.default = __default;
     `
   }
-  
+
   // Compose JS body
   const output = [
     preamble,

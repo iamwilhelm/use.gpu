@@ -50,7 +50,7 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
   } = props;
 
   const Resume = useCallback((instances: StorageSource, fieldSources: StorageSource[]) => {
-    
+
     const [view, boundPosition, boundDifferential] = useMemo(() => {
 
       const [matrices, normalMatrices] = fieldSources;

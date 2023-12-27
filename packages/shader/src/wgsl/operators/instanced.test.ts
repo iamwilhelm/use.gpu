@@ -6,7 +6,7 @@ import { instanceWith } from './instanced';
 describe('instanced', () => {
 
   it('loads two instanced values', () => {
-    
+
     const value1 = `
     @export fn getValue1(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 2.0, 3.0, 4.0); }
     `;

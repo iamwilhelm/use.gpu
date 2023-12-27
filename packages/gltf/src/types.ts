@@ -142,7 +142,7 @@ export type GLTFAccessorData<T = any> = GLTFObject<T> & {
   componentType: number,
   count: number,
   type: string,
-  
+
   bufferView?: number,
   byteOffset?: number,
   normalized?: number,

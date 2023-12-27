@@ -27,6 +27,7 @@ import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions
 import { makeArrowFlatGeometry } from './geometry/arrow-flat';
 import { makeArrowGeometry } from './geometry/arrow';
 
+import { getAnchorIndex } from '@use-gpu/wgsl/instance/index/anchor.wgsl';
 import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
@@ -82,7 +83,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     count = null,
     id = 0,
   } = props;
-  
+
   const det = Math.max(4, detail);
   const geometry = useMemo(() => flat ? makeArrowFlatGeometry() : makeArrowGeometry(det), [flat, det]);
 
@@ -123,7 +124,8 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     c, e, w, d, z,
     positionCount
   ]);
-  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, instance, instances, anchorCount);
+  const anchorIndex = useShader(getAnchorIndex, [a]);
+  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, instance, instances, anchorCount, anchorIndex);
   const getPicking = usePickingShader(props);
   const getFragment = getPassThruColor;
 

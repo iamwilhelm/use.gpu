@@ -139,7 +139,7 @@ export const SceneDeferredPage: LC = (props) => {
                         </>)}
                       />
                     </PBRMaterial>
-              
+
                   </Scene>
                 </Environment>
 

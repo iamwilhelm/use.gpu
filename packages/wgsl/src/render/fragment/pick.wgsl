@@ -2,7 +2,7 @@ use '@use-gpu/wgsl/mask/scissor':: { isScissored };
 
 @fragment
 fn main(
-  @location(0) fragScissor: vec4<f32>,  
+  @location(0) fragScissor: vec4<f32>,
   @location(1) fragUV: vec2<f32>,
   @location(2) @interpolate(flat) fragId: u32,
   @location(3) @interpolate(flat) fragIndex: u32,

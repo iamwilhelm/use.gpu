@@ -24,7 +24,7 @@ export const RTTFeedbackPage: LC = () => {
                 }
               `
             }/>
-          
+
             <RawData
               format='vec4<f32>'
               length={100}

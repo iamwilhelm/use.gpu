@@ -13,7 +13,7 @@ export const makeTuples = <N extends number, T = number>(array: TypedArray | T[]
   const aa: T[] = array as any;
 
   const get = (i: number, j: number) => aa[i * dims + j];
-  
+
   const length = n;
 
   const iterate = (f: (...args: any[]) => void, start: number = 0, end: number = n) => {
@@ -21,7 +21,7 @@ export const makeTuples = <N extends number, T = number>(array: TypedArray | T[]
 
     while (start < 0) start += n;
     while (end < 0) end += n;
-    
+
     const s = start * dims;
     const e = end * dims;
 

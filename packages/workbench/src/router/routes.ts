@@ -120,7 +120,7 @@ export const pathSpecToRegexp = (s: string, exact: boolean = false) => {
       regexp += escapeRegExp(segment);
     }
   }
-  
+
   if (exact) {
     if (segments.length === 0) regexp += '/';
     return new RegExp(regexp + '$');

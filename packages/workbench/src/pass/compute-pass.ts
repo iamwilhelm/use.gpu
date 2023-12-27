@@ -14,7 +14,7 @@ export type ComputePassProps = {
 };
 
 const NO_OPS: any[] = [];
-const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
+const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 const computeToContext = (
   commandEncoder: GPUCommandEncoder,

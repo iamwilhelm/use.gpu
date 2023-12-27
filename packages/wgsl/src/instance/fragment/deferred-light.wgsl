@@ -24,7 +24,7 @@ use '@use-gpu/wgsl/codec/octahedral'::{ decodeOctahedral };
   let normal = getNormal(uv);
   let material = getMaterial(uv);
   let depth = getDepth(uv);
-  
+
   let position = to3D(clipToWorld(vec4<f32>((uv * 2.0 - 1.0) * vec2<f32>(1.0, -1.0), depth, 1.0)));
 
   let surface = SurfaceFragment(

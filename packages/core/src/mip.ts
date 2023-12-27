@@ -131,14 +131,14 @@ export const updateMipTextureChain = (
     baseArrayLayer: layer ?? 0,
     dimension: layer != null ? '2d-array' : '2d',
   }));
-  
+
   const renderPassDescriptors = seq(mips).map(i => ({
     colorAttachments: [makeColorAttachment(views[i], null, NO_CLEAR, 'load')],
   } as GPURenderPassDescriptor));
 
   let cache = MIP_PIPELINES.get(device);
   if (!cache) MIP_PIPELINES.set(device, cache = new Map());
-  
+
   const key = [format, layout].join('/');
   let pipeline = cache.get(key);
   if (!pipeline) {
@@ -167,7 +167,7 @@ export const updateMipTextureChain = (
     passEncoder.setBindGroup(0, bindGroups[i - 1]);
     passEncoder.setVertexBuffer(0, vertexBuffer);
     passEncoder.draw(mesh.count, 1, 0, 0);
-    passEncoder.end();    
+    passEncoder.end();
   }
 
   device.queue.submit([commandEncoder.finish()]);

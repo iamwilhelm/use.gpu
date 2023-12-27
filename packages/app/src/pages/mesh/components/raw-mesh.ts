@@ -118,7 +118,7 @@ export const RawMesh: LiveComponent<RawMeshProps> = memo((props: RawMeshProps) =
       'main',
       getBundleLabel(fragmentShader)
     );
-    
+
     inspect({vertex});
     inspect({fragment});
 
@@ -176,5 +176,5 @@ export const RawMesh: LiveComponent<RawMeshProps> = memo((props: RawMeshProps) =
   return yeet({
     // Optionally pass `bounds` of type Lazy<DataBounds> to enable culling
     [mode]: {draw}
-  }); 
+  });
 }, 'Mesh');

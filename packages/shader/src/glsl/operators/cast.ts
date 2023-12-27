@@ -16,7 +16,7 @@ const literal = (v: number, neg: boolean, isFloat: boolean) => {
 export const makeAutoSwizzle = (from: string, to: string) => {
   const mf = from.match(/vec([0-9])/);
   const mt = to.match(/vec([0-9])/);
-  
+
   const nf = mf ? +mf[1] : 1;
   const nt = mt ? +mt[1] : 1;
 
@@ -74,11 +74,11 @@ export const makeSwizzle = (
   const {basis, signs, gain} = parseSwizzle(sz);
   const out: string[] = basis.split('').map((v, i) => {
     const neg = !!(signs && signs[i] === '-');
-    
+
     if (v.match(/[0-9]/)) return literal(+v, neg, isFloat);
     else return (neg ? '-' : '') + `${name}.${v}`;
   });
-  
+
   const compact: string[] = [];
   let compat = true;
   for (let c of out) {

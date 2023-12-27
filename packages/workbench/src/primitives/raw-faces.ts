@@ -23,6 +23,7 @@ import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions
 import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
+import { getInstancedFaceIndex } from '@use-gpu/wgsl/instance/index/face.wgsl';
 
 export type RawFacesFlags = {
   flat?: boolean,
@@ -154,7 +155,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     ps, n, t, u, ss, g, c, z,
     i,
   ]);
-  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, attr.instance, attr.instances, instanceCount, 3);
+  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, attr.instance, attr.instances, instanceCount, getInstancedFaceIndex);
   const getPicking = usePickingShader(attr);
 
   const links = useMemo(() => {

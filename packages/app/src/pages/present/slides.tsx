@@ -20,7 +20,7 @@ import { vec3 } from 'gl-matrix';
 let t = 0;
 
 export const PresentSlidesPage: LC = () => {
-  
+
   return (
     <Loop>
       <LinearRGB>
@@ -32,14 +32,14 @@ export const PresentSlidesPage: LC = () => {
 
               <Overlay stay={1}>
                 <Absolute left={50} bottom={50} right={50}>
-                  <Block padding={[10, 10, 10, 20]} fill="#404040"><Inline><Text size={48} color="#fff" weight="bold">Lorem Ipsum</Text></Inline></Block>                  
+                  <Block padding={[10, 10, 10, 20]} fill="#404040"><Inline><Text size={48} color="#fff" weight="bold">Lorem Ipsum</Text></Inline></Block>
                 </Absolute>
               </Overlay>
 
               <Slide effect={{type: 'wipe', direction: 'left'}}>
                 <Absolute left={50} top={50} bottom={50} right={50}>
                   <Block padding={[10, 10, 10, 20]} fill="#404040"><Inline><Text size={48} color="#fff" weight="bold">Use.GPU Present</Text></Inline></Block>
-                  
+
                   <Block padding={10}>
                     <Step effect={{type: 'wipe', duration: 0.5}}>
                       <Block padding={10} margin={[0, 0, 0, 10]} fill="#404040"><Inline><Text size={24} color="#fff">Lorem ipsum dolor sit amet</Text></Inline></Block>
@@ -53,7 +53,7 @@ export const PresentSlidesPage: LC = () => {
               <Slide effect={{type: 'move', direction: 'left', duration: 1}}>
                 <Absolute left={50} top={50} bottom={50} right={50}>
                   <Block padding={[10, 10, 10, 20]} margin={[0, 0, 0, 10]} fill="#404040"><Inline><Text size={48} color="#fff" weight="bold">With Fancy Transitions</Text></Inline></Block>
-                  
+
                   <Block padding={10} margin={[0, 0, 0, 10]}>
                     <Step effect={{type: 'fade', direction: 'left', duration: 0.25}}>
                       <Block padding={10} fill="#404040"><Inline><Text size={24} color="#fff">Cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Text></Inline></Block>

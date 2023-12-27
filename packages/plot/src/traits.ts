@@ -555,7 +555,7 @@ export const LinesTrait = combine(
     width: optional(parseScalarArrayLike),
     widths: optional(parseMultiScalarArray),
   }),
-  LineSegmentsTrait,  
+  LineSegmentsTrait,
 );
 
 export const ArrowsTrait = combine(
@@ -565,11 +565,11 @@ export const ArrowsTrait = combine(
     size: optional(parseScalarArrayLike),
     sizes: optional(parseMultiScalarArray),
   }),
-  ArrowSegmentsTrait,  
+  ArrowSegmentsTrait,
 );
 
 export const FacesTrait = combine(
   ColorsTrait({ composite: true }),
   FacetedVerticesTrait,
-  FaceSegmentsTrait,  
+  FaceSegmentsTrait,
 );

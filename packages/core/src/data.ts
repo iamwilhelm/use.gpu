@@ -197,7 +197,7 @@ export const unweldNumberArray = (() => {
   ) => {
     arg = indices;
     return copyWithIndex(from, to, fromDims, toDims, fromIndex, toIndex, count, stride);
-  }  
+  }
 })();
 
 export const offsetNumberArray = (() => {
@@ -254,11 +254,11 @@ export const fillNumberArray = (() => {
           t += step;
         }
       }
-      
+
       return count * step;
     }
     else {
-      return copyWithZeroIndex(from, to, fromDims, toDims, fromIndex, toIndex, count, stride); 
+      return copyWithZeroIndex(from, to, fromDims, toDims, fromIndex, toIndex, count, stride);
     }
   }
 })();
@@ -485,7 +485,7 @@ export const getUnweldedArray = (
   const ctor = from.constructor ?? Float32Array;
   const to = new ctor(indices.length * toDims);
   unweldNumberArray(from, to, indices, fromDims, toDims, fromIndex, toIndex, count, stride);
-  return to; 
+  return to;
 };
 
 export const makeExprEmitter = (to: VectorLike, dims: number): {
@@ -566,7 +566,7 @@ export const emitIntoMultiNumberArray = <T>(expr: Emitter, to: VectorLike, dims:
       increment();
     };
   }
-  
+
   return emitIntoNumberArray(nest, to, dims);
 }
 

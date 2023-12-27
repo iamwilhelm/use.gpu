@@ -54,6 +54,6 @@ use '@use-gpu/wgsl/codec/octahedral'::{ encodeOctahedral };
   else {
     s += sampleShadow(uv, index, depth);
   }
-  
+
   return s;
 };

@@ -72,7 +72,7 @@ export const wgsl = (literals: TemplateStringsArray, ...tokens: string[]) => {
 /** Format `number` as WGSL `f32` */
 export const f32 = (x: number) => {
   const s = x.toString();
-  return (!s.match(/\./)) ? s + '.0' : s;  
+  return (!s.match(/\./)) ? s + '.0' : s;
 };
 /** Format `number` as WGSL `u32` */
 export const u32 = (x: number) => Math.round(x).toString() + 'u';

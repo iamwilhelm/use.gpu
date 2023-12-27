@@ -59,7 +59,7 @@ export const useFontText = (
     const spans = makeTuples(m, 3);
     const glyphs = makeTuples(g, 4);
     const missing = makeTuples(i, 2);
-    
+
     missing.iterate((index: number, glyph: number) =>
       rustText.loadMissingGlyph(stack[index], glyph, forceUpdate)
     );
@@ -76,7 +76,7 @@ export const useFontHeight = (
 ) => {
   const rustText = useFontContext();
   const [id] = stack;
-  
+
   return useMemo(() => {
     let {ascent, descent, lineHeight: fontHeight, xHeight, emUnit} = rustText.measureFont(id, size);
 

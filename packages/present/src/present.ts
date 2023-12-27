@@ -38,7 +38,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
     onChange,
     children,
   } = props;
-  
+
   const backgroundColor = useProp(props.backgroundColor, parseBackground, '#000000');
 
   // Presentation state starts out empty
@@ -87,7 +87,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
 
       const slide = map.get(id);
       if (!slide) return -1;
-    
+
       const {step} = state;
       return step < slide.from ? -1 : step >= slide.to ? 1 : 0;
     };
@@ -99,7 +99,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
       const slide = map.get(id);
       return !!slide?.thread;
     };
-  
+
     const isVisible = (id: number) => Math.abs(getVisibleState(id) ?? -1) !== 1;
     const useTransition = makeUseTransition(getVisibleState);
 
@@ -112,7 +112,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
       ...api,
     };
   }, [api, state]);
-  
+
   const view = use(Stage, {
     step: state.step,
     api,

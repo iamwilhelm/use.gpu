@@ -25,9 +25,9 @@ export const MapboxProvider: LC<MapboxProviderProps> = (props: PropsWithChildren
     accessToken = '',
     children,
   } = props;
-  
+
   useOne(() => accessToken || console.warn('<MapboxProvider> accessToken was not set.'), accessToken);
-  
+
   const context = useMemo(() => ({
     getMVT: makeMVTSource(username, style, accessToken),
   }), [username, style, accessToken]);

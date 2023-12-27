@@ -14,12 +14,12 @@ export const IconRow = ({height = 16, gap = 4, children}: PropsWithChildren<Icon
   if (!children) return null;
 
   const render = Array.isArray(children) ? children.flatMap((c, i) => [<span key={i.toString()} style={{paddingLeft: gap}} />, c]) : children;
-  
+
   return <div style={{display: 'inline-block', height, position: 'relative', top: 3/16 * height}}>{render}</div>;
 };
 
 type SVGProps = {
-  color?: string,  
+  color?: string,
   title?: string,
   size?: string | number,
 };

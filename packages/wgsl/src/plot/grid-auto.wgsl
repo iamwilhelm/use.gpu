@@ -8,7 +8,7 @@ use '@use-gpu/wgsl/use/view'::{ getViewPosition };
 @export fn getGridAutoPosition() -> vec4<f32> {
   let base = getGridAutoBase();
   let shift = getGridAutoShift();
-  
+
   var a = base;
   var b = base + shift;
   a = transformPosition(a);

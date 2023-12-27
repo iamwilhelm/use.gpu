@@ -63,12 +63,12 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     depthTest,
     depthWrite,
     blend,
-    
+
     texture,
     transform,
     clip,
     mask,
-    
+
     debugContours = false,
   } = props;
 

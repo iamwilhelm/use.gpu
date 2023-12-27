@@ -18,7 +18,7 @@ export const getWireframe = (
 ) => {
   const i = instanceCount;
   const v = vertexCount;
-  
+
   const isTriangleStrip = topology === 'triangle-strip';
 
   let instanceSize;
@@ -35,7 +35,7 @@ export const getWireframe = (
     instanceCount = () => resolve(v) * resolve(i);
     instanceSize = () => resolve(v);
   }
-  
+
   const shader = isTriangleStrip ? getWireframeStripVertex : getWireframeListVertex;
   const bound = getShader(shader, [getVertex, instanceSize]);
 
@@ -80,6 +80,6 @@ export const getWireframeIndirect = (
   return {
     getVertex: boundVertex,
     wireframeCommand: boundDispatch,
-    wireframeIndirect: destination, 
+    wireframeIndirect: destination,
   };
 }

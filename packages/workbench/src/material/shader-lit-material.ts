@@ -15,8 +15,8 @@ import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 
 export type ShaderLitMaterialProps = {
   /** Flat shader, for unlit passes (e.g. shadow map)
- 
-  fn getFragment(color: vec4<f32>, uv: vec4<f32>, st: vec4<f32>) -> vec4<f32> 
+
+  fn getFragment(color: vec4<f32>, uv: vec4<f32>, st: vec4<f32>) -> vec4<f32>
   */
   fragment: ShaderModule,
 
@@ -31,7 +31,7 @@ export type ShaderLitMaterialProps = {
   depth?: ShaderModule,
 
   /** Surface shader, for material properties
-  
+
   fn getSurface(
     color: vec4<f32>,
     uv: vec4<f32>,
@@ -54,7 +54,7 @@ export type ShaderLitMaterialProps = {
   environment?: ShaderModule,
 
   /** Material lighting shader, for lighting model. e.g. `applyPBRMaterial`.
-  
+
   fn getLight(surface: SurfaceFragment) -> vec4<f32> */
   apply?: ShaderModule,
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,

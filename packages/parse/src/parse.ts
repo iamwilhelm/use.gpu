@@ -302,7 +302,7 @@ export const parseBooleanArray = (vec: VectorLike): Uint8Array =>
   vec ? toScalarArray(vec, Uint8Array) as Uint8Array : new Uint8Array();
 
 export const parseBooleanArrayLike = (vec: VectorLike): Uint8Array =>
-typeof 
+typeof
   vec ? toScalarArray(vec, Uint8Array) as Uint8Array : new Uint8Array();
 
 export const parseColorArray = (colors?: ColorLikes): Float32Array => {
@@ -315,7 +315,7 @@ export const parseColorArrayLike = (colors?: ColorLikes): Float32Array => {
   if (isTypedArray(colors)) return colors as Float32Array;
   if (Array.isArray(colors) && typeof colors[0] !== 'number') {
     return parseVec4Array(colors.map(parseColor));
-  } 
+  }
   return parseColor(colors);
 };
 

@@ -20,7 +20,7 @@ export type BlockProps =
   TraitProps<typeof ElementTrait> &
 {
   direction?: Direction,
-  
+
   padding?: MarginLike,
   snap?: boolean,
   contain?: boolean,
@@ -115,7 +115,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
         };
       };
 
-      return yeet({        
+      return yeet({
         sizing,
         margin,
         grow,

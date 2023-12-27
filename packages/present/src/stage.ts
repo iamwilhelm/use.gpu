@@ -57,7 +57,7 @@ export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>)
 
       const threadIds = threads.map(({id}) => id);
       const floatIds  = floats.map(({id}) => id);
-  
+
       // Get entering slide (only one at a time)
       const entering = threadIds.filter((id) => api.isVisible(id))[0] ?? null;
 
@@ -79,7 +79,7 @@ export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>)
 
       const enteringLayer = threads[enteringIndex];
       const exitingLayer = threads[exitingIndex];
-    
+
       const effect = threads[Math.max(enteringIndex, exitingIndex)]?.enter;
 
       // Layer pair

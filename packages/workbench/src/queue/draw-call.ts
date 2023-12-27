@@ -37,7 +37,7 @@ export type DrawCallProps = {
 
   vertex: ParsedBundle,
   fragment?: ParsedBundle | null,
-  
+
   globalLayout?: GPUBindGroupLayout,
   passLayout?: GPUBindGroupLayout,
 
@@ -184,7 +184,7 @@ export const drawCall = (props: DrawCallProps) => {
   }
 
   const base = 1 + +!!passLayout;
-  
+
   // Uniforms
   const uniform = useMemo(() => {
     if (globalLayout) return null;
@@ -211,7 +211,7 @@ export const drawCall = (props: DrawCallProps) => {
       triangles: 0,
     },
   });
-  
+
   const isStrip = topology === 'triangle-strip';
   const isVolatileGlobal = typeof uniform?.bindGroup === 'function';
 
@@ -281,7 +281,7 @@ export const drawCall = (props: DrawCallProps) => {
         if (dispatchVersion === d) return;
         dispatchVersion = d;
       }
-      
+
       return inner(passEncoder, countGeometry, uniforms, flip);
     };
   }

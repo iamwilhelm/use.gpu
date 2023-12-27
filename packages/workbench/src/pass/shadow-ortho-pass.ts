@@ -31,7 +31,7 @@ export type ShadowOrthoPassProps = {
 };
 
 const NO_OPS: any[] = [];
-const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
+const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 /** Orthographic shadow render pass.
 

@@ -13,6 +13,8 @@ import {
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
+import { InfoBox } from '../../ui/info-box';
+
 let t = 0;
 
 const BACKGROUND = [0, 0, 0.09, 1];
@@ -23,14 +25,15 @@ const KEYFRAMES = [
 ] as Keyframe[];
 
 export const Plot2DPage: LC = () => {
-  
-  return (
+
+  return (<>
+    <InfoBox>Draw 2D and 3D shapes using the plot API and animate their transforms like CSS.</InfoBox>
     <Loop>
       <Cursor cursor="move" />
       <Camera>
         <Pass>
           <Plot>
-            
+
             <Point
               position={[50, 50]}
               size={20}
@@ -48,7 +51,7 @@ export const Plot2DPage: LC = () => {
               size={10}
               color={'#30ff90'}
             />
-            
+
             <Line
               position={[[100, 50], [150, 150]]}
               width={5}
@@ -252,7 +255,7 @@ export const Plot2DPage: LC = () => {
               position={[400, 400, 0]}
               scale={[400, 400, 1]}
             >
-            
+
 
               <Axis
                 origin={[100, 100]}
@@ -270,28 +273,13 @@ export const Plot2DPage: LC = () => {
                 end
               />
             </Cartesian>
-            
-            {/*
-            */}
 
           </Plot>
         </Pass>
       </Camera>
     </Loop>
-  );
+  </>);
 }
-
-/*
-              <Grid
-                axes='xy'
-                width={2}
-                first={{ detail: 3, divide: 5 }}
-                second={{ detail: 3, divide: 5 }}
-                depth={0.5}
-                zBias={-1}
-                auto
-              />
-*/
 
 const Camera = ({children}: PropsWithChildren<object>) => (
   <PanControls

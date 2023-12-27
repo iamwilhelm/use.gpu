@@ -32,7 +32,7 @@ const DEFAULT_SHADOW_MAP = {
 };
 
 export const PointLight: LC<PointLightProps> = memo((props: PointLightProps) => {
-  
+
   const position = useProp(props.position, parsePosition);
   const color = useProp(props.color, parseColor);
   const intensity = useProp(props.intensity, parseNumber, 1);

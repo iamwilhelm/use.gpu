@@ -1,15 +1,15 @@
 import { bindBundle, bindingsToLinks, resolveBindings } from './bind';
 import { loadModule } from './shader';
 import { linkBundle } from './link';
-import { formatAST } from '../util/tree'; 
+import { formatAST } from '../util/tree';
 import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
 
 describe("bind", () => {
-  
+
   it("binds an external", () => {
-    
+
     const codeMain = `
     vec4 getColor();
     void main() {
@@ -21,7 +21,7 @@ describe("bind", () => {
 
     const codeSub = `
     vec4 getSubColor();
-    
+
     vec4 colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
     vec4 colorNotUsed() { return vec4(0.0, 0.1, 0.2, 1.0); }
 
@@ -30,12 +30,12 @@ describe("bind", () => {
       return getSubColor() + colorUsed();
     }
     `
-    
+
     const codeColor = `
     #pragma export
     vec4 getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
     `
-    
+
     const module = loadModule(codeMain, 'main');
     const sub = loadModule(codeSub, 'sub', 'getColor');
     const getColor = loadModule(codeColor, 'getColor');
@@ -47,7 +47,7 @@ describe("bind", () => {
       const linked = linkBundle(sub, links, defines);
       expect(linked).toMatchSnapshot();
     }
-    
+
     {
       const bound = bindBundle(sub, links, defines);
       const linked = linkBundle(bound);
@@ -113,7 +113,7 @@ describe("bind", () => {
     const code = `
     vec4 getColor(int);
     vec2 getSize(int);
-    
+
     void main() {
       getColor(0);
       getSize(0);

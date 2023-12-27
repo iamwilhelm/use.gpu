@@ -11,7 +11,7 @@ import {
   OrbitCamera, OrbitControls,
   Pick, Cursor,
   PointLight, AmbientLight,
-  
+
   makeBoxGeometry,
 } from '@use-gpu/workbench';
 

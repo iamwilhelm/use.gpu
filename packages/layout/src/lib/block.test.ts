@@ -9,7 +9,7 @@ import { getBlockMinMax, getBlockMargin, fitBlock } from './block';
 import { makeBoxLayout } from './util';
 
 describe('block layout', () => {
-  
+
   let ID = 0;
   const makeElement = (
     width: number,
@@ -94,7 +94,7 @@ describe('block layout', () => {
       const sizingY = getBlockMargin(els, [0, 0, 0, 0], [5, 3, 7, 10], 'y', false);
       expect(sizingY).toEqual([0, 7, 0, 10]);
     }
-    
+
     {
       const sizingX = getBlockMargin(els, [-5, -10, -25, 5], [0, 0, 0, 0], 'x', false);
       expect(sizingX).toEqual([5, -10, -5, 5]);

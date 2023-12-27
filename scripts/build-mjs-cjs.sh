@@ -39,7 +39,7 @@ fi
 
 MODULE_ENV=cjs babel src --out-dir ../../build/ts/$NPM_PACKAGE/src --extensions ".ts,.tsx,.js,.jsx" --ignore "src/**/__mocks__/**/*.js" --ignore "src/**/*.test.ts" 1>/dev/null
 exit_on_error $? babel
-  
+
 if test -n "$(find . -maxdepth 1 -name '*.ts' -print -quit 2>/dev/null)"
 then
   MODULE_ENV=cjs babel *.ts --out-dir ../../build/ts/$NPM_PACKAGE --extensions ".ts" 1>/dev/null

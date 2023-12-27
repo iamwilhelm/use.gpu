@@ -108,7 +108,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   const frame = useOne(() => ({current: 0}));
   frame.current = incrementVersion(frame.current);
 
-  return provide(FrameContext, frame.current, 
+  return provide(FrameContext, frame.current,
     use(ViewProvider, {
       defs: VIEW_UNIFORMS,
       uniforms,

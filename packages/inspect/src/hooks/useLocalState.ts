@@ -12,7 +12,7 @@ export const makeUseLocalState = (
       const obj = JSON.parse(item);
       return unmarshal ? unmarshal(obj) : obj;
     } catch (e) {};
-    
+
     return typeof initial === 'function' ? (initial as any)() : initial;
   });
 
@@ -21,7 +21,7 @@ export const makeUseLocalState = (
     setLastKey(key);
     setState(initial);
   }
-  
+
   const setLocalState = useCallback((value: SetStateAction<T>) => {
     setState((state: T) => {
       state = typeof value === 'function' ? (value as any)(state) : value;
@@ -29,6 +29,6 @@ export const makeUseLocalState = (
       return state;
     });
   }, []);
-  
+
   return [state, setLocalState];
 };

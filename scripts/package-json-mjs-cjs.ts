@@ -45,14 +45,14 @@ for (const file of files) {
         let ts = readFileSync(dts).toString();
         ts = ts.replace(/\.\/src\//g, './mjs/');
         writeFileSync(dts, ts);
-      }  
+      }
 
       const jsRoots = glob.sync(file.replace(/\/package\.json$/, '/*.js'));
       for (const js of jsRoots) {
         let ts = readFileSync(js).toString();
         ts = ts.replace(/\.\/src\//g, './cjs/');
         writeFileSync(js, ts);
-      }  
+      }
     } catch (e) {};
 
   }

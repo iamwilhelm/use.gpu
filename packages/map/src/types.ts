@@ -44,6 +44,6 @@ export type MVTStyleProperties = {
     weight?: string | number,
     lineHeight?: number,
     size?: number,
-  },  
+  },
 };
 

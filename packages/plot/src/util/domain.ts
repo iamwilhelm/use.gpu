@@ -51,7 +51,7 @@ export const linear = (
     (base % 3 == 0) ? [base / 3, 1, 1 / 3] :
     (base % 5 == 0) ? [base / 5, 1, 1 / 5] :
     [1];
- 
+
   const steps = factors.map(f => ref * f);
 
   // Find step size closest to ideal.

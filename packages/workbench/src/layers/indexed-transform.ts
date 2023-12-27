@@ -16,7 +16,7 @@ export type IndexedTransformProps = PropsWithChildren<{
 
 export const IndexedTransform: FC<IndexedTransformProps> = (props: IndexedTransformProps) => {
   const {matrices, normalMatrices, children} = props;
-  
+
   const transform = useMatrixTransformSources(matrices, normalMatrices);
   console.log({props, transform})
 

@@ -6,6 +6,7 @@ import {
   makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
   getBoundingBox, toDataBounds,
+  toCPUDims, toGPUDims,
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -85,7 +86,7 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   // Refresh and upload data
   const refresh = () => {
     let emitted = 0;
-    if (data?.length) copyNumberArray(data, array, dims);
+    if (data?.length) copyNumberArray(data, array, toCPUDims(dims), toGPUDims(dims));
     if (expr && size.length) {
       emitted = emitIntoMultiNumberArray(expr, array, dims, size, clock!);
     }

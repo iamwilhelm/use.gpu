@@ -7,7 +7,7 @@ import { vec3 } from 'gl-matrix';
 import {
   Pass,
   Cursor,
-  CompositeData, LineSegments, ArrowSegments,
+  Data2, getLineSegments, getArrowSegments,
   OrbitCamera, OrbitControls,
   LineLayer, ArrowLayer,
 } from '@use-gpu/workbench';
@@ -17,27 +17,17 @@ import { lineData, zigzagData, arrowData } from './line-data';
 // Line data fields
 
 const dataSchema = {
-  positions: {
-    format: 'vec3<f32>',
-    // Path is an array
-    composite: true,
-    // Accessor function
-    accessor: (o: any) => o.path,
-  },
-  colors: {
-    format: 'vec4<f32>',
-    // String accessor
-    accessor: 'color',
-  },
-  widths: {
-    format: 'f32',
-    accessor: 'width',
-  },
+  // Use data[n].path as position
+  positions: {format: 'array<vec3<f32>>', prop: 'path'},
+  // Use data[n].color as color
+  colors: {format: 'vec4<f32>', prop: 'color'},
+  // Use data[n].width as color
+  widths: {format: 'f32', prop: 'width'},
 };
 
-const isLoop = (o: any) => o.loop;
-const isStart = (o: any) => o.start;
-const isEnd = (o: any) => o.end;
+const isLoop  = (i: number) => lineData[i].loop;
+const isStart = (i: number) => lineData[i].start;
+const isEnd   = (i: number) => lineData[i].end;
 
 export const GeometryLinesPage: LC = () => {
 
@@ -45,44 +35,41 @@ export const GeometryLinesPage: LC = () => {
     <Camera>
       <Cursor cursor='move' />
       <Pass>
-        <CompositeData
+        <Data2
           schema={dataSchema}
           data={lineData}
           loop={isLoop}
-          on={<LineSegments />}
+          segments={getLineSegments}
           render={(props) =>
             <LineLayer {...props} depth={0.5} />
           }
         />
 
-        <CompositeData
+        {/*
+        <Data2
           schema={dataSchema}
           data={zigzagData}
-          on={<LineSegments />}
+          segments={getLineSegments}
           render={(props) =>
             <LineLayer {...props} depth={0.5} join='round' />
           }
         />
 
-        <CompositeData
+        <Data2
           schema={dataSchema}
           data={arrowData}
           loop={isLoop}
           start={isStart}
           end={isEnd}
-          on={<ArrowSegments />}
+          segments={getArrowSegments}
           render={(props) =>
             <ArrowLayer
-              positions={positions}
-              colors={colors}
-              widths={widths}
-              segments={segments}
-              anchors={anchors}
-              trims={trims}
+              {...props}
               depth={0.5}
             />
           }
         />
+        */}
       </Pass>
     </Camera>
   );

@@ -1,108 +1,139 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TypedArray, StorageSource, UniformType, Accessor, DataField, DataBounds } from '@use-gpu/core';
+import type { ArrowFunction, TypedArray, StorageSource, UniformType, Accessor, DataSchema, DataField, DataBounds } from '@use-gpu/core';
 
-import { yeet, signal, useOne, useMemo, useNoMemo, useContext, useNoContext, useYolo, incrementVersion } from '@use-gpu/live';
-import {
-  makeDataArray, makeDataAccessor, copyDataArray, copyNumberArray, 
-  makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
-  getBoundingBox, toDataBounds,
-} from '@use-gpu/core';
-
-import { DeviceContext } from '../providers/device-provider';
+import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
+import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
+import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, useCallback, useYolo, useNoYolo, incrementVersion } from '@use-gpu/live';
+import {
+  seq,
+  toCPUDims,
+  isUniformArrayType,
+  getUniformArrayDepth,
+
+  makeDataArray2,
+  copyRecursiveNumberArray2,
+  getBoundingBox,
+  toDataBounds,
+
+  schemaToArchetype,
+  schemaToEmitters,
+  getAggregateSummary,
+} from '@use-gpu/core';
+import { toMultiCompositeChunks } from '@use-gpu/parse';
 
 export type DataProps = {
-  /** Input data, array of structs */
-  data?: any[],
-  /** WGSL schema of input data */
-  fields?: DataField[],
-  /** Resample `data` on every animation frame. */
+  /** WGSL schema of input data + accessors */
+  schema: DataSchema,
+  /** Input data, array of structs of values/arrays, or 1 struct, if data is not virtualized */
+  data?: Record<string, any> | (Record<string, any>)[],
+  /** Input data accessors, if data is virtualized */
+  virtual?: Record<string, (i: number) => any>,
+  /** Input length, if data is virtualized */
+  count?: number,
+  /** Input version, if data is virtualized. Controls re-upload if set. */
+  version?: number,
+  /** Resample data on every animation frame. */
   live?: boolean,
 
-  /** Receive 1 source per field, in struct-of-array format. Leave empty to yeet sources instead. */
-  render?: (...sources: StorageSource[]) => LiveElement,
+  /** Receive 1 source per field, in virtual struct-of-array format. Leave empty to yeet sources instead. */
+  render?: (sources: Record<string, StorageSource>) => LiveElement,
 };
 
 const NO_FIELDS = [] as DataField[];
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
-/** Compose array-of-structs into struct-of-array data. */
+/** Compose array-of-structs with singular fields `T` into WGSL storage. Returns a struct of virtual storage sources. */
 export const Data: LiveComponent<DataProps> = (props) => {
-  const device = useContext(DeviceContext);
-
   const {
-    data,
-    fields,
+    skip = 0,
+    count,
+    version,
+    data: propData,
+    virtual,
+    schema = NO_SCHEMA,
+    loop,
+    start,
+    end,
     render,
+    segments,
     live = false,
   } = props;
 
-  const length = data?.length || fields?.[0]?.[1]?.length;
-  const l = useBufferedSize(length || 1);
-  const fs = fields ?? NO_FIELDS;
+  const data = propData ? Array.isArray(propData) ? propData : [propData] : null;
+  const itemCount = Math.max(0, (count ?? data?.length) - skip);
+  const allocItems = useBufferedSize(itemCount);
 
-  // Make data buffers
-  const [fieldBuffers, fieldSources] = useMemo(() => {
-    const fieldBuffers = fs.map(([format, accessor, accessorType]) => {
-      if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
-      const f = format as any as UniformType;
+  // Make arrays for merged attributes
+  const [fields, attributes, archetype] = useMemo(() => {
+    const fields = {};
+    const attributes = {};
 
-      let {raw, length, fn} = makeDataAccessor(f, accessor);
-      if (length == null) length = l;
+    for (const k in schema) {
+      const {format, prop = k, index, unwelded, ref} = schema[k];
+      if (ref) throw new Error(`Ref '${k}' not supported in <Data>`);
+      if (index || unwelded) throw new Error(`Use <CompositeData> for indexed and unwelded data`);
+      if (isUniformArrayType(format)) throw new Error(`Use <CompositeData> for array data`);
 
-      const {array, dims} = makeDataArray(f, length);
+      const {array, dims} = makeDataArray2(format, allocItems);
 
-      const buffer = makeStorageBuffer(device, array.byteLength);
-      const source = {
-        buffer,
-        format,
-        length: 0,
-        size: [0],
-        version: 0,
-        bounds: {...NO_BOUNDS},
-      };
+      fields[k] = {array, dims, prop};
+      attributes[k] = array;
+    }
 
-      return {buffer, array, source, dims, accessor: fn, raw};
-    });
-    const fieldSources = fieldBuffers.map(f => f.source);
-    return [fieldBuffers, fieldSources];
-  }, [device, fs, l]);
+    const archetype = schemaToArchetype(schema, attributes);
+    return [fields, attributes, archetype];
+  }, [schema, allocItems]);
 
-  // Refresh and upload data
-  const refresh = () => {
-    for (const {buffer, array, source, dims, accessor, raw} of fieldBuffers) if (raw || data) {
-      if (raw?.length) copyNumberArray(raw, array, dims);
-      else if (data?.length) copyDataArray(data, array, dims, accessor as Accessor);
+  // Blit all data into merged arrays
+  const items = useMemo(() => {
+    for (const k in fields) {
+      const accessor = virtual?.[k];
+      if (!accessor || !data) continue;
 
-      uploadBuffer(device, buffer, array.buffer);
+      const {array, dims, depth, prop} = fields[k];
 
-      const length = raw ? array.length / dims : data ? data.length : 0;
-      source.length  = length;
-      source.size[0] = length;
-      source.version = incrementVersion(source.version);
+      // Keep CPU-only layout, as useAggregator will widen for us
+      const dimsIn = toCPUDims(dims);
 
-      const {bounds} = source;
-      if (bounds) {
-        const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
-        bounds.center = center;
-        bounds.radius = radius;
-        bounds.min = min;
-        bounds.max = max;
+      let b = 0;
+      let o = 0;
+      for (let i = 0; i < itemCount; ++i) {
+        o += copyNumberArray2(accessor ? accessor(i + skip) : data[i + skip][props], array, dimsIn, dimsIn, 0, o, 1);
       }
     }
-  };
 
-  if (!live) {
-    useNoAnimationFrame();
-    useMemo(refresh, [device, data, fieldBuffers, length]);
-  }
-  else {
-    useAnimationFrame();
-    refresh();
-  }
+    return [{
+      count: itemCount,
+      archetype,
+      attributes,
+    }];
+  }, [
+    live ? NaN : virtual ? (version ?? NaN) : null, data,
+    itemCount, skip,
+    archetype, attributes,
+  ]);
 
-  const trigger = useOne(() => signal(), fieldSources[0]?.version);
-  const view = useYolo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
+  // Aggregate into struct buffer
+  const {sources} = useAggregator(schema, items);
+  console.log('item', {item: items[0], emitters, total, indexed, sources})
+
+  // Tag positions with bounds
+  useMemo(() => {
+    if (!fields.positions) return null;
+
+    const {array, dims} = fields.positions;
+    const bounds = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
+
+    if (sources.positions && bounds) sources.positions.bounds = bounds;
+  }, [fields, items, sources]);
+
+  if (live) useAnimationFrame();
+  else useNoAnimationFrame();
+
+  const trigger = useOne(() => signal(), items);
+
+  const view = useYolo(() => render ? render(sources) : yeet(sources), [render, sources]);
   return [trigger, view];
 };

@@ -114,7 +114,7 @@ export const makeParseScalarArray = <T extends TypedArrayConstructor>(
 ) => (
   vec: VectorLike
 ): InstanceType<T> => {
-  return toScalarArray(vec, constructor) as T;
+  return (toScalarArray(vec, constructor) ?? new constructor(0)) as T;
 };
 
 export const makeParseScalarArrayLike = <T extends TypedArrayConstructor>(
@@ -123,7 +123,7 @@ export const makeParseScalarArrayLike = <T extends TypedArrayConstructor>(
   vec: number | VectorLike,
 ): number | InstanceType<T> => {
   if (typeof vec === 'number') return vec;
-  return toScalarArray(vec, constructor) as T;
+  return (toScalarArray(vec, constructor) ?? new constructor(0)) as T;
 };
 
 export const makeParseMultiScalarArray = <T extends TypedArrayConstructor>(
@@ -131,7 +131,7 @@ export const makeParseMultiScalarArray = <T extends TypedArrayConstructor>(
 ) => (
   vecs: VectorLikes
 ): InstanceType<T> => {
-  return toMultiScalarArray(vecs, constructor) as T;
+  return (toMultiScalarArray(vecs, constructor) ?? new constructor(0)) as T;
 };
 
 export const makeParseVectorArray = <T extends TypedArrayConstructor>(
@@ -141,7 +141,7 @@ export const makeParseVectorArray = <T extends TypedArrayConstructor>(
 ) => (
   vecs: VectorLikes
 ): InstanceType<T> => {
-  return toVectorArray(vecs, dims, w, constructor) as T;
+  return (toVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as T;
 };
 
 export const makeParseMultiVectorArray = <T extends TypedArrayConstructor>(
@@ -151,7 +151,7 @@ export const makeParseMultiVectorArray = <T extends TypedArrayConstructor>(
 ) => (
   vecs: VectorLikes
 ): InstanceType<T> => {
-  return toMultiVectorArray(vecs, dims, w, constructor) as T;
+  return (toMultiVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as T;
 };
 
 export const makeParseMultiMultiVectorArray = <T extends TypedArrayConstructor>(
@@ -161,7 +161,7 @@ export const makeParseMultiMultiVectorArray = <T extends TypedArrayConstructor>(
 ) => (
   vecs: VectorLikes
 ): InstanceType<T> => {
-  return toMultiMultiVectorArray(vecs, dims, w, constructor) as T;
+  return (toMultiMultiVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as T;
 };
 
 export const makeParseBasis = (defaults: string) => {

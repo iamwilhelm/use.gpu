@@ -1,7 +1,7 @@
 import type { LiveFiber, LiveComponent, LiveElement, Task, PropsWithChildren } from '@use-gpu/live';
 import type { StorageSource, StorageTarget, UniformType } from '@use-gpu/core';
 
-import { seq, getDataArrayByteLength, makeDataBuffer } from '@use-gpu/core';
+import { seq, getUniformArraySize, makeDataBuffer } from '@use-gpu/core';
 import { use, wrap, provide, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
@@ -47,7 +47,7 @@ export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props: PropsWit
   const [buffer, buffers, counter] = useMemo(
     () => {
       const flags = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
-      const byteLength = getDataArrayByteLength(format, length);
+      const byteLength = getUniformArraySize(format, length);
       const buffer = makeDataBuffer(device, byteLength, flags);
 
       const buffers = history > 0 ? seq(history).map(() =>

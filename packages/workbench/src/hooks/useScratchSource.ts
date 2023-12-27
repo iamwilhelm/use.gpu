@@ -3,7 +3,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { ArrowFunction, Task } from '@use-gpu/live';
 
 import { useMemo, useOne, incrementVersion } from '@use-gpu/live';
-import { resolve, makeDataBuffer, getDataArrayByteLength, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
+import { resolve, makeDataBuffer, getUniformArraySize, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
 
 import { adjustSize } from './useBufferedSize';
 import { useDeviceContext } from '../providers/device-provider';
@@ -39,7 +39,7 @@ export const useScratchSource = (
 
       if (alloc !== newAlloc) {
         alloc = newAlloc;
-        const byteLength = getDataArrayByteLength(f, alloc || 1);
+        const byteLength = getUniformArraySize(f, alloc || 1);
         source.buffer = makeDataBuffer(device, byteLength, flags);
       }
 

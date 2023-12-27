@@ -2,7 +2,6 @@ export * from './array-data';
 export * from './composite-data';
 export * from './composite-geometry-data';
 export * from './data';
-export * from './data2';
 export * from './fetch';
 export * from './geometry-data';
 export * from './image-cube-texture';

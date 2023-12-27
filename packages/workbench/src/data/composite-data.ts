@@ -1,275 +1,280 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TypedArray, StorageSource, UniformType, Accessor, DataField, DataBounds } from '@use-gpu/core';
+import type { ArrowFunction, TypedArray, StorageSource, DataSchema, DataBounds } from '@use-gpu/core';
 
-import { DeviceContext } from '../providers/device-provider';
+import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
+import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
-import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, useContext, useNoContext, useYolo, useNoYolo, incrementVersion } from '@use-gpu/live';
+import { yeet, signal, useOne, useMemo, useNoMemo, useYolo } from '@use-gpu/live';
 import {
-  makeDataArray, makeDataAccessor,
-  copyDataArray, copyNumberArray,
-  copyDataArrays, copyNumberArrays,
-  copyDataArraysComposite, copyNumberArraysComposite,
-  copyDataArrayChunked, copyNumberArrayChunked,
-  accumulateChunks,
-  makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
-  getBoundingBox, toDataBounds,
+  seq,
+  toCPUDims,
+  isUniformArrayType,
+  getUniformArrayDepth,
+
+  makeDataArray2,
+  copyRecursiveNumberArray2,
+  getBoundingBox,
+  toDataBounds,
+
+  schemaToArchetype,
+  schemaToEmitters,
+  getAggregateSummary,
 } from '@use-gpu/core';
+import { toMultiCompositeChunks } from '@use-gpu/parse';
 
-export type CompositeDataProps = {
-  /** Input data, array of structs of values/arrays */
-  data?: (Record<string, any>)[],
-  /** WGSL schema of input data */
-  fields?: DataField[],
-  /** Resample `data` on every animation frame. */
-  live?: boolean,
+type BooleanList = boolean | boolean[] | (<T>(i: number) => boolean);
 
-  /** Per item `isLoop` accessor */
-  loop?: <T>(t: T[]) => boolean,
-  /** Per item `hasStart` accessor */
-  start?: <T>(t: T[]) => boolean,
-  /** Per item `hasEnd` accessor */
-  end?: <T>(t: T[]) => boolean,
-  
-  /** Segment decorator(s) */
-  on?: LiveElement,
-
-  /** Receive 1 source per field, in struct-of-array format. Leave empty to yeet sources instead. */
-  render?: (...sources: StorageSource[]) => LiveElement,
+export type SegmentsInfo = {
+  positions: TypedArray,
+  chunks: number[] | TypedArray,
+  groups: number[] | TypedArray,
+  loops: boolean[] | boolean,
+  starts: boolean[] | boolean,
+  ends: boolean[] | boolean,
 };
 
-const NO_FIELDS = [] as DataField[];
+export type CompositeDataProps = {
+  /** WGSL schema of input data + accessors */
+  schema: DataSchema,
+  /** Input data, array of structs of values/arrays, or 1 struct, if data is not virtualized */
+  data?: Record<string, any> | (Record<string, any>)[],
+  /** Input data accessors, if data is virtualized */
+  virtual?: Record<string, (i: number) => any>,
+  /** Input length, if data is virtualized */
+  count?: number,
+  /** Input version, if data is virtualized. Controls re-upload if set. */
+  version?: number,
+  /** Resample data on every animation frame. */
+  live?: boolean,
+
+  /** Global flag or per item `isLoop` accessor */
+  loop?: BooleanList,
+  /** Global flag or per item `hasStart` accessor */
+  start?: BooleanList,
+  /** Global flag or per item `hasEnd` accessor */
+  end?: BooleanList,
+
+  /** Segment decorator(s) */
+  segments?: (args: SegmentsInfo) => Record<string, any>,
+
+  /** Receive 1 source per field, in virtual struct-of-array format. Leave empty to yeet sources instead. */
+  render?: (sources: Record<string, StorageSource>) => LiveElement,
+};
+
+const NO_SCHEMA = {} as DataSchema;
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
-const isComposite = (format: string) => !!format.match(/^array</);
-const toSimple = (format: string) => format.slice(6, -1);
-
-const accumulate = (xs: number[]): number[] => {
-  let out: number[] = [];
-  let n = xs.length;
-  let accum = 0;
-  for (let i = 0; i < n; ++i) {
-    out.push(accum);
-    accum += xs[i];
-  }
-  return out;
-}
-
-const iterateChunks = (
-  data: any[] | undefined,
-  field: DataField,
-  callback: (n: number, item?: any) => void,
-) => {
-  // Read out chunk lengths and cycle flag
-  let [format, accessor] = field;
-  format = toSimple(format);
-
-  // Prepare format appropriate accessor
-  if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
-  const f = format as any as UniformType;
-  const dims = UNIFORM_ARRAY_DIMS[f];
-
-  let {raw, length: l, fn} = makeDataAccessor(f, accessor);
-
-  const push = (list: any, item?: any) => {
-    const n = (list.length || 0) / (typeof list[0] === 'number' ? Math.floor(dims) : 1);
-    callback(n, item);
-  }
-
-  if (raw && l != null) for (let i = 0; i < l; ++i) {
-    push(raw[i]);
-  }
-  else if (fn && data) for (const v of data) {
-    push(fn(v), v);
-  }
-}
-
-/** Compose array-of-structs with fields `T | T[]` into struct-of-array data. */
+/** Aggregate array-of-structs with fields `T | T[] | T[][]` into grouped storage sources. */
 export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
-  const device = useContext(DeviceContext);
-
   const {
-    data,
-    fields,
+    skip = 0,
+    count,
+    version,
+    data: propData,
+    virtual,
+    schema = NO_SCHEMA,
+    loop,
+    start,
+    end,
     render,
-    on,
+    segments,
     live = false,
   } = props;
 
-  const fs = fields ?? NO_FIELDS;
+  const data = propData ? Array.isArray(propData) ? propData : [propData] : null;
+  const itemCount = Math.max(0, (count ?? data?.length) - skip);
 
-  const isLoop = props.loop;
-  const isStart = props.start;
-  const isEnd = props.end;
+  // Identify an array and index field (if any)
+  const [countKey, indexedKey, isArray, isIndexed] = useMemo(() => {
+    const keys = Object.keys(schema);
+    const countKey = keys.find(k => isUniformArrayType(schema[k].format as any));
+    const indexedKey = keys.find(k => schema[k].index);
 
-  // Gather data layout/length
-  const layout = useMemo(() => {
+    const isArray = !!countKey;
+    const isIndexed = !!indexedKey;
 
-    // Count simple array lengths as fallback
-    // in case of no composite field.
-    const rawLength = fs.reduce((l: number | null, [, accessor]: DataField): number | null => {
-      if (l != null) return l as number;
-      if (typeof accessor === 'object') return accessor?.length;
-      return l;
-    }, 0) as number;
+    return [countKey ?? keys[0], indexedKey, isArray, isIndexed];
+  }, [schema]);
 
-    // Look for index field
-    const indexes = fs.filter(([,, accessorType]) => accessorType === 'index');
-    const [index] = indexes;
+  // Resolve segment flags
+  const [loops, starts, ends] = useMemo(() => {
+    const loops  = resolveSegmentFlag(itemCount, loop, skip);
+    const starts = resolveSegmentFlag(itemCount, start, skip);
+    const ends   = resolveSegmentFlag(itemCount, end, skip);
 
-    // Look for first non-index composite field
-    const composites = fs.filter(([format,, accessorType]) => isComposite(format));
-    const [composite] = composites;
-    if (!composite) {
-      const length = data?.length ?? rawLength ?? 0;
-      return {chunks: [length], loops: undefined, starts: undefined, ends: undefined, dataCount: length, indexCount: length};
+    return [loops, starts, ends];
+  }, [itemCount, loop, start, end, skip]);
+
+  // Resolve chunk/group counts
+  const [chunks, groups, vertexCount, indexCount] = useMemo(() => {
+    let chunks = null;
+    let groups = null;
+    let vertexCount = itemCount
+    let indexCount = itemCount;
+
+    if (isArray && segments) {
+      [vertexCount, chunks, groups] = getChunkCount(schema, countKey, itemCount, data, virtual, skip);
+      if (indexedKey) [indexCount] = getChunkCount(schema, indexKey, itemCount, data, virtual, skip);
     }
 
-    // Gather chunk sizes and chunk metadata
-    const dataChunks = [] as number[];
-    const indexChunks = index ? [] as number[] : undefined;
-    const loops = isLoop ? [] as boolean[] : undefined;
-    const starts = isStart ? [] as boolean[] : undefined;
-    const ends = isEnd ? [] as boolean[] : undefined;
+    return [chunks, groups, vertexCount, indexedKey ? indexCount : vertexCount];
+  }, [isArray, segments, itemCount, countKey, indexedKey, data, virtual, skip]);
 
-    iterateChunks(data, composite, (n: number, item?: any) => {
-      dataChunks.push(n);
+  const allocItems = useBufferedSize(itemCount);
+  const allocVertices = useBufferedSize(vertexCount);
+  const allocIndices = useBufferedSize(indexCount);
 
-      if (item != null) {
-        if (isLoop) {
-          const loop = isLoop(item);
-          loops!.push(!!loop);
-        }
-        if (isStart) {
-          const start = isStart(item);
-          starts!.push(!!start);
-        }
-        if (isEnd) {
-          const end = isEnd(item);
-          ends!.push(!!end);
-        }
-      }
+  // Make arrays for merged attributes
+  const [fields, attributes, archetype] = useMemo(() => {
+    const fields = {};
+    const attributes = {};
+
+    for (const k in schema) {
+      const {format, prop = k, index, unwelded, ref} = schema[k];
+      if (ref) throw new Error(`Ref '${k}' not supported in <CompositeData>`);
+
+      const isArray = isUniformArrayType(format);
+      const {array, dims} = makeDataArray2(format, isArray ? (index || unwelded) ? allocIndices : allocVertices : allocItems);
+      const depth = getUniformArrayDepth(format);
+
+      fields[k] = {array, dims, depth, prop};
+      attributes[k] = array;
+    }
+
+    const archetype = schemaToArchetype(schema, attributes);
+    if (attributes.instances) throw new Error(`Reserved attribute name 'instances'.`);
+
+    return [fields, attributes, archetype];
+  }, [schema, allocItems, allocVertices, allocIndices]);
+
+  console.log(attributes, fields);
+
+  // Get emitters for data + segment data
+  const [emitters, total, indexed, sparse] = useMemo(() => {
+    if (!isArray || !segments) return [schemaToEmitters(schema, attributes), vertexCount, indexCount, 0];
+
+    const positions = fields[countKey].array;
+
+    const segmentData = segments({
+        chunks: chunks!,
+        groups: groups!,
+        positions,
+        loops,
+        starts,
+        ends,
     });
 
-    if (index) {
-      iterateChunks(data, index, (n: any) => indexChunks!.push(n));
+    const {count: total, indexed, sparse, ...rest} = segmentData;
+    for (const k in rest) if (attributes[k]) throw new Error(`Attribute name '${k}' reserved for segment data.`);
+
+    const emitters = schemaToEmitters(schema, {...attributes, ...rest});
+
+    return [emitters, total, indexed, sparse];
+  }, [schema, fields, countKey, attributes, segments, chunks, groups, loops, starts, ends]);
+
+  // Blit all data into merged arrays
+  const items = useMemo(() => {
+    const slices = [];
+
+    for (const k in fields) {
+      const accessor = virtual?.[k];
+      if (!accessor || !data) continue;
+
+      const {array, dims, depth, prop} = fields[k];
+      const slice = k === countKey;
+
+      // Keep CPU-only layout, as useAggregator will widen for us
+      const dimsIn = toCPUDims(dims);
+
+      let b = 0;
+      let o = 0;
+      for (let i = 0; i < itemCount; ++i) {
+        o += copyRecursiveNumberArray2(accessor ? accessor(i + skip) : data[i + skip][props], array, dimsIn, dimsIn, depth, o, 1);
+        if (slice) slices.push((o - b) / dimsIn + ((loops === true || loops[i]) ? 3 : 0));
+        b = o;
+      }
     }
 
-    const chunks = indexChunks ?? dataChunks;
-    const indexed = indexChunks && dataChunks;
-
-    const dataCount = accumulateChunks(dataChunks, loops);
-    const indexCount = indexChunks ? accumulateChunks(indexChunks, loops) : 0;
-    const offsets = indexed && accumulate(indexed);
-
-    return {
-      chunks,
+    return [{
+      count: total,
       indexed,
-      loops,
-      starts,
-      ends,
-      offsets,
-      dataCount,
-      indexCount,
-    };
-  }, [data, fs]);
+      instanced: itemCount,
+      slices,
+      archetype,
+      attributes: emitters,
+    }];
+  }, [
+    live ? NaN : virtual ? (version ?? NaN) : null, data,
+    itemCount, skip, total, indexed,
+    archetype, emitters,
+  ]);
 
-  const {chunks, indexed, loops, starts, ends, dataCount, indexCount} = layout;
+  // Aggregate into struct buffers by access policy
+  const {sources} = useAggregator(schema, items);
+  console.log('item', {item: items[0], emitters, total, indexed, sources})
 
-  const lData = useBufferedSize(dataCount);
-  const lIndex = useBufferedSize(indexCount);
+  // Tag positions with bounds
+  useMemo(() => {
+    if (!fields.positions) return null;
 
-  // Make data buffers
-  const [fieldBuffers, fieldSources] = useMemo(() => {
+    const {array, dims} = fields.positions;
+    const bounds = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
 
-    const fieldBuffers = fs.map(([format, accessor, accessorType]) => {
-      const composite = isComposite(format);
-      format = composite ? toSimple(format) : format;
+    if (sources.positions && bounds) sources.positions.bounds = bounds;
+  }, [fields, items, sources]);
 
-      const isIndex = accessorType === 'index';
-      const isUnwelded = accessorType === 'unwelded';
+  if (live) useAnimationFrame();
+  else useNoAnimationFrame();
 
-      if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
-      const f = format as any as UniformType;
+  const trigger = useOne(() => signal(), items);
 
-      let {raw, fn} = makeDataAccessor(f, accessor);
+  const view = useYolo(() => render ? render(sources) : yeet(sources), [render, sources]);
+  return [trigger, view];
+};
 
-      const l = isIndex || isUnwelded ? lIndex : lData;
-      const {array, dims} = makeDataArray(f, l);
-
-      const buffer = makeStorageBuffer(device, array.byteLength);
-      const source = {
-        buffer,
-        format,
-        length: 0,
-        size: [0],
-        version: 0,
-        bounds: {...NO_BOUNDS},
-      };
-
-      return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex, isUnwelded};
-    });
-
-    const fieldSources = fieldBuffers.map(f => f.source);
-
-    return [fieldBuffers, fieldSources];
-  }, [device, fs, lData, lIndex]);
-  
-  // Refresh and upload data
-  const refresh = () => {
-    for (const {buffer, array, source, dims, accessor, raw, composite, isIndex, isUnwelded} of fieldBuffers) if (raw || data) {
-      const a = accessor as Accessor;
-      const c = isIndex || isUnwelded ? chunks : indexed ?? chunks;
-      const l = (!indexed || isIndex) ? loops : undefined;
-      const o = isIndex ? layout.offsets : undefined;
-
-      if (composite) {
-        if (raw?.length) copyNumberArraysComposite(raw, array, dims, c, l, o);
-        else if (data?.length) copyDataArraysComposite(data, array, dims, a, c, l, o);
-      }
-      else {
-        if (raw?.length) copyNumberArrayChunked(raw, array, dims, c, l, layout.indexed);
-        else if (data?.length) copyDataArrayChunked(data, array, dims, a, c, l, o);
-      }
-      uploadBuffer(device, buffer, array.buffer);
-
-      source.length  = isIndex || isUnwelded ? indexCount : dataCount;
-      source.size[0] = source.length;
-      source.version = incrementVersion(source.version);
-
-      const {bounds} = source;
-      const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
-      bounds.center = center;
-      bounds.radius = radius;
-      bounds.min = min;
-      bounds.max = max;
-    }
-  };
-
-  if (!live) {
-    useNoAnimationFrame();
-    useMemo(refresh, [device, data, fieldBuffers, dataCount, indexCount]);
+// Resolve loop/start/end flags into array
+const resolveSegmentFlag = (count: number, flag?: Boolean, skip: number = 0) => {
+  if (typeof flag === 'function') {
+    let flags = [];
+    for (let i = 0; i < count; ++i) flags.push((flag as ArrowFunction)(i + skip));
+    return flags;
   }
-  else {
-    useAnimationFrame();
-    useNoMemo();
-    refresh()
+  if (Array.isArray(flag)) {
+    if (skip) return flag(skip, skip + count);
+    else if (flag.length > count) return flag.slice(0, count);
+    return flag;
+  }
+  return flag;
+};
+
+// Get list of inner ragged chunk lengths plus outer ragged groupings
+const getChunkCount = (
+  schema: DataSchema,
+  key: string,
+  itemCount: number,
+  data?: Record<string, any> | (Record<string, any>)[],
+  virtual?: Record<string, (i: number) => any>,
+  skip: number = 0
+) => {
+  const {format, prop} = schema[key];
+  const accessor = virtual?.[key];
+
+  let i = 0;
+  const get = (accessor
+    ? (i: number) => accessor(i).length ?? 1
+    : (i: number) => data[i][prop] ?? 1
+  );
+
+  const chunks = [];
+  const groups = [];
+
+  for (let i = 0; i < itemCount; ++i) {
+    const [c, g] = toMultiCompositeChunks(get(i + skip));
+    c.push(...c);
+    g.push(...g);
   }
 
-  const trigger = useOne(() => signal(), fieldSources[0]?.version);
-
-  if (on) {
-    useNoYolo();
-
-    const els = extend(on, layout);
-    return gather(els, (sources: StorageSource[]) => {
-      const s = [...fieldSources, ...sources];
-      const view = useYolo(() => render ? render(...s) : yeet(s), [render, ...s]);
-      return [trigger, view];
-    });
-  }
-  else {
-    const view = useYolo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
-    return [trigger, view];
-  }
+  const count = chunks.reduce((a, b) => a + b, 0);
+  return [count, chunks, groups];
 };

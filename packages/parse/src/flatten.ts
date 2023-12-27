@@ -1,5 +1,5 @@
 import type { ArchetypeSchema, Emit, TypedArrayConstructor, VectorLike, VectorLikes } from '@use-gpu/core';
-import { isTypedArray, copyNumberArray2, copyNestedNumberArray2 } from '@use-gpu/core';
+import { isTypedArray, copyNumberArray, copyNestedNumberArray } from '@use-gpu/core';
 
 const NO_CHUNKS = new Uint16Array(0);
 
@@ -9,21 +9,21 @@ const maybeTypedArray = (
 
 const maybeEmptyArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
-  constructor: T,
-) => !xs.length ? new constructor(0) : null;
+  ctor: T,
+) => !xs.length ? new ctor(0) : null;
 
 // Array of scalars
 const maybeScalarArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
-  constructor: T,
-) => typeof xs[0] === 'number' ? new constructor(xs) : null
+  ctor: T,
+) => typeof xs[0] === 'number' ? new ctor(xs) : null
 
 // Array of vectors
 const maybeVectorArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
   dims: number,
   w: number,
-  constructor: T,
+  ctor: T,
 ) => {
   const d = (xs[0] as any)?.length;
   if (d == null) return null;
@@ -33,15 +33,15 @@ const maybeVectorArray = <T extends TypedArrayConstructor>(
 
   const n = xs.length;
 
-  const to = new constructor(n * dims);
-  copyNestedNumberArray2(xs as any, to, d, dims, 0, 0, n, w);
+  const to = new ctor(n * dims);
+  copyNestedNumberArray(xs as any, to, d, dims, 0, 0, n, w);
   return to;
 }
 
 // Array of ragged scalar arrays
 const maybeMultiScalarArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
-  constructor: T,
+  ctor: T,
 ) => {
   const d = (xs[0] as any)?.length;
   if (d == null) return null;
@@ -53,12 +53,12 @@ const maybeMultiScalarArray = <T extends TypedArrayConstructor>(
   let n = 0;
   for (let i = 0; i < chunks; i++) n += xs[i].length;
 
-  const to = new constructor(n);
+  const to = new ctor(n);
   let o = 0;
   for (let i = 0; i < chunks; i++) {
     const x = xs[i];
     const l = x.length;
-    copyNumberArray2(x, to, l, 0, o);
+    copyNumberArray(x, to, 1, 1, 0, o, l);
     o += l;
   }
   return to;
@@ -69,7 +69,7 @@ const maybeMultiVectorArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
   dims: number,
   w: number,
-  constructor: T,
+  ctor: T,
 ) => {
   const d = (xs[0]?.[0] as any)?.length;
   if (d == null) return null;
@@ -82,13 +82,13 @@ const maybeMultiVectorArray = <T extends TypedArrayConstructor>(
   let n = 0;
   for (let i = 0; i < chunks; i++) n += xs[i].length;
 
-  const to = new constructor(n * dims);
+  const to = new ctor(n * dims);
   let o = 0;
   for (let i = 0; i < chunks; i++) {
     const x = xs[i];
     const l = x.length;
 
-    copyNestedNumberArray2(x, to, d, dims, 0, o, l, w);
+    copyNestedNumberArray(x, to, d, dims, 0, o, l, w);
     o += l * dims;
   }
   return to;
@@ -98,7 +98,7 @@ const maybeMultiMultiVectorArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
   dims: number,
   w: number,
-  constructor: T,
+  ctor: T,
 ) => {
   const d = (xs[0]?.[0]?.[0] as any)?.length;
   if (d == null) return null;
@@ -118,7 +118,7 @@ const maybeMultiMultiVectorArray = <T extends TypedArrayConstructor>(
     }
   }
 
-  const to = new constructor(n * dims);
+  const to = new ctor(n * dims);
   let o = 0;
   for (let i = 0; i < chunks; i++) {
     const chunk = xs[i];
@@ -128,7 +128,7 @@ const maybeMultiMultiVectorArray = <T extends TypedArrayConstructor>(
       const x = chunk[j];
       const l = x.length;
 
-      copyNestedNumberArray2(x, to, d, dims, 0, o, l, w);
+      copyNestedNumberArray(x, to, d, dims, 0, o, l, w);
       o += l * dims;
     }
   }
@@ -137,81 +137,69 @@ const maybeMultiMultiVectorArray = <T extends TypedArrayConstructor>(
 
 export const toScalarArray = <T extends TypedArrayConstructor>(
   xs: VectorLike,
-  constructor?: T = Float32Array
-): T => (
-  maybeTypedArray(xs) ||
-  maybeEmptyArray(xs, constructor) ||
-  maybeScalarArray(xs, constructor) ||
-  new constructor(0)
+  ctor?: T = Float32Array
+): T | null => (
+  maybeTypedArray(xs) ??
+  maybeEmptyArray(xs, ctor) ??
+  maybeScalarArray(xs, ctor)
 );
 
 export const toVectorArray = <T extends TypedArrayConstructor>(
   xs: VectorLikes,
   dims: number,
   w: number = 0,
-  constructor: T = Float32Array,
-) => (
-  maybeTypedArray(xs) ||
-  maybeEmptyArray(xs, constructor) ||
-  maybeScalarArray(xs, constructor) ||
-  maybeVectorArray(xs, dims, w, constructor) ||
-  new constructor(0)
+  ctor: T = Float32Array,
+): T | null => (
+  toScalarArray(xs) ??
+  maybeVectorArray(xs, dims, w, ctor)
 );
 
 export const toMultiScalarArray = <T extends TypedArrayConstructor>(
   xs: VectorLike,
-  constructor: T = Float32Array
-) => (
-  maybeTypedArray(xs) ||
-  maybeEmptyArray(xs, constructor) ||
-  maybeScalarArray(xs, constructor) ||
-  maybeMultiScalarArray(xs, constructor) ||
-  new constructor(0)
+  ctor: T = Float32Array
+): T | null => (
+  toScalarArray(xs) ??
+  maybeMultiScalarArray(xs, ctor)
 );
 
 export const toMultiVectorArray = <T extends TypedArrayConstructor>(
   xs: VectorLikes | VectorLikes[],
   dims: number,
   w: number = 0,
-  constructor: T = Float32Array
-) => (
-  maybeTypedArray(xs) ||
-  maybeEmptyArray(xs, constructor) ||
-  maybeScalarArray(xs, constructor) ||
-  maybeVectorArray(xs, dims, w, constructor) ||
-  maybeMultiVectorArray(xs, dims, w, constructor) ||
-  new constructor(0)
+  ctor: T = Float32Array
+): T | null => (
+  toVectorArray(xs) ??
+  maybeMultiVectorArray(xs, dims, w, ctor)
 );
 
 export const toMultiMultiVectorArray = <T extends TypedArrayConstructor>(
   xs: VectorLikes | VectorLikes[],
   dims: number,
   w: number = 0,
-  constructor: T = Float32Array
-) => (
-  maybeTypedArray(xs) ||
-  maybeEmptyArray(xs, constructor) ||
-  maybeScalarArray(xs, constructor) ||
-  maybeVectorArray(xs, dims, w, constructor) ||
-  maybeMultiVectorArray(xs, dims, w, constructor) ||
-  maybeMultiMultiVectorArray(xs, dims, w, constructor) ||
-  new constructor(0)
+  ctor: T = Float32Array
+): T | null => (
+  toMultiVectorArray(xs) ??
+  maybeMultiMultiVectorArray(xs, dims, w, ctor)
 );
 
 // Get list of ragged chunk lengths
-export const toCompositeChunks = (xs: VectorLike | VectorLikes | VectorLikes[]) => {
-  if (!xs.length) return NO_CHUNKS;
+export const toCompositeChunks = (
+  xs: VectorLike | VectorLikes | VectorLikes[],
+) => {
+  const n = xs.length;
+  if (!n) return NO_CHUNKS;
+
+  const x = xs[0];
   if (
     isTypedArray(xs) ||
-    typeof xs[0] === 'number' ||
-    typeof xs[0]?.[0] === 'number'
+    typeof x === 'number' ||
+    typeof x?.[0] === 'number'
   ) {
     const to = new Uint16Array(1);
-    to[0] = xs.length;
+    to[0] = n;
     return to;
   }
-  if (typeof xs[0]?.[0]?.[0] === 'number') {
-    const n = xs.length;
+  if (typeof x?.[0]?.[0] === 'number') {
     const to = new Uint16Array(n);
     for (let i = 0; i < n; ++i) to[i] = xs[i].length;
     return to;
@@ -220,9 +208,13 @@ export const toCompositeChunks = (xs: VectorLike | VectorLikes | VectorLikes[]) 
 };
 
 // Get list of inner ragged chunk lengths plus outer ragged groupings
-export const toMultiCompositeChunks = (xs: VectorLike | VectorLikes | VectorLikes[]) => {
-  if (typeof xs[0]?.[0]?.[0]?.[0] === 'number') {
-    const n = xs.length;
+export const toMultiCompositeChunks = (
+  xs: VectorLike | VectorLikes | VectorLikes[],
+) => {
+  const n = xs.length;
+  const x = xs[0];
+
+  if (typeof x?.[0]?.[0]?.[0] === 'number') {
     const groups = new Uint16Array(n);
 
     let count = 0;
@@ -246,7 +238,6 @@ export const toMultiCompositeChunks = (xs: VectorLike | VectorLikes | VectorLike
     return [to, groups];
   }
 
-  const chunks = toCompositeChunks(xs);
+  const chunks = toCompositeChunks(xs, n);
   return [chunks, [1]];
 };
-

@@ -3,12 +3,13 @@ import type {
   UniformAttribute, UniformAttributeDescriptor,
   UniformLayout, UniformType,
   UniformPipe, UniformByteSetter, UniformFiller, UniformDataSetter, UniformValueSetter,
+  TypedArrayConstructor,
   DataBinding,
   StorageSource,
   TextureSource,
   Lazy,
 } from './types';
-import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS, UNIFORM_ARRAY_DIMS } from './constants';
+import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS, UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 
 import { getObjectKey, toMurmur53, mixBits53 } from '@use-gpu/state';
@@ -29,10 +30,19 @@ export const getUniformElementType = (type: string) =>
   ? getUniformElementType(type.replace(/^array<(.*)>$/, '$1'))
   : type;
 
+export const toCPUDims = (dims: number): number => dims !== Math.round(dims) ? Math.ceil(dims) * 3 / 4 : dims;
+export const toGPUDims = (dims: number): number => Math.ceil(dims);
+
 export const getUniformDims = (format: UniformType): number => UNIFORM_ARRAY_DIMS[format];
 export const getUniformSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformAlign = (format: UniformType): number => UNIFORM_ATTRIBUTE_ALIGNS[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
+
+export const getUniformArrayType = (format: UniformType): TypedArrayConstructor => UNIFORM_ARRAY_TYPES[format];
+export const getUniformArraySize = (format: UniformType, length: number): TypedArrayConstructor => {
+  const size = getUniformSize(format);
+  return alignSizeTo(length * size, 4);
+};
 
 export const makeGlobalUniforms = (
   device: GPUDevice,

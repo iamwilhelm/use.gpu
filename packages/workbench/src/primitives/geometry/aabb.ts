@@ -1,5 +1,5 @@
 import type { CPUGeometry } from '@use-gpu/core';
-import { makeDataEmitter } from '@use-gpu/core';
+import { makeExprEmitter } from '@use-gpu/core';
 
 type AABBGeometryProps = {
   min?: [number, number] | [number, number, number],
@@ -17,8 +17,8 @@ export const makeAABBGeometry = ({
   const positions = new Float32Array(count * 4);
   const segments = new Uint8Array(count);
 
-  const {emit: positionEmitter} = makeDataEmitter(positions, 4);
-  const {emit: segmentEmitter} = makeDataEmitter(segments, 1);
+  const {emit: positionEmitter} = makeExprEmitter(positions, 4);
+  const {emit: segmentEmitter} = makeExprEmitter(segments, 1);
 
   const emitPosition = (x: number, y: number, z: number) =>
     positionEmitter(

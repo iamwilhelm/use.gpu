@@ -2,7 +2,7 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, DataBounds,
+  VertexData, DataBounds, GPUGeometry,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
@@ -62,6 +62,7 @@ export type RawFacesProps = {
     lookups?: boolean,
   },
 
+  geometry?: GPUGeometry,
   count?: Lazy<number>,
 
   shouldDispatch?: (u: Record<string, any>) => boolean | number | null,
@@ -89,10 +90,14 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     instance,
     instances,
 
-    unwelded,
+    geometry,
+    unwelded = geometry?.unwelded,
+
     shouldDispatch,
     onDispatch,
   } = props;
+
+  const attr = geometry ? {...props, ...geometry.attributes} : props;
 
   // Set up draw as:
   // - individual tris (none)
@@ -103,40 +108,40 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const instanceCount = useCallback(() => {
     if (count != null) {
       const c = resolve(count) || 0;
-      return (props.segments != null) ? Math.max(0, c - 2) : c;
+      return (attr.segments != null) ? Math.max(0, c - 2) : c;
     }
 
-    const segments = (props.segments as any)?.length;
-    const indices = (props.indices as any)?.length;
-    const positions = (props.positions as any)?.length;
+    const segments = (attr.segments as any)?.length;
+    const indices = (attr.indices as any)?.length;
+    const positions = (attr.positions as any)?.length;
 
     if (segments != null) return segments - 2;
     if (indices != null) return indices / 3;
-    if (positions != null && !props.indices) return positions / 3;
+    if (positions != null && !attr.indices) return positions / 3;
 
     return 0;
-  }, [props.positions, props.indices, props.segments, count]);
+  }, [attr.positions, attr.indices, attr.segments, count]);
 
-  const p = useShaderRef(props.position, props.positions);
-  const n = useShaderRef(props.normal, props.normals);
-  const t = useShaderRef(props.tangent, props.tangents);
-  const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts);
-  const g = useShaderRef(props.segment, props.segments);
-  const c = useShaderRef(props.color, props.colors);
-  const z = useShaderRef(props.zBias, props.zBiases);
+  const p = useShaderRef(attr.position, attr.positions);
+  const n = useShaderRef(attr.normal, attr.normals);
+  const t = useShaderRef(attr.tangent, attr.tangents);
+  const u = useShaderRef(attr.uv, attr.uvs);
+  const s = useShaderRef(attr.st, attr.sts);
+  const g = useShaderRef(attr.segment, attr.segments);
+  const c = useShaderRef(attr.color, attr.colors);
+  const z = useShaderRef(attr.zBias, attr.zBiases);
 
-  const i = useShaderRef(null, props.indices);
+  const i = useShaderRef(null, attr.indices);
 
   const {transform: xf, differential: xd, bounds: getBounds} = useCombinedTransform();
   const scissor = useScissorContext();
 
   const ps = p ? useSource(POSITION, p) : useNoSource();
-  const ss = props.sts == null ? ps : props.sts;
+  const ss = attr.sts == null ? ps : attr.sts;
 
   let bounds: Lazy<DataBounds> | null = null;
-  if (getBounds && (props.positions as any)?.bounds) {
-    bounds = useCallback(() => getBounds((props.positions! as any).bounds), [props.positions, getBounds]);
+  if (getBounds && (attr.positions as any)?.bounds) {
+    bounds = useCallback(() => getBounds((attr.positions! as any).bounds), [attr.positions, getBounds]);
   }
   else {
     useNoCallback();
@@ -149,8 +154,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     ps, n, t, u, ss, g, c, z,
     i,
   ]);
-  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, props.instance, props.instances, instanceCount, 3);
-  const getPicking = usePickingShader(props);
+  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, attr.instance, attr.instances, instanceCount, 3);
+  const getPicking = usePickingShader(attr);
 
   const links = useMemo(() => {
     return shaded
@@ -177,8 +182,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     blend,
   });
 
-  const hasIndices = !!props.indices;
-  const hasSegments = !!props.segments;
+  const hasIndices = !!attr.indices;
+  const hasSegments = !!attr.segments;
   const defines = useMemo(() => ({
     ...defs,
     ...instanceDefs,

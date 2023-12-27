@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, TypedArray } from '@use-gpu/core';
 
 import { use, memo, yeet, useMemo, useOne, useRef, useResource } from '@use-gpu/live';
-import { getDataArrayByteLength, getDataArrayConstructor } from '@use-gpu/core';
+import { getUniformArraySize, getUniformArrayType } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useScratchSource } from '../hooks/useScratchSource';
@@ -63,7 +63,7 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
       const i = requested = mapped.indexOf(false);
       if (i >= 0) {
         const [storage, allocate] = storages[i];
-        const byteLength = getDataArrayByteLength(source.format, source.length);
+        const byteLength = getUniformArraySize(source.format, source.length);
         allocate(source.length);
 
         const commandEncoder = device.createCommandEncoder();
@@ -85,7 +85,7 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
 
         if (cancelled) return null;
 
-        const ctor = getDataArrayConstructor(source.format);
+        const ctor = getUniformArrayType(source.format);
         const array = new ctor(buffer.getMappedRange());
         const data = array.slice();
 

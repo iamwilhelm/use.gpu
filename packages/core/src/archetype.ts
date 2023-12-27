@@ -1,5 +1,4 @@
-import type { AggregateBuffer, ArchetypeSchema, ArchetypeField, UniformType } from './types';
-import type { VectorEmitter, VectorRefEmitter } from './data2';
+import type { AggregateBuffer, ArchetypeSchema, ArchetypeField, VectorEmitter, VectorRefEmitter, UniformType } from './types';
 import { toMurmur53, scrambleBits53, mixBits53 } from '@use-gpu/state';
 import { isTypedArray } from './buffer';
 import {
@@ -14,13 +13,9 @@ import {
   uploadStorage,
 } from './aggregate';
 import {
-  spreadNumberArray2,
-  makeCopyEmitter2,
-  makeSpreadEmitter2,
-  makeRefEmitter2,
-  makePartialRefEmitter2,
-  makeUnweldEmitter2,
-} from './data2';
+  makeSpreadEmitter,
+  makeUnweldEmitter,
+} from './data';
 import {
   getUniformAlign,
   getUniformDims,
@@ -89,7 +84,7 @@ export const schemaToEmitters = (
       if (isArray) {
         if (!(unwelded || index) && unwelds) {
           // Unweld welded attribute
-          attributes[key] = makeUnweldEmitter2(values, unwelds, dims);
+          attributes[key] = makeUnweldEmitter(values, unwelds, dims);
         }
         else {
           // Direct attribute
@@ -99,7 +94,7 @@ export const schemaToEmitters = (
       else {
         // Single per slice
         if (spread && values.length > dims) {
-          attributes[spread] = makeSpreadEmitter2(values, slices, dims);
+          attributes[spread] = makeSpreadEmitter(values, slices, dims);
         }
         // Single per item
         else {
@@ -146,7 +141,7 @@ export const schemaToAggregate = (
   allocIndices: number = 0,
 ): Aggregate => {
   let byRef: string[] = [];
-  let byItem: string[] = [];
+  let byInstance: string[] = [];
   let byVertex: string[] = [];
   let byIndex: string[] = [];
   let byUnwelded: string[] = [];
@@ -187,7 +182,7 @@ export const schemaToAggregate = (
           // Uniform with lazy ref
           hasRef ? byRef :
           // Uniform per item
-          !isArray ? byItem :
+          !isArray ? byInstance :
           // Per index
           index ? byIndex :
           // Per unwelded vertex
@@ -246,21 +241,23 @@ export const schemaToAggregate = (
   if (byIndex.length) byIndex.push(...byUnwelded);
   else byVertex.push(...byUnwelded);
 
-  // If only per item indices, simplify to per vertex
-  if (byItem.length && !byRef.length && !byVertex.length && !byIndex.length && !bySelf.length) {
-    byVertex = byItem;
-    byItem = [];
+  // If only per instance indices, simplify to per vertex
+  if (byInstance.length && !byRef.length && !byVertex.length && !byIndex.length && !bySelf.length) {
+    byVertex = byInstance;
+    byInstance = [];
   }
 
   let byRefs = buildGroup(byRef, allocItems, true);
-  let byItems = buildGroup(byItem, allocItems, true);
+  let byInstances = buildGroup(byInstance, allocItems, true);
   let byVertices = buildGroup(byVertex, allocVertices);
   let byIndices = buildGroup(byIndex, allocIndices);
 
   // Add instances buffer for lookup per item/ref
-  if (byItems || byRefs) aggregateBuffers.instances = makeAggregateBuffer(device, 'u16', allocIndices);
+  if (byInstances || byRefs) {
+    aggregateBuffers.instances = makeAggregateBuffer(device, 'u32', allocIndices);
+  }
 
-  const aggregate = {aggregateBuffers, refBuffers, bySelfs, byRefs, byItems, byVertices, byIndices};
+  const aggregate = {aggregateBuffers, refBuffers, bySelfs, byRefs, byInstances, byVertices, byIndices};
   console.warn('aggregate', aggregate);
 
   return aggregate;
@@ -273,32 +270,33 @@ export const updateAggregateFromSchema = (
   items: Item[],
   count: number,
   indexed: number = 0,
-  offsets: number[] = NO_OFFSETS,
+  instanced: number = items.length,
+  indexOffsets: number[] = NO_OFFSETS,
 ) => {
-  const {aggregateBuffers, refBuffers, byRefs, byItems, byVertices, byIndices, bySelfs} = aggregate;
+  const {aggregateBuffers, refBuffers, byRefs, byInstances, byVertices, byIndices, bySelfs} = aggregate;
 
-  if (byItems) for (const k of byItems.keys) {
+  if (byInstances) for (const k of byInstances.keys) {
     const name = schema[k].name ?? k;
-    updateAggregateBuffer(device, aggregateBuffers[name], items, 1, k);
+    updateAggregateBuffer(device, aggregateBuffers[name], items, k, false, true);
   }
 
   if (byVertices) for (const k of byVertices.keys) {
     const name = schema[k].name ?? k;
-    updateAggregateBuffer(device, aggregateBuffers[name], items, null, k);
+    updateAggregateBuffer(device, aggregateBuffers[name], items, k);
   }
 
   if (byIndices) for (const k of byIndices.keys) {
     const {name: n, index, unwelded} = schema[k];
     const name = n ?? k;
-    const o = index ? offsets : undefined;
-    updateAggregateBuffer(device, aggregateBuffers[name], items, null, k, index || unwelded, o);
+    const o = index ? indexOffsets : undefined;
+    updateAggregateBuffer(device, aggregateBuffers[name], items, k, index || unwelded, false, o);
   }
 
   for (const k of bySelfs.keys) {
     const {name: n, index, unwelded} = schema[k];
     const name = n ?? k;
-    const o = index ? offsets : undefined;
-    updateAggregateBuffer(device, aggregateBuffers[name], items, null, k, index || unwelded, o);
+    const o = index ? indexOffsets : undefined;
+    updateAggregateBuffer(device, aggregateBuffers[name], items, k, index || unwelded, false, o);
   }
 
   for (const k in refBuffers) {
@@ -306,11 +304,11 @@ export const updateAggregateFromSchema = (
   }
 
   const {instances} = aggregateBuffers;
-  if ((byRefs || byItems) && instances) {
+  if ((byRefs || byInstances) && instances) {
     updateAggregateInstances(device, instances, items, indexed);
   }
 
-  if (byItems) updateMultiAggregateBuffer(device, byItems, items.length);
+  if (byInstances) updateMultiAggregateBuffer(device, byInstances, instanced);
   if (byVertices) updateMultiAggregateBuffer(device, byVertices, count);
   if (byIndices) updateMultiAggregateBuffer(device, byIndices, indexed);
 };

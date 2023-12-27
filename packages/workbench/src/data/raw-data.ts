@@ -7,6 +7,7 @@ import {
   makeDataArray, copyNumberArray, emitIntoNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
   getBoundingBox, toDataBounds,
+  toCPUDims, toGPUDims,
   seq,
 } from '@use-gpu/core';
 
@@ -115,7 +116,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   const refresh = () => {
     let emitted = 0;
 
-    if (data) copyNumberArray(data, array, dims);
+    if (data) copyNumberArray(data, array, toCPUDims(dims), toGPUDims(dims));
     if (expr) emitted = emitIntoNumberArray(expr, array, dims, clock!);
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);

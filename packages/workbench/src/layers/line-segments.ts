@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, VectorLike } from '@use-gpu/core';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
-import { accumulateChunks, generateChunkSegments, generateChunkSegments2, alignSizeTo2 } from '@use-gpu/core';
+import { accumulateChunks, generateChunkSegments, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
 export type LineSegmentsData = {
@@ -21,17 +21,13 @@ export const getLineSegments = ({
   starts?: boolean[] | boolean | null,
   ends?: boolean[] | boolean | null,
 }) => {
-  const count = (
-    loops === true ? chunks.reduce((a, b, i) => a + b + 3, 0) :
-    loops ? chunks.reduce((a, b, i) => a + b + (loops[i] ? 3 : 0), 0) :
-    chunks.reduce((a, b, i) => a + b, 0)
-  );
+  const count = accumulateChunks(chunks, loops);
 
-  const segments = new Int8Array(alignSizeTo2(count, 4));
-  const slices = new Uint16Array(alignSizeTo2(chunks.length, 2));
-  const unwelds = loops ? new Uint16Array(alignSizeTo2(count, 2)) : undefined;
+  const segments = new Int8Array(alignSizeTo(count, 4));
+  const slices = new Uint16Array(alignSizeTo(chunks.length, 2));
+  const unwelds = loops ? new Uint16Array(alignSizeTo(count, 2)) : undefined;
 
-  generateChunkSegments2(segments, slices, unwelds, chunks, loops);
+  generateChunkSegments(segments, slices, unwelds, chunks, loops);
 
   return {count, segments, slices, unwelds};
 };

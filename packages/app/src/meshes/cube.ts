@@ -1,4 +1,4 @@
-import type { VertexData, DataTexture } from '@use-gpu/core';
+import type { VertexData, DataTexture, DataSchema } from '@use-gpu/core';
 import { makeVertexAttributeLayout } from '@use-gpu/core';
 
 export const makeMesh = (): VertexData => {
@@ -27,15 +27,19 @@ export const rawTextureRGBA: DataTexture = {
   size: [8, 8],
 };
 
+export const meshSchema = {
+  positions: {format: 'vec4<f32>'},
+  normals: {format: 'vec4<f32>'},
+  colors: {format: 'vec4<f32>'},
+  uvs: {format: 'vec2<f32>'},
+} as DataSchema;
+
+// Vertex attribute layout (only for illustration purposes)
 export const meshAttributes = makeVertexAttributeLayout([
-  // @ts-ignore
-  { name: 'position', format: 'float32x4' },
-  // @ts-ignore
-  { name: 'normal', format: 'float32x4' },
-  // @ts-ignore
-  { name: 'color', format: 'float32x4' },
-  // @ts-ignore
-  { name: 'uv', format: 'float32x2' },
+  { name: 'positions', format: 'float32x4' },
+  { name: 'normals', format: 'float32x4' },
+  { name: 'colors', format: 'float32x4' },
+  { name: 'uvs', format: 'float32x2' },
 ]);
 
 export const meshVertexArray = new Float32Array([

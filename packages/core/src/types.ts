@@ -188,7 +188,7 @@ export type UniformDataSetter = (index: number, item: any) => void;
 export type UniformValueSetter = (index: number, field: number, value: any) => void;
 export type UniformByteSetter = (view: DataView, offset: number, data: any) => void;
 
-export type DataBoundingBox = [number[], number[]];
+export type DataBoundingBox = {min: VectorLike, max: VectorLike};
 export type DataBounds = {
   center: number[],
   radius: number,
@@ -375,6 +375,8 @@ export type AggregateItem = {
   archetype: number,
   count: number,
   indexed?: number,
+  instanced?: number,
+  slices?: number[],
   attributes?: Record<string, AggregateValue>,
   flags?: Record<string, any>,
 };

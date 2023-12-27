@@ -1,5 +1,5 @@
 import type { CPUGeometry } from '@use-gpu/core';
-import { makeDataEmitter } from '@use-gpu/core';
+import { makeExprEmitter } from '@use-gpu/core';
 
 type BoxGeometryProps = {
   width?: number,
@@ -24,9 +24,9 @@ export const makeBoxGeometry = ({
   const normals = new Float32Array(count * 4);
   const uvs = new Float32Array(count * 4);
 
-  const {emit: positionEmitter} = makeDataEmitter(positions, 4);
-  const {emit: normalEmitter} = makeDataEmitter(normals, 4);
-  const {emit: uvEmitter} = makeDataEmitter(uvs, 4);
+  const {emit: positionEmitter} = makeExprEmitter(positions, 4);
+  const {emit: normalEmitter} = makeExprEmitter(normals, 4);
+  const {emit: uvEmitter} = makeExprEmitter(uvs, 4);
 
   const emitPosition = (x: number, y: number, z: number) =>
     positionEmitter(x * width / 2, y * height / 2, z * depth / 2, 1);

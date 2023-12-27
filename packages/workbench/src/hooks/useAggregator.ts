@@ -22,18 +22,18 @@ export const useAggregator = (
   items: Record<string, AggregateValue>[],
 ) => {
   const device = useDeviceContext();
-  const {archetype, count, indexed, offsets} = useOne(() => getAggregateSummary(items), items);
+  const {archetype, count, indexed, instanced, indexOffsets} = useOne(() => getAggregateSummary(items), items);
 
-  const allocItems = useBufferedSize(items.length);
+  const allocInstances = useBufferedSize(instanced);
   const allocVertices = useBufferedSize(count);
   const allocIndices = useBufferedSize(indexed);
 
   const aggregate = useMemo(() =>
-    makeAggregator(schema)(device, items, allocItems, allocVertices, allocIndices),
-    [archetype, allocItems, allocVertices, allocIndices]
+    makeAggregator(schema)(device, items, allocInstances, allocVertices, allocIndices),
+    [archetype, allocInstances, allocVertices, allocIndices]
   );
 
-  return useOne(() => aggregate(items, count, indexed, offsets), items);
+  return useOne(() => aggregate(items, count, indexed, instanced, indexOffsets), items);
 };
 
 export const makeAggregator = (
@@ -41,19 +41,19 @@ export const makeAggregator = (
 ) => (
   device: GPUDevice,
   initialItems: Record<string, AggregateValue>[],
-  allocItems: number,
+  allocInstances: number,
   allocVertices: number,
   allocIndices: number,
 ) => {
   const [item] = initialItems;
   const {attributes, refs} = item;
 
-  const aggregate = schemaToAggregate(device, schema, attributes, refs, allocItems, allocVertices, allocIndices);
-  const {aggregateBuffers, refBuffers, byRefs, byItems, byVertices, byIndices, bySelfs} = aggregate;
+  const aggregate = schemaToAggregate(device, schema, attributes, refs, allocInstances, allocVertices, allocIndices);
+  const {aggregateBuffers, refBuffers, byRefs, byInstances, byVertices, byIndices, bySelfs} = aggregate;
   const {instances} = aggregateBuffers;
 
   const refSources  = byRefs && getInstancedAggregate(byRefs, instances);
-  const itemSources = byItems && getInstancedAggregate(byItems, instances);
+  const itemSources = byInstances && getInstancedAggregate(byInstances, instances);
 
   const sources = {
     ...combineInstances(refSources, itemSources),
@@ -62,16 +62,16 @@ export const makeAggregator = (
     ...bySelfs.sources,
   };
 
-  let itemCount = initialItems;
+  let itemCount = initialItems.length;
 
   const uploadRefs = byRefs ? () => {
     updateAggregateFromSchemaRefs(device, schema, aggregate, itemCount);
   } : null;
 
-  return (items: ArrowAggregate[], count: number, indexed: number, offsets: number[]) => {
+  return (items: ArrowAggregate[], count: number, indexed: number, instanced: number, offsets: number[]) => {
     itemCount = items.length;
 
-    updateAggregateFromSchema(device, schema, aggregate, items, count, indexed, offsets);
+    updateAggregateFromSchema(device, schema, aggregate, items, count, indexed, instanced, offsets);
 
     return {count: indexed, sources, uploadRefs};
   };

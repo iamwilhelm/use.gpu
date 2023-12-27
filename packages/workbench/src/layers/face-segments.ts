@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, VectorLike } from '@use-gpu/core';
 
 import { memo, yeet, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
-import { generateChunkFaces2, generateConcaveIndices2, alignSizeTo2 } from '@use-gpu/core';
+import { accumulateChunks, generateChunkFaces, generateConcaveIndices, alignSizeTo } from '@use-gpu/core';
 import { useRawSource, useNoRawSource } from '../hooks/useRawSource';
 
 export type FaceSegmentsData = {
@@ -16,14 +16,12 @@ export const getFaceSegments = ({
 }: {
   chunks: VectorLike,
 }) => {
-  const count = (
-    chunks.reduce((a, b, i) => a + b, 0)
-  );
+  const count = accumulateChunks(chunks);
 
-  const segments = new Int8Array(alignSizeTo2(count, 4));
-  const slices = new Uint16Array(alignSizeTo2(chunks.length, 2));
+  const segments = new Int8Array(alignSizeTo(count, 4));
+  const slices = new Uint16Array(alignSizeTo(chunks.length, 2));
 
-  generateChunkFaces2(segments, slices, chunks);
+  generateChunkFaces(segments, slices, chunks);
 
   return {count, segments, slices};
 };
@@ -36,14 +34,12 @@ export const getFaceSegmentsConcave = ({
   positions: TypedArray,
   dims: number,
 }) => {
-  const count = (
-    chunks.reduce((a, b, i) => a + b, 0)
-  );
+  const count = accumulateChunks(chunks);
 
   const indices = new Uint32Array(count * 3);
-  const slices = new Uint16Array(alignSizeTo2(groups.length, 2));
+  const slices = new Uint16Array(alignSizeTo(groups.length, 2));
 
-  const indexed = generateConcaveIndices2(indices, slices, chunks, groups, positions, dims);
+  const indexed = generateConcaveIndices(indices, slices, chunks, groups, positions, dims);
 
   return {count, indexed, indices, slices};
 };

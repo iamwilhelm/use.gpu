@@ -34,7 +34,7 @@ const expandArrays = (schema: Record<string, CompactSchema>): ArchetypeSchema =>
 };
 
 export const INSTANCE_SCHEMA = {
-  instances:  {format: 'array<u16>'},
+  instances:  {format: 'array<u32>'},
 };
 
 export const SHAPE_SCHEMA = expandArrays({

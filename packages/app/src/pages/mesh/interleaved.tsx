@@ -11,14 +11,7 @@ import {
   PointLight,
 } from '@use-gpu/workbench';
 
-import { meshVertexArray, makeTexture } from '../../meshes/cube';
-
-const MESH_FIELDS = [
-  ['vec4<f32>', 'position'],
-  ['vec4<f32>', 'normal'],
-  ['vec4<f32>', 'color'],
-  ['vec2<f32>', 'uv'],
-] as [UniformType, string][];
+import { meshVertexArray, meshSchema, makeTexture } from '../../meshes/cube';
 
 const COLOR_ON = [1, 1, 1, 1];
 const COLOR_OFF = [0.5, 0.5, 0.5, 1.0];
@@ -31,7 +24,7 @@ export const MeshInterleavedPage: LC = (props) => {
     <Gather
       children={[
         <InterleavedData
-          fields={MESH_FIELDS}
+          schema={meshSchema}
           data={meshVertexArray}
         />,
         <RawTexture

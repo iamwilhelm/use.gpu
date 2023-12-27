@@ -44,7 +44,7 @@ import {
   parsePointShape,
 } from '@use-gpu/parse';
 import { generateChunkSegments2 } from '@use-gpu/core';
-import { useArrowSegments, useFaceSegments, useNoFaceSegments, useLineSegments, useFaceSegmentsConcave, useNoFaceSegmentsConcave } from '@use-gpu/workbench';
+import { getArrowSegments, getFaceSegments, getFaceSegmentsConcave, getLineSegments } from '@use-gpu/workbench';
 
 import { vec4 } from 'gl-matrix';
 
@@ -424,7 +424,7 @@ export const LineSegmentsTrait = combine(
 
     const l = loop || loops;
 
-    const line = useMemo(() => getLineSegments(chunks, l), [chunks, l]);
+    const line = useMemo(() => getLineSegments({chunks, loops: l}), [chunks, l]);
     for (const k in line) parsed[k] = line[k];
   },
 );
@@ -459,7 +459,7 @@ export const ArrowSegmentsTrait = combine(
     const s = start || starts;
     const e = end || ends;
 
-    const arrow = useMemo(() => getArrowSegments(chunks, l, s, e), [chunks, l, s, e]);
+    const arrow = useMemo(() => getArrowSegments({chunks, loops: l, starts: s, ends: e}), [chunks, l, s, e]);
     for (const k in arrow) parsed[k] = arrow[k];
   },
 );
@@ -487,7 +487,7 @@ export const FaceSegmentsTrait = combine(
     if (!chunks) return;
 
     if (concave && (position || positions)) {
-      const face = useProp(position ?? positions, (v) => getFaceSegmentsConcave(v, chunks, groups));
+      const face = useProp(position ?? positions, (v) => getFaceSegmentsConcave({chunks, groups, positions: v, dims: 4}));
       for (const k in face) parsed[k] = face[k];
     }
     else {

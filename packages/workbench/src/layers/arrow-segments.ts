@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
-import { accumulateChunks, generateChunkSegments2, generateChunkAnchors2, alignSizeTo2 } from '@use-gpu/core';
+import { accumulateChunks, generateChunkSegments, generateChunkAnchors, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
 export type ArrowSegmentsData = {
@@ -26,14 +26,14 @@ export const getArrowSegments = ({
 }) => {
   const count = accumulateChunks(chunks, loops);
 
-  const segments = new Int8Array(alignSizeTo2(count, 4));
+  const segments = new Int8Array(alignSizeTo(count, 4));
   const anchors = new Uint32Array(count * 4);
   const trims = new Uint32Array(count * 4);
-  const slices = new Uint16Array(alignSizeTo2(chunks.length, 2));
-  const unwelds = loops ? new Uint16Array(alignSizeTo2(count, 2)) : undefined;
+  const slices = new Uint16Array(alignSizeTo(chunks.length, 2));
+  const unwelds = loops ? new Uint16Array(alignSizeTo(count, 2)) : undefined;
 
-  generateChunkSegments2(segments, slices, unwelds, chunks, loops, starts, ends);
-  const sparse = generateChunkAnchors2(anchors, trims, chunks, loops, starts, ends);
+  generateChunkSegments(segments, slices, unwelds, chunks, loops, starts, ends);
+  const sparse = generateChunkAnchors(anchors, trims, chunks, loops, starts, ends);
 
   return {
     count,

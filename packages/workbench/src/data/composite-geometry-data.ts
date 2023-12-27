@@ -2,9 +2,9 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { GPUGeometry, DataField, StorageSource, CPUGeometry } from '@use-gpu/core';
 
-import { keyed, yeet, gather, useMemo, useYolo } from '@use-gpu/live';
-import { getAggregateArchetype } from '@use-gpu/core';
-import zipObject from 'lodash/zipObject';
+import { keyed, yeet, gather, useMemo, useOne, useYolo } from '@use-gpu/live';
+import { formatToArchetype } from '@use-gpu/core';
+import mapObject from 'lodash/zipObject';
 import groupBy from 'lodash/groupBy';
 
 import { CompositeData } from './composite-data';
@@ -20,40 +20,51 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
     render,
   } = props;
 
-  const partitions = groupBy(data, (geometry: CPUGeometry) => {
-    const {archetype, formats, unwelded} = geometry;
-    return archetype ?? (geometry.archetype = getAggregateArchetype(formats, unwelded));
-  });
+  const partitions = useOne(
+    () => groupBy(data, (geometry: CPUGeometry) => {
+      const {archetype, formats, unwelded, topology} = geometry;
+      return archetype ?? (geometry.archetype = formatToArchetype(formats, {topology, unwelded}));
+    }),
+    data);
 
   const archetypes = Object.keys(partitions);
+
+  const schemas = useMemo(() =>
+    mapObject(partitions, ([item]: CPUGeometry[], archetype: number) =>
+      mapObject(item.attributes, (_, k) => ({
+        format: `array<${formats[k]}>`,
+        index: k === 'indices',
+        unwelded: !!item.unwelded[k],
+      }))
+    ),
+    // Diff archetypes by value
+    archetypes);
+
+  const items = useMemo(() => {
+    mapObject(partitions, (items: CPUGeometry[], archetype: number) => items.map(i => i.attributes))
+  }, [data, schemas]);
 
   return gather(archetypes.map((archetype: string) => {
     const data = partitions[archetype];
     if (!data.length) return null;
 
+    const schema = schames[archetype];
     const {topology, attributes, formats, unwelded} = data[0];
-    const fields = useMemo(() =>
-      Object.keys(attributes).map(k => [
-        `array<${formats[k]}>`,
-        d => d.attributes[k],
-        k === 'indices' ? 'index' : unwelded?.[k] ? 'unwelded' : null,
-      ] as DataField),
-      [attributes, formats, unwelded]
-    );
 
     return keyed(CompositeData, archetype, {
-      data,
-      fields,
-      render: (...sources: StorageSource[]) => {
+      data: items[archetype],
+      schema,
+      render: (sources: Record<string, StorageSource>) => {
         const out = {
-          ...zipObject(Object.keys(attributes), sources),
+          archetype,
+          attributes: sources,
           topology,
           unwelded,
         };
         return yeet(out);
       },
     })
-  }), (meshes: Record<string, StorageSource>[]) => {
+  }), (meshes: GPUGeometry[]) => {
     return useYolo(() => render ? render(meshes) : yeet(meshes), [render, meshes]);
   });
 };

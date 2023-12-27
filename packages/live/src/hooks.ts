@@ -557,7 +557,6 @@ export const useYolo = <T>(
         fiber.state = scope;
         return initialState();
       }
-      catch (e) { throw e; }
       finally {
         state![i + 1] = fiber.state;
         fiber.pointer = pointer + STATE_SLOTS;

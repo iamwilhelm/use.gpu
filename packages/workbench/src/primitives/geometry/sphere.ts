@@ -1,5 +1,5 @@
 import type { CPUGeometry } from '@use-gpu/core';
-import { makeDataEmitter } from '@use-gpu/core';
+import { makeExprEmitter } from '@use-gpu/core';
 
 const τ = Math.PI * 2;
 
@@ -31,10 +31,10 @@ export const makeSphereGeometry = ({
   const uvs = new Float32Array(verts * 4);
   const indices = new Uint16Array(tris * 3);
 
-  const {emit: positionEmitter} = makeDataEmitter(positions, 4);
-  const {emit: normalEmitter} = makeDataEmitter(normals, 4);
-  const {emit: uvEmitter} = makeDataEmitter(uvs, 4);
-  const {emit: indexEmitter} = makeDataEmitter(indices, 1);
+  const {emit: positionEmitter} = makeExprEmitter(positions, 4);
+  const {emit: normalEmitter} = makeExprEmitter(normals, 4);
+  const {emit: uvEmitter} = makeExprEmitter(uvs, 4);
+  const {emit: indexEmitter} = makeExprEmitter(indices, 1);
 
   const emitPosition = (x: number, y: number, z: number) => {
     if      (axis === 'x') positionEmitter(z * width / 2, x * height / 2, y * depth / 2, 1.0);

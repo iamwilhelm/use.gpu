@@ -66,8 +66,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
   } = props;
 
   const t = Math.max(1, Math.round(items) || 0);
-  const s = size.map(n => n + padding * 2);
-  const length = t * (s.length ? s.reduce((a, b) => a * b, 1) : 1);
+  const padded = size.map(n => n + padding * 2);
+  const length = t * (padded.length ? padded.reduce((a, b) => a * b, 1) : 1);
   const alloc = useBufferedSize(length);
 
   // Make data buffer
@@ -229,22 +229,16 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
       }
 
       if (sampled) {
-        emitted = emitIntoMultiNumberArray(sampled, array, dims, s, clock!);
+        emitted = emitIntoMultiNumberArray(sampled, array, dims, padded, clock!);
       }
     }
-    if (expr) {
-      uploadBuffer(device, buffer, array.buffer);
-      source.version = incrementVersion(source.version);
-    }
 
-    const length  = !sparse ? length : emitted;
-    const size    = !sparse ? (items > 1 ? [items, ...s] : s) : [items, emitted / items];
+    const l = !sparse ? length : emitted;
+    const s = !sparse ? (items > 1 ? [items, ...padded] : padded) : [items, emitted / items];
 
-    uploadStorage(device, source, length, size);
+    uploadStorage(device, source, array.buffer, l, s);
 
-    const {bounds} = source;
-    const b = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
-    for (const k in b) bounds![k] = b[k];
+    source.bounds = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
   };
 
   if (!live) {

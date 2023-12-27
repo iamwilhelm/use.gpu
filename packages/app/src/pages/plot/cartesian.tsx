@@ -34,6 +34,7 @@ export const PlotCartesianPage: LC = () => {
                 loop
                 mirror
                 delay={0}
+                paused
                 keyframes={[
                   [0, [[-3, 0], [0, 1], [0, 3]]],
                   [10, [[0, 3], [0, 1], [0, 3]]],

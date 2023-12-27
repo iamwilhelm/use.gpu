@@ -1,26 +1,35 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { UniformAttribute } from '@use-gpu/core';
 import type { VectorLike } from '@use-gpu/traits';
-import type { ColorTrait, LineTrait, ROPTrait } from '../types';
 
-import { parseNumber, parseVec4, parseIntegerPositive, useProp } from '@use-gpu/traits';
+import { makeUseTrait, trait, combine, optional, useProp } from '@use-gpu/traits/live';
+import { parseNumber, parseVec4, parseIntegerPositive } from '@use-gpu/parse';
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { diffBy } from '@use-gpu/shader/wgsl';
 import { useSource, TickLayer } from '@use-gpu/workbench';
 
-import { DataContext } from '../providers/data-provider';
+import { useDataContext, useNoDataContext } from '../providers/data-provider';
 import { RangeContext } from '../providers/range-provider';
-import {
-  useColorTrait,
-  useLineTrait,
-  useROPTrait,
-} from '../traits';
 import { vec4 } from 'gl-matrix';
 
-export type TickProps =
-  Partial<ColorTrait> &
-  Partial<LineTrait> &
-  Partial<ROPTrait> & {
+import {
+  ColorTrait,
+  LineTrait,
+  ROPTrait,
+} from '../traits';
+
+const Traits = combine(
+  ColorTrait,
+  LineTrait,
+  ROPTrait,
+  trait({
+    position: parsePositionArray
+  }),
+);
+
+const useTraits = makeUseTrait(Traits);
+
+export type TickProps = TraitProps<typeof Traits> & {
   base?: number,
   size?: number,
   detail?: number,

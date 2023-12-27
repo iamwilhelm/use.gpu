@@ -15,7 +15,7 @@ import { getLineSegments, useInspectHoverable, useTransformContext, LINE_SCHEMA 
 import {
   LinesTrait,
 
-  LineTrait,
+  DataTrait,
   ROPTrait,
   StrokeTrait,
   ZIndexTrait,
@@ -24,6 +24,7 @@ import {
 const Traits = combine(
   LinesTrait,
 
+  DataTrait,
   ROPTrait,
   StrokeTrait,
   ZIndexTrait,
@@ -60,6 +61,8 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       segments,
       slices,
       unwelds,
+
+      sources,
       ...flags
   } = parsed;
 
@@ -77,7 +80,10 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
   const archetype = schemaToArchetype(LINE_SCHEMA, attributes, flags, refs);
 
   console.log({count, attributes});
-  if (!count || Number.isNaN(count)) debugger;
+  if (!count || Number.isNaN(count)) {
+    if (count !== count) debugger;
+    return null;
+  }
 
   const shapes = {
     line: {

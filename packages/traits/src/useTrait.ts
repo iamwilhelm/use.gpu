@@ -9,6 +9,8 @@ import {
 
 const makeObject = () => ({});
 
+const TRAIT = Symbol('trait');
+
 // Make parsed value optional
 export const optional = <A, B>(parse: (t: A) => B) => (t?: A): B | undefined | void => t !== undefined ? parse(t) : undefined;
 
@@ -40,15 +42,20 @@ export const trait = <
 // Combine traits into new trait
 export const combine: TraitCombinator = (
   ...traits: Trait<any, any>[]
-): Trait<any, any> => (
-  input: any,
-  output: any,
-  hooks: UseHooks,
-) => {
-  for (const parse of traits) {
-    parse(input, output, hooks);
-  }
-};
+): Trait<any, any> => {
+  const ts = traits.flatMap(t => t[TRAIT] ?? t);
+  const parse = (
+    input: any,
+    output: any,
+    hooks: UseHooks,
+  ) => {
+    for (const parse of ts) {
+      parse(input, output, hooks);
+    }
+  };
+  parse[TRAIT] = ts;
+  return parse;
+}
 
 /**
  * Make a parser for the given trait.

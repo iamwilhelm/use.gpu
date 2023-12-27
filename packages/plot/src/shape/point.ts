@@ -73,7 +73,10 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
 
   const count = positions ? (attributes.positions?.length / 4) || 0 : 1;
   console.log({count, attributes});
-  if (Number.isNaN(count)) debugger;
+  if (!count || Number.isNaN(count)) {
+    if (count !== count) debugger;
+    return null;
+  }
 
   const shapes = {
     point: {

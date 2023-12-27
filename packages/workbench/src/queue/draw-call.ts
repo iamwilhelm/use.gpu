@@ -12,6 +12,7 @@ import {
   uploadBuffer,
   resolve,
 } from '@use-gpu/core';
+import { getBundleLabel } from '@use-gpu/shader';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useSuspenseContext } from '../providers/suspense-provider';
@@ -262,8 +263,8 @@ export const drawCall = (props: DrawCallProps) => {
 
     if (indirect) passEncoder.drawIndirect(indirect.buffer, indirect.byteOffset ?? 0);
     else {
-      if (Number.isNaN(v * i * fv * fi)) debugger;
-      passEncoder.draw(v, i, fv, fi);
+      if (Number.isNaN(v * i * fv * fi)) console.warn('NaN draw call', getBundleLabel(vertexShader), getBundleLabel(fragmentShader));
+      else passEncoder.draw(v, i, fv, fi);
     }
   };
 

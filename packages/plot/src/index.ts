@@ -9,11 +9,12 @@ export * from './shape/arrow';
 export * from './shape/face';
 export * from './shape/line';
 export * from './shape/point';
-/*
-export * from './providers/data-provider';
 
 export * from './source/scale';
 export * from './source/sampled';
+/*
+export * from './providers/data-provider';
+
 export * from './source/transpose';
 
 export * from './shape/label';

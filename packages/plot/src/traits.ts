@@ -46,6 +46,8 @@ import {
 import { generateChunkSegments2 } from '@use-gpu/core';
 import { getArrowSegments, getFaceSegments, getFaceSegmentsConcave, getLineSegments } from '@use-gpu/workbench';
 
+import { useDataContext } from './providers/data-provider';
+
 import { vec4 } from 'gl-matrix';
 
 const EMPTY: any[] = [];
@@ -329,6 +331,26 @@ const applyOpacity = (colors?: TypedArray, opacity: number = 1) => {
   return copy;
 }
 
+export const DataTrait = (
+  props: any,
+  parsed: any,
+) => {
+  const dataContext = useDataContext();
+
+  const sources = {...dataContext};  
+  for (const k in parsed) if (!parsed[k]) {
+    const v = props[k];
+    if (v && (v.module || v.table || v.buffer || v.texture || v.view)) {
+      sources![k] = v;
+      delete parsed[k];
+    }
+  }
+
+  let has = false;
+  for (const k in sources) { has = true; break; }
+  if (has) parsed.sources = sources;
+};
+
 // Chunking
 
 export const SegmentsTrait = combine(
@@ -347,7 +369,7 @@ export const SegmentsTrait = combine(
   ) => {
     parsed.chunks = useProp(
       props.positions ?? props.position,
-      (pos) => !props.segments ? parseChunks(pos) : undefined,
+      (pos) => pos && !props.segments ? parseChunks(pos) : undefined,
     );
   },
 );
@@ -371,7 +393,7 @@ export const FacetedTrait = combine(
   ) => {
     const [chunks, groups] = useProp(
       props.positions ?? props.position,
-      (pos) => !props.segments && !props.indices ? parseMultiChunks(pos) : [],
+      (pos) => pos && !props.segments && !props.indices ? parseMultiChunks(pos) : [],
     );
     parsed.chunks = chunks;
     parsed.groups = groups;

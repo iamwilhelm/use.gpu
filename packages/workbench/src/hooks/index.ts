@@ -1,6 +1,4 @@
 export * from './useApplyTransform';
-export * from './useShader';
-export * from './useSource';
 export * from './useBufferedSize';
 export * from './useCombinedTransform';
 export * from './useComputePipeline';
@@ -20,5 +18,8 @@ export * from './usePipelineLayout';
 export * from './usePipelineOptions';
 export * from './useRawSource';
 export * from './useRenderPipeline';
+export * from './useRenderProp';
 export * from './useScratchSource';
+export * from './useShader';
 export * from './useShaderRef';
+export * from './useSource';

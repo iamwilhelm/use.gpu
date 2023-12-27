@@ -2,10 +2,10 @@ import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/liv
 import type { StorageSource, Emit } from '@use-gpu/core';
 
 import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } from '@use-gpu/live';
-import { SampledData } from '@use-gpu/workbench';
-import { DataContext } from '../providers/data-provider';
+import { SampledData, getRenderFunc } from '@use-gpu/workbench';
+import { useDataContext, DataContext } from '../providers/data-provider';
 import { RangeContext } from '../providers/range-provider';
-import { parseAxis } from '@use-gpu/traits';
+import { parseAxis } from '@use-gpu/parse';
 
 export type SampledProps = {
   axis?: string,
@@ -25,16 +25,20 @@ export type SampledProps = {
   index?: boolean,
   time?: boolean,
 
+  as?: string,
+
   render?: (source: StorageSource) => LiveElement,
+  children?: (source: StorageSource) => LiveElement,
 };
 
 export const Sampled: LiveComponent<SampledProps> = (props: PropsWithChildren<SampledProps>) => {
   const {
     axis,
     axes = 'xyzw',
-    render,
     range: outerRange,
+    render,
     children,
+    as = 'positions',
     ...rest
   } = props;
 
@@ -47,18 +51,25 @@ export const Sampled: LiveComponent<SampledProps> = (props: PropsWithChildren<Sa
     return basis.map(i => resolvedRange[i]);
   }, [resolvedRange, a]);
 
+  const dataContext = useDataContext();
+
   return (
-    gather(
-      use(SampledData, {...rest, range}),
-      tagFunction(([source]: StorageSource[]) =>
-        useMemo(() => {
-          if (render == null && children === undefined) return yeet(source);
+    use(SampledData, {
+      ...rest,
+      range,
+      render: tagFunction((source: StorageSource) => {
+        const context = useMemo(() => ({...dataContext, [as]: source}), dataContext, source, as);
+        const call = getRenderFunc(props);
+
+        return useMemo(() => {
+          if (call == null && children == null) return yeet(source);
+          if (call) return render(source);
           return (
-            provide(DataContext, source, render != null ? render(source) : children)
+            provide(DataContext, context, children)
           );
-        }, [render, children, source])
-      , 'sample')
-    )
+        }, [render, children, source, dataContext]);
+      }, 'sample')
+    })
   );
 };
 

@@ -3,8 +3,8 @@ import type { VectorLike } from '@use-gpu/traits';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { XYZW } from '@use-gpu/core';
 
-import { makeUseTrait, optional, combine, useProp } from '@use-gpu/traits/live';
-import { parseIntegerPositive, parseAxis, parseVec4 } from '@use-gpu/parse';
+import { makeUseTrait, optional, combine, trait, useProp } from '@use-gpu/traits/live';
+import { parseBoolean, parseIntegerPositive, parseAxis, parseVec4 } from '@use-gpu/parse';
 import { yeet, memo, use, fragment, gather, provide, useContext, useFiber, useOne, useMemo } from '@use-gpu/live';
 import {
   useShader, useNoShader,
@@ -37,6 +37,10 @@ const Traits = combine(
   GridTrait,
   LineTrait,
   ROPTrait,
+  trait({
+    origin: parseVec4,
+    auto: optional(parseBoolean),
+  }),
 );
 
 const useScaleTrait = makeUseTrait(ScaleTrait);
@@ -49,19 +53,14 @@ export type GridProps =
 & {
   first?: Partial<ScaleTrait> & { detail?: number },
   second?: Partial<ScaleTrait> & { detail?: number },
-  origin?: VectorLike,
-  auto?: boolean,
 };
 
 const NO_SCALE_PROPS: Partial<ScaleTrait> = {};
 
 export const Grid: LiveComponent<GridProps> = (props) => {
   const {
-    auto = false,
-  } = props;
-
-  const {
     axes, range, loop,
+    origin, auto,
     ...flags
   } = useTraits(props);
 
@@ -70,8 +69,6 @@ export const Grid: LiveComponent<GridProps> = (props) => {
 
   const firstDetail = useProp(props.first?.detail, parseIntegerPositive);
   const secondDetail = useProp(props.second?.detail, parseIntegerPositive);
-
-  const origin = useProp(props.origin, parseVec4);
 
   const parentRange = useRangeContext();
   const transform = useTransformContext();

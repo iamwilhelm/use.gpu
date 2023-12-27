@@ -15,13 +15,15 @@ export type AnimateProps<T> = {
   ease?: 'ease' | 'cosine' | 'linear' | 'bezier',
 
   delay?: number,
-  pause?: number,
+  rest?: number,
   duration?: number,
   speed?: number,
 
   tracks?: Record<string, Keyframe<T>[]>,
   keyframes?: Keyframe<T>[],
   prop?: string,
+
+  paused?: boolean,
 
   render?: (value: any) => LiveElement,
 };
@@ -60,11 +62,11 @@ const getActiveKeyframes = <T>(keyframes: Keyframe<T>[], time: number) => {
   return [keyframes[i], keyframes[i + 1]];
 };
 
-const getLoopedTime = (time: number, duration: number, pause: number, repeat: number, mirror: boolean) => {
+const getLoopedTime = (time: number, duration: number, rest: number, repeat: number, mirror: boolean) => {
   const max = duration * (repeat + 1);
   let t = Math.min(max, time);
 
-  let dp = duration + pause;
+  let dp = duration + rest;
   if (mirror) {
     t = time % (dp * 2);
     if (t < dp) t = Math.min(duration, t);
@@ -110,13 +112,15 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
     ease = 'cosine',
 
     delay = 0,
-    pause = 0,
+    rest = 0,
     speed = 1,
     duration = null,
 
     tracks,
     keyframes,
     prop,
+
+    paused,
 
     render,
     children,
@@ -129,6 +133,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
   if (!script) return null;
 
   const startedRef = useOne(() => ({current: -1}), script);
+  const pausedRef = useOne(() => ({current: 0}), script);
   const length = useMemo(() => {
     if (duration) return duration;
     const tracks = Array.from(Object.values(script));
@@ -149,16 +154,21 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
 
       let {current: started} = startedRef;
       if (started < 0) started = startedRef.current = elapsed;
+      if (paused && !pausedRef.current) pausedRef.current = elapsed;
+      if (!paused && pausedRef.current) {
+        startRef.current += elapsed - pausedRef.current;
+        pausedRef.current = 0;
+      }
 
       flip = !flip;
       const props = flip ? props1 : props2;
 
       const time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
-      const [t, max] = getLoopedTime(time, length, pause, repeat, mirror);
+      const [t, max] = getLoopedTime(time, length, rest, repeat, mirror);
 
       for (let k in props) props[k] = evaluateKeyframes(script[k], t, ease);
 
-      if (time < max) useAnimationFrame();
+      if (time < max && !paused) useAnimationFrame();
       else useNoAnimationFrame();
 
       if (render) return tracks ? render(props) : (prop ? render(props[prop]) : null);

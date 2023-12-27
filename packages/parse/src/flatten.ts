@@ -10,7 +10,7 @@ const maybeTypedArray = (
 const maybeEmptyArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
   ctor: T,
-) => !xs.length ? new ctor(0) : null;
+) => Array.isArray(xs) && !xs.length ? new ctor(0) : null;
 
 // Array of scalars
 const maybeScalarArray = <T extends TypedArrayConstructor>(

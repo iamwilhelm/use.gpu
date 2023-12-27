@@ -12,6 +12,11 @@ const maybeEmptyArray = <T extends TypedArrayConstructor>(
   ctor: T,
 ) => Array.isArray(xs) && !xs.length ? new ctor(0) : null;
 
+const maybeTensorArray = <T extends TypedArrayConstructor>(
+  xs: VectorLike | VectorLikes | VectorLikes[],
+  ctor: T,
+) => Array.isArray(xs) && !xs.length ? new ctor(0) : null;
+
 // Array of scalars
 const maybeScalarArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],

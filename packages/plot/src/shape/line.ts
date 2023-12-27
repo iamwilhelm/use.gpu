@@ -4,18 +4,17 @@ import type { TraitProps } from '@use-gpu/traits/live';
 
 import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
-import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
+import { yeet, memo, keyed, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
 import { getLineSegments, useInspectHoverable, useTransformContext, LINE_SCHEMA } from '@use-gpu/workbench';
 
-//import { PointLayer } from '@use-gpu/workbench';
-//import { DataContext } from '../providers/data-provider';
+import { LineLayer } from '@use-gpu/workbench';
 
 import {
   LinesTrait,
 
-  DataTrait,
+  DataContextTrait,
   ROPTrait,
   StrokeTrait,
   ZIndexTrait,
@@ -24,7 +23,7 @@ import {
 const Traits = combine(
   LinesTrait,
 
-  DataTrait,
+  DataContextTrait,
   ROPTrait,
   StrokeTrait,
   ZIndexTrait,
@@ -58,11 +57,13 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       loop,
       loops,
 
+      schema,
+      tensor,
       segments,
       slices,
       unwelds,
 
-      sources,
+      data,
       ...flags
   } = parsed;
 
@@ -74,16 +75,11 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
   const context = useTransformContext();
   const {transform, nonlinear, matrix: refs} = context;
 
-  console.log('line', {parsed, flags, refs});
-
   const attributes = schemaToEmitters(LINE_SCHEMA, parsed);
   const archetype = schemaToArchetype(LINE_SCHEMA, attributes, flags, refs);
 
-  console.log({count, attributes});
-  if (!count || Number.isNaN(count)) {
-    if (count !== count) debugger;
-    return null;
-  }
+  if (Number.isNaN(count)) debugger;
+  if (!count) return;
 
   const shapes = {
     line: {
@@ -96,7 +92,6 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       zIndex,
     },
   };
-
   return yeet(shapes);
 }, shouldEqual({
   position: sameShallow(sameShallow()),

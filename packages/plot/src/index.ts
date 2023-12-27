@@ -10,15 +10,12 @@ export * from './shape/face';
 export * from './shape/line';
 export * from './shape/point';
 
+export * from './source/array-sampler';
+export * from './source/range-sampler';
 export * from './source/scale';
-export * from './source/sampled';
-/*
-export * from './providers/data-provider';
-
 export * from './source/transpose';
-
+/*
 export * from './shape/label';
-
 
 export * from './layer/tick';
 export * from './layer/implicit-surface';

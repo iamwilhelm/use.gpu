@@ -40,6 +40,15 @@ export const formatToArchetype = (
   return toMurmur53(tokens);
 };
 
+export const normalizeSchema = <T>(schema: Record<string, string | T>) => {
+  const out = {};
+  for (const k in schema) {
+    const f = schema[k];
+    out[k] = typeof f === 'string' ? {format: f} : f;
+  }
+  return out;
+};
+
 export const schemaToAttributes = (
   schema: ArchetypeSchema,
   props: Record<string, any>,
@@ -138,7 +147,7 @@ export const schemaToAggregate = (
   schema: ArchetypeSchema,
   attributes: Record<string, TypedArray | VectorEmitter>,
   refs?: Record<string, RefObject<TypedArray | number>>,
-  allocItems: number = 0,
+  allocInstances: number = 0,
   allocVertices: number = 0,
   allocIndices: number = 0,
 ): Aggregate => {
@@ -163,7 +172,7 @@ export const schemaToAggregate = (
 
       // Allocation size per spread type
       const alloc = (
-        ref || !isArray ? allocItems :
+        ref || !isArray ? allocInstances :
         unwelded || index ? allocIndices :
         allocVertices
       );
@@ -249,8 +258,8 @@ export const schemaToAggregate = (
     byInstance = [];
   }
 
-  let byRefs = buildGroup(byRef, allocItems, true);
-  let byInstances = buildGroup(byInstance, allocItems, true);
+  let byRefs = buildGroup(byRef, allocInstances, true);
+  let byInstances = buildGroup(byInstance, allocInstances, true);
   let byVertices = buildGroup(byVertex, allocVertices);
   let byIndices = buildGroup(byIndex, allocIndices);
 

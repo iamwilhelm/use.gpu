@@ -22,6 +22,7 @@ import {
   LoopTrait,
   ColorTrait,
   ROPTrait,
+  ZIndexTrait,
 } from '../traits';
 import { getAxisPosition } from '@use-gpu/wgsl/plot/axis.wgsl';
 
@@ -33,6 +34,7 @@ const Traits = combine(
   LoopTrait,
   ColorTrait,
   ROPTrait,
+  ZIndexTrait,
   trait({
     origin: parseVec4,
     detail: parseIntegerPositive,
@@ -50,6 +52,7 @@ export const Axis: LiveComponent<AxisProps> = memo((props) => {
     axis, range,
     loop, start, end,
     origin, detail,
+    zIndex,
     ...flags
   } = parsed;
 
@@ -90,9 +93,10 @@ export const Axis: LiveComponent<AxisProps> = memo((props) => {
   );
 
   return yeet({
-    layer: {
+    element: {
       transform,
       element,
+      zIndex,
     },
   });
 }, shouldEqual({

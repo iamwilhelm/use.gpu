@@ -43,7 +43,7 @@ import {
   parseDomain,
   parsePointShape,
 } from '@use-gpu/parse';
-import { generateChunkSegments2 } from '@use-gpu/core';
+import { seq } from '@use-gpu/core';
 import { getArrowSegments, getFaceSegments, getFaceSegmentsConcave, getLineSegments } from '@use-gpu/workbench';
 
 import { useDataContext } from './providers/data-provider';
@@ -331,24 +331,19 @@ const applyOpacity = (colors?: TypedArray, opacity: number = 1) => {
   return copy;
 }
 
-export const DataTrait = (
-  props: any,
-  parsed: any,
+export const DataContextTrait = (
+  props: {},
+  parsed: {
+    tensor: number[],
+  },
 ) => {
   const dataContext = useDataContext();
 
-  const sources = {...dataContext};  
-  for (const k in parsed) if (!parsed[k]) {
-    const v = props[k];
-    if (v && (v.module || v.table || v.buffer || v.texture || v.view)) {
-      sources![k] = v;
-      delete parsed[k];
-    }
+  for (const k in dataContext) {
+    const {array, size} = dataContext[k];
+    if (!(props as any)[k]) (parsed as any)[k] = array;
+    if (k === 'positions') parsed.tensor = size;
   }
-
-  let has = false;
-  for (const k in sources) { has = true; break; }
-  if (has) parsed.sources = sources;
 };
 
 // Chunking
@@ -364,12 +359,20 @@ export const SegmentsTrait = combine(
       segments?: VectorLikes,
     },
     parsed: {
+      positions?: TypedArray,
       chunks?: TypedArray,
     },
   ) => {
     parsed.chunks = useProp(
-      props.positions ?? props.position,
-      (pos) => pos && !props.segments ? parseChunks(pos) : undefined,
+      parsed.positions ?? props.positions ?? props.position,
+      (pos) => {
+        if (!pos || props.segments) return;
+        if (parsed.tensor) {
+          const [segment] = parsed.tensor;
+          return seq((pos.length || 1) / segment / 4).map(_ => segment);
+        }
+        return parseChunks(pos);
+      }
     );
   },
 );
@@ -387,13 +390,21 @@ export const FacetedTrait = combine(
       indices?: VectorLikes,
     },
     parsed: {
+      positions?: TypedArray,
       chunks?: TypedArray,
       groups?: TypedArray,
     },
   ) => {
     const [chunks, groups] = useProp(
-      props.positions ?? props.position,
-      (pos) => pos && !props.segments && !props.indices ? parseMultiChunks(pos) : [],
+      parsed.positions ?? props.positions ?? props.position,
+      (pos) => {
+        if (!pos || props.segments || props.indices) return;
+        if (parsed.tensor) {
+          const [segment] = parsed.tensor;
+          return seq((pos.length || 1) / segment / 4).map(_ => segment);
+        }
+        return parseMultiChunks(pos);
+      }
     );
     parsed.chunks = chunks;
     parsed.groups = groups;
@@ -436,6 +447,7 @@ export const LineSegmentsTrait = combine(
       loops?: TypedArray,
 
       count?: number,
+      segment?: number,
       segments?: TypedArray,
       unwelds?: TypedArray,
       slices?: TypedArray,
@@ -563,35 +575,39 @@ export const FacetedVerticesTrait = trait({
 
 export const PointsTrait = combine(
   ColorsTrait(),
-  VerticesTrait,
   trait({
     size: optional(parseNumber),
     sizes: optional(parseScalarArray),
   }),
+  VerticesTrait,
+  DataContextTrait,
 );
 
 export const LinesTrait = combine(
   ColorsTrait({ composite: true }),
-  CompositeVerticesTrait,
   trait({
     width: optional(parseScalarArrayLike),
     widths: optional(parseMultiScalarArray),
   }),
+  CompositeVerticesTrait,
+  DataContextTrait,
   LineSegmentsTrait,
 );
 
 export const ArrowsTrait = combine(
   ColorsTrait({ composite: true }),
-  CompositeVerticesTrait,
   trait({
     size: optional(parseScalarArrayLike),
     sizes: optional(parseMultiScalarArray),
   }),
+  CompositeVerticesTrait,
+  DataContextTrait,
   ArrowSegmentsTrait,
 );
 
 export const FacesTrait = combine(
   ColorsTrait({ composite: true }),
   FacetedVerticesTrait,
+  DataContextTrait,
   FaceSegmentsTrait,
 );

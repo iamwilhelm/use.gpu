@@ -2,7 +2,7 @@ import type { StorageSource, LambdaSource, TypedArray } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import { makeContext, useContext } from '@use-gpu/live';
 
-export type DataContextProps = Record<string, StorageSource | LambdaSource | ShaderModule>;
+export type DataContextProps = Record<string, TensorData>;
 
 export type ValuesContextProps = number[] | TypedArray;
 
@@ -11,12 +11,6 @@ export type ValuesContextProps = number[] | TypedArray;
  * @category Providers
  */
 export const DataContext = makeContext<DataContextProps>({}, 'DataContext');
-
-/**
- * Provides a typed array for current data
- * @category Providers
- */
-export const ValuesContext = makeContext<ValuesContextProps>(undefined, 'ValuesContext');
 
 /** @category Providers */
 export const useDataContext = () => useContext<DataContextProps>(DataContext);

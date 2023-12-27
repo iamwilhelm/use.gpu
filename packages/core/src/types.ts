@@ -49,6 +49,8 @@ export type DeepPartial<T> = T | {
   [P in keyof T]?: DeepPartial<T[P]>;
 };
 
+export type Lazy<T> = T | (() => T) | {expr: () => T} | {current: T};
+
 // Rendering
 
 export type UseGPURenderContext = {
@@ -188,6 +190,28 @@ export type UniformDataSetter = (index: number, item: any) => void;
 export type UniformValueSetter = (index: number, field: number, value: any) => void;
 export type UniformByteSetter = (view: DataView, offset: number, data: any) => void;
 
+// Shaders
+export type ShaderModuleDescriptor = {
+  code: TypedArray | string,
+  label?: string,
+  entryPoint: string,
+  hash: string | number,
+};
+
+export type ShaderStageDescriptor = {
+  module: GPUShaderModule,
+  entryPoint: string,
+};
+
+// Shader bindings
+export type DataBinding<T = any, S = any> = {
+  uniform: UniformAttribute,
+  storage?: StorageSource,
+  texture?: TextureSource,
+  lambda?: LambdaSource<S>,
+  constant?: Lazy<T>,
+};
+
 export type DataBoundingBox = {min: VectorLike, max: VectorLike};
 export type DataBounds = {
   center: number[],
@@ -196,7 +220,6 @@ export type DataBounds = {
   max: number[],
 };
 
-// Storage bindings
 export type StorageSource = {
   buffer: GPUBuffer,
   format: any,
@@ -265,19 +288,6 @@ export type ExternalTexture = {
   layout?: string,
 };
 
-// Shaders
-export type ShaderModuleDescriptor = {
-  code: TypedArray | string,
-  label?: string,
-  entryPoint: string,
-  hash: string | number,
-};
-
-export type ShaderStageDescriptor = {
-  module: GPUShaderModule,
-  entryPoint: string,
-};
-
 // Projection pipeline
 export type ViewUniforms = {
   projectionMatrix: { current: mat4 },
@@ -298,14 +308,22 @@ export type PickingUniforms = {
   pickingId: { value: number },
 };
 
-// Data
+// Data ingestion
 
 export type Tuples<N extends number, T = number> = {
   array: T[],
-  get: (i: number, j: number) => T,
-  iterate: (f: (...args: T[]) => void, start?: number, end?: number) => void;
   dims: number,
   length: number,
+  get: (i: number, j: number) => T,
+  iterate: (f: (...args: T[]) => void, start?: number, end?: number) => void;
+};
+
+export type TensorArray = {
+  array: TypedArray,
+  dims: number,
+  length: number,
+  size: number[],
+  format?: UniformType,
 };
 
 export type VectorEmitter = (to: TypedArray, count: number, toIndex?: number, stride?: number) => void;
@@ -337,9 +355,7 @@ export type Time = {
   delta: number,
 };
 
-export type AccessorSpec = string | Accessor;
-
-export type DataSchema = Record<string, DataField>;
+export type DataSchema = Record<string, string | DataField>;
 export type DataField = {
   /** UniformType or array<…> or array<array<…>> */
   format: string,
@@ -391,16 +407,6 @@ export type AggregateItem = {
   flags?: Record<string, any>,
 };
 
-export type DataBinding<T = any, S = any> = {
-  uniform: UniformAttribute,
-  storage?: StorageSource,
-  texture?: TextureSource,
-  lambda?: LambdaSource<S>,
-  constant?: Lazy<T>,
-};
-
-export type Lazy<T> = T | (() => T) | {expr: () => T} | {current: T};
-
 export type AggregateBuffer = {
   buffer: GPUBuffer,
   array?: TypedArray,
@@ -438,7 +444,7 @@ export type RenderPassMode = 'opaque' | 'transparent' | 'picking' | 'debug' | 's
 
 // Uniform types
 
-export type UniformType =
+type RawUniformType =
   | "bool"
   | "vec2<bool>"
   | "vec3<bool>"
@@ -547,3 +553,5 @@ export type UniformType =
   | "vec3to4<i32>"
   | "vec3to4<f32>"
 ;
+
+export type UniformType = RawUniformType | `array<${RawUniformType}>` | `array<array<${RawUniformType}>>`;

@@ -1,3 +1,4 @@
+export * from './useAggregator';
 export * from './useApplyTransform';
 export * from './useBufferedSize';
 export * from './useCombinedTransform';
@@ -12,7 +13,6 @@ export * from './useInstancedSources';
 export * from './useLambdaSource';
 export * from './useLinkedShader';
 export * from './useMatrixTransform';
-export * from './useMemoKey';
 export * from './useNativeColor';
 export * from './usePipelineLayout';
 export * from './usePipelineOptions';

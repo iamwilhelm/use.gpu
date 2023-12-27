@@ -75,8 +75,6 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
 
   if (zIndex && !zBias) parsed.zBias = zIndex;
 
-  console.log('arrow', {parsed, flags});
-
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
@@ -86,11 +84,8 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
   const attributes = schemaToEmitters(ARROW_SCHEMA, parsed);
   const archetype = schemaToArchetype(ARROW_SCHEMA, attributes, flags, refs);
 
-  console.log({count, attributes});
-  if (!count || Number.isNaN(count)) {
-    if (count !== count) debugger;
-    return null;
-  }
+  if (Number.isNaN(count)) debugger;
+  if (!count) return;
 
   const shapes = {
     arrow: {

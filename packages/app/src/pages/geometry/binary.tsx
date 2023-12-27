@@ -95,8 +95,8 @@ const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
     count: bins,
     values: {
       schema: {
-        positions: {format: 'array<vec4<u8>>'},
-        counts: {format: 'array<u32>'},
+        positions: 'array<vec4<u8>>',
+        counts: 'array<u32>',
       } as DataSchema,
       data: {
         positions,

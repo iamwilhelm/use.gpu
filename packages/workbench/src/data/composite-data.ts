@@ -18,6 +18,7 @@ import {
   getBoundingBox,
   toDataBounds,
 
+  normalizeSchema,
   schemaToArchetype,
   schemaToEmitters,
   getAggregateSummary,
@@ -64,7 +65,6 @@ export type CompositeDataProps = {
   children?: (sources: Record<string, StorageSource>) => LiveElement,
 };
 
-const NO_SCHEMA = {} as DataSchema;
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Aggregate array-of-structs with fields `T | T[] | T[][]` into grouped storage sources. */
@@ -74,8 +74,8 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     count,
     version,
     data: propData,
+    schema: propSchema,
     virtual,
-    schema = NO_SCHEMA,
     loop,
     start,
     end,
@@ -83,6 +83,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     live = false,
   } = props;
 
+  const schema = useOne(() => normalizeSchema(propSchema), propSchema);
   const data = propData ? Array.isArray(propData) ? propData : [propData] : null;
   const itemCount = Math.max(0, (count ?? data?.length) - skip);
 

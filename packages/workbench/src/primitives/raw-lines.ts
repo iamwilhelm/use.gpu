@@ -105,7 +105,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   // Instanced draw (repeated or random access)
   const p = useShaderRef(props.position, props.positions);
   const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts);
+  const s = useShaderRef(props.st, props.sts ?? props.positions);
   const g = useShaderRef(null, props.segments);
   const c = useShaderRef(props.color, props.colors);
   const w = useShaderRef(props.width, props.widths);
@@ -118,10 +118,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const auto = useOne(() => props.segment != null ? getShader(getLineSegment, [props.segment]) : null, props.segment);
 
-  const ps = p ? useSource(POSITION, p) : useNoSource();
-  const ss = props.sts == null ? ps : s;
-
-  const {positions, scissor, bounds: getBounds} = useApplyTransform(ps);
+  const {positions, scissor, bounds: getBounds} = useApplyTransform(p);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
@@ -135,7 +132,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const boundVertex = useShader(getLineVertex, [
     positions, scissor,
-    u, ss,
+    u, s,
     g ?? auto, c, w, d, z,
     t, e,
     instanceCount,

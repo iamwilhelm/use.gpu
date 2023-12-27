@@ -136,3 +136,15 @@ export const uploadStorage = (
   source.length = count;
   source.version = incrementVersion(source.version);
 };
+
+export const updateTensor = (
+  tensor: TensorArray,
+  count: number,
+  size?: number,
+) => {
+  if (size) tensor.size = size;
+  else tensor.size[0] = count;
+
+  tensor.length = count;
+  tensor.version = incrementVersion(tensor.version);
+};

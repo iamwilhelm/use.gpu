@@ -64,8 +64,6 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
 
   if (zIndex && !zBias) parsed.zBias = zIndex;
 
-  console.log('face', {parsed, flags});
-
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
@@ -75,11 +73,8 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
   const attributes = schemaToEmitters(FACE_SCHEMA, parsed);
   const archetype = schemaToArchetype(FACE_SCHEMA, attributes, flags, refs);
 
-  console.log({count, attributes});
-  if (!count || Number.isNaN(count)) {
-    if (count !== count) debugger;
-    return null;
-  }
+  if (Number.isNaN(count)) debugger;
+  if (!count) return;
 
   const shapes = {
     face: {

@@ -77,14 +77,11 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const d = useShaderRef(props.depth, props.depths);
   const z = useShaderRef(props.zBias, props.zBiases);
   const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts);
+  const s = useShaderRef(props.st, props.sts ?? props.positions);
 
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
 
-  const ps = p ? useSource(POSITION, p) : useNoSource();
-  const ss = props.sts == null ? ps : s;
-
-  const {positions, scissor, bounds: getBounds} = useApplyTransform(ps);
+  const {positions, scissor, bounds: getBounds} = useApplyTransform(p);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {

@@ -4,7 +4,6 @@ import type { Update } from '@use-gpu/state';
 import { makeRenderPipeline, makeRenderPipelineAsync } from '@use-gpu/core';
 import { useMemo, useNoMemo, useOne, useNoOne, useState, useNoState } from '@use-gpu/live';
 import { toMurmur53 } from '@use-gpu/state';
-import { useMemoKey } from './useMemoKey';
 import { DeviceContext } from '../providers/device-provider';
 import LRU from 'lru-cache';
 

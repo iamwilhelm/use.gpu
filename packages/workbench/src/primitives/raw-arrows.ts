@@ -95,7 +95,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const a = useShaderRef(props.anchor, props.anchors);
   const p = useShaderRef(props.position, props.positions);
   const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts);
+  const s = useShaderRef(props.st, props.sts ?? props.positions);
   const c = useShaderRef(props.color, props.colors);
   const e = useShaderRef(props.size, props.sizes);
   const w = useShaderRef(props.width, props.widths);
@@ -105,10 +105,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const g = useRawSource(geometry.attributes.positions, 'vec4<f32>');
   const l = useShaderRef(null, props.instances);
 
-  const ps = p ? useSource(POSITION, p) : useNoSource();
-  const ss = props.sts == null ? ps : s;
-
-  const {positions, scissor, bounds: getBounds} = useApplyTransform(ps);
+  const {positions, scissor, bounds: getBounds} = useApplyTransform(p);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
@@ -120,7 +117,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
 
   const boundVertex = useShader(getArrowVertex, [
     g, a, positions, scissor,
-    u, ss,
+    u, s,
     c, e, w, d, z,
     positionCount
   ]);

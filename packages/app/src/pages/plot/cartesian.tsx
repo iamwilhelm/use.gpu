@@ -3,14 +3,14 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React, { use } from '@use-gpu/live';
 
 import {
-  Loop, Pass, FlatCamera, ArrayData, Data, RawData,
+  Loop, Pass, FlatCamera, Data, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
   Animate,
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
+  Plot, Cartesian, Axis, Grid, Label, Line, RangeSampler, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
@@ -34,7 +34,6 @@ export const PlotCartesianPage: LC = () => {
                 loop
                 mirror
                 delay={0}
-                paused
                 keyframes={[
                   [0, [[-3, 0], [0, 1], [0, 3]]],
                   [10, [[0, 3], [0, 1], [0, 3]]],
@@ -60,7 +59,6 @@ export const PlotCartesianPage: LC = () => {
                     second={{ detail: 3, divide: 5 }}
                     depth={0.5}
                     zBias={-1}
-                    auto
                   />
                   <Grid
                     axes='yz'
@@ -124,7 +122,7 @@ export const PlotCartesianPage: LC = () => {
                     depth={0.5}
                     end
                   />
-                  <Sampled
+                  <RangeSampler
                     axes='zx'
                     format='vec4<f32>'
                     size={[10, 20]}
@@ -150,7 +148,7 @@ export const PlotCartesianPage: LC = () => {
                         zBias={1}
                       />
                     </Transpose>
-                  </Sampled>
+                  </RangeSampler>
                 </Cartesian>
               </Animate>
             </Plot>

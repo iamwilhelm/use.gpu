@@ -60,8 +60,6 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
 
   if (zIndex && !zBias) parsed.zBias = zIndex;
 
-  console.log('point', {parsed, flags});
-
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
@@ -72,11 +70,8 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
   const archetype = schemaToArchetype(POINT_SCHEMA, attributes, flags, refs);
 
   const count = positions ? (attributes.positions?.length / 4) || 0 : 1;
-  console.log({count, attributes});
-  if (!count || Number.isNaN(count)) {
-    if (count !== count) debugger;
-    return null;
-  }
+  if (Number.isNaN(count)) debugger;
+  if (!count) return;
 
   const shapes = {
     point: {

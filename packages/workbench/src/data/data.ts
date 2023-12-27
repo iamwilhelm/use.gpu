@@ -18,6 +18,7 @@ import {
   getBoundingBox,
   toDataBounds,
 
+  normalizeSchema,
   schemaToArchetype,
   schemaToEmitters,
   getAggregateSummary,
@@ -53,8 +54,8 @@ export const Data: LiveComponent<DataProps> = (props) => {
     count,
     version,
     data: propData,
+    schema: propSchema,
     virtual,
-    schema = NO_SCHEMA,
     loop,
     start,
     end,
@@ -62,6 +63,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
     live = false,
   } = props;
 
+  const schema = useOne(() => normalizeSchema(propSchema), propSchema);
   const data = propData ? Array.isArray(propData) ? propData : [propData] : null;
   const itemCount = Math.max(0, (count ?? data?.length) - skip);
   const allocItems = useBufferedSize(itemCount);

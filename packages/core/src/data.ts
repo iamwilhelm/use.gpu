@@ -1,4 +1,4 @@
-import type { Lazy, Emitter, VectorEmitter, Emit, TypedArray, VectorLike, UniformType, UniformAttribute } from './types';
+import type { Lazy, Emitter, VectorEmitter, Emit, TypedArray, TensorArray, VectorLike, UniformType, UniformAttribute } from './types';
 
 import { getUniformArrayType, getUniformDims, getUniformAlign, toCPUDims, toGPUDims } from './uniform';
 import { isTypedArray } from './buffer';
@@ -25,6 +25,27 @@ export const makeDataArray = (type: UniformType, length: number) => {
   return {array, dims};
 };
 
+export const makeTensorArray = (type: UniformType, lengthOrData: number | VectorLike, size?: number[]): TensorArray => {
+  const ctor  = getUniformArrayType(type);
+  const dims  = getUniformDims(type);
+  const align = getUniformAlign(type);
+
+  const d = toCPUDims(dims);
+
+  let length = 0;
+  if (typeof lengthOrData === 'number') {
+    length = lengthOrData;
+
+    const n = length * d;
+    const array = new ctor(n);
+    return {array, dims: d, length, size: size ?? [length], format: type};
+  }
+  else {
+    length = (lengthOrData.length / dims)|0;
+    return {array: lengthOrData, dims: d, length, size: size ?? [length], format: type};
+  }
+};
+
 export const castRawArray = (buffer: ArrayBuffer | TypedArray, type: UniformType) => {
   const ctor = getUniformArrayType(type);
   const dims = getUniformDims(type);
@@ -49,7 +70,7 @@ export const makeCopyPipe = ({
   toDims: number = fromDims,
   fromIndex: number = 0,
   toIndex: number = 0,
-  count: number = 0,
+  count?: number,
   stride?: number,
 ) => {
 

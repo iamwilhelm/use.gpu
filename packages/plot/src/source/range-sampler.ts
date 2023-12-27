@@ -1,30 +1,36 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { DataBounds, TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
 
-import { provide, yeet, signal, useOne, useMemo, useNoMemo, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
+import { provide, yeet, signal, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
-  makeAggregateBuffer, copyNumberArray, emitIntoMultiNumberArray, uploadStorage,
+  makeTensorArray, emitIntoMultiNumberArray, updateTensor,
   getBoundingBox, toDataBounds,
   toCPUDims, toGPUDims,
 } from '@use-gpu/core';
+import { parseAxis } from '@use-gpu/parse';
+import {
+  useTimeContext, useNoTimeContext,
+  useAnimationFrame, useNoAnimationFrame,
+  useBufferedSize, getRenderFunc,
+} from '@use-gpu/workbench';
+import { useRangeContext, useNoRangeContext } from '../providers/range-provider';
+import { useDataContext, DataContext } from '../providers/data-provider';
 
-import { DeviceContext } from '../providers/device-provider';
-import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
-import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
-import { useBufferedSize } from '../hooks/useBufferedSize';
-import { useRenderProp } from '../hooks/useRenderProp';
-
-export type SampledDataProps = {
+export type RangeSamplerProps = {
   /** Sample count up to [width, height, depth, layers] */
   size: number[],
+  /** Axis to sample on (1D) */
+  axis?: string,
+  /** Axes to sample on (2D+) */
+  axes?: string,
 
   /** WGSL type per sample */
   format?: string,
 
   /** Input emitter expression */
   expr?: Emitter,
-  /** Input range to sample on each axis */
-  range: [number, number][],
+  /** Input range to sample on each axis. Use RangeContext if omitted. */
+  range?: [number, number][],
   /** Extra padding samples to add outside the input range. */
   padding?: number,
   /** Emit N items per `expr` call. Output size is `[items, ...size]` if > 1. */
@@ -48,15 +54,15 @@ export type SampledDataProps = {
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Up-to-4D array of a WGSL type. Samples a given `expr` on the given `range`. */
-export const SampledData: LiveComponent<SampledDataProps> = (props) => {
-  const device = useContext(DeviceContext);
-
+export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
   const {
-    range,
+    axis,
+    axes = 'xyzw',
     format,
     size,
     expr,
-    items = 1,
+    children,
+    as = 'positions',
     padding = 0,
     sparse = false,
     centered = false,
@@ -65,18 +71,27 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     time = false,
   } = props;
 
-  const t = Math.max(1, Math.round(items) || 0);
+  const parentRange = props.range ? (useNoRangeContext(), props.range) : useRangeContext();
+  const items = Math.max(1, Math.round(props.items) || 0);
+
+  const a = axis ?? axes;
+  const range = useMemo(() => {
+    const basis = a.split('').map(parseAxis);
+    return basis.map(i => parentRange[i]);
+  }, [parentRange, a]);
+
   const padded = size.map(n => n + padding * 2);
-  const length = t * (padded.length ? padded.reduce((a, b) => a * b, 1) : 1);
+  const length = items * padded.reduce((a, b) => a * b, 1);
   const alloc = useBufferedSize(length);
 
-  // Make data buffer
-  const {buffer, array, source, dims} = useMemo(() => makeAggregateBuffer(device, format, alloc), [device, format, alloc]);
+  // Make tensor array
+  const tensor = useMemo(() => makeTensorArray(format, alloc, size), [format, alloc, size]);
 
   const clock = time ? useTimeContext() : useNoTimeContext();
 
   // Refresh and upload data
   const refresh = () => {
+    const {array, dims} = tensor;
     let emitted = 0;
 
     if (expr && size.length) {
@@ -234,24 +249,27 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     }
 
     const l = !sparse ? length : emitted;
-    const s = !sparse ? (items > 1 ? [items, ...padded] : padded) : [items, emitted / items];
+    const s = !sparse ? (items > 1 ? [items, ...padded] : padded) : (items > 1  ? [items, emitted / items] : [emitter / items]);
+    updateTensor(tensor, l, s);
 
-    uploadStorage(device, source, array.buffer, l, s);
-
-    source.bounds = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
+    return {...tensor};
   };
 
+  let value;
   if (!live) {
     useNoAnimationFrame();
-    useMemo(refresh, [device, buffer, array, expr, dims, length, items, range]);
+    value = useMemo(refresh, [tensor, expr, items, range]);
   }
   else {
     useAnimationFrame();
     useNoMemo();
-    refresh();
+    value = refresh();
   }
 
-  const trigger = useOne(() => signal(), source.version);
-  const view = useRenderProp(props, source);
-  return [trigger, view];
+  const render = getRenderFunc(props);
+
+  const dataContext = useDataContext();
+  const context = !render && children ? useMemo(() => ({...dataContext, [as]: value}), [dataContext, value, as]) : useNoMemo();
+
+  return render ? render(tensor) : children ? provide(DataContext, context, children) : yeet(tensor);
 };

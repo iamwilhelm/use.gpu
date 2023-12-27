@@ -17,14 +17,20 @@ export type LayerAggregator = {
 
 export type BaseAggregate = {
   archetype: number,
-  count: number,
-  indices?: number,
-};
-
-export type ShapeAggregate = BaseAggregate & {
   transform?: TransformContextProps,
   material?: MaterialContextProps,
   zIndex?: number,
+};
+
+export type ElementAggregate = BaseAggregate & {
+  element: LiveElement,
+};
+
+export type ShapeAggregate = BaseAggregate & {
+  count: number,
+  indexed?: number,
+  instanced?: number,
+  slices?: number[],
 };
 
 export type PointAggregate = ShapeAggregate & {
@@ -126,14 +132,10 @@ export type FaceAggregate = ShapeAggregate & {
   },
 };
 
-export type ElementAggregate = BaseAggregate & {
-  element: LiveElement,
-};
-
 export type LayerAggregate = {
+  element: ElementAggregate | ElementAggregrate[],
   point: PointAggregate | PointAggregate[],
   line: LineAggregate | LineAggregate[],
   arrow: ArrowAggregate | ArrowAggregate[],
   face: FaceAggregate | FaceAggregate[],
-  element: ElementAggregate | ElementAggregrate[],
 };

@@ -1,15 +1,15 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TypedArray, StorageSource, UniformType, VectorLike, DataSchema, DataBounds } from '@use-gpu/core';
 
-import { DeviceContext } from '../providers/device-provider';
+import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
 import { useStructSources } from '../hooks/useStructSources';
-import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
+import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, incrementVersion } from '@use-gpu/live';
 import {
   makePackedLayout,
-  makeDataArray,
+  makeDataArray, normalizeSchema,
   makeStorageBuffer, uploadStorage, UNIFORM_ARRAY_DIMS,
   getBoundingBox, toDataBounds,
   isUniformArrayType,
@@ -33,14 +33,15 @@ const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Use a flat, packed array with interleaved fields `T` without any struct alignment/padding. */
 export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
-  const device = useContext(DeviceContext);
+  const device = useDeviceContext();
 
   const {
     data,
-    schema,
+    schema: propSchema,
     live = false,
   } = props;
 
+  const schema = useOne(() => normalizeSchema(propSchema), propSchema);
   const typedArray = useOne(() => Array.isArray(data) ? new Float32Array(data) : data ?? new Float32Array(256), data);
 
   const uniforms = useMemo(

@@ -127,7 +127,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const n = useShaderRef(attr.normal, attr.normals);
   const t = useShaderRef(attr.tangent, attr.tangents);
   const u = useShaderRef(attr.uv, attr.uvs);
-  const s = useShaderRef(attr.st, attr.sts);
+  const s = useShaderRef(attr.st, attr.sts ?? attr.positions);
   const g = useShaderRef(attr.segment, attr.segments);
   const c = useShaderRef(attr.color, attr.colors);
   const z = useShaderRef(attr.zBias, attr.zBiases);
@@ -136,9 +136,6 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
   const {transform: xf, differential: xd, bounds: getBounds} = useCombinedTransform();
   const scissor = useScissorContext();
-
-  const ps = p ? useSource(POSITION, p) : useNoSource();
-  const ss = attr.sts == null ? ps : attr.sts;
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (attr.positions as any)?.bounds) {
@@ -152,7 +149,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const material = useMaterialContext()[renderer];
   const boundVertex = useShader(getFaceVertex, [
     xf, xd, scissor,
-    ps, n, t, u, ss, g, c, z,
+    p, n, t, u, s, g, c, z,
     i,
   ]);
   const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, attr.instance, attr.instances, instanceCount, getInstancedFaceIndex);

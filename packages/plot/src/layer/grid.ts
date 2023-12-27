@@ -30,6 +30,7 @@ import {
   LineTrait,
   ROPTrait,
   ScaleTrait,
+  ZIndexTrait,
 } from '../traits';
 
 const Traits = combine(
@@ -37,6 +38,7 @@ const Traits = combine(
   GridTrait,
   LineTrait,
   ROPTrait,
+  ZIndexTrait,
   trait({
     origin: parseVec4,
     auto: optional(parseBoolean),
@@ -61,6 +63,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const {
     axes, range, loop,
     origin, auto,
+    zIndex,
     ...flags
   } = useTraits(props);
 
@@ -164,9 +167,10 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   ], id);
 
   return yeet({
-    layer: {
+    element: {
       transform,
       element: view,
+      zIndex,
     },
   });
 };

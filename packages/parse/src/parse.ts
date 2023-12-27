@@ -25,6 +25,7 @@ const NO_RANGE = vec2.fromValues(-1, 1);
 const NO_RANGES = [NO_RANGE, NO_RANGE, NO_RANGE, NO_RANGE];
 
 const AXIS_NUMBERS = {'x': 0, 'y': 1, 'z': 2, 'w': 3} as Record<string, number>;
+const AXIS_LETTERS = Object.keys(AXIS_NUMBERS);
 
 const u4ToFloat = (s: string) => parseInt(s, 16) / 15;
 const u8ToFloat = (s: string) => parseInt(s, 16) / 255;
@@ -164,24 +165,24 @@ export const makeParseMultiMultiVectorArray = <T extends TypedArrayConstructor>(
   return (toMultiMultiVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as T;
 };
 
-export const makeParseBasis = (defaults: string) => {
-  const axes = defaults.split('');
-  const order = seq(axes.length);
+export const makeParseBasis = (defaults: string | number[], min: number = defaults.length) => {
+  const parseLetters = (s: string) => s.split('').map(letter => AXIS_NUMBERS[letter]);
 
-  const getOrder = (s: string) => {
+  const getOrder = (basis: number[]) => {
     // Fill out incomplete basis, e.g. 'yx' -> 'yxzw'
-    order.sort((a, b) => {
-      const ai = s.indexOf(axes[a]);
-      const bi = s.indexOf(axes[b]);
-      if (ai >= 0 && bi >= 0) return ai - bi;
-      if (ai < 0 && bi < 0) return a - b;
-      return (ai < 0) ? 1 : -1;
-    });
-    return order.map(x => axes[x]).join('');
+    const max = Math.max(min, basis.reduce((a, b) => Math.max(a, b), 0));
+    const rest = [];
+    if (basis.length < max) for (let i = 0; i < max; ++i) {
+      if (!basis.includes(i)) rest.push(i);
+    }
+    return [...basis, ...rest].map(i => AXIS_LETTERS[i]).join('');
   };
 
-  return (s?: string) => {
-    if (s != null) return getOrder(s);
+  return (s?: string | number[]) => {
+    if (s != null) {
+      if (typeof s === 'string') return getOrder(s.split('').map(letter => AXIS_NUMBERS[letter]).filter(n => n != null));
+      return getOrder(s);
+    }
     return defaults;
   };
 };

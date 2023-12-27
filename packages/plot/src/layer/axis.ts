@@ -58,8 +58,6 @@ export const Axis: LiveComponent<AxisProps> = memo((props) => {
     ...flags
   } = parsed;
 
-  console.log('axis', {parsed, flags})
-
   const p = useProp(origin, parseVec4);
   const d = useProp(detail, parseIntegerPositive);
 

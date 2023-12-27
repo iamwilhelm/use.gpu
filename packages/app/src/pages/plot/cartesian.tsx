@@ -14,13 +14,16 @@ import {
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
+import { InfoBox } from '../../ui/info-box';
+
 let t = 0;
 
 const BACKGROUND = [0, 0, 0.09, 1];
 
 export const PlotCartesianPage: LC = () => {
 
-  return (
+  return (<>
+    <InfoBox>Plot a sampled surface in an animated viewport.</InfoBox>
     <Loop>
       <LinearRGB backgroundColor={BACKGROUND} tonemap="aces" gain={2}>
         <Cursor cursor="move" />
@@ -56,6 +59,7 @@ export const PlotCartesianPage: LC = () => {
                     second={{ detail: 3, divide: 5 }}
                     depth={0.5}
                     zBias={-1}
+                    auto
                   />
                   <Grid
                     axes='yz'
@@ -72,6 +76,7 @@ export const PlotCartesianPage: LC = () => {
                     width={5}
                     color={[0.75, 0.75, 0.75, 1]}
                     depth={0.5}
+                    end
                   />
                   <Scale
                     divide={5}
@@ -108,6 +113,7 @@ export const PlotCartesianPage: LC = () => {
                     color={[0.75, 0.75, 0.75, 1]}
                     detail={8}
                     depth={0.5}
+                    end
                   />
                   <Axis
                     axis='z'
@@ -115,6 +121,7 @@ export const PlotCartesianPage: LC = () => {
                     color={[0.75, 0.75, 0.75, 1]}
                     detail={8}
                     depth={0.5}
+                    end
                   />
                   <Sampled
                     axes='zx'
@@ -150,7 +157,7 @@ export const PlotCartesianPage: LC = () => {
         </Camera>
       </LinearRGB>
     </Loop>
-  );
+  </>);
 }
 
 const Camera = ({children}: PropsWithChildren<object>) => (

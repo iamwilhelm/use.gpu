@@ -211,7 +211,7 @@ export const ScaleTrait = trait(
     unit: 1,
     base: 10,
     start: true,
-    end: false,
+    end: true,
     zero: true,
     factor: 1,
     nice: true,

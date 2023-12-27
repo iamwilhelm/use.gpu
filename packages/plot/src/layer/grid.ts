@@ -21,7 +21,7 @@ import { vec4 } from 'gl-matrix';
 import { logarithmic, linear } from '../util/domain';
 
 import { getGridPosition } from '@use-gpu/wgsl/plot/grid.wgsl';
-import { getGridAutoPosition } from '@use-gpu/wgsl/plot/grid-auto.wgsl';
+import { getGridAutoState } from '@use-gpu/wgsl/plot/grid-auto.wgsl';
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 
 import {
@@ -74,7 +74,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const origin = useProp(props.origin, parseVec4);
 
   const parentRange = useRangeContext();
-  const transform = useTransformContext().transform;
+  const transform = useTransformContext();
 
   const getGrid = (options: ScaleTrait, detail: number, index: number, other: number) => {
     const main  = parseAxis(axes[index]);
@@ -93,31 +93,25 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     const n = values.length * (detail + 1);
 
     const orig = vec4.clone(origin);
+    const shift = vec4.clone(NO_POINT4);
 
     let autoBound: ShaderModule | null = null;
     if (auto) {
-      const autoBase = useShaderRef(NO_POINT4.slice());
-      const autoShift = useShaderRef(NO_POINT4.slice());
-
       orig.forEach((_, i) => {
         // Pin to minimum
         orig[i] = parentRange[i][0];
 
         if (i === main || i === cross) {
-          autoBase.current[i] = (parentRange[i][0] + parentRange[i][1]) / 2;
-          autoShift.current[i] = 0;
+          shift[i] = 0;
         }
         else {
-          autoBase.current[i] = orig[i];
-          autoShift.current[i] = parentRange[i][1] - parentRange[i][0];
+          shift[i] = parentRange[i][1] - parentRange[i][0];
         }
       });
 
-      //autoBound = useShader(getGridAutoPosition, [xform, autoBase, autoShift]);
+      autoBound = useShader(getGridAutoState, [transform.transform]);
     }
     else {
-      useNoShaderRef();
-      useNoShaderRef();
       useNoShader();
     }
 
@@ -129,20 +123,19 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     max[main] = 0;
     max[cross] = r2[1];
 
-    const a = useShaderRef(main);
+    const m = useShaderRef(main);
     const m1 = useShaderRef(min);
     const m2 = useShaderRef(max);
+    const s = useShaderRef(shift);
 
-    const defines = useOne(() => ({ LINE_DETAIL: detail }), detail);
-    const bound = useShader(getGridPosition, [data, a, m1, m2], defines);
+    const defines = useOne(() => ({ LINE_DETAIL: detail, GRID_AUTO: !!auto }), detail);
+    const bound = useShader(getGridPosition, [data, m, m1, m2, s, autoBound], defines);
 
     // Expose position source
     const source = useMemo(() => ({
       shader: bound,
-      alloc: (data as any).alloc,
       length: n,
       size: [n],
-      version: 0,
     }), [bound]);
 
     source.length = n;
@@ -160,11 +153,13 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const {id} = useFiber();
   const view = fragment([
     props.first !== null ? use(LineLayer, {
+      count: () => firstPositions.length * (auto ? 2 : 1),
       positions: firstPositions,
       segments: getLineSegment,
       ...flags,
     }) : null,
     props.second !== null ? use(LineLayer, {
+      count: () => secondPositions.length * (auto ? 2 : 1),
       positions: secondPositions,
       segments: getLineSegment,
       ...flags,

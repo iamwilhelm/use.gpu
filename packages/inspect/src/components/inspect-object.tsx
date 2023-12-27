@@ -46,22 +46,28 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
   if (seen.has(object)) return <span>{`{Repeated}`}</span>;
   seen.add(object);
 
+  let extra = false;
+  let keys;
+
   if (Array.isArray(object)) {
     let n = object.length;
     if (n > 100) {
       object = object.slice(0, 100);
+      extra = true;
     }
     if (object.reduce((b: boolean, o: any) => b && typeof o === 'number', true)) {
-      return <span>{`[${object.join(', ')}${n > 100 ? '…' : ''}]`}</span>;
+      return <span>{`[${object.join(', ')}${extra ? '…' : ''}]`}</span>;
     }
-    if (n > 100) object.push('…');
   }
 
   if (object?.constructor?.name?.match(/Array/)) {
+    if (object.byteLength != null) {
+      object = new Uint8Array(object.slice(0, 100));
+      extra = object.byteLength > 100;
+    }
     if (object.length > 100) {
       object = object.slice(0, 100);
-      object = Array.from(object);
-      object.push('…');
+      extra = true;
     }
   }
 
@@ -80,7 +86,8 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
     object = o;
   }
 
-  const fields = Object.keys(object).map((k: string) => {
+  keys = keys ?? Object.keys(object);
+  const fields = keys.map((k: string) => {
     const key = path +'/'+ k;
     const code = (typeof object[k] === 'string' && object[k].length > 80 && object[k].match(/\n/));
     const expandable = (typeof object[k] === 'object' && object[k]) || code;

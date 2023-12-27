@@ -7,12 +7,12 @@ import React, { memo, useMemo, useLayoutEffect, useRef, PropsWithChildren } from
 import { usePingTracker, usePingContext } from '../providers/ping-provider';
 import { Node } from './node';
 import { ReactNode } from './react-node';
-import { ExpandState, SelectState, HoverState, Action } from './types';
+import { ExpandState, SelectState, HoverState, FocusState, Action } from './types';
 
-import { TreeWrapper, TreeWrapperWithLegend, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeLegendGroup, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
+import { TreeWrapper, TreeWrapperWithLegend, TreeBanner, TreeTip, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeLegendColumns, TreeLegendGroup, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted, InlineButton } from './layout';
 import { Expandable } from './expandable';
 
-import { IconItem, SVGChevronDown, SVGChevronRight, SVGNextOpen, SVGNextClosed, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard, SVGViewOutput } from './svg';
+import { IconItem, SVGChevronDown, SVGChevronLeft, SVGChevronRight, SVGNextOpen, SVGNextClosed, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard, SVGViewOutput } from './svg';
 
 type FiberTreeProps = {
   fiber: LiveFiber<any>,
@@ -25,7 +25,12 @@ type FiberTreeProps = {
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
+  focusCursor: Cursor<FocusState>,
 }
+
+type FiberNavProps = {
+  focusCursor: Cursor<FocusState>,
+};
 
 type FiberNodeProps = {
   fiber: LiveFiber<any>,
@@ -34,8 +39,10 @@ type FiberNodeProps = {
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
+  focusCursor: Cursor<FocusState>,
   indent?: number,
   skipDepth?: number,
+  focusDepth?: number,
   renderDepth?: number,
   depthLimit?: number,
   runCounts?: boolean,
@@ -73,6 +80,19 @@ const getRenderDepth = (fibers: Map<number, LiveFiber<any>>, fiber: LiveFiber<an
   return renderDepth;
 };
 
+export const FiberNav: React.FC<FiberNavProps> = (props: FiberNavProps) => {
+  const {focusCursor} = props;
+  const [focusState, updateFocusState] = focusCursor();
+  const back = focusState ? (
+    <TreeBanner>
+      <InlineButton className="icon-left" onClick={() => updateFocusState(null)}>
+        <IconItem top={0}><SVGChevronLeft /></IconItem> Back to root
+      </InlineButton>
+    </TreeBanner>
+  ) : null;
+  return back;
+};
+
 // Legend at bottom of fiber tree
 export const FiberLegend: React.FC = () => {
   const makeFiber = (name: string) => {
@@ -86,80 +106,83 @@ export const FiberLegend: React.FC = () => {
 
   return (<>
     <TreeLegend><div>
-      <TreeLegendGroup>
-        <TreeLegendItem>
-          <Node
-            fiber={fiber}
-            staticMount={true}
-          />
-          <span>Mounted</span>
-        </TreeLegendItem>
-        <TreeLegendItem>
-          <Node
-            fiber={fiber}
-            staticPing={true}
-          />
-          <span>Updated</span>
-        </TreeLegendItem>
-        <TreeLegendItem>
-          <Node
-            fiber={fiber}
-            hovered={0}
-          />
-          <span>Rendered By</span>
-        </TreeLegendItem>
-      </TreeLegendGroup>
+      <TreeLegendColumns>
+        <TreeLegendGroup>
+          <TreeLegendItem>
+            <Node
+              fiber={fiber}
+              staticMount={true}
+            />
+            <span>Mounted</span>
+          </TreeLegendItem>
+          <TreeLegendItem>
+            <Node
+              fiber={fiber}
+              staticPing={true}
+            />
+            <span>Updated</span>
+          </TreeLegendItem>
+          <TreeLegendItem>
+            <Node
+              fiber={fiber}
+              hovered={0}
+            />
+            <span>Rendered By</span>
+          </TreeLegendItem>
+        </TreeLegendGroup>
 
-      <TreeLegendGroup>
-        <TreeLegendItem>
-          <Node
-            fiber={fiber}
-            depends={true}
-          />
-          <span>Dependency</span>
-        </TreeLegendItem>
-        <TreeLegendItem>
-          <Node
-            fiber={fiber}
-            quoted={true}
-          />
-          <span>Portal</span>
-        </TreeLegendItem>
-      </TreeLegendGroup>
+        <TreeLegendGroup>
+          <TreeLegendItem>
+            <Node
+              fiber={fiber}
+              depends={true}
+            />
+            <span>Dependency</span>
+          </TreeLegendItem>
+          <TreeLegendItem>
+            <Node
+              fiber={fiber}
+              quoted={true}
+            />
+            <span>Portal</span>
+          </TreeLegendItem>
+        </TreeLegendGroup>
 
-      <TreeLegendGroup>
-        <TreeLegendItem>
-          <IconItem gap={-5} top={-2}><SVGYeet /></IconItem>
-          <span>Yeet</span>
-        </TreeLegendItem>
+        <TreeLegendGroup>
+          <TreeLegendItem>
+            <IconItem gap={-5} top={-2}><SVGYeet /></IconItem>
+            <span>Yeet</span>
+          </TreeLegendItem>
 
-        <TreeLegendItem>
-          <IconItem gap={-5} top={-2}><SVGQuote /></IconItem>
-          <span>Quote</span>
-        </TreeLegendItem>
+          <TreeLegendItem>
+            <IconItem gap={-5} top={-2}><SVGQuote /></IconItem>
+            <span>Quote</span>
+          </TreeLegendItem>
 
-        <TreeLegendItem>
-          <IconItem gap={-5} top={-2}><SVGHighlightElement /></IconItem>
-          <span>Highlight</span>
-        </TreeLegendItem>
-      </TreeLegendGroup>
+          <TreeLegendItem>
+            <IconItem gap={-5} top={-2}><SVGHighlightElement /></IconItem>
+            <span>Highlight</span>
+          </TreeLegendItem>
+        </TreeLegendGroup>
 
-      <TreeLegendGroup>
-        <TreeLegendItem>
-          <IconItem gap={-5} top={-2}><SVGViewOutput /></IconItem>
-          <span>Output</span>
-        </TreeLegendItem>
+        <TreeLegendGroup>
+          <TreeLegendItem>
+            <IconItem gap={-5} top={-2}><SVGViewOutput /></IconItem>
+            <span>Output</span>
+          </TreeLegendItem>
 
-        <TreeLegendItem>
-          <IconItem gap={-5} top={-2}><SVGDashboard /></IconItem>
-          <span>Layout</span>
-        </TreeLegendItem>
+          <TreeLegendItem>
+            <IconItem gap={-5} top={-2}><SVGDashboard /></IconItem>
+            <span>Layout</span>
+          </TreeLegendItem>
 
-        <TreeLegendItem>
-          <IconItem gap={-5} top={-2}><SVGAtom /></IconItem>
-          <span>React</span>
-        </TreeLegendItem>
-      </TreeLegendGroup>
+          <TreeLegendItem>
+            <IconItem gap={-5} top={-2}><SVGAtom /></IconItem>
+            <span>React</span>
+          </TreeLegendItem>
+        </TreeLegendGroup>
+      </TreeLegendColumns>
+      <TreeTip><Muted>Double click to focus tree view</Muted></TreeTip>
     </div></TreeLegend>
   </>)
 };
@@ -176,20 +199,23 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   expandCursor,
   selectedCursor,
   hoveredCursor,
+  focusCursor,
 }) => {
   const {fibers} = usePingContext();
   const by = fibers.get(fiber.by);
+  const [focusedId] = focusCursor();
 
   const Wrap = legend ? TreeWrapperWithLegend : TreeWrapper;
 
-  return (<>
-    <Wrap>
+  return (
+    <Wrap style={{paddingTop: focusedId ? 0 : undefined}}>
       <FiberNode
         by={by}
         fiber={fiber}
         fibers={fibers}
         renderDepth={0}
         skipDepth={skipDepth}
+        focusDepth={0}
         depthLimit={depthLimit}
         runCounts={runCounts}
         builtins={builtins}
@@ -197,10 +223,11 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
+        focusCursor={focusCursor}
       />
       {(legend ?? true) ? <FiberLegend /> : null}
     </Wrap>
-  </>);
+  );
 }
 
 // One node in the tree
@@ -208,6 +235,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   by,
   fiber,
   fibers,
+  focusDepth = 0,
   skipDepth = 0,
   renderDepth = 0,
   depthLimit = Infinity,
@@ -217,6 +245,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   expandCursor,
   selectedCursor,
   hoveredCursor,
+  focusCursor,
   continuation,
   wide,
   indented = 1,
@@ -225,6 +254,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   let {id, mount, mounts, next, order, host, yeeted, __inspect} = fiber;
   const [selectState, updateSelectState] = selectedCursor();
   const [hoverState, updateHoverState] = hoveredCursor();
+  const [focusState, updateFocusState] = focusCursor();
 
   // Avoid jumpyness on hover
   const lockedWide = useMemo(() => (!mount && !mounts && !next), []);
@@ -252,12 +282,13 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   renderDepth = getRenderDepth(fibers, fiber) ?? renderDepth;
 
   // Resolve node omission
-  const shouldRender = !skipDepth && (renderDepth < depthLimit) && (builtins || !fiber.f?.isLiveBuiltin);
+  const isFocused = !!focusDepth || ((focusState != null) ? fiber.id === focusState : true);
+  const shouldRender = isFocused && !skipDepth && (renderDepth < depthLimit) && (builtins || !fiber.f?.isLiveBuiltin);
   const shouldAbsolute = !shouldRender && (parents || depends || precedes || quoted || unquoted);
   const shouldStartOpen = fiber.f !== DEBUG && !fiber.__inspect?.react;
 
   // Make click/hover handlers
-  const [select, hover, unhover] = useMemo(() => {
+  const [select, hover, unhover, focus] = useMemo(() => {
     const root = () => fiber.yeeted && fiber.type === YEET ? fiber.yeeted.root : null;
 
     const select  = () => updateSelectState({ $set: fiber });
@@ -277,7 +308,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       root: null,
       depth: 0,
     } });
-    return [select, hover, unhover];
+    const focus = (e: any) => { unhover({}); updateFocusState(fiber.id); e.stopPropagation(); };
+    return [select, hover, unhover, focus];
   }, [fiber, updateSelectState, updateHoverState]);
 
   const rowRef = useRef<HTMLDivElement>(null);
@@ -330,6 +362,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       depth={styleDepth}
       runCount={runCounts}
       onClick={select}
+      onDoubleClick={focus}
       onMouseEnter={hover}
       onMouseLeave={unhover}
       ref={rowRef}
@@ -346,6 +379,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         fiber={mount}
         fibers={fibers}
         skipDepth={skipDepth && (skipDepth - 1)}
+        focusDepth={isFocused ? focusDepth + 1 : 0}
         renderDepth={renderDepth}
         depthLimit={depthLimit}
         runCounts={runCounts}
@@ -354,6 +388,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
+        focusCursor={focusCursor}
         indent={indent}
         indented={+!!shouldRender}
         wide={!!next}
@@ -372,6 +407,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             fiber={sub}
             fibers={fibers}
             skipDepth={skipDepth && (skipDepth - 1)}
+            focusDepth={isFocused ? focusDepth + 1 : 0}
             renderDepth={renderDepth}
             depthLimit={depthLimit}
             runCounts={runCounts}
@@ -380,6 +416,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             expandCursor={expandCursor}
             selectedCursor={selectedCursor}
             hoveredCursor={hoveredCursor}
+            focusCursor={focusCursor}
             indent={indent}
             indented={+!!shouldRender}
             wide={order.length > 1 || !!next}
@@ -427,6 +464,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         fiber={next}
         fibers={fibers}
         skipDepth={skipDepth && (skipDepth - 1)}
+        focusDepth={isFocused ? focusDepth + 1 : 0}
         renderDepth={renderDepth}
         depthLimit={depthLimit}
         runCounts={runCounts}
@@ -435,6 +473,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
+        focusCursor={focusCursor}
         indented={0}
         wide={true}
         indent={indent}

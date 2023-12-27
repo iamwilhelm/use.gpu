@@ -1,5 +1,5 @@
 import type { LiveFiber } from '@use-gpu/live';
-import type { ExpandState, SelectState, HoverState, OptionState, PingState, InspectAppearance } from './types';
+import type { ExpandState, SelectState, HoverState, OptionState, FocusState, PingState, InspectAppearance } from './types';
 
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
 import { useUpdateState, useCursor } from '@use-gpu/state/react';
@@ -12,7 +12,7 @@ import { PingProvider, usePingContext } from '../providers/ping-provider';
 import { useAppearance } from '../providers/appearance-provider';
 
 import { Node } from './node';
-import { FiberTree } from './fiber';
+import { FiberTree, FiberNav } from './fiber';
 import { Options } from './options';
 import { Panels } from './panels';
 import { Resizer } from './resizer';
@@ -79,6 +79,7 @@ export const Inspect: React.FC<InspectProps> = ({
   const hoveredCursor = useCursor(useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
   })));
+  const focusCursor = useCursor(useUpdateState<FocusState>(null));
 
   let [selectedFiber, updateSelected] = selectedCursor();
   const [depthLimit] = optionCursor.depth();
@@ -91,6 +92,7 @@ export const Inspect: React.FC<InspectProps> = ({
   const [splitBottom, setSplitBottom] = optionCursor.splitBottom();
   const [inspect, updateInspect] = optionCursor.inspect();
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor();
+  const [focusedId, updateFocused] = focusCursor();
 
   if (!select) selectedCursor()[1] = updateSelected = NOP;
 
@@ -132,7 +134,8 @@ export const Inspect: React.FC<InspectProps> = ({
           <Options cursor={optionCursor} toggleInspect={onInspect && toggleInspect} />
         </TreeControls>
       ) : null}
-      <TreeView onClick={() => updateSelected(null)}>
+      <FiberNav focusCursor={focusCursor} />
+      <TreeView key={focusedId} onClick={() => updateSelected(null)} onDoubleClick={() => updateFocused(null)}>
         <FiberTree
           fiber={fiber}
           legend={legend}
@@ -144,6 +147,7 @@ export const Inspect: React.FC<InspectProps> = ({
           expandCursor={expandCursor}
           selectedCursor={selectedCursor}
           hoveredCursor={hoveredCursor}
+          focusCursor={focusCursor}
         />
       </TreeView>
     </InsetColumnFull>

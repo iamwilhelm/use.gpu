@@ -44,6 +44,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   ooo,
   runCount,
   onClick,
+  onDoubleClick,
   onMouseEnter,
   onMouseLeave,
 }, ref) => {
@@ -86,9 +87,9 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   const className = classes.join(' ');
 
   const handleClick = useCallback((e: any) => {
+    onClick && onClick(e);
     e.stopPropagation();
     e.preventDefault();
-    onClick && onClick(e);
   }, [onClick]);
 
   const name = formatNodeName(fiber);
@@ -99,6 +100,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
       ref={ref}
       className={"fiber-tree-node " + className}
       onClick={handleClick}
+      onDoubleClick={onDoubleClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >

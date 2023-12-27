@@ -4,6 +4,7 @@ import type { LiveFiber } from '@use-gpu/live';
 export type ExpandState = Record<string | number, boolean>;
 export type PingState = Record<number, number>;
 export type SelectState = LiveFiber<any> | null;
+export type FocusState = number | null;
 export type HoverState = {
   fiber: LiveFiber<any> | null,
   by: LiveFiber<any> | null,

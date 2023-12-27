@@ -3,6 +3,8 @@ import { reactInterop } from './fiber';
 
 const {prototype: {hasOwnProperty}} = Object;
 
+const ARRAY_OR_BUFFER = /Array$|^ArrayBuffer$/;
+
 export type LoggingOptions = {
   tick: boolean,
   dispatch: boolean,
@@ -182,27 +184,30 @@ export const formatNode = <F extends Function>(_node: LiveElement<F>): string =>
   return `<${name}${args ? args.join(' ') : ''}>`;
 }
 
+export const formatArrayLike = (x: any, seen: WeakMap<object, boolean> = new WeakMap()) => {
+  if (x.byteLength != null) x = new Uint8Array(x.slice(0, 100));
+
+  const out = [];
+  const length = x.length ?? 0;
+  const n = Math.min(length, 100);
+  for (let i = 0; i < n; ++i) {
+    out.push(`${formatShortValue(x[i], seen)}`);
+  }
+  if (length > 100) out.push('…');
+  return '[' + out.join(', ') + ']';
+};
+
 export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()): string => {
   if (!x) return '' + x;
-  if (Array.isArray(x) || x?.constructor?.name?.match(/Array/)) {
+  if (Array.isArray(x) || x?.constructor?.name?.match(ARRAY_OR_BUFFER)) {
     if (seen.get(x)) return '[Repeated]';
     seen.set(x, true);
 
-    const out = [];
-    let n = Math.min(x.length, 100);
-    for (let i = 0; i < n; ++i) {
-      out.push(`${formatShortValue(x[i], seen)}`);
-    }
-    if (x.length > 100) out.push('…');
-    return '[' + out.join(', ') + ']';
+    return formatArrayLike(x, seen);
   }
   if (typeof x === 'object') {
     if (seen.get(x)) return '[Repeated]';
     seen.set(x, true);
-
-    if (x.constructor.name.match(/Array/)) {
-      if (x.length > 100) x = x.slice(0, 100);
-    }
 
     const signature = Object.keys(x).join('/');
     if (signature === 'f/args/key/by' || signature === 'f/arg/key/by') return formatNode(x);
@@ -221,13 +226,8 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
 
 export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()): string => {
   if (!x) return '' + x;
-  if (Array.isArray(x) || x?.constructor?.name?.match(/Array/)) {
-    let extra = '';
-    if (x.length > 100) {
-      x = x.slice(0, 100);
-      extra = ', …';
-    }
-    return '[' + x.map((x: any) => formatShortValue(x, seen)).join(', ') + extra + ']';
+  if (Array.isArray(x) || x?.constructor?.name?.match(ARRAY_OR_BUFFER)) {
+    return formatArrayLike(x, seen);
   }
   if (typeof x === 'boolean') return x ? 'true' : 'false';
   if (typeof x === 'number') return formatNumber(x, 5);
@@ -239,7 +239,7 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
     return body != null ? name + truncate(body.replace(/\s+/g, ' '), 40) : name;
   }
   if (typeof x === 'object') {
-    if (x.constructor.name.match(/Array/)) {
+    if (x.constructor.name.match(ARRAY_OR_BUFFER)) {
       if (x.length > 100) x = x.slice(0, 100);
     }
 
@@ -261,4 +261,4 @@ const truncate = (s: string, n: number) => {
   s = s.replace(/\s+/g, ' ');
   if (s.length < n) return s;
   return s.slice(0, n) + '…';
-}
+};

@@ -57,7 +57,7 @@ const ARROW_ASPECT: f32 = 2.5;
     u = getViewVector(startPos.xyz);
   }
   else {
-    u = select(vec3<f32>(1.0, 0.0, 0.0), vec3<f32>(0.0, 0.0, 1.0), abs(t.z) > 0.5);
+    u = select(vec3<f32>(1.0, 0.0, 0.0), vec3<f32>(0.0, 0.0, 1.0), abs(t.z) < 0.5);
   }
 
   let n = normalize(cross(t, u));

@@ -21,6 +21,8 @@ import {
   getUniformDims,
   isUniformArrayType,
   getUniformElementType,
+  toCPUDims,
+  toGPUDims,
 } from './uniform';
 
 type Item = Record<string, any>;
@@ -84,7 +86,7 @@ export const schemaToEmitters = (
       if (isArray) {
         if (!(unwelded || index) && unwelds) {
           // Unweld welded attribute
-          attributes[key] = makeUnweldEmitter(values, unwelds, dims);
+          attributes[key] = makeUnweldEmitter(values, unwelds, toCPUDims(dims), toGPUDims(dims));
         }
         else {
           // Direct attribute
@@ -94,7 +96,7 @@ export const schemaToEmitters = (
       else {
         // Single per slice
         if (spread && values.length > dims) {
-          attributes[spread] = makeSpreadEmitter(values, slices, dims);
+          attributes[spread] = makeSpreadEmitter(values, slices, toCPUDims(dims), toGPUDims(dims));
         }
         // Single per item
         else {

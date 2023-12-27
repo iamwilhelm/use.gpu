@@ -140,7 +140,6 @@ export const updateAggregateBuffer = (
     } = item;
 
     const c = single ? instanced : unwelded ? indexed : count;
-    //if (key === 'color') debugger;
 
     if (typeof values === 'function') values(array, b, c, stride);
     else if (offsets && offsets !== true) offsetNumberArray(values, array, offsets[i], dimsIn, dimsOut, 0, b, c, stride);

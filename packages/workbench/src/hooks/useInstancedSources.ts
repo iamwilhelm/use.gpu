@@ -5,6 +5,7 @@ import { chainTo, instanceWith, bindEntryPoint } from '@use-gpu/shader/wgsl';
 import { getShader } from './useShader';
 import { getSource } from './useSource';
 import { getStructAggregate } from './useStructSources';
+import { getLambdaSource } from './useLambdaSource';
 
 const NO_AGGREGATE: Record<string, StorageSource> = {};
 const INDEX = {name: 'instances', format: 'u32'};
@@ -31,7 +32,7 @@ export const getInstancedSources = (
 
   const sources = {};
   for (const {name} of uniforms) {
-    sources[name] = bindEntryPoint(instances, name);
+    sources[name] = getLambdaSource(bindEntryPoint(instances, name), index);
   };
 
   return [sources, instances];

@@ -2,7 +2,7 @@ import type { LC, LiveElement } from '@use-gpu/live';
 import type { TypedArray, UniformAttribute } from '@use-gpu/core';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
-import { unweldIndexedArray, getAggregateArchetype, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
+import { getUnweldedArray, formatToArchetype, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
 import { useMemo } from '@use-gpu/live';
 import { patch, $nop } from '@use-gpu/state';
 import { transformPositions, transformNormals } from '@use-gpu/workbench';
@@ -60,9 +60,9 @@ export const useGLTFGeometry = (
         // Unweld mesh
         const inds = arrays[indices] as any;
         if (inds) {
-          ps = unweldIndexedArray(ps as any, inds, 3);
-          ns = unweldIndexedArray(ns as any, inds, 3);
-          ts = unweldIndexedArray(ts as any, inds, 2);
+          ps = getUnweldedArray(ps as any, inds, 3);
+          ns = getUnweldedArray(ns as any, inds, 3);
+          ts = getUnweldedArray(ts as any, inds, 2);
         }
       }
 
@@ -80,7 +80,7 @@ export const useGLTFGeometry = (
       count: attributes.indices?.length ?? (attributes.positions.length / dims),
       attributes,
       formats,
-      archetype: getAggregateArchetype(formats, unwelded),
+      archetype: formatToArchetype(formats, unwelded),
       unwelded,
       side,
     };

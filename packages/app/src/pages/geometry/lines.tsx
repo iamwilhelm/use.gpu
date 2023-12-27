@@ -7,7 +7,7 @@ import { vec3 } from 'gl-matrix';
 import {
   Pass,
   Cursor,
-  Data2, getLineSegments, getArrowSegments,
+  CompositeData, getLineSegments, getArrowSegments,
   OrbitCamera, OrbitControls,
   LineLayer, ArrowLayer,
 } from '@use-gpu/workbench';
@@ -16,7 +16,7 @@ import { lineData, zigzagData, arrowData } from './line-data';
 
 // Line data fields
 
-const dataSchema = {
+const lineSchema = {
   // Use data[n].path as position
   positions: {format: 'array<vec3<f32>>', prop: 'path'},
   // Use data[n].color as color
@@ -35,41 +35,39 @@ export const GeometryLinesPage: LC = () => {
     <Camera>
       <Cursor cursor='move' />
       <Pass>
-        <Data2
-          schema={dataSchema}
+
+        <CompositeData
+          schema={lineSchema}
           data={lineData}
           loop={isLoop}
           segments={getLineSegments}
-          render={(props) =>
-            <LineLayer {...props} depth={0.5} />
-          }
-        />
+        >{
+          (props) => <LineLayer {...props} depth={0.5} />
+        }</CompositeData>
 
-        {/*
-        <Data2
-          schema={dataSchema}
+        <CompositeData
+          schema={lineSchema}
           data={zigzagData}
           segments={getLineSegments}
-          render={(props) =>
-            <LineLayer {...props} depth={0.5} join='round' />
-          }
-        />
+        >{
+          (props) => <LineLayer {...props} depth={0.5} join='round' />
+        }</CompositeData>
 
-        <Data2
-          schema={dataSchema}
+        <CompositeData
+          schema={lineSchema}
           data={arrowData}
           loop={isLoop}
           start={isStart}
           end={isEnd}
           segments={getArrowSegments}
-          render={(props) =>
+        >{
+          (props) =>
             <ArrowLayer
               {...props}
               depth={0.5}
             />
-          }
-        />
-        */}
+        }</CompositeData>
+
       </Pass>
     </Camera>
   );

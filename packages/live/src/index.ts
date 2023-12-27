@@ -17,7 +17,7 @@ export {
   useResource,
   useState,
   useVersion,
-  useYolo,
+  useHooks,
 
   useNoAwait,
   useNoFiber,
@@ -32,7 +32,7 @@ export {
   useNoResource,
   useNoState,
   useNoVersion,
-  useNoYolo,
+  useNoHooks,
 
   useRef,
   useNoRef,

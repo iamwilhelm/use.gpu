@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import { extend, useContext, useMemo, useNoMemo, useOne, useResource, useNoResource, useYolo } from '@use-gpu/live';
+import { extend, useContext, useMemo, useNoMemo, useOne, useResource, useNoResource, useHooks } from '@use-gpu/live';
 import { EventContext, MouseContext, MouseEventState } from '../providers/event-provider';
 
 export type PickState = {
@@ -136,7 +136,7 @@ export const Pick: LiveComponent<PickProps> = ({
 
   if (move && countRef.current === 1) return null; 
 
-  return useYolo(() =>
+  return useHooks(() =>
     render ? render({id, index, hovered, pressed, presses, clicks, x: px, y: py, moveX: dx, moveY: dy}) : (children ? extend(children, {id}) : null),
     [render, children, id, index, hovered, pressed, count, px, py, dx, dy]
   );

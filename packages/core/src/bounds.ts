@@ -196,7 +196,7 @@ export const extendBoundingBox = (box: DataBoundingBox, data: VectorLike, dims: 
 };
 
 export const toDataBounds = (box: DataBoundingBox): DataBounds => {
-  const [min, max] = box;
+  const {min, max} = box;
   const dims = min.length;
 
   if (dims === 1) {

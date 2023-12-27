@@ -3,7 +3,7 @@ import type { VectorLike } from '@use-gpu/core';
 
 import { useProp } from '@use-gpu/traits/live';
 import { parsePosition } from '@use-gpu/parse';
-import { useContext, useOne, useResource, useState, useYolo } from '@use-gpu/live';
+import { useContext, useOne, useResource, useState, useHooks } from '@use-gpu/live';
 import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { KeyboardContext, MouseContext, WheelContext } from '../providers/event-provider';
 import { LayoutContext } from '../providers/layout-provider';
@@ -132,6 +132,6 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     if (active) stop();
   }, wheel);
 
-  return useYolo(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);
+  return useHooks(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);
 };
 

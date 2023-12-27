@@ -33,9 +33,9 @@ const expandArrays = (schema: Record<string, CompactSchema>): ArchetypeSchema =>
   return out;
 };
 
-export const INSTANCE_SCHEMA = {
-  instances:  {format: 'array<u32>'},
-};
+export const INSTANCE_SCHEMA = expandArrays({
+  instances:  {format: 'u32'},
+});
 
 export const SHAPE_SCHEMA = expandArrays({
   ids:        {format: 'u32', single: 'id'},
@@ -59,43 +59,50 @@ export const POINT_SCHEMA = {
   }),
 };
 
+export const LINE_SEGMENTS_SCHEMA = expandArrays({
+  segments:  {format: 'i8', unwelded: true},
+});
+
 export const LINE_SCHEMA = {
   ...SHAPE_SCHEMA,
   ...MATRIX_SCHEMA,
+  ...LINE_SEGMENTS_SCHEMA,
   ...expandArrays({
     positions: {format: 'array<vec4<f32>>', single: 'position'},
     widths:    {format: 'f32', single: 'width'},
+  }),
+};
 
-    segments:  {format: 'i8', unwelded: true},
+export const ARROW_SEGMENTS_SCHEMA = {
+  ...LINE_SEGMENTS_SCHEMA,
+  ...expandArrays({
+    anchors:   {format: 'vec4<u32>', unwelded: true},
+    trims:     {format: 'vec4<u32>', unwelded: true},
   }),
 };
 
 export const ARROW_SCHEMA = {
   ...SHAPE_SCHEMA,
   ...MATRIX_SCHEMA,
+  ...ARROW_SEGMENTS_SCHEMA,
   ...expandArrays({
     positions: {format: 'array<vec4<f32>>', single: 'position'},
     widths:    {format: 'f32', single: 'width'},
     sizes:     {format: 'f32', single: 'size'},
-
-    segments:  {format: 'i8', unwelded: true},
-    anchors:   {format: 'vec4<u32>', unwelded: true},
-    trims:     {format: 'vec4<u32>', unwelded: true},
   }),
 };
+
+export const FACE_SEGMENTS_SCHEMA = expandArrays({
+  segments:  {format: 'i8', unwelded: true},
+  indices:   {format: 'u32', index: true},
+});
 
 export const FACE_SCHEMA = {
   ...SHAPE_SCHEMA,
   ...MATRIX_SCHEMA,
+  ...FACE_SEGMENTS_SCHEMA,
   ...expandArrays({
     positions: {format: 'array<vec4<f32>>', single: 'position'},
-    indices:   {format: 'u32', index: true},
-    segments:  {format: 'i8', unwelded: true},
   }),
 };
 
-export const SEGMENT_SCHEMA = {
-  segments:  {format: 'i8', unwelded: true},
-  anchors:   {format: 'vec4<u32>', unwelded: true},
-  trims:     {format: 'vec4<u32>', unwelded: true},
-};

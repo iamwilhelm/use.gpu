@@ -4,6 +4,7 @@ import type { StorageSource, VectorLike } from '@use-gpu/core';
 import { memo, yeet, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { accumulateChunks, generateChunkFaces, generateConcaveIndices, alignSizeTo } from '@use-gpu/core';
 import { useRawSource, useNoRawSource } from '../hooks/useRawSource';
+import { FACE_SEGMENTS_SCHEMA } from './schemas';
 
 export type FaceSegmentsData = {
   count: number,
@@ -41,7 +42,7 @@ export const getFaceSegmentsConcave = ({
 
   const indexed = generateConcaveIndices(indices, slices, chunks, groups, positions, dims);
 
-  return {count, indexed, indices, slices};
+  return {count, indexed, indices, slices, schema: FACE_SEGMENTS_SCHEMA};
 };
 
 export const useFaceSegmentsSource = (
@@ -68,7 +69,7 @@ export const useFaceSegmentsConcaveSource = (
   i.length = indexed;
   i.size[0] = indexed;
 
-  return {count, indexed, segments};
+  return {count, indexed, segments, schema: FACE_SEGMENTS_SCHEMA};
 };
 
 export const useNoFaceSegments = useNoOne;

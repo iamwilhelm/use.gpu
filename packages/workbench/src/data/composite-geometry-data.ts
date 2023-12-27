@@ -2,22 +2,23 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { GPUGeometry, DataField, StorageSource, CPUGeometry } from '@use-gpu/core';
 
-import { keyed, yeet, gather, useMemo, useOne, useYolo } from '@use-gpu/live';
+import { keyed, yeet, gather, useMemo, useOne, useHooks } from '@use-gpu/live';
 import { formatToArchetype } from '@use-gpu/core';
 import mapObject from 'lodash/zipObject';
 import groupBy from 'lodash/groupBy';
+import { useRenderProp } from '../hooks/useRenderProp';
 
 import { CompositeData } from './composite-data';
 
 export type CompositeGeometryDataProps = {
   data: CPUGeometry[],
   render?: (meshes: GPUGeometry[]) => LiveElement,
+  children?: (meshes: GPUGeometry[]) => LiveElement,
 };
 
 export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = (props: CompositeGeometryDataProps) => {
   const {
     data,
-    render,
   } = props;
 
   const partitions = useOne(
@@ -65,6 +66,6 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
       },
     })
   }), (meshes: GPUGeometry[]) => {
-    return useYolo(() => render ? render(meshes) : yeet(meshes), [render, meshes]);
+    return useRenderProp(props, meshes);
   });
 };

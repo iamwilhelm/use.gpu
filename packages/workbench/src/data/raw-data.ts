@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter, Time, DataBounds } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { provide, yeet, signal, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, useYolo, incrementVersion } from '@use-gpu/live';
+import { provide, yeet, signal, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, copyNumberArray, emitIntoNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
@@ -15,6 +15,7 @@ import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
+import { useRenderProp } from '../hooks/useRenderProp';
 import { useSource, useNoSource } from '../hooks/useSource';
 import { getShader } from '../hooks/useShader';
 
@@ -41,11 +42,9 @@ export type RawDataProps = {
   /** Add current `TimeContext` to the `expr` arguments. */
   time?: boolean,
 
-  /** Split output into 1 source per item. */
-  interleaved?: boolean,
-
   /** Leave empty to yeet source(s) instead. */
-  render?: (...source: ShaderSource[]) => LiveElement,
+  render?: (source: ShaderSource) => LiveElement,
+  children?: (source: ShaderSource) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
@@ -57,7 +56,6 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   const {
     format, length,
     data, expr,
-    render,
     items = 1,
     interleaved = false,
     sparse = false,
@@ -153,8 +151,6 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   }
 
   const trigger = useOne(() => signal(), source.version);
-  const view = sources
-    ? useYolo(() => render ? render(...sources!) : yeet(sources!), [render, sources])
-    : useYolo(() => render ? render(source) : yeet(source), [render, source]);
+  const view = useRenderProp(props, sources ?? source);
   return [trigger, view];
 };

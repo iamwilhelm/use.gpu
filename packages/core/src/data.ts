@@ -472,6 +472,21 @@ export const makeUnweldEmitter = (
   stride?: number,
 ) => unweldNumberArray(from, to, indices, fromDims, toDims, fromIndex, toIndex, count, stride);
 
+export const getUnweldedArray = (
+  from: VectorLike | number,
+  indices: TypedArray,
+  fromDims: number = 1,
+  toDims: number = fromDims,
+  fromIndex: number = 0,
+  toIndex: number = 0,
+  count?: number,
+  stride?: number,
+) => {
+  const ctor = from.constructor ?? Float32Array;
+  const to = new ctor(indices.length * toDims);
+  unweldNumberArray(from, to, indices, fromDims, toDims, fromIndex, toIndex, count, stride);
+  return to; 
+};
 
 export const makeExprEmitter = (to: VectorLike, dims: number): {
   emit: Emit,

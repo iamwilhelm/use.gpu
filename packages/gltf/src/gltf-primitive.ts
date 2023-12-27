@@ -2,7 +2,7 @@ import type { LC, LiveElement } from '@use-gpu/live';
 import type { UniformAttribute, DataBounds } from '@use-gpu/core';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
-import { unweldIndexedArray } from '@use-gpu/core';
+import { getUnweldedArray } from '@use-gpu/core';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { use, provide, useCallback, useOne, useNoOne, useMemo, useNoMemo, useVersion, useNoCallback, useNoVersion } from '@use-gpu/live';
 import { generateTangents } from 'mikktspace';
@@ -73,9 +73,9 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
         // Unweld mesh
         const inds = arrays[indices];
         if (inds) {
-          ps = unweldIndexedArray(ps as any, inds, 3);
-          ns = unweldIndexedArray(ns as any, inds, 3);
-          ts = unweldIndexedArray(ts as any, inds, 2);
+          ps = getUnweldedArray(ps as any, inds, 3);
+          ns = getUnweldedArray(ns as any, inds, 3);
+          ts = getUnweldedArray(ts as any, inds, 2);
         }
       }
 

@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, Lazy } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { yeet, useMemo, useYolo } from '@use-gpu/live';
+import { yeet, useMemo, useHooks } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useShaderRefs } from '../hooks/useShaderRef';
@@ -63,5 +63,5 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
     );
   }, [shader, args.length, source, sources]);
 
-  return useYolo(() => render ? render(getData) : yeet(getData), [render, getData]);
+  return useHooks(() => render ? render(getData) : yeet(getData), [render, getData]);
 };

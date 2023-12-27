@@ -103,7 +103,7 @@ export const memoArgs = <F extends ArrowFunction>(
     const deps = [fiber.version] as any[];
     if (!customMemo) deps.push(...args);
 
-    const value = useYolo(() => {
+    const value = useHooks(() => {
       deps[0] = fiber.version = incrementVersion(fiber.version!);
       return f(...args);
     }, deps);
@@ -149,7 +149,7 @@ export const memoProps = <F extends ArrowFunction>(
       deps.push(props[k]);
     }
 
-    const value = useYolo(() => {
+    const value = useHooks(() => {
       deps[0] = fiber.version = incrementVersion(fiber.version!);
       return f(props);
     }, deps);
@@ -526,14 +526,14 @@ export const useNoHasCapture = () => {};
 /**
  * Memoize a hook with given dependencies
  */
-export const useYolo = <T>(
+export const useHooks = <T>(
   initialState: () => T,
   dependencies: any[] = NO_DEPS,
 ): T => {
   const fiber = useFiber();
   const {pointer} = fiber;
 
-  const i = pushState(fiber, Hook.YOLO);
+  const i = pushState(fiber, Hook.HOOKS);
   let {state} = fiber;
 
   let value;
@@ -568,8 +568,8 @@ export const useYolo = <T>(
   return value as unknown as T;
 }
 
-export const useNoYolo = () => {
-  useNoHook(Hook.YOLO);
+export const useNoHooks = () => {
+  useNoHook(Hook.HOOKS);
   useNoHook(Hook.MEMO);
 };
 

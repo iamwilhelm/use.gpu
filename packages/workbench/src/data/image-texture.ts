@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { XY, ColorSpace, TextureSource } from '@use-gpu/core';
 
-import { use, yeet, gather, memo, suspend, useMemo, useYolo } from '@use-gpu/live';
+import { use, yeet, gather, memo, suspend, useMemo, useHooks } from '@use-gpu/live';
 import { makeDynamicTexture, uploadDataTexture, uploadExternalTexture, updateMipTextureChain } from '@use-gpu/core';
 import { ImageLoader } from './image-loader';
 
@@ -91,6 +91,6 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
       return source;
     }, [resource, sampler]);
 
-    return useYolo(() => render ? (source ? render(source) : null) : yeet(source), [render, source]);
+    return useHooks(() => render ? (source ? render(source) : null) : yeet(source), [render, source]);
   });
 };

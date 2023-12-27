@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ColorSpace, DataTexture, TypedArray } from '@use-gpu/core';
 
-import { use, yeet, gather, memo, useMemo, useYolo } from '@use-gpu/live';
+import { use, yeet, gather, memo, useMemo, useHooks } from '@use-gpu/live';
 import { patch } from '@use-gpu/state';
 import { Await } from '../queue/await';
 import { Fetch } from './fetch';

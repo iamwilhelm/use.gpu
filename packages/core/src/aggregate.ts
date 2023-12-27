@@ -1,7 +1,7 @@
 import type { AggregateBuffer, AggregateValue, MultiAggregateBuffer, UniformType, VirtualAggregateBuffer } from './types';
 
 import { resolve } from './lazy';
-import { makeStorageBuffer, uploadBuffer } from './buffer';
+import { makeStorageBuffer, uploadBuffer, uploadStorage } from './buffer';
 import { incrementVersion } from './id';
 import {
   alignSizeTo,
@@ -16,11 +16,6 @@ import {
 } from './data';
 import { makeUniformLayout, toCPUDims, toGPUDims } from './uniform';
 import { toMurmur53, mixBits53 } from '@use-gpu/state';
-
-export const getAggregateArchetype = (
-  formats: Record<string, string>,
-  unwelded?: Record<string, boolean>,
-) => mixBits53(toMurmur53(formats), toMurmur53(unwelded));
 
 export const getAggregateSummary = (items: AggregateItem[]) => {
   const n = items.length;
@@ -198,19 +193,3 @@ export const updateAggregateRefs = (
 
   if (buffer) uploadStorage(device, source, array.buffer, count);
 }
-
-export const uploadStorage = (
-  device: GPUDevice,
-  source: StorageStorage,
-  arrayBuffer: ArrayBuffer,
-  count: number,
-  size?: number,
-) => {
-  uploadBuffer(device, source.buffer, arrayBuffer);
-
-  if (size) source.size = size;
-  else source.size[0] = count;
-
-  source.length = count;
-  source.version = incrementVersion(source.version);
-};

@@ -14,14 +14,6 @@ type VectorHelperProps = {
   length?: number,
 };
 
-type AABBHelperProps = {
-  matrix?: number[] | TypedArray,
-  min?: number[] | TypedArray,
-  max?: number[] | TypedArray,
-  color?: number[] | TypedArray,
-  width?: number,
-};
-
 const CHUNKS = [2];
 const ENDS   = [true];
 

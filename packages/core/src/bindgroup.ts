@@ -1,6 +1,6 @@
 import type { DataBinding, StorageSource, ShaderStructType, UniformType } from './types';
 import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
-import { makeUniformLayout } from './uniform';
+import { makeUniformLayout, toTypeString } from './uniform';
 
 const BINDING_TEXTURE_TYPES = {
   'texture_1d': { viewDimension: '1d' },
@@ -153,7 +153,8 @@ export const getMinBindingSize = (format: UniformType | UniformAttribute[] | Sha
   const {struct} = declarations.find((d: any) => d.struct?.name === entry);
   if (!struct) return 0;
 
-  const members = struct.members.map((m: any) => ({name: m.name, format: m.type}));
+  const members = struct.members.map((m: any) => ({name: m.name, format: toTypeString(m.type)}));
   const layout = makeUniformLayout(members);
   return layout.length;
 };
+

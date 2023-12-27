@@ -4,8 +4,9 @@ import type { TypedArray, StorageSource, UniformType, VectorLike, DataSchema, Da
 import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
+import { useRenderProp } from '../hooks/useRenderProp';
 import { useStructSources } from '../hooks/useStructSources';
-import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, useContext, useNoContext, useYolo, incrementVersion } from '@use-gpu/live';
+import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
 import {
   makePackedLayout,
   makeDataArray,
@@ -24,6 +25,7 @@ export type InterleavedDataProps = {
 
   /** Receive 1 source per field, in struct-of-array format. Leave empty to yeet sources instead. */
   render?: (sources: Record<string, StorageSource>) => LiveElement,
+  children?: (sources: Record<string, StorageSource>) => LiveElement,
 };
 
 const NO_FIELDS = [] as [UniformType, string][];
@@ -36,7 +38,6 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
   const {
     data,
     schema,
-    render,
     live = false,
   } = props;
 
@@ -115,6 +116,6 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
 
   const trigger = useOne(() => signal(), source.version);
 
-  const view = useYolo(() => render ? render(sources) : yeet(sources), [render, sources]);
+  const view = useRenderProp(props, sources);
   return [trigger, view];
 };

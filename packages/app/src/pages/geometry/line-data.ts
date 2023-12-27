@@ -18,7 +18,6 @@ export const lineData = seq(9).map((i) => ({
   width: Math.random() * 30 + 5,
   loop: i >= 5,
 }));
-console.log({lineData})
 
 export const zigzagData = [{
   path: seq(24).map(i => [i / 14 - 1 - .2, -.1, ((i % 2) - .5) * .1]),

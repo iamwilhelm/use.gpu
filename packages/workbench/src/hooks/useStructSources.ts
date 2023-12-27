@@ -4,6 +4,7 @@ import { useMemo, useOne } from '@use-gpu/live';
 import { explode, structType, bindEntryPoint } from '@use-gpu/shader/wgsl';
 import { getShader } from './useShader';
 import { getSource } from './useSource';
+import { getLambdaSource } from './useLambdaSource';
 
 const toTitleCase = (s: string) => s.slice(0, 1).toUpperCase() + s.slice(1);
 
@@ -29,7 +30,7 @@ export const getStructSources = (
 
   const sources = {};
   for (const {name} of uniforms) {
-    sources[name] = bindEntryPoint(exploded, name);
+    sources[name] = getLambdaSource(bindEntryPoint(exploded, name), source);
   };
 
   return sources;

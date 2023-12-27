@@ -30,6 +30,16 @@ export const getUniformElementType = (type: string) =>
   ? getUniformElementType(type.replace(/^array<(.*)>$/, '$1'))
   : type;
 
+export const toTypeString = (t: string | any) => {
+  if (typeof t === 'string') return t;
+  if (t.entry != null) return t.entry;
+  if (t.module?.entry != null) return t.module.entry;
+  if (t.name != null) return t.name;
+  if (t.type != null) return toTypeString(t.type);
+  if (Array.isArray(t)) return `[${t.map(toTypeString).join(',')}]`;
+  return 'void';
+};
+
 export const toCPUDims = (dims: number): number => dims !== Math.round(dims) ? Math.ceil(dims) * 3 / 4 : dims;
 export const toGPUDims = (dims: number): number => Math.ceil(dims);
 

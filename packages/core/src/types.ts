@@ -341,22 +341,32 @@ export type AccessorSpec = string | Accessor;
 
 export type DataSchema = Record<string, DataField>;
 export type DataField = {
+  /** UniformType or array<…> or array<array<…>> */
   format: string,
+  /** Prop name in input data */
   prop?: string,
-  spread?: string,
-  ref?: boolean,
+  /** Is an index attribute */
   index?: boolean,
+  /** Is an unwelded vertex attribute */
   unwelded?: boolean,
+  /** Spread a singular to a plural attribute */
+  spread?: string,
 };
 
 export type ArchetypeSchema = Record<string, ArchetypeField>;
 export type ArchetypeField = {
+  /** UniformType or array<…> or array<array<…>> */
   format: string,
+  /** Output attribute name */
   name?: string,
-  spread?: string,
-  ref?: boolean,
+  /** Is an index attribute */
   index?: boolean,
+  /** Is an unwelded vertex attribute */
   unwelded?: boolean,
+  /** Spread a singular to a plural attribute */
+  spread?: string,
+  /** Instance attribute passed by ref just-in-time */
+  ref?: boolean,
 };
 
 export type Aggregate = {

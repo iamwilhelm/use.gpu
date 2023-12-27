@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`shader transpiles wgsl to CJS 1`] = `
+"const {decompressAST, bindEntryPoint} = require(\\"@use-gpu/shader/wgsl\\");
+const t = {\\"symbols\\":[\\"QUAD\\",\\"getQuadIndex\\",\\"getQuadUV\\"],\\"visibles\\":[\\"getQuadIndex\\",\\"getQuadUV\\"],\\"exports\\":[{\\"at\\":137,\\"symbol\\":\\"getQuadIndex\\",\\"flags\\":1,\\"func\\":{\\"name\\":\\"getQuadIndex\\",\\"type\\":\\"vec2<i32>\\",\\"attr\\":[\\"export\\"],\\"parameters\\":[{\\"name\\":\\"vertex\\",\\"type\\":\\"i32\\"}],\\"identifiers\\":[\\"QUAD\\"]}},{\\"at\\":215,\\"symbol\\":\\"getQuadUV\\",\\"flags\\":1,\\"func\\":{\\"name\\":\\"getQuadUV\\",\\"type\\":\\"vec2<f32>\\",\\"attr\\":[\\"export\\"],\\"parameters\\":[{\\"name\\":\\"vertex\\",\\"type\\":\\"i32\\"}],\\"identifiers\\":[\\"getQuadIndex\\"]}}]}; const data = {
+  \\"name\\": \\"geometry/quad\\",
+  \\"code\\": \\"\\\\n\\\\nconst QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(\\\\n  vec2<i32>(0, 0),\\\\n  vec2<i32>(1, 0),\\\\n  vec2<i32>(0, 1),\\\\n  vec2<i32>(1, 1),\\\\n);\\\\n\\\\n@export fn getQuadIndex(vertex: i32) -> vec2<i32> {\\\\n  return QUAD[vertex];\\\\n}\\\\n\\\\n@export fn getQuadUV(vertex: i32) -> vec2<f32> {\\\\n  return vec2<f32>(getQuadIndex(vertex));\\\\n}\\\\n\\",
+  \\"hash\\": 6621184793223281,
+  \\"table\\": t,
+  \\"shake\\": [[0,[0,1,2]],[137,[1,2]],[215,[2]]],
+  \\"tree\\": decompressAST([[0,0,135],[2,8,12],[0,129,205],[1,0,7],[2,11,23],[2,13,19],[2,37,41],[2,5,11],[0,12,104],[1,0,7],[2,11,20],[2,10,16],[2,47,59],[2,13,19]], t.symbols),
+};
+
+const libs = {};
+const getSymbol = (entry) => ({module: bindEntryPoint(data, entry), libs});
+
+const __default = getSymbol();
+Object.defineProperty(exports, '__esModule', { value: true });
+Object.assign(exports, __default);
+exports.default = __default;
+    
+exports.getQuadIndex = getSymbol(\\"getQuadIndex\\");
+exports.getQuadUV = getSymbol(\\"getQuadUV\\");
+/* __WGSL_LOADER_GENERATED */"
+`;
+
+exports[`shader transpiles wgsl to CJS 2`] = `
+"const {decompressAST, bindEntryPoint} = require(\\"@use-gpu/shader/wgsl\\");
+const t = {\\"symbols\\":[\\"QUAD\\",\\"getQuadIndex\\",\\"getQuadUV\\"],\\"visibles\\":[\\"getQuadIndex\\",\\"getQuadUV\\"],\\"exports\\":[{\\"at\\":112,\\"symbol\\":\\"getQuadIndex\\",\\"flags\\":1,\\"func\\":{\\"name\\":\\"getQuadIndex\\",\\"type\\":\\"vec2<i32>\\",\\"attr\\":[\\"export\\"],\\"parameters\\":[{\\"name\\":\\"v\\",\\"type\\":\\"i32\\"}],\\"identifiers\\":[\\"QUAD\\"]}},{\\"at\\":170,\\"symbol\\":\\"getQuadUV\\",\\"flags\\":1,\\"func\\":{\\"name\\":\\"getQuadUV\\",\\"type\\":\\"vec2<f32>\\",\\"attr\\":[\\"export\\"],\\"parameters\\":[{\\"name\\":\\"v\\",\\"type\\":\\"i32\\"}],\\"identifiers\\":[\\"getQuadIndex\\"]}}]}; const data = {
+  \\"name\\": \\"geometry/quad\\",
+  \\"code\\": \\" const QUAD:array<vec2<i32>,4>=array<vec2<i32>,4>(vec2<i32>(0,0),vec2<i32>(1,0),vec2<i32>(0,1),vec2<i32>(1,1),);@export fn getQuadIndex(v:i32)->vec2<i32>{return QUAD[v];}@export fn getQuadUV(v:i32)->vec2<f32>{return vec2<f32>(getQuadIndex(v));}\\\\n\\",
+  \\"hash\\": 3382987731877431,
+  \\"table\\": t,
+  \\"shake\\": [[0,[0,1,2]],[112,[1,2]],[170,[2]]],
+  \\"tree\\": decompressAST([[0,0,112],[2,7,11],[0,105,163],[1,0,7],[2,11,23],[2,13,14],[2,25,29],[2,5,6],[0,4,78],[1,0,7],[2,11,20],[2,10,11],[2,35,47],[2,13,14]], t.symbols),
+};
+
+const libs = {};
+const getSymbol = (entry) => ({module: bindEntryPoint(data, entry), libs});
+
+const __default = getSymbol();
+Object.defineProperty(exports, '__esModule', { value: true });
+Object.assign(exports, __default);
+exports.default = __default;
+    
+exports.getQuadIndex = getSymbol(\\"getQuadIndex\\");
+exports.getQuadUV = getSymbol(\\"getQuadUV\\");
+/* __WGSL_LOADER_GENERATED */"
+`;
+
+exports[`shader transpiles wgsl to ES 1`] = `
+"import {decompressAST, bindEntryPoint} from \\"@use-gpu/shader/wgsl\\";
+const t = {\\"symbols\\":[\\"QUAD\\",\\"getQuadIndex\\",\\"getQuadUV\\"],\\"visibles\\":[\\"getQuadIndex\\",\\"getQuadUV\\"],\\"exports\\":[{\\"at\\":137,\\"symbol\\":\\"getQuadIndex\\",\\"flags\\":1,\\"func\\":{\\"name\\":\\"getQuadIndex\\",\\"type\\":\\"vec2<i32>\\",\\"attr\\":[\\"export\\"],\\"parameters\\":[{\\"name\\":\\"vertex\\",\\"type\\":\\"i32\\"}],\\"identifiers\\":[\\"QUAD\\"]}},{\\"at\\":215,\\"symbol\\":\\"getQuadUV\\",\\"flags\\":1,\\"func\\":{\\"name\\":\\"getQuadUV\\",\\"type\\":\\"vec2<f32>\\",\\"attr\\":[\\"export\\"],\\"parameters\\":[{\\"name\\":\\"vertex\\",\\"type\\":\\"i32\\"}],\\"identifiers\\":[\\"getQuadIndex\\"]}}]}; const data = {
+  \\"name\\": \\"geometry/quad\\",
+  \\"code\\": \\"\\\\n\\\\nconst QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(\\\\n  vec2<i32>(0, 0),\\\\n  vec2<i32>(1, 0),\\\\n  vec2<i32>(0, 1),\\\\n  vec2<i32>(1, 1),\\\\n);\\\\n\\\\n@export fn getQuadIndex(vertex: i32) -> vec2<i32> {\\\\n  return QUAD[vertex];\\\\n}\\\\n\\\\n@export fn getQuadUV(vertex: i32) -> vec2<f32> {\\\\n  return vec2<f32>(getQuadIndex(vertex));\\\\n}\\\\n\\",
+  \\"hash\\": 6621184793223281,
+  \\"table\\": t,
+  \\"shake\\": [[0,[0,1,2]],[137,[1,2]],[215,[2]]],
+  \\"tree\\": decompressAST([[0,0,135],[2,8,12],[0,129,205],[1,0,7],[2,11,23],[2,13,19],[2,37,41],[2,5,11],[0,12,104],[1,0,7],[2,11,20],[2,10,16],[2,47,59],[2,13,19]], t.symbols),
+};
+
+const libs = {};
+const getSymbol = (entry) => ({module: bindEntryPoint(data, entry), libs});
+export default getSymbol();
+export const getQuadIndex = getSymbol(\\"getQuadIndex\\");
+export const getQuadUV = getSymbol(\\"getQuadUV\\");
+/* __WGSL_LOADER_GENERATED */"
+`;
+
+exports[`shader transpiles wgsl to ES 2`] = `
+"import {decompressAST, bindEntryPoint} from \\"@use-gpu/shader/wgsl\\";
+const t = {\\"symbols\\":[\\"QUAD\\",\\"getQuadIndex\\",\\"getQuadUV\\"],\\"visibles\\":[\\"getQuadIndex\\",\\"getQuadUV\\"],\\"exports\\":[{\\"at\\":112,\\"symbol\\":\\"getQuadIndex\\",\\"flags\\":1,\\"func\\":{\\"name\\":\\"getQuadIndex\\",\\"type\\":\\"vec2<i32>\\",\\"attr\\":[\\"export\\"],\\"parameters\\":[{\\"name\\":\\"v\\",\\"type\\":\\"i32\\"}],\\"identifiers\\":[\\"QUAD\\"]}},{\\"at\\":170,\\"symbol\\":\\"getQuadUV\\",\\"flags\\":1,\\"func\\":{\\"name\\":\\"getQuadUV\\",\\"type\\":\\"vec2<f32>\\",\\"attr\\":[\\"export\\"],\\"parameters\\":[{\\"name\\":\\"v\\",\\"type\\":\\"i32\\"}],\\"identifiers\\":[\\"getQuadIndex\\"]}}]}; const data = {
+  \\"name\\": \\"geometry/quad\\",
+  \\"code\\": \\" const QUAD:array<vec2<i32>,4>=array<vec2<i32>,4>(vec2<i32>(0,0),vec2<i32>(1,0),vec2<i32>(0,1),vec2<i32>(1,1),);@export fn getQuadIndex(v:i32)->vec2<i32>{return QUAD[v];}@export fn getQuadUV(v:i32)->vec2<f32>{return vec2<f32>(getQuadIndex(v));}\\\\n\\",
+  \\"hash\\": 3382987731877431,
+  \\"table\\": t,
+  \\"shake\\": [[0,[0,1,2]],[112,[1,2]],[170,[2]]],
+  \\"tree\\": decompressAST([[0,0,112],[2,7,11],[0,105,163],[1,0,7],[2,11,23],[2,13,14],[2,25,29],[2,5,6],[0,4,78],[1,0,7],[2,11,20],[2,10,11],[2,35,47],[2,13,14]], t.symbols),
+};
+
+const libs = {};
+const getSymbol = (entry) => ({module: bindEntryPoint(data, entry), libs});
+export default getSymbol();
+export const getQuadIndex = getSymbol(\\"getQuadIndex\\");
+export const getQuadUV = getSymbol(\\"getQuadUV\\");
+/* __WGSL_LOADER_GENERATED */"
+`;

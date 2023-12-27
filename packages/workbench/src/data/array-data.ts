@@ -1,10 +1,9 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { DataBounds, TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
 
-import { provide, yeet, signal, useOne, useMemo, useNoMemo, useContext, useNoContext, useYolo, incrementVersion } from '@use-gpu/live';
+import { provide, yeet, signal, useOne, useMemo, useNoMemo, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
 import {
-  makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
-  makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
+  makeAggregateBuffer, copyNumberArray, emitIntoMultiNumberArray, uploadStorage,
   getBoundingBox, toDataBounds,
   toCPUDims, toGPUDims,
 } from '@use-gpu/core';
@@ -13,6 +12,7 @@ import { DeviceContext } from '../providers/device-provider';
 import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
+import { useRenderProp } from '../hooks/useRenderProp';
 
 export type ArrayDataProps = {
   /** Input size up to [width, height, depth, layers] */
@@ -36,6 +36,7 @@ export type ArrayDataProps = {
 
   /** Leave empty to yeet source instead. */
   render?: (source: StorageSource) => LiveElement,
+  children?: (source: StorageSource) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
@@ -50,7 +51,6 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     data,
     expr,
     items = 1,
-    render,
     sparse = false,
     live = false,
     time = false,
@@ -59,26 +59,10 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   const t = Math.max(1, Math.round(items) || 0);
 
   const length = t * (size.length ? size.reduce((a, b) => a * b, 1) : (data?.length || 0));
-  const l = useBufferedSize(length);
+  const alloc = useBufferedSize(length);
 
   // Make data buffer
-  const [buffer, array, source, dims] = useMemo(() => {
-    const f = (format && (format in UNIFORM_ARRAY_DIMS)) ? format as UniformType : 'f32';
-
-    const {array, dims} = makeDataArray(f, l || 1);
-
-    const buffer = makeStorageBuffer(device, array.byteLength);
-    const source = {
-      buffer,
-      format: f,
-      length,
-      size,
-      version: 0,
-      bounds: {...NO_BOUNDS},
-    };
-
-    return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
-  }, [device, format, l]);
+  const {buffer, array, source, dims} = useMemo(() => makeAggregateBuffer(device, format, alloc), [device, format, alloc]);
 
   // Provide time for expr
   const clock = time && expr ? useTimeContext() : useNoTimeContext();
@@ -90,20 +74,15 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     if (expr && size.length) {
       emitted = emitIntoMultiNumberArray(expr, array, dims, size, clock!);
     }
-    if (data || expr) {
-      uploadBuffer(device, buffer, array.buffer);
-      source.version = incrementVersion(source.version);
-    }
 
-    source.length  = !sparse ? length : emitted;
-    source.size    = !sparse ? (items > 1 ? [items, ...size] : size) : [items, emitted / items];
+    const length  = !sparse ? length : emitted;
+    const size    = !sparse ? (items > 1 ? [items, ...size] : size) : [items, emitted / items];
+
+    uploadStorage(device, source, length, size);
 
     const {bounds} = source;
-    const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
-    bounds!.center = center;
-    bounds!.radius = radius;
-    bounds!.min = min;
-    bounds!.max = max;
+    const b = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
+    for (const k in b) bounds![k] = b[k];
   };
 
   if (!live) {
@@ -117,6 +96,6 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   }
 
   const trigger = useOne(() => signal(), source.version);
-  const view = useYolo(() => render ? render(source) : yeet(source), [render, source]);
+  const view = useRenderProp(props, source);
   return [trigger, view];
 };

@@ -1,17 +1,18 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { DataBounds, TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
 
-import { provide, yeet, signal, useOne, useMemo, useNoMemo, useContext, useNoContext, useYolo, incrementVersion } from '@use-gpu/live';
+import { provide, yeet, signal, useOne, useMemo, useNoMemo, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
 import {
-  makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
-  makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
+  makeAggregateBuffer, copyNumberArray, emitIntoMultiNumberArray, uploadStorage,
   getBoundingBox, toDataBounds,
+  toCPUDims, toGPUDims,
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
 import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
+import { useRenderProp } from '../hooks/useRenderProp';
 
 export type SampledDataProps = {
   /** Sample count up to [width, height, depth, layers] */
@@ -41,6 +42,7 @@ export type SampledDataProps = {
 
   /** Leave empty to yeet source instead. */
   render?: (source: StorageSource) => LiveElement,
+  children?: (source: StorageSource) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
@@ -55,7 +57,6 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     size,
     expr,
     items = 1,
-    render,
     padding = 0,
     sparse = false,
     centered = false,
@@ -67,27 +68,10 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
   const t = Math.max(1, Math.round(items) || 0);
   const s = size.map(n => n + padding * 2);
   const length = t * (s.length ? s.reduce((a, b) => a * b, 1) : 1);
-  const l = useBufferedSize(length);
+  const alloc = useBufferedSize(length);
 
   // Make data buffer
-  const [buffer, array, source, dims] = useMemo(() => {
-    const f = (format && (format in UNIFORM_ARRAY_DIMS)) ? format as UniformType : 'f32';
-
-    const {array, dims} = makeDataArray(f, l || 1);
-    if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
-
-    const buffer = makeStorageBuffer(device, array.byteLength);
-    const source = {
-      buffer,
-      format: f,
-      length: 0,
-      size: [],
-      version: 0,
-      bounds: {...NO_BOUNDS},
-    };
-
-    return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
-  }, [device, format, l]);
+  const {buffer, array, source, dims} = useMemo(() => makeAggregateBuffer(device, format, alloc), [device, format, alloc]);
 
   const clock = time ? useTimeContext() : useNoTimeContext();
 
@@ -253,15 +237,14 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
       source.version = incrementVersion(source.version);
     }
 
-    source.length  = !sparse ? length : emitted;
-    source.size    = !sparse ? (items > 1 ? [items, ...s] : s) : [items, emitted / items];
+    const length  = !sparse ? length : emitted;
+    const size    = !sparse ? (items > 1 ? [items, ...s] : s) : [items, emitted / items];
+
+    uploadStorage(device, source, length, size);
 
     const {bounds} = source;
-    const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
-    bounds!.center = center;
-    bounds!.radius = radius;
-    bounds!.min = min;
-    bounds!.max = max;
+    const b = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
+    for (const k in b) bounds![k] = b[k];
   };
 
   if (!live) {
@@ -275,6 +258,6 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
   }
 
   const trigger = useOne(() => signal(), source.version);
-  const view = useYolo(() => render ? render(source) : yeet(source), [render, source]);
+  const view = useRenderProp(props, source);
   return [trigger, view];
 };

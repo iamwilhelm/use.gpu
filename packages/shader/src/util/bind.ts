@@ -78,13 +78,14 @@ export const bindBundle = (
     if (relinks[k]) {
       throw new Error(`${getBundleName(bundle)}.${k} already linked`);
     } else if (links[k]) {
+      const link = links[k];
 
       // Ensure link exists in module
       let check = k.indexOf(':') > 0 ? k.split(':')[0] : k;
       if (!linkable[check]) continue;
 
-      mergeBindings(rebound, links[k]);
-      relinks[k] = links[k];
+      mergeBindings(rebound, link);
+      relinks[k] = link;
     }
   }
 

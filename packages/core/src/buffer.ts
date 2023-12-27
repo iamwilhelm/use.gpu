@@ -1,5 +1,6 @@
-import type { TypedArrayConstructor, TypedArray } from './types';
+import type { StorageSource, TypedArrayConstructor, TypedArray } from './types';
 import { TYPED_ARRAYS, TEXTURE_FORMAT_SIZES, TEXTURE_FORMAT_DIMS } from './constants';
+import { incrementVersion } from './id';
 
 type BufferArray = TypedArray | number[] | ArrayBuffer | number;
 
@@ -119,3 +120,19 @@ export const uploadBufferRange = (
   // @ts-ignore
   device.queue.writeBuffer(buffer, offset + from, data, from, length);
 }
+
+export const uploadStorage = (
+  device: GPUDevice,
+  source: StorageStorage,
+  arrayBuffer: ArrayBuffer,
+  count: number,
+  size?: number,
+) => {
+  uploadBuffer(device, source.buffer, arrayBuffer);
+
+  if (size) source.size = size;
+  else source.size[0] = count;
+
+  source.length = count;
+  source.version = incrementVersion(source.version);
+};

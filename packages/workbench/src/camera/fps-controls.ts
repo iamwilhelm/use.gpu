@@ -3,7 +3,7 @@ import type { VectorLike } from '@use-gpu/core';
 
 import { useProp } from '@use-gpu/traits/live';
 import { parsePosition } from '@use-gpu/parse';
-import { useContext, useYolo, useOne, useRef, useResource, useState } from '@use-gpu/live';
+import { useContext, useHooks, useOne, useRef, useResource, useState } from '@use-gpu/live';
 import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { KeyboardContext, MouseContext } from '../providers/event-provider';
@@ -141,5 +141,5 @@ export const FPSControls: LiveComponent<FPSControlsProps> = (props) => {
   if (moving) useAnimationFrame();
   else useNoAnimationFrame();
 
-  return useYolo(() => render(bearing, pitch, position), [render, bearing, pitch, position]);
+  return useHooks(() => render(bearing, pitch, position), [render, bearing, pitch, position]);
 };

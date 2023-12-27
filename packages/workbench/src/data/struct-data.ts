@@ -4,13 +4,14 @@ import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { useDeviceContext } from '../providers/device-provider';
 
-import { yeet, signal, useMemo, useNoMemo, useOne, useYolo } from '@use-gpu/live';
+import { yeet, signal, useMemo, useNoMemo, useOne, useHooks } from '@use-gpu/live';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { incrementVersion } from '@use-gpu/live';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
 import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
+import { useRenderProp } from '../hooks/useRenderProp';
 
 export type StructDataProps = {
   /** Set/override input length */
@@ -20,7 +21,7 @@ export type StructDataProps = {
   format?: ShaderModule,
 
   /** Input data */
-  data?: number[] | TypedArray,
+  data?: Record<string, number | number[] | TypedArray>[],
   /** Input emitter expression */
   expr?: (emit: Emit, ...args: any[]) => void,
   /** Emit 0 or 1 item per `expr` call. */
@@ -32,6 +33,7 @@ export type StructDataProps = {
 
   /** Leave empty to yeet source instead. */
   render?: (...source: ShaderSource[]) => LiveElement,
+  children?: (...source: ShaderSource[]) => LiveElement,
 };
 
 export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructDataProps>) => {
@@ -45,11 +47,9 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
     
     format,
     live,
-
-    render,
   } = props;
 
-  if (!format || typeof (format as any) === 'string') throw new Error("<StructData> format must be a shader module");
+  if (!format || typeof (format as any) === 'string') throw new Error("<StructData> format must be a WGSL type shader module");
 
   // Make struct uniform layout
   const [bindings, layout] = useOne(() => {
@@ -92,7 +92,9 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
   const refresh = () => {
     let emitted = 0;
 
-    if (data) filler.fill(data);
+    if (data) {
+      filler.fill(data);
+    }
     if (expr) {
       let field = 0;
       const emit = (...args: any[]) => filler.setValue(emitted, field++, args);
@@ -125,6 +127,6 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
   }
 
   const trigger = useOne(() => signal(), source.version);
-  const view = useYolo(() => render ? render(source) : yeet(source), [render, source]);
+  const view = useRenderProp(props, source);
   return [trigger, view];
 };

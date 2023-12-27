@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
 import { lerp } from '@use-gpu/core';
-import { use, useCallback, useContext, useMemo, useOne, useRef, useResource, useState, useYolo } from '@use-gpu/live';
+import { use, useCallback, useContext, useMemo, useOne, useRef, useResource, useState, useHooks } from '@use-gpu/live';
 import { MouseContext, WheelContext, KeyboardContext } from '../providers/event-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';

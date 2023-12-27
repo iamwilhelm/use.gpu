@@ -4,6 +4,7 @@ import type { StorageSource } from '@use-gpu/core';
 import { memo, yeet, useMemo } from '@use-gpu/live';
 import { accumulateChunks, generateChunkSegments, generateChunkAnchors, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
+import { ARROW_SEGMENTS_SCHEMA } from './schemas';
 
 export type ArrowSegmentsData = {
   count: number,
@@ -43,6 +44,7 @@ export const getArrowSegments = ({
     trims,
     slices,
     unwelds,
+    schema: ARROW_SEGMENTS_SCHEMA,
   };
 }
 

@@ -5,15 +5,16 @@ import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
-import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, useCallback, useYolo, useNoYolo, incrementVersion } from '@use-gpu/live';
+import { useRenderProp } from '../hooks/useRenderProp';
+import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, useCallback, incrementVersion } from '@use-gpu/live';
 import {
   seq,
   toCPUDims,
   isUniformArrayType,
   getUniformArrayDepth,
 
-  makeDataArray2,
-  copyRecursiveNumberArray2,
+  makeDataArray,
+  copyRecursiveNumberArray,
   getBoundingBox,
   toDataBounds,
 
@@ -39,6 +40,7 @@ export type DataProps = {
 
   /** Receive 1 source per field, in virtual struct-of-array format. Leave empty to yeet sources instead. */
   render?: (sources: Record<string, StorageSource>) => LiveElement,
+  children?: (sources: Record<string, StorageSource>) => LiveElement,
 };
 
 const NO_FIELDS = [] as DataField[];
@@ -56,7 +58,6 @@ export const Data: LiveComponent<DataProps> = (props) => {
     loop,
     start,
     end,
-    render,
     segments,
     live = false,
   } = props;
@@ -76,7 +77,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
       if (index || unwelded) throw new Error(`Use <CompositeData> for indexed and unwelded data`);
       if (isUniformArrayType(format)) throw new Error(`Use <CompositeData> for array data`);
 
-      const {array, dims} = makeDataArray2(format, allocItems);
+      const {array, dims} = makeDataArray(format, allocItems);
 
       fields[k] = {array, dims, prop};
       attributes[k] = array;
@@ -90,7 +91,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
   const items = useMemo(() => {
     for (const k in fields) {
       const accessor = virtual?.[k];
-      if (!accessor || !data) continue;
+      if (!accessor && !data) continue;
 
       const {array, dims, depth, prop} = fields[k];
 
@@ -100,7 +101,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
       let b = 0;
       let o = 0;
       for (let i = 0; i < itemCount; ++i) {
-        o += copyNumberArray2(accessor ? accessor(i + skip) : data[i + skip][props], array, dimsIn, dimsIn, 0, o, 1);
+        o += copyNumberArray(accessor ? accessor(i + skip) : data[i + skip][prop], array, dimsIn, dimsIn, 0, o, 1);
       }
     }
 
@@ -134,6 +135,6 @@ export const Data: LiveComponent<DataProps> = (props) => {
 
   const trigger = useOne(() => signal(), items);
 
-  const view = useYolo(() => render ? render(sources) : yeet(sources), [render, sources]);
+  const view = useRenderProp(props, sources);
   return [trigger, view];
 };

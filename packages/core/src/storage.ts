@@ -1,5 +1,6 @@
 import type { SharedAllocation, StorageSource, UniformAttribute, DataBinding } from './types';
 import { makeBindGroupLayout } from './bindgroup';
+import { toTypeString } from './uniform';
 
 export const makeSharedStorage = (
   device: GPUDevice,
@@ -55,8 +56,6 @@ export const makeStorageEntries = (
   return entries;
 };
 
-const toTypeName = (s: any) => s?.module?.entry ?? s?.entry ?? s;
-
 export const checkStorageTypes = (
   uniforms: UniformAttribute[],
   links: Record<string, StorageSource | null | undefined>,
@@ -74,13 +73,13 @@ export const checkStorageType = (
   const {name, format: from} = uniform;
   const to = link?.format;
 
-  const fromName = toTypeName(from);
-  const toName = toTypeName(to);
-  
+  if (Array.isArray(from) || Array.isArray(to)) return;
+
+  const fromName = toTypeString(from);
+  const toName = toTypeString(to);
+
   let f = fromName;
   let t = toName;
-
-  if (Array.isArray(f) || Array.isArray(t)) return;
 
   if (link && t != null && f !== t) {
 

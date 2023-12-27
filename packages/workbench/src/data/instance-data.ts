@@ -5,6 +5,7 @@ import {
   makeIdAllocator,
   makeDataArray, copyNumberArrayRange,
   makeStorageBuffer, uploadBuffer, uploadBufferRange, UNIFORM_ARRAY_DIMS,
+  toCPUDims, toGPUDims,
 } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
@@ -142,7 +143,9 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
 
       for (const {array, dims, accessor} of fieldBuffers) {
         const v = data[accessor];
-        if (v != null) copyNumberArrayRange(v, array, 0, instance * Math.ceil(dims), Math.ceil(dims), dims);
+        const fromDims = toCPUDims(dims);
+        const toDims = toGPUDims(dims);
+        if (v != null) copyNumberArray(v, array, fromDims, toDims, 0, instance * toDims, 1);
       }
     }
     if (needsRefresh) ranges = [[0, size]];

@@ -4,6 +4,7 @@ import type { StorageSource, VectorLike } from '@use-gpu/core';
 import { memo, yeet, useMemo } from '@use-gpu/live';
 import { accumulateChunks, generateChunkSegments, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
+import { LINE_SEGMENTS_SCHEMA } from './schemas';
 
 export type LineSegmentsData = {
   count: number,
@@ -29,7 +30,7 @@ export const getLineSegments = ({
 
   generateChunkSegments(segments, slices, unwelds, chunks, loops);
 
-  return {count, segments, slices, unwelds};
+  return {count, segments, slices, unwelds, schema: LINE_SEGMENTS_SCHEMA};
 };
 
 export const useLineSegmentsSource = ({

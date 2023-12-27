@@ -1,10 +1,10 @@
 import { ShaderModule, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
 import { formatMurmur53, toMurmur53, getObjectKey, mixBits, scrambleBits } from '../util/hash';
-import { getBundleHash, getBundleEntry, toModule } from '../util/bundle';
+import { getBundleHash, getBundleEntry, toBundle, toModule } from '../util/bundle';
 import { getBindingArgument } from '../util/bind';
-import { loadVirtualModule } from './shader';
-import { makeSwizzle } from './operators/cast';
+import { loadVirtualModule, bundleToAttribute } from './shader';
+import { castTo, makeSwizzle } from './operators/cast';
 import { PREFIX_VIRTUAL } from '../constants';
 import { VIRTUAL_BINDGROUP, VOLATILE_BINDGROUP } from './constants';
 
@@ -216,12 +216,76 @@ export const makeBindingAccessors = (
   } : virtual;
 
   const links: Record<string, ShaderModule> = {};
-  for (const binding of constants) links[binding.uniform.name] = bundle;
-  for (const binding of storages)  links[binding.uniform.name] = bundle;
-  for (const binding of textures)  links[binding.uniform.name] = bundle;
-  for (const lambda  of lambdas)   links[lambda.uniform.name]  = lambda.lambda!.shader;
+  for (const {uniform} of constants) links[uniform.name] = bundle;
+  for (const {uniform} of storages)  links[uniform.name] = bundle;
+  for (const {uniform} of textures)  links[uniform.name] = bundle;
+  for (const {uniform, lambda} of lambdas)   {
+    const needsCast = !checkLambdaType(uniform, lambda);      
+    links[uniform.name] = needsCast
+      ? castTo(lambda!.shader, uniform.format)
+      : lambda!.shader;
+  }
 
   return links;
+};
+
+export const checkLambdaType = (
+  uniform: UniformAttribute,
+  lambda: LambdaSource,
+) => {
+  const {name, format: from} = uniform;
+
+  const bundle = toBundle(lambda.shader);
+  const {format: to} = bundleToAttribute(bundle);
+
+  if (Array.isArray(from) || Array.isArray(to)) return true;
+
+  const fromName = toTypeString(from);
+  const toName = toTypeString(to);
+
+  let f = fromName;
+  let t = toName;
+
+  if (f === t) return true;
+  if (t == null) {
+    console.warn(`Unable to determine lambda format for uniform ${uniform.name} -> bundle ${getBundleEntry(bundle)}`)
+    return true;
+  }
+
+  // Remove vec<..> to allow for automatic widening/narrowing
+  f = f.replace(/vec[0-9]/, '').replace(/^<|>$/g, '');
+  t = t.replace(/vec[0-9]/, '').replace(/^<|>$/g, ''); 
+
+  // Shorthand
+  if (f.match(/^vec[0-9]uif$/)) f += '32';
+  if (f.match(/^vec[0-9]h$/))   f = 'f16';
+  if (t.match(/^vec[0-9]uif$/)) t += '32';
+  if (t.match(/^vec[0-9]h$/))   t = 'f16';
+
+  if (f !== t) {
+    // Remove bit size to allow for automatic widening/narrowing
+    const fromScalar = f.replace(/([uif])([0-9]+)/, '$1__');
+    const toScalar   = t.replace(/([uif])([0-9]+)/, '$1__');
+
+    if (fromScalar !== toScalar) {
+      // uppercase = struct type, allow any
+      if (fromName.match(/[A-Z]/) && toName) return true;
+
+      throw new Error(`Invalid format ${to} bound for ${from} "${name}" (${fromScalar} != ${toScalar})`);
+    }
+  }
+
+  return false;
+};
+
+export const toTypeString = (t: string | any) => {
+  if (typeof t === 'string') return t;
+  if (t.entry != null) return t.entry;
+  if (t.module?.entry != null) return t.module.entry;
+  if (t.name != null) return t.name;
+  if (t.type != null) return toTypeString(t.type);
+  if (Array.isArray(t)) return `[${t.map(toTypeString).join(',')}]`;
+  return 'void';
 };
 
 export const makeUniformBlock = (

@@ -5,15 +5,16 @@ import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
-import { yeet, signal, useOne, useMemo, useNoMemo, useYolo } from '@use-gpu/live';
+import { useRenderProp } from '../hooks/useRenderProp';
+import { yeet, signal, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   seq,
   toCPUDims,
   isUniformArrayType,
   getUniformArrayDepth,
 
-  makeDataArray2,
-  copyRecursiveNumberArray2,
+  makeDataArray,
+  copyRecursiveNumberArray,
   getBoundingBox,
   toDataBounds,
 
@@ -60,6 +61,7 @@ export type CompositeDataProps = {
 
   /** Receive 1 source per field, in virtual struct-of-array format. Leave empty to yeet sources instead. */
   render?: (sources: Record<string, StorageSource>) => LiveElement,
+  children?: (sources: Record<string, StorageSource>) => LiveElement,
 };
 
 const NO_SCHEMA = {} as DataSchema;
@@ -77,7 +79,6 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     loop,
     start,
     end,
-    render,
     segments,
     live = false,
   } = props;
@@ -135,7 +136,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       if (ref) throw new Error(`Ref '${k}' not supported in <CompositeData>`);
 
       const isArray = isUniformArrayType(format);
-      const {array, dims} = makeDataArray2(format, isArray ? (index || unwelded) ? allocIndices : allocVertices : allocItems);
+      const {array, dims} = makeDataArray(format, isArray ? (index || unwelded) ? allocIndices : allocVertices : allocItems);
       const depth = getUniformArrayDepth(format);
 
       fields[k] = {array, dims, depth, prop};
@@ -148,11 +149,9 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     return [fields, attributes, archetype];
   }, [schema, allocItems, allocVertices, allocIndices]);
 
-  console.log(attributes, fields);
-
   // Get emitters for data + segment data
-  const [emitters, total, indexed, sparse] = useMemo(() => {
-    if (!isArray || !segments) return [schemaToEmitters(schema, attributes), vertexCount, indexCount, 0];
+  const [mergedSchema, emitters, total, indexed, sparse] = useMemo(() => {
+    if (!isArray || !segments) return [schema, schemaToEmitters(schema, attributes), vertexCount, indexCount, 0];
 
     const positions = fields[countKey].array;
 
@@ -165,12 +164,13 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
         ends,
     });
 
-    const {count: total, indexed, sparse, ...rest} = segmentData;
+    const {count: total, indexed, sparse, schema: segmentSchema, ...rest} = segmentData;
     for (const k in rest) if (attributes[k]) throw new Error(`Attribute name '${k}' reserved for segment data.`);
 
-    const emitters = schemaToEmitters(schema, {...attributes, ...rest});
+    const mergedSchema = {...schema, ...segmentSchema};
+    const emitters = schemaToEmitters(mergedSchema, {...attributes, ...rest});
 
-    return [emitters, total, indexed, sparse];
+    return [mergedSchema, emitters, total, indexed, sparse];
   }, [schema, fields, countKey, attributes, segments, chunks, groups, loops, starts, ends]);
 
   // Blit all data into merged arrays
@@ -179,7 +179,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
 
     for (const k in fields) {
       const accessor = virtual?.[k];
-      if (!accessor || !data) continue;
+      if (!accessor && !data) continue;
 
       const {array, dims, depth, prop} = fields[k];
       const slice = k === countKey;
@@ -190,8 +190,8 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       let b = 0;
       let o = 0;
       for (let i = 0; i < itemCount; ++i) {
-        o += copyRecursiveNumberArray2(accessor ? accessor(i + skip) : data[i + skip][props], array, dimsIn, dimsIn, depth, o, 1);
-        if (slice) slices.push((o - b) / dimsIn + ((loops === true || loops[i]) ? 3 : 0));
+        o += copyRecursiveNumberArray(accessor ? accessor(i + skip) : data[i + skip][prop], array, dimsIn, dimsIn, depth, o, 1);
+        if (slice) slices.push((o - b) / dimsIn + ((loops === true || loops?.[i]) ? 3 : 0));
         b = o;
       }
     }
@@ -211,12 +211,12 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   ]);
 
   // Aggregate into struct buffers by access policy
-  const {sources} = useAggregator(schema, items);
+  const {sources} = useAggregator(mergedSchema, items);
   console.log('item', {item: items[0], emitters, total, indexed, sources})
 
   // Tag positions with bounds
   useMemo(() => {
-    if (!fields.positions) return null;
+    if (!fields.positions) return NO_BOUNDS;
 
     const {array, dims} = fields.positions;
     const bounds = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
@@ -229,7 +229,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
 
   const trigger = useOne(() => signal(), items);
 
-  const view = useYolo(() => render ? render(sources) : yeet(sources), [render, sources]);
+  const view = useRenderProp(props, sources);
   return [trigger, view];
 };
 
@@ -271,8 +271,8 @@ const getChunkCount = (
 
   for (let i = 0; i < itemCount; ++i) {
     const [c, g] = toMultiCompositeChunks(get(i + skip));
-    c.push(...c);
-    g.push(...g);
+    chunks.push(...c);
+    groups.push(...g);
   }
 
   const count = chunks.reduce((a, b) => a + b, 0);

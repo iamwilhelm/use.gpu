@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { XY, ColorSpace, TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { use, yeet, useMemo, useYolo } from '@use-gpu/live';
+import { use, yeet, useMemo, useHooks } from '@use-gpu/live';
 import { getShader } from '../hooks/useShader';
 import { getDerivedSource } from '../hooks/useDerivedSource';
 
@@ -47,5 +47,5 @@ export const PanoramaMap: LiveComponent<PanoramaMapProps> = (props) => {
     return source;
   }, [texture]);
 
-  return useYolo(() => render ? render(source) : yeet(source), [render, source]);
+  return useHooks(() => render ? render(source) : yeet(source), [render, source]);
 };

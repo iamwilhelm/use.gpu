@@ -1,11 +1,10 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
-import type { ColorTrait, LineTrait, ROPTrait, SurfaceTrait } from '../types';
 
-import { use } from '@use-gpu/live';
-import { SurfaceLayer } from '@use-gpu/workbench';
-
+import { memo, use } from '@use-gpu/live';
 import { makeUseTrait, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
+import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
+import { useInspectHoverable, CompositeData, SurfaceLayer, SURFACE_SCHEMA } from '@use-gpu/workbench';
 
 import {
   SurfaceTrait,
@@ -31,43 +30,13 @@ const useTraits = makeUseTrait(Traits);
 
 export type SurfaceProps = TraitProps<typeof Traits>;
 
-export const Surface: LiveComponent<SurfaceProps> = (props) => {
-  const {side, shadow, colors} = props;
-
-  const positions = useContext(DataContext) ?? undefined;
-
-  const {loopX, loopY, shaded} = useSurfaceTrait(props);
-  const color = useColorTrait(props);
-  const rop = useROPTrait(props);
-
-  return (
-    use(SurfaceLayer, {
-      positions,
-      color,
-      colors,
-      loopX,
-      loopY,
-      shadow,
-      shaded,
-      side,
-      ...rop,
-    })
-  );
-};
-
-
-
-export const Line: LiveComponent<LineProps> = memo((props) => {
+export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
   const parsed = useTraits(props);
   const {
       position,
       positions,
       color,
       colors,
-      width,
-      widths,
-      depth,
-      depths,
       zIndex,
       zBias,
       zBiases,
@@ -77,18 +46,8 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       lookup,
       lookups,
 
-      count,
-      chunks,
-      loop,
-      loops,
-
-      schema,
+      size,
       tensor,
-      segments,
-      slices,
-      unwelds,
-
-      data,
       ...flags
   } = parsed;
 
@@ -97,29 +56,20 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
-  const {transform, nonlinear, matrix: refs} = useTransformContext();
-  const scissor = useScissorContext();
-
-  const attributes = schemaToEmitters(LINE_SCHEMA, parsed);
-  const archetype = schemaToArchetype(LINE_SCHEMA, attributes, flags, refs);
-
-  if (Number.isNaN(count)) debugger;
-  if (!count) return;
-
-  const shapes = {
-    line: {
-      count,
-      archetype,
-      attributes,
-      flags,
-      refs,
-      transform: nonlinear ?? context,
-      scissor,
-      zIndex,
-    },
-  };
-  return yeet(shapes);
+  return use(CompositeData, {
+    schema: SURFACE_SCHEMA,
+    data: parsed,
+    tensor: size ?? tensor,
+    render: (sources: Record<string, ShaderSource>) => use(SurfaceLayer, {
+      ...flags,
+      ...sources,
+      size: size ?? tensor,
+      color,
+      zBias,
+      id,
+      lookup,
+    }),
+  });
 }, shouldEqual({
-  position: sameShallow(sameShallow()),
   color: sameShallow(),
-}), 'Line');
+}), 'Surface');

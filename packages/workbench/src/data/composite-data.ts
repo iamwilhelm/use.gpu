@@ -3,17 +3,18 @@ import type { ArrowFunction, TypedArray, StorageSource, DataSchema, DataBounds }
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
+import { QueueReconciler } from '../reconcilers';
 import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
-import { yeet, signal, useOne, useMemo, useNoMemo } from '@use-gpu/live';
+import { yeet, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   seq,
   toCPUDims,
   isUniformArrayType,
   getUniformArrayDepth,
 
-  makeDataArray,
+  makeCPUArray,
   copyRecursiveNumberArray,
   getBoundingBox,
   toDataBounds,
@@ -23,7 +24,9 @@ import {
   schemaToEmitters,
   getAggregateSummary,
 } from '@use-gpu/core';
-import { toMultiCompositeChunks } from '@use-gpu/parse';
+import { toMultiCompositeChunks, sizeToMultiCompositeChunks } from '@use-gpu/parse';
+
+const {signal} = QueueReconciler;
 
 type BooleanList = boolean | boolean[] | (<T>(i: number) => boolean);
 
@@ -59,6 +62,8 @@ export type CompositeDataProps = {
 
   /** Segment decorator(s) */
   segments?: (args: SegmentsInfo) => Record<string, any>,
+  /** Segments from tensor dimensions */
+  tensor?: number[],
 
   /** Receive 1 source per field, in virtual struct-of-array format. Leave empty to yeet sources instead. */
   render?: (sources: Record<string, StorageSource>) => LiveElement,
@@ -80,6 +85,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     start,
     end,
     segments,
+    tensor,
     live = false,
   } = props;
 
@@ -87,16 +93,18 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   const data = propData ? Array.isArray(propData) ? propData : [propData] : null;
   const itemCount = Math.max(0, (count ?? data?.length) - skip);
 
+  if (itemCount === 0) return null;
+
   // Identify an array and index field (if any)
-  const [countKey, indexedKey, isArray, isIndexed] = useMemo(() => {
-    const keys = Object.keys(schema);
+  const [countKey, indexedKey, keys, isArray, isIndexed] = useMemo(() => {
+    const keys = Object.keys(schema).filter(k => data[0][k] != null);
     const countKey = keys.find(k => isUniformArrayType(schema[k].format as any));
     const indexedKey = keys.find(k => schema[k].index);
 
     const isArray = !!countKey;
     const isIndexed = !!indexedKey;
 
-    return [countKey ?? keys[0], indexedKey, isArray, isIndexed];
+    return [countKey ?? keys[0], indexedKey, keys, isArray, isIndexed];
   }, [schema]);
 
   // Resolve segment flags
@@ -115,9 +123,15 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     let vertexCount = itemCount
     let indexCount = itemCount;
 
-    if (isArray && segments) {
-      [vertexCount, chunks, groups] = getChunkCount(schema, countKey, itemCount, data, virtual, skip);
-      if (indexedKey) [indexCount] = getChunkCount(schema, indexKey, itemCount, data, virtual, skip);
+    if (isArray) {
+      if (segments) {
+        [vertexCount, chunks, groups] = getChunkCount(schema, countKey, itemCount, data, virtual, skip);
+        if (indexedKey) [indexCount] = getChunkCount(schema, indexKey, itemCount, data, virtual, skip);
+      }
+      else if (tensor) {
+        [chunks, groups] = sizeToMultiCompositeChunks(tensor);
+        vertexCount = chunks.reduce((a, b) => a + b, 0);
+      }
     }
 
     return [chunks, groups, vertexCount, indexedKey ? indexCount : vertexCount];
@@ -132,12 +146,12 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     const fields = {};
     const attributes = {};
 
-    for (const k in schema) {
+    for (const k in schema) if (keys.includes(k)) {
       const {format, prop = k, index, unwelded, ref} = schema[k];
       if (ref) throw new Error(`Ref '${k}' not supported in <CompositeData>`);
 
       const isArray = isUniformArrayType(format);
-      const {array, dims} = makeDataArray(format, isArray ? (index || unwelded) ? allocIndices : allocVertices : allocItems);
+      const {array, dims} = makeCPUArray(format, isArray ? (index || unwelded) ? allocIndices : allocVertices : allocItems);
       const depth = getUniformArrayDepth(format);
 
       fields[k] = {array, dims, depth, prop};
@@ -164,8 +178,6 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
         starts,
         ends,
     });
-
-    console.log({segmentData}, loops, starts, ends)
 
     const {count: total, indexed, sparse, schema: segmentSchema, ...rest} = segmentData;
     for (const k in rest) if (attributes[k]) throw new Error(`Attribute name '${k}' reserved for segment data.`);
@@ -215,7 +227,6 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
 
   // Aggregate into struct buffers by access policy
   const {sources} = useAggregator(mergedSchema, items);
-  console.log('item', {item: items[0], emitters, total, indexed, sources})
 
   // Tag positions with bounds
   useMemo(() => {

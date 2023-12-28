@@ -1,5 +1,5 @@
 import type { ArchetypeSchema, Emit, TypedArrayConstructor, VectorLike, VectorLikes } from '@use-gpu/core';
-import { isTypedArray, copyNumberArray, copyNestedNumberArray } from '@use-gpu/core';
+import { seq, isTypedArray, copyNumberArray, copyNestedNumberArray } from '@use-gpu/core';
 
 const NO_CHUNKS = new Uint16Array(0);
 
@@ -245,4 +245,18 @@ export const toMultiCompositeChunks = (
 
   const chunks = toCompositeChunks(xs, n);
   return [chunks, [1]];
+};
+
+export const sizeToMultiCompositeChunks = (size: number[]) => {
+  const [segment, group, ...rest] = size;
+
+  if (rest.length === 0) {
+    const chunks = seq(group).map(_ => segment);
+    return [chunks, [1]];
+  }
+
+  const planes = rest.reduce((a, b) => a * b, 1);
+  const chunks = seq(group * planes).map(_ => segment);
+  const groups = seq(planes).map(_ => group);
+  return [chunks, groups];
 };

@@ -6,7 +6,7 @@ import type {
 } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
-import { Virtual } from './virtual';
+import { useDraw } from '../hooks/useDraw';
 
 import { use, yeet, memo, useOne, useNoOne, useRef } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
@@ -70,7 +70,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
     blend,
   });
 
-  return use(Virtual, {
+  return useDraw({
     vertexCount,
     instanceCount,
 

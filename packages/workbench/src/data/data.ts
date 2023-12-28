@@ -3,17 +3,18 @@ import type { ArrowFunction, TypedArray, StorageSource, UniformType, Accessor, D
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
+import { QueueReconciler } from '../reconcilers';
 import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
-import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, useCallback, incrementVersion } from '@use-gpu/live';
+import { yeet, useOne, useMemo, useNoMemo, useCallback, incrementVersion } from '@use-gpu/live';
 import {
   seq,
   toCPUDims,
   isUniformArrayType,
   getUniformArrayDepth,
 
-  makeDataArray,
+  makeCPUArray,
   copyRecursiveNumberArray,
   getBoundingBox,
   toDataBounds,
@@ -24,6 +25,8 @@ import {
   getAggregateSummary,
 } from '@use-gpu/core';
 import { toMultiCompositeChunks } from '@use-gpu/parse';
+
+const {signal} = QueueReconciler;
 
 export type DataProps = {
   /** WGSL schema of input data + accessors */
@@ -79,7 +82,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
       if (index || unwelded) throw new Error(`Use <CompositeData> for indexed and unwelded data`);
       if (isUniformArrayType(format)) throw new Error(`Use <CompositeData> for array data`);
 
-      const {array, dims} = makeDataArray(format, allocItems);
+      const {array, dims} = makeCPUArray(format, allocItems);
 
       fields[k] = {array, dims, prop};
       attributes[k] = array;

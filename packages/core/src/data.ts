@@ -14,6 +14,16 @@ export const alignSizeTo = (n: number, s: number) => {
 
 export const makeRawArray = (byteSize: number) => new ArrayBuffer(byteSize);
 
+export const makeCPUArray = (type: UniformType, length: number) => {
+  const ctor  = getUniformArrayType(type);
+  const dims  = getUniformDims(type);
+
+  const n = length * toCPUDims(dims);
+
+  const array = new ctor(n);
+  return {array, dims};
+};
+
 export const makeDataArray = (type: UniformType, length: number) => {
   const ctor  = getUniformArrayType(type);
   const dims  = getUniformDims(type);
@@ -342,7 +352,7 @@ export const copyRecursiveNumberArray = (
     const n = from.length;
     let b = 0;
     for (let i = 0; i < n; ++i) {
-      const l = copyRecursiveNumberArray(from, to, dimsIn, dimsOut, fromDepth - 1, b, w);
+      const l = copyRecursiveNumberArray(from, to, fromDims, toDims, fromDepth - 1, b, w);
       b += l;
     }
     return b;

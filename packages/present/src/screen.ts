@@ -66,7 +66,7 @@ export const Screen: LC<ScreenProps> = memo((props: ScreenProps) => {
     HAS_MASK: !!mask,
   }), [defs, mask]);
 
-  return use(Virtual, {
+  return useDraw({
     vertexCount,
     instanceCount,
 

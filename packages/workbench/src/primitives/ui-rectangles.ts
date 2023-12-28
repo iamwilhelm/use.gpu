@@ -6,7 +6,7 @@ import type {
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { Virtual } from './virtual';
+import { useDraw } from '../hooks/useDraw';
 
 import { use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import { getBundleKey } from '@use-gpu/shader/wgsl';
@@ -115,7 +115,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     DEBUG_SDF: debugContours,
   }), [defs, debugContours, mask]);
 
-  return use(Virtual, {
+  return useDraw({
     vertexCount,
     instanceCount,
 

@@ -3,8 +3,11 @@ import type { TypedArray, DataTexture, TextureSource } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
-import { yeet, signal, memo, useOne, useMemo, useNoMemo, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
+import { QueueReconciler } from '../reconcilers';
+import { yeet, memo, useOne, useMemo, useNoMemo, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
 import { makeSampler, makeRawTexture, uploadDataTexture, updateMipTextureChain, updateMipArrayTextureChain } from '@use-gpu/core';
+
+const {signal} = QueueReconciler;
 
 export type RawTextureProps = {
   /** Texture data */

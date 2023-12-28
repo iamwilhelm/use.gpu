@@ -3,10 +3,11 @@ import type { TypedArray, StorageSource, UniformType, VectorLike, DataSchema, Da
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
+import { QueueReconciler } from '../reconcilers';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
 import { useStructSources } from '../hooks/useStructSources';
-import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, incrementVersion } from '@use-gpu/live';
+import { yeet, extend, gather, useOne, useMemo, useNoMemo, incrementVersion } from '@use-gpu/live';
 import {
   makePackedLayout,
   makeDataArray, normalizeSchema,
@@ -14,6 +15,8 @@ import {
   getBoundingBox, toDataBounds,
   isUniformArrayType,
 } from '@use-gpu/core';
+
+const {signal} = QueueReconciler;
 
 export type InterleavedDataProps = {
   /** Input data, array of flat values with packed array-of-structs layout */

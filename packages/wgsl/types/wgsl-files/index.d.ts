@@ -270,7 +270,7 @@ declare module "@use-gpu/wgsl/instance/index/face.wgsl" {
 declare module "@use-gpu/wgsl/instance/index/interleave.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getIndex: ParsedBundle;
+  export const getInterleaveIndex: ParsedBundle;
   export default __module;
 }
 
@@ -579,7 +579,7 @@ declare module "@use-gpu/wgsl/plot/axis.wgsl" {
 declare module "@use-gpu/wgsl/plot/grid-auto.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getGridAutoPosition: ParsedBundle;
+  export const getGridAutoState: ParsedBundle;
   export default __module;
 }
 
@@ -590,10 +590,24 @@ declare module "@use-gpu/wgsl/plot/grid.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/plot/loop.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const loopSurface: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/plot/scale.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getScalePosition: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/plot/surface-normal.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getSurfaceNormal: ParsedBundle;
   export default __module;
 }
 
@@ -602,7 +616,6 @@ declare module "@use-gpu/wgsl/plot/surface.wgsl" {
   const __module: ParsedBundle;
   export const getSurfaceIndex: ParsedBundle;
   export const getSurfaceUV: ParsedBundle;
-  export const getSurfaceNormal: ParsedBundle;
   export default __module;
 }
 

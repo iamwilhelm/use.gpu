@@ -2,9 +2,9 @@ import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
 import type { UseGPURenderContext } from '@use-gpu/core';
 import type { LightEnv, RenderComponents, VirtualDraw, AggregatedCalls } from '../pass/types';
 
-import { use, yeet, provide, unquote, multiGather, memo, useMemo, useOne } from '@use-gpu/live';
+import { use, yeet, provide, unquote, multiGather, memo, useCallback, useMemo } from '@use-gpu/live';
 
-import { PassContext, VirtualContext } from '../providers/pass-provider';
+import { PassContext, VariantContext } from '../providers/pass-provider';
 import { PassReconciler } from '../reconcilers';
 
 import { DebugRender } from './forward/debug';
@@ -44,12 +44,9 @@ export const FullScreenRenderer: LC<FullScreenRendererProps> = memo((props: Prop
     children,
   } = props;
 
-  const virtualContext = useOne(() => {
-    const useVariants = (virtual: VirtualDraw, hovered: boolean) =>
-      useMemo(() => hovered ? [DebugRender] : COMPONENTS.modes[virtual.mode], [virtual, hovered]);
-
-    return useVariants;
-  });
+  const useVariants = useCallback((virtual: VirtualDraw, hovered: boolean) =>
+    useMemo(() => hovered ? [DebugRender] : COMPONENTS.modes[virtual.mode], [virtual, hovered])
+  );
 
   // Pass aggregrated calls to pass runners
   const Resume = (
@@ -75,7 +72,7 @@ export const FullScreenRenderer: LC<FullScreenRendererProps> = memo((props: Prop
         provide(PassContext, NO_ENV,
           multiGather(
             unquote(
-              provide(VirtualContext, virtualContext, children)
+              provide(VariantContext, useVariants, children)
             ),
             Resume
           )

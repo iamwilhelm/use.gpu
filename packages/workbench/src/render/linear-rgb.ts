@@ -53,37 +53,35 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: PropsWithChildre
       format: "rgba16float",
       colorSpace: 'linear',
     }),
-    ([target]: UseGPURenderContext[]) =>
-      use(RenderToTexture, {
-        target,
-        children,
-        then: (texture: TextureSource) => {
-          const {then} = props;
+    ([target]: UseGPURenderContext[]) => {
+      const {then} = props;
 
-          const g = useShaderRef(gain);
-          const defs = useOne(() => ({IS_OPAQUE: !overlay}), overlay);
+      const g = useShaderRef(gain);
+      const defs = useOne(() => ({IS_OPAQUE: !overlay}), overlay);
 
-          const filter = useMemo(() => {
-            let filter = getShader(gainColor, [g], defs);
-            if (tonemap === 'aces') filter = chainTo(filter, tonemapACES);
-            return filter;
-          }, [defs, tonemap]);
+      const filter = useMemo(() => {
+        let filter = getShader(gainColor, [g], defs);
+        if (tonemap === 'aces') filter = chainTo(filter, tonemapACES);
+        return filter;
+      }, [defs, tonemap]);
 
-          const view = useMemo(() =>
-            use(Pass, {
-              mode: 'fullscreen',
-              picking: false,
-              children:
-                use(RawFullScreen, {
-                  texture,
-                  filter,
-                }),
+      const view = useMemo(() => [
+        use(RenderToTexture, {
+          target,
+          children,
+        }),
+        use(Pass, {
+          mode: 'fullscreen',
+          picking: false,
+          children:
+            use(RawFullScreen, {
+              texture: target.source,
+              filter,
             }),
-            [texture, filter]
-          );
+        }),
+      ], [target, filter]);
 
-          return then ? [view, then(texture)] : view;
-        },
-      })
+      return then ? [view, then(texture)] : view;
+    },
   );
 };

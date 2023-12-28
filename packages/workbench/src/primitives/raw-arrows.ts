@@ -6,7 +6,7 @@ import type {
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { Virtual } from './virtual';
+import { useDraw } from '../hooks/useDraw';
 
 import { use, yeet, memo, useCallback, useOne, useMemo, useNoMemo, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
@@ -147,7 +147,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   }), [defs, instanceDefs, flat]);
 
   return (
-     use(Virtual, {
+     useDraw({
       vertexCount,
       instanceCount: totalCount,
       bounds,

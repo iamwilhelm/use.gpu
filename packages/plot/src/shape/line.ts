@@ -61,7 +61,6 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       slices,
       unwelds,
 
-      data,
       ...flags
   } = parsed;
 

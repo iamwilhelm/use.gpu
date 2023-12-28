@@ -11,13 +11,13 @@ export type PassContextProps = {
   bind?: (...args: any[]) => (passEncoder: GPURenderPassEncoder) => void,
 };
 
-export type VirtualContextProps = (virtual: VirtualDraw, hovered: boolean) => null | LiveComponent | LiveComponent[];
+export type VariantContextProps = (virtual: VirtualDraw, hovered: boolean) => null | LiveComponent | LiveComponent[];
 
 export const PassContext = makeContext<PassContextProps>(undefined, 'PassContext');
-export const VirtualContext = makeContext<VirtualContextProps>(undefined, 'VirtualContext');
+export const VariantContext = makeContext<VariantContextProps>(undefined, 'VariantContext');
 
 export const usePassContext = () => useContext<PassContextProps>(PassContext);
 export const useNoPassContext = () => useNoContext(PassContext);
 
-export const useVirtualContext = () => useContext<VirtualContextProps>(VirtualContext);
-export const useNoVirtualContext = () => useNoContext(VirtualContext);
+export const useVariantContext = () => useContext<VariantContextProps>(VariantContext);
+export const useNoVariantContext = () => useNoContext(VariantContext);

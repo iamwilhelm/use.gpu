@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter, Time, DataBounds } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { provide, yeet, signal, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
+import { provide, yeet, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, copyNumberArray, emitIntoNumberArray,
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
@@ -14,6 +14,7 @@ import {
 import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
+import { QueueReconciler } from '../reconcilers';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
 import { useSource, useNoSource } from '../hooks/useSource';
@@ -21,6 +22,8 @@ import { getShader } from '../hooks/useShader';
 
 import { chainTo } from '@use-gpu/shader/wgsl';
 import { getInterleaveIndex } from '@use-gpu/wgsl/instance/index/interleave.wgsl';
+
+const {signal} = QueueReconciler;
 
 export type RawDataProps = {
   /** Set/override input length */

@@ -9,7 +9,10 @@ import {
 } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
+import { QueueReconciler } from '../reconcilers';
 import { useBufferedSize } from '../hooks/useBufferedSize';
+
+const {signal} = QueueReconciler;
 
 type Queued = {instance: number, data: Record<string, any>};
 type FieldBuffer = {
@@ -176,7 +179,8 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
       indexSource.version = version;
     }, version);
 
-    return then ? then(indexSource, fieldSources) : null;
+    const trigger = useOne(() => signal(), version);
+    return then ? [trigger, then(indexSource, fieldSources)] : trigger;
   };
 
   return render ? capture(InstanceCapture, render(useInstance), Resume) : null;

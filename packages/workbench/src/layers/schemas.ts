@@ -41,7 +41,6 @@ export const SHAPE_SCHEMA = expandArrays({
   ids:        {format: 'u32', single: 'id'},
   lookups:    {format: 'u32', single: 'lookup'},
   colors:     {format: 'vec4<f32>', single: 'color'},
-  depths:     {format: 'f32', single: 'depth'},
   zBiases:    {format: 'f32', single: 'zBias'},
 });
 
@@ -56,6 +55,7 @@ export const POINT_SCHEMA = {
   ...expandArrays({
     positions: {format: 'vec4<f32>', single: 'position'},
     sizes:     {format: 'f32', single: 'size'},
+    depths:     {format: 'f32', single: 'depth'},
   }),
 };
 
@@ -70,6 +70,7 @@ export const LINE_SCHEMA = {
   ...expandArrays({
     positions: {format: 'array<vec4<f32>>', single: 'position'},
     widths:    {format: 'f32', single: 'width'},
+    depths:     {format: 'f32', single: 'depth'},
   }),
 };
 
@@ -89,6 +90,7 @@ export const ARROW_SCHEMA = {
     positions: {format: 'array<vec4<f32>>', single: 'position'},
     widths:    {format: 'f32', single: 'width'},
     sizes:     {format: 'f32', single: 'size'},
+    depths:     {format: 'f32', single: 'depth'},
   }),
 };
 
@@ -106,3 +108,13 @@ export const FACE_SCHEMA = {
   }),
 };
 
+export const SURFACE_SCHEMA = {
+  ids:        {format: 'array<u32>'},
+  lookups:    {format: 'array<u32>'},
+  colors:     {format: 'array<vec4<f32>>'},
+  zBiases:    {format: 'array<f32>'},
+  ...expandArrays({
+    positions: {format: 'array<vec4<f32>>', single: 'position'},
+    debug: {format: 'f32'},
+  }),
+};

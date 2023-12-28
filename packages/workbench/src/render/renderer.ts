@@ -5,7 +5,7 @@ import type { AggregatedCalls, RenderComponents, VirtualDraw } from '../pass/typ
 import { use, memo, unquote, provide, multiGather, extend, useMemo } from '@use-gpu/live';
 import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries } from '@use-gpu/core';
 
-import { PassContext, VirtualContext } from '../providers/pass-provider';
+import { PassContext, VariantContext } from '../providers/pass-provider';
 import { useDeviceContext } from '../providers/device-provider';
 import { PassReconciler } from '../reconcilers';
 
@@ -66,7 +66,7 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
   }, [device, buffers, entries, renderContext]);
 
   // Provide draw call variants for sub-passes
-  const virtualContext = useMemo(() => {
+  const useVariants = useMemo(() => {
     const {shadow, picking} = buffers;
 
     const getRender = (mode: string, render: string | null = null) =>
@@ -131,7 +131,7 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
         provide(PassContext, passContext,
           multiGather(
             unquote(
-              provide(VirtualContext, virtualContext, children)
+              provide(VariantContext, useVariants, children)
             ),
             Resume
           )

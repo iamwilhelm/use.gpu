@@ -306,7 +306,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       indirect: indirectReadout2,
       shouldDispatch,
     }),
-    use(Virtual, {
+    useDraw({
       bounds,
       indirect: indirectStorage,
 

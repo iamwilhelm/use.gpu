@@ -158,11 +158,14 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
       
       const props = flip ? props1 : props2;
       if (!paused) {
+        // Deduct pause time from elapsed on resume
         if (pausedRef.current) {
-          startRef.current += elapsed - pausedRef.current;
+          startedRef.current += elapsed - pausedRef.current;
           pausedRef.current = 0;
         }
-
+      }
+      if (!paused || pausedRef.current === elapsed) {
+        // Run if not paused or first frame
         flip = !flip;
 
         const time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;

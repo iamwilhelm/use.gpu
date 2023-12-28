@@ -6,7 +6,7 @@ import type {
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { Virtual } from './virtual';
+import { useDraw } from '../hooks/useDraw';
 
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoOne, useNoCallback } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -197,7 +197,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   }), [defs, flat, fragDepth, instanceDefs, hasSegments, unwelded]);
 
   return (
-    use(Virtual, {
+    useDraw({
       vertexCount,
       instanceCount: totalCount,
       bounds,

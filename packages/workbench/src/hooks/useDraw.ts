@@ -8,9 +8,7 @@ import { PassReconciler } from '../reconcilers';
 
 const {quote} = PassReconciler;
 
-export type VirtualProps = VirtualDraw;
-
-export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) => {
+export const useDraw = (props: VirtualDraw) => {
   const useVariants = useVariantContext();
 
   const hovered = useInspectHoverable();
@@ -27,4 +25,4 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     const component = variants;
     return quote(use(component, props));
   }
-}, 'Virtual');
+};

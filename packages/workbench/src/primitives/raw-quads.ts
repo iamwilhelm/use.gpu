@@ -6,7 +6,7 @@ import type {
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { Virtual } from './virtual';
+import { useDraw } from '../hooks/useDraw';
 
 import { use, memo, useCallback, useOne, useMemo, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, chainTo } from '@use-gpu/shader/wgsl';
@@ -127,7 +127,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     HAS_EDGE_BLEED: true,
   }), [defs, instanceDefs]);
 
-  return use(Virtual, {
+  return useDraw({
     vertexCount,
     instanceCount,
     bounds,

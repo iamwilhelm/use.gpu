@@ -31,6 +31,7 @@ export const PlotCartesianPage: LC = () => {
           <Pass>
             <Plot>
               <Animate
+                paused
                 loop
                 mirror
                 delay={0}

@@ -6,7 +6,7 @@ import type {
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { Virtual } from './virtual';
+import { useDraw } from '../hooks/useDraw';
 
 import { use, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
@@ -130,7 +130,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     DEBUG_SDF: false,
   }), [defs]);
 
-  return use(Virtual, {
+  return useDraw({
     vertexCount,
     instanceCount,
     bounds,

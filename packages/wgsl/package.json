@@ -425,10 +425,20 @@
       "import": "./src/plot/grid.wgsl",
       "require": "./src/plot/grid.wgsl"
     },
+    "./plot/loop.wgsl": {
+      "types": "./src/plot/loop.wgsl.d.ts",
+      "import": "./src/plot/loop.wgsl",
+      "require": "./src/plot/loop.wgsl"
+    },
     "./plot/scale.wgsl": {
       "types": "./src/plot/scale.wgsl.d.ts",
       "import": "./src/plot/scale.wgsl",
       "require": "./src/plot/scale.wgsl"
+    },
+    "./plot/surface-normal.wgsl": {
+      "types": "./src/plot/surface-normal.wgsl.d.ts",
+      "import": "./src/plot/surface-normal.wgsl",
+      "require": "./src/plot/surface-normal.wgsl"
     },
     "./plot/surface.wgsl": {
       "types": "./src/plot/surface.wgsl.d.ts",

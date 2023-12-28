@@ -622,3 +622,13 @@ export const FacesTrait = combine(
   DataContextTrait,
   FaceSegmentsTrait,
 );
+
+export const SurfaceTrait = combine(
+  ColorsTrait({ composite: true }),
+  Loop2DTrait,
+  CompositeVerticesTrait,
+  DataContextTrait('positions', 'colors', 'zBiases', 'ids', 'lookups'),
+  trait({
+    size: optional(parseScalarArray),
+  }),
+);

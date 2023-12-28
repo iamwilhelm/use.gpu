@@ -18,7 +18,8 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useSource } from '../hooks/useSource';
 import { useShader } from '../hooks/useShader';
 
-import { getSurfaceIndex, getSurfaceNormal, getSurfaceUV } from '@use-gpu/wgsl/plot/surface.wgsl';
+import { getSurfaceIndex, getSurfaceUV } from '@use-gpu/wgsl/plot/surface.wgsl';
+import { getSurfaceNormal } from '@use-gpu/wgsl/plot/surface-normal.wgsl';
 
 export type SurfaceLayerProps = {
   position?: VectorLike,
@@ -42,6 +43,7 @@ export type SurfaceLayerProps = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const [SIZE_BINDING] = bundleToAttributes(getSurfaceIndex);
+const POSITION_BINDING = bundleToAttributes(getSurfaceIndex);
 
 /** Draws 2D surfaces across the X and Y data dimension. */
 export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: SurfaceLayerProps) => {
@@ -80,13 +82,14 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
   const indices = useShader(getSurfaceIndex, [boundSize], defines);
 
   const p = useShaderRef(props.position, props.positions);
-  const normals = useShader(getSurfaceNormal, [boundSize, p], defines);
+  const ps = useSource({format: 'vec4<f32>', name: 'positions'}, p);
+
+  const normals = useShader(getSurfaceNormal, [boundSize, ps]);
 
   const uvs = useShader(getSurfaceUV, [boundSize]);
 
   return use(RawFaces, {
-    position,
-    positions,
+    positions: ps,
     color,
     colors,
     st,

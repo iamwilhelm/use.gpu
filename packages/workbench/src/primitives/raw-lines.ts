@@ -6,7 +6,7 @@ import type {
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { Virtual } from './virtual';
+import { useDraw } from '../hooks/useDraw';
 
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
@@ -165,7 +165,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     LINE_JOIN_SIZE: segments,
   }), [defs, instanceDefs, style, segments]);
 
-  return use(Virtual, {
+  return useDraw({
     vertexCount,
     instanceCount: totalCount,
     bounds,

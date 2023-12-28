@@ -1,9 +1,9 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { memo, use } from '@use-gpu/live';
+import { memo, use, useOne } from '@use-gpu/live';
 import { makeUseTrait, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
-import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
+import { adjustSchema } from '@use-gpu/core';
 import { useInspectHoverable, CompositeData, SurfaceLayer, SURFACE_SCHEMA } from '@use-gpu/workbench';
 
 import {
@@ -48,6 +48,7 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
 
       size,
       tensor,
+      formats,
       ...flags
   } = parsed;
 
@@ -56,8 +57,10 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
+  const schema = useOne(() => adjustSchema(SURFACE_SCHEMA, formats), formats);
+
   return use(CompositeData, {
-    schema: SURFACE_SCHEMA,
+    schema,
     data: parsed,
     tensor: size ?? tensor,
     render: (sources: Record<string, ShaderSource>) => use(SurfaceLayer, {

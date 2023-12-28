@@ -69,7 +69,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
   } = props;
 
   const sizeExpr = useMemo(() => () =>
-    (props.positions as any)?.size ?? resolve(size),
+    resolve(size) ?? (props.positions as any)?.size,
     [props.positions, size]);
   const boundSize = useSource(SIZE_BINDING, sizeExpr);
 

@@ -18,7 +18,6 @@
 };
 
 
-
 @export struct PickVertex {
   position: vec4<f32>,
   scissor: vec4<f32>,

@@ -3,7 +3,7 @@ import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { useOne, useMemo, useNoMemo, useVersion } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
-import { bindingToModule } from '@use-gpu/shader/wgsl';
+import { bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
 
 type Ref<T> = { current: T };
 
@@ -23,16 +23,24 @@ export const getSource = <T = any>(
   source: ShaderSource | T,
 ) => {
   const s = source as any;
+  let shader;
 
   // ParsedBundle | ParsedModule
-  if (s.module || s.table) return s;
+  if (s.module || s.table) shader = s as ShaderModule;
 
   // LambdaSource
-  if (s.shader) return s.shader;
+  if (s.shader) shader = s.shader;
+
+  // If shader return type matches, bind directly, otherwise make a binding with a cast
+  if (shader) {
+    const {format} = bundleToAttribute(shader);
+    if (format === def.format) return shader;
+    console.warn(format, def.format)
+  }
 
   const binding = makeShaderBinding<ShaderModule>(def, s);
   return bindingToModule(binding);
-}
+};
 
 export const useNoSource = useNoMemo;
 

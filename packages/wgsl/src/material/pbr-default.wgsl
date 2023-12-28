@@ -1,6 +1,6 @@
 use '@use-gpu/wgsl/fragment/pbr'::{ PBRParams };
 
-const roughness: f32 = 0.5;
+const roughness: f32 = 0.35;
 const metalness: f32 = 0.0;
 
 @export fn getDefaultPBRMaterial(

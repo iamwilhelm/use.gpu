@@ -31,7 +31,6 @@ export const PlotCartesianPage: LC = () => {
           <Pass>
             <Plot>
               <Animate
-                paused
                 loop
                 mirror
                 delay={0}
@@ -140,16 +139,18 @@ export const PlotCartesianPage: LC = () => {
                       />
                       <Line
                         width={2}
-                        color={[0.5, 0.5, 1, 0.5]}
+                        color={[0.5, 0.5, 1, 0.25]}
                         depth={0.5}
                         zBias={1}
+                        blend="add"
                       />
                       <Transpose axes='yx'>
                         <Line
                           width={2}
-                          color={[0.5, 0.5, 1, 0.5]}
+                          color={[0.5, 0.5, 1, 0.25]}
                           depth={0.5}
                           zBias={1}
+                          blend="add"
                         />
                       </Transpose>
                     </RangeSampler>

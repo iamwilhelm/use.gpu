@@ -3,7 +3,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { TraitProps } from '@use-gpu/traits/live';
 
 import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
-import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
+import { schemaToArchetype, schemaToEmitters, adjustSchema } from '@use-gpu/core';
 import { yeet, memo, keyed, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
@@ -55,7 +55,8 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       loop,
       loops,
 
-      schema,
+      schema: _,
+      formats,
       tensor,
       segments,
       slices,
@@ -73,8 +74,9 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
   const context = useTransformContext();
   const {transform, nonlinear, matrix: refs} = context;
 
-  const attributes = schemaToEmitters(LINE_SCHEMA, parsed);
-  const archetype = schemaToArchetype(LINE_SCHEMA, attributes, flags, refs);
+  const schema = useOne(() => adjustSchema(LINE_SCHEMA, formats), formats);
+  const attributes = schemaToEmitters(schema, parsed);
+  const archetype = schemaToArchetype(schema, attributes, flags, refs);
 
   if (Number.isNaN(count)) debugger;
   if (!count) return;
@@ -86,8 +88,9 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       attributes,
       flags,
       refs,
-      transform: nonlinear ?? context,
+      schema: formats ? schema : undefined,
       scissor,
+      transform: nonlinear ?? context,
       zIndex,
     },
   };

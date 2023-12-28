@@ -11,7 +11,7 @@ import {
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
-  Plot, Spherical, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
+  Plot, Spherical, Axis, Grid, Label, Line, RangeSampler, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 
 const π = Math.PI;
@@ -114,7 +114,7 @@ export const PlotSphericalPage: LC = () => {
                     origin={[0, 0, 1]}
                   />
 
-                  <Sampled
+                  <RangeSampler
                     axes='x'
                     format='vec3<f32>'
                     size={[256]}
@@ -125,11 +125,11 @@ export const PlotSphericalPage: LC = () => {
                   >
                     <Line
                       width={4}
-                      color={0x3090FF}
+                      color={'#3090FF'}
                       depth={0.5}
                       zBias={1}
                     />
-                  </Sampled>
+                  </RangeSampler>
                 </Spherical>
               </Animate>
             </Plot>

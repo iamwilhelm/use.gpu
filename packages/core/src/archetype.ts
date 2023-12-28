@@ -19,6 +19,7 @@ import {
 import {
   getUniformAlign,
   getUniformDims,
+  getUniformArrayDepth,
   isUniformArrayType,
   getUniformElementType,
   toCPUDims,
@@ -45,6 +46,22 @@ export const normalizeSchema = <T>(schema: Record<string, string | T>) => {
   for (const k in schema) {
     const f = schema[k];
     out[k] = typeof f === 'string' ? {format: f} : f;
+  }
+  return out;
+};
+
+export const adjustSchema = <T>(schema: Record<string, string | T>, formats: Record<string, string>) => {
+  const out = {};
+  for (const k in schema) {
+    const field = schema[k];
+    let format = formats[k];
+
+    if (!format) out[k] = field; 
+    else {
+      const depth = getUniformArrayDepth(field.format);
+      for (let i = 0; i < depth; ++i) format = `array<${format}>`;
+      out[k] = {...field, format};
+    }
   }
   return out;
 };

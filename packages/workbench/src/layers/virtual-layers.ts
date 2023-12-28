@@ -116,7 +116,7 @@ const Aggregate: LiveFunction<any> = (
   const {transform, material, scissor, flags} = item;
   const {schema, component} = layerAggregator;
 
-  const {count, sources, uploadRefs} = useAggregator(schema, items);
+  const {count, sources, uploadRefs} = useAggregator(item.schema ?? schema, items);
 
   return useMemo(() => {
     const {matrices, normalMatrices, ...rest} = sources;

@@ -1,4 +1,4 @@
-import type { DataBounds, StorageSource, LambdaSource, TextureSource, TypedArray, UniformAttributeValue } from '@use-gpu/core';
+import type { DataBounds, StorageSource, LambdaSource, TextureSource, TypedArray, UniformAttribute } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import type { TransformBounds } from '../providers/transform-provider';
 import type { Ref } from '@use-gpu/live';
@@ -14,7 +14,7 @@ import { useMatrixBounds, useNoMatrixBounds, useMatrixTransform, useNoMatrixTran
 
 import { mat3 } from 'gl-matrix';
 
-const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u32'], value: [0, 0, 0, 0] } as UniformAttributeValue;
+const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u32'] } as UniformAttribute;
 
 export const useApplyTransform = (
   positions?: StorageSource | LambdaSource | TextureSource | ShaderModule | Ref<TypedArray | number[]> | (() => TypedArray | number[]) | null,

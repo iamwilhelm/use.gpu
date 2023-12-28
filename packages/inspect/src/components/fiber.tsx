@@ -268,12 +268,17 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   // Resolve hover-state
   const selected = fiber === selectState;
-  const hovered  = hoverState.fiber?.id ?? -1;
-  const parents  = hoverState.fiber?.by === fiber.id;
-  const depends  = hoverState.deps.indexOf(fiber.id) >= 0 || (hoverState.root === fiber);
-  const precedes = hoverState.precs.indexOf(fiber.id) >= 0 || (yeeted?.root === hoverState.fiber && yeeted.value !== undefined);
-  const quoted   = hoverState.fiber?.quote?.to === fiber || fiber?.quote?.to === hoverState.fiber;
-  const unquoted = hoverState.fiber?.unquote?.to === fiber || !!(hoverState.fiber && fiber?.unquote?.to === hoverState.fiber);
+  const {fiber: hoverF, deps, precs, root} = hoverState;
+
+  const hovered  = hoverF?.id ?? -1;
+  const parents  = hoverF?.by === fiber.id;
+  const depends  = deps.indexOf(fiber.id) >= 0 || (root === fiber);
+  const precedes = precs.indexOf(fiber.id) >= 0 || (yeeted?.root === hoverF && yeeted.value !== undefined);
+  const quoted   = (
+    (hoverF?.quote ? hoverF.quotes.get(hoverF.quote).to === fiber : false) ||
+    (fiber?.quote ? fiber.quotes.get(fiber.quote).to === hoverF : false)
+  );
+  const unquoted = hoverF?.unquote?.to === fiber || !!(hoverF && fiber?.unquote?.to === hoverF);
 
   // Resolve depth-highlighting
   const subnode = hoverState.by ? isSubNode(hoverState.by, fiber) : true;

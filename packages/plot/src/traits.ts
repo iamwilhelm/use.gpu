@@ -309,16 +309,29 @@ export const DataContextTrait = (...keys: string[]) => {
   return (
     props: {},
     parsed: {
+      formats: Record<string, string>,
       tensor: number[],
     },
   ) => {
     const dataContext = useDataContext();
 
-    for (const k in dataContext) if (match.has(k)) {
-      const {array, size} = dataContext[k];
-      if (!(props as any)[k]) (parsed as any)[k] = array;
-      if (k === 'positions') parsed.tensor = size;
-    }
+    const data = useMemo(() => {
+      const data = {formats: {}};
+      let n = 0;
+      for (const k in dataContext) if (match.has(k)) {
+        const {array, format, dims, size} = dataContext[k];
+        if (!(props as any)[k]) {
+          data[k] = array;
+          data.formats[k] = format;
+          n++;
+
+          if (k === 'positions') data.tensor = size;
+        }
+      }
+      return n ? data : {};
+    }, [dataContext]);
+
+    for (const k in data) parsed[k] = data[k];
   };
 };
 

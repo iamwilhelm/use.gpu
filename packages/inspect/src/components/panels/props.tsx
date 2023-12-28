@@ -76,7 +76,13 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, api}) => {
       const [children, then, fallback] = args;
       props = {children, then, fallback};
     }
+    else if (f.name === 'QUOTE') {
+      const [reconciler] = args;
+      props = {reconciler: reconciler.displayName};
+    }
     else if (f.name === 'SIGNAL') {
+      const reconciler = args;
+      props = {reconciler: reconciler.displayName};
     }
     else {
       if (args.length === 1 && typeof args[0] === 'object') props = args[0];

@@ -1,4 +1,5 @@
 import type { LiveFunction, LiveComponent } from '@use-gpu/live';
+import type { AggregateSchema } from '@use-gpu/core';
 import type { PointShape } from '@use-gpu/parse';
 import type { LineLayerFlags } from '../line-layer';
 import type { FaceLayerFlags } from '../face-layer';
@@ -21,6 +22,7 @@ export type BaseAggregate = {
   transform?: TransformContextProps,
   material?: MaterialContextProps,
   scissor?: ScissorContextProps,
+  schema?: AggregateSchema,
   zIndex?: number,
 };
 

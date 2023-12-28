@@ -16,10 +16,10 @@ type CallProps = {
 
 export const Call: React.FC<CallProps> = ({fiber}) => {
   // @ts-ignore
-  const {id, depth, runs, path, order, keys, type, state, context, yeeted, quote, unquote, mount, mounts, next, ...rest} = fiber;
+  const {id, depth, runs, path, order, keys, type, state, context, yeeted, quotes, quote, unquote, mount, mounts, next, ...rest} = fiber;
 
   let props = {id, runs, depth, path, keys, '[internals]': rest} as any;
-  let env = {context, yeeted, quote, unquote} as any;
+  let env = {context, yeeted, quotes, unquote, quote: quote?.displayName} as any;
   let rendered = {type, mount, mounts, next, order} as any;
 
   if (!mount) delete rendered.mount;
@@ -28,7 +28,8 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
 
   if (!context.values.size) delete env.context;
   if (!yeeted) delete env.yeeted;
-  if (!quote) delete env.quote;
+  if (!quotes) delete env.quotes;
+  if (!env.quote) delete env.quote;
   if (!unquote) delete env.unquote;
 
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});

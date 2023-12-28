@@ -1,10 +1,10 @@
 import type { LiveComponent, LiveFiber, LiveElement } from '@use-gpu/live';
 import type { LambdaSource, TextureSource } from '@use-gpu/core';
 
-import { memo, use, wrap, provide, signal, useFiber, useMemo, useOne, makeContext } from '@use-gpu/live';
+import { memo, use, wrap, provide, useFiber, useMemo, useOne, makeContext } from '@use-gpu/live';
 import { LiveCanvas } from '@use-gpu/react';
 import { wgsl } from '@use-gpu/shader/wgsl';
-import { Pass, FlatCamera, FontLoader, Queue, DeviceContext, getShader, getLambdaSource } from '@use-gpu/workbench';
+import { Pass, FlatCamera, FontLoader, Queue, DeviceContext, getShader, getLambdaSource, QueueReconciler } from '@use-gpu/workbench';
 import { AutoCanvas } from '@use-gpu/webgpu';
 import { UI, Layout, Flex, Block, Inline, Text, Overflow, Absolute } from '@use-gpu/layout';
 
@@ -16,6 +16,8 @@ import { UseInspect } from '@use-gpu/inspect';
 import { inspectGPU } from '.';
 
 import { decodeOctahedral } from '@use-gpu/wgsl/codec/octahedral.wgsl';
+
+const {signal} = QueueReconciler;
 
 const NO_OPS: any[] = [];
 const toArray = <T,>(x?: T | T[]): T[] => Array.isArray(x) ? x : x ? [x] : NO_OPS;

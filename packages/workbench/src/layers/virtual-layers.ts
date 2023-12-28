@@ -92,12 +92,8 @@ const Resume = (
     const items = aggregates[type];
     if (!items.length) continue;
 
-    // Pass on unknown types, probably raw draw calls
     const layerAggregator = AGGREGATORS[type];
-    if (!layerAggregator && type !== 'element') {
-      els.push(yeet({[type]: items}));
-      continue;
-    }
+    if (!layerAggregator) continue;
 
     for (let item of items) if (item) {
       partitioner.push(item, type);
@@ -106,18 +102,8 @@ const Resume = (
 
   const layers = partitioner.resolve();
   for (const {key, type, items} of layers) {
-    if (type === 'element') {
-      for (const item of items) {
-        const {transform, material, scissor, element} = item;
-        
-        const layer = provideContext(element, item);
-        els.push(layer);
-      }
-    }
-    else {
-      const layerAggregator = AGGREGATORS[type];
-      els.push(keyed(Aggregate, key, layerAggregator, items));
-    }
+    const layerAggregator = AGGREGATORS[type];
+    els.push(keyed(Aggregate, key, layerAggregator, items));
   }
   return els;
 }, aggregates);

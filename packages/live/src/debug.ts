@@ -236,7 +236,13 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
   if (typeof x === 'function') {
     const name = `${x.displayName ?? x.name}(…)`;
     const body = x.toString().split(/=>/)[1];
-    return body != null ? name + truncate(body.replace(/\s+/g, ' '), 40) : name;
+    return body != null ? (
+      name + truncate(
+        body
+        .replace(/\s+/g, ' ')
+        .replace(/\(0,_use_gpu_[a-z_]+__WEBPACK_IMPORTED_MODULE_[0-9]+__.resolve\)/g, '')
+      , 40)
+    ) : name;
   }
   if (typeof x === 'object') {
     if (x.constructor.name.match(ARRAY_OR_BUFFER)) {

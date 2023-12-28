@@ -1,4 +1,4 @@
-import type { LiveFunction, LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveFunction, LiveComponent } from '@use-gpu/live';
 import type { PointShape } from '@use-gpu/parse';
 import type { LineLayerFlags } from '../line-layer';
 import type { FaceLayerFlags } from '../face-layer';
@@ -22,10 +22,6 @@ export type BaseAggregate = {
   material?: MaterialContextProps,
   scissor?: ScissorContextProps,
   zIndex?: number,
-};
-
-export type ElementAggregate = BaseAggregate & {
-  element: LiveElement,
 };
 
 export type ShapeAggregate = BaseAggregate & {
@@ -135,7 +131,6 @@ export type FaceAggregate = ShapeAggregate & {
 };
 
 export type LayerAggregate = {
-  element: ElementAggregate | ElementAggregrate[],
   point: PointAggregate | PointAggregate[],
   line: LineAggregate | LineAggregate[],
   arrow: ArrowAggregate | ArrowAggregate[],

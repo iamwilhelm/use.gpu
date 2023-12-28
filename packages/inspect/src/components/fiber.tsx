@@ -1,6 +1,6 @@
 import type { LiveFiber } from '@use-gpu/live';
 import type { Cursor } from '@use-gpu/state';
-import { formatValue, isSubNode, YEET, DEBUG } from '@use-gpu/live';
+import { formatValue, isSubNode, YEET, DEBUG, RECONCILE } from '@use-gpu/live';
 
 import React, { memo, useMemo, useLayoutEffect, useRef, PropsWithChildren } from 'react';
 
@@ -182,7 +182,7 @@ export const FiberLegend: React.FC = () => {
           </TreeLegendItem>
         </TreeLegendGroup>
       </TreeLegendColumns>
-      <TreeTip><Muted>Double click to focus tree view</Muted></TreeTip>
+      <TreeTip><Muted>Double click to focus a fiber in the tree</Muted></TreeTip>
     </div></TreeLegend>
   </>)
 };
@@ -284,14 +284,15 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   // Resolve node omission
   const isFocused = !!focusDepth || ((focusState != null) ? fiber.id === focusState : true);
-  const shouldTerminate = fiber.f?.isLiveReconcile && !builtin;
-  const shouldRenderFull = (
+  const isBuiltin = !builtins && (fiber.f?.isLiveBuiltin || fiber.f?.isLiveReconcile) && (fiber.f !== RECONCILE);
+  const isVisible = (
     isFocused &&
     !skipDepth &&
-    (renderDepth < depthLimit) &&
-    (builtins || !(fiber.f?.isLiveBuiltin || fiber.f?.isLiveReconcile))
+    (renderDepth < depthLimit)
   );
-  const shouldRender = shouldRenderFull || shouldTerminate;
+  const shouldRenderFull = !isBuiltin;
+  const shouldTerminate = fiber.f?.isLiveReconcile && !builtin;
+  const shouldRender = (shouldRenderFull || shouldTerminate) && isVisible;
   const shouldAbsolute = !shouldRender && (parents || depends || precedes || quoted || unquoted);
   const shouldStartOpen = fiber.f !== DEBUG && !fiber.__inspect?.react;
 

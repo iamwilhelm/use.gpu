@@ -106,6 +106,16 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
 
   let showProps = f !== YEET;
 
+  const getQuote = () => {
+    const {quotes, quote} = fiber;
+    if (!quote) return null;
+    
+    const {to} = quotes.get(quote)!;
+    const f = to.mounts.get(fiber.id);
+    if (f) return renderFiberButton(f, selectFiber);
+    return null;
+  };
+
   const getHistory = () => {
     let parent = fiber;
     if (parent.by) {
@@ -117,29 +127,19 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
         parent = source as any;
       }
       if (parents.length) {
-        return parents.map((fiber) => {
-          const text = formatNode(fiber);
-          const name = formatNodeName(fiber);
-          const parts = text.split(name);
-          return (
-            <Fiber key={fiber.id} onClick={() => {
-              selectFiber(fiber);
-            }}><div>
-              {parts[0]}
-              <FiberName>{name}</FiberName>
-              {parts.slice(1).join(' ')}
-            </div></Fiber>
-          );
-        });
+        return parents.map((fiber) => renderFiberButton(fiber, selectFiber));
       }
     }
     return '[Runtime]';
   };
 
+  let [quote, setQuote] = useState(getQuote);
   let [history, setHistory] = useState(getHistory);
   useLayoutEffect(() => {
     const h = getHistory();
+    const q = getQuote();
     if (h.length !== history.length) setHistory(h);
+    if (q?.key !== quote?.key) setQuote(q);
   });
 
   return (<>
@@ -156,9 +156,31 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
     ) : null}
     {showProps && yt ? <Spacer /> : null}
     {yt}
+    {quote ? (<>
+      <Spacer />
+      <div><b>Quoted</b></div>
+      <div>{quote}</div>
+    </>) : null}
     <Spacer />
     <div><b>Rendered By</b></div>
     <div>{history}</div>
   </>);
 }
 
+const renderFiberButton = (
+  fiber: LiveFiber<any>,
+  selectFiber: (fiber: LiveFiber<any>) => void,
+) => {
+  const text = formatNode(fiber);
+  const name = formatNodeName(fiber);
+  const parts = text.split(name);
+  return (
+    <Fiber key={fiber.id} onClick={() => {
+      selectFiber(fiber);
+    }}><div>
+      {parts[0]}
+      <FiberName>{name}</FiberName>
+      {parts.slice(1).join(' ')}
+    </div></Fiber>
+  );
+}

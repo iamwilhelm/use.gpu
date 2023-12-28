@@ -2,10 +2,10 @@ import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
 import type { StorageSource, TextureSource, UseGPURenderContext } from '@use-gpu/core';
 import type { AggregatedCalls, RenderComponents, VirtualDraw } from '../pass/types';
 
-import { use, memo, provide, multiGather, extend, useMemo } from '@use-gpu/live';
+import { use, memo, reconcile, quote, unquote, provide, multiGather, extend, useMemo } from '@use-gpu/live';
 import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries } from '@use-gpu/core';
 
-import { PassContext } from '../providers/pass-provider';
+import { PassContext, VirtualContext } from '../providers/pass-provider';
 import { useDeviceContext } from '../providers/device-provider';
 
 import { ComputePass } from '../pass/compute-pass';
@@ -32,7 +32,7 @@ const NO_CONTEXT: Record<string, any> = {};
 export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<RendererProps>) => {
   const {
     entries = NO_ENTRIES,
-    context: passContext = NO_CONTEXT,
+    context: renderContext = NO_CONTEXT,
     overlay = false,
     merge = false,
 
@@ -44,8 +44,8 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
 
   const device = useDeviceContext();
 
-  const context = useMemo(() => {
-    const {shadow, picking} = buffers;
+  // Pass on shared render context(s) for renderables
+  const passContext = useMemo(() => {
 
     // Prepare shared bind group for forward/deferred lighting
     const hasEntries = !!entries.length;
@@ -59,7 +59,13 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
       };
     } : () => () => {};
 
-    // Provide draw call variants for sub-passes
+    return {buffers, layout, bind, context: renderContext};
+  }, [device, buffers, entries, renderContext]);
+
+  // Provide draw call variants for sub-passes
+  const virtualContext = useMemo(() => {
+    const {shadow, picking} = buffers;
+
     const getRender = (mode: string, render: string | null = null) =>
       components.modes[mode] ?? components.renders[render!]?.[mode];
 
@@ -86,8 +92,8 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
     const useVariants = (virtual: VirtualDraw, hovered: boolean) =>
       useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
 
-    return {useVariants, buffers, layout, bind, context: passContext};
-  }, [device, buffers, entries, passContext]);
+    return useVariants;
+  }, [device, buffers, components]);
 
   // Pass aggregrated calls to pass runners
   const Resume = (
@@ -116,5 +122,18 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
       ];
     }, [calls, buffers, passes, overlay, merge]);
 
-  return provide(PassContext, context, multiGather(children, Resume));
+  return (
+    reconcile(
+      quote(
+        provide(PassContext, passContext,
+          multiGather(
+            unquote(
+              provide(VirtualContext, virtualContext, children)
+            ),
+            Resume
+          )
+        )
+      )
+    )
+  );
 }, 'Renderer');

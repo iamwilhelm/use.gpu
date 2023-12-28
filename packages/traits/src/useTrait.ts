@@ -34,7 +34,7 @@ export const trait = <
     for (const k in propDef) {
       const v = (input as any)[k];
       const p = useProp(v, (propDef as any)[k], defaults ? defaults[k] : undefined);
-      (output as any)[k] = p;
+      if (p !== undefined || k in output)(output as any)[k] = p;
     }
   };
 };

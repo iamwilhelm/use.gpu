@@ -185,7 +185,7 @@ export const formatNode = <F extends Function>(_node: LiveElement<F>): string =>
 }
 
 export const formatArrayLike = (x: any, seen: WeakMap<object, boolean> = new WeakMap()) => {
-  if (x.byteLength != null) x = new Uint8Array(x.slice(0, 100));
+  if (!x.buffer && x.byteLength != null) x = new Uint8Array(x.slice(0, 100));
 
   const out = [];
   const length = x.length ?? 0;

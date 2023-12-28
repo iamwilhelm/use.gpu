@@ -1,6 +1,6 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type {
-  TypedArray, ViewUniforms, DeepPartial, Lazy,
+  VectorLike, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, LambdaSource, DataBounds,
 } from '@use-gpu/core';
@@ -27,14 +27,14 @@ import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 import { getMaskedColor } from '@use-gpu/wgsl/mask/masked.wgsl';
 
 export type RawQuadsProps = {
-  position?: number[] | TypedArray,
-  rectangle?: number[] | TypedArray,
-  color?: number[] | TypedArray,
+  position?: VectorLike,
+  rectangle?: VectorLike,
+  color?: VectorLike,
   depth?: number,
   zBias?: number,
   mask?: number,
-  uv?: number[] | TypedArray,
-  st?: number[] | TypedArray,
+  uv?: VectorLike,
+  st?: VectorLike,
 
   positions?: ShaderSource,
   rectangles?: ShaderSource,

@@ -5,7 +5,7 @@ import type { XYZW } from '@use-gpu/core';
 
 import { makeUseTrait, optional, combine, trait, useProp } from '@use-gpu/traits/live';
 import { parseBoolean, parseIntegerPositive, parseAxis, parseVec4 } from '@use-gpu/parse';
-import { yeet, memo, use, fragment, gather, provide, useContext, useFiber, useOne, useMemo } from '@use-gpu/live';
+import { yeet, memo, use, fragment, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   useShader, useNoShader,
   useViewContext, useRawSource,
@@ -38,7 +38,6 @@ const Traits = combine(
   GridTrait,
   LineTrait,
   ROPTrait,
-  ZIndexTrait,
   trait({
     origin: parseVec4,
     auto: optional(parseBoolean),
@@ -63,7 +62,6 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const {
     axes, range, loop,
     origin, auto,
-    zIndex,
     ...flags
   } = useTraits(props);
 
@@ -74,7 +72,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const secondDetail = useProp(props.second?.detail, parseIntegerPositive);
 
   const parentRange = useRangeContext();
-  const transform = useTransformContext();
+  const transform = auto ? useTransformContext() : useNoTransformContext();
 
   const getGrid = (options: ScaleTrait, detail: number, index: number, other: number) => {
     const main  = parseAxis(axes[index]);
@@ -130,7 +128,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
 
     const defines = useOne(() => ({ LINE_DETAIL: detail, GRID_AUTO: !!auto }), detail);
     const bound = useShader(getGridPosition, [data, m, m1, m2, s, autoBound], defines);
-
+  
     // Expose position source
     const source = useMemo(() => ({
       shader: bound,
@@ -138,8 +136,9 @@ export const Grid: LiveComponent<GridProps> = (props) => {
       size: [n],
     }), [bound]);
 
-    source.length = n;
-    source.size[0] = n;
+    const l = n * (auto ? 2 : 1);
+    source.length = l;
+    source.size[0] = l;
 
     return source;
   };
@@ -150,27 +149,18 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   // const firstLoop = loop || props.first?.loop;
   // const secondLoop = loop || props.second?.loop;
 
-  const {id} = useFiber();
-  const view = fragment([
-    props.first !== null ? use(LineLayer, {
-      count: () => firstPositions.length * (auto ? 2 : 1),
-      positions: firstPositions,
-      segments: getLineSegment,
-      ...flags,
-    }) : null,
-    props.second !== null ? use(LineLayer, {
-      count: () => secondPositions.length * (auto ? 2 : 1),
-      positions: secondPositions,
-      segments: getLineSegment,
-      ...flags,
-    }) : null,
-  ], id);
-
-  return yeet({
-    element: {
-      transform,
-      element: view,
-      zIndex,
-    },
-  });
+  return useMemo(() => (
+    fragment([
+      props.first !== null ? use(LineLayer, {
+        positions: firstPositions,
+        segments: getLineSegment,
+        ...flags,
+      }) : null,
+      props.second !== null ? use(LineLayer, {
+        positions: secondPositions,
+        segments: getLineSegment,
+        ...flags,
+      }) : null,
+    ])
+  ), [firstPositions, secondPositions, auto, flags]);
 };

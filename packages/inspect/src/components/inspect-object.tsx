@@ -61,7 +61,7 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
   }
 
   if (object?.constructor?.name?.match(/Array/)) {
-    if (object.byteLength != null) {
+    if (!object.buffer && object.byteLength != null) {
       object = new Uint8Array(object.slice(0, 100));
       extra = object.byteLength > 100;
     }

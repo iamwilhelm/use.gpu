@@ -5,6 +5,8 @@ import type { LayerAggregator, LayerAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
 import { TransformContext } from '../providers/transform-provider';
+import { MaterialContext } from '../providers/material-provider';
+import { ScissorContext } from '../providers/scissor-provider';
 import { use, keyed, fragment, quote, yeet, provide, signal, multiGather, extend, useMemo, useOne } from '@use-gpu/live';
 import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
@@ -19,7 +21,7 @@ import { ArrowLayer } from './arrow-layer';
 
 import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA, INSTANCE_SCHEMA } from './schemas';
 
-const DEBUG = true;
+const DEBUG = false;
 
 export type VirtualLayersProps = {
   items?: Record<string, LayerAggregate[]>,
@@ -43,15 +45,18 @@ export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props: VirtualL
   return items ? Resume(items) : children ? multiGather(children, Resume) : null;
 };
 
-const provideTransform = (
+const provideContext = (
   element: LiveElement,
-  transform?: TransformContextProps,
+  item?: LayerAggregate,
   refSources?: Record<string, ShaderSource>,
 ) => {
   if (!element) return null;
+  const {material, scissor, transform} = item;
 
   const hasRefTransform = !!refSources?.matrices;
   const hasTransform = !!transform?.key;
+  const hasMaterial = !!material;
+  const hasScissor = !!scissor;
 
   let view = element;
   if (hasRefTransform) {
@@ -59,6 +64,12 @@ const provideTransform = (
   }
   if (hasTransform) {
     view = provide(TransformContext, transform, view, element.key);
+  }
+  if (hasMaterial) {
+    view = provide(MaterialContext, material, view, element.key);
+  }
+  if (hasScissor) {
+    view = provide(ScissorContext, scissor, view, element.key);
   }
   return view;
 };
@@ -93,8 +104,9 @@ const Resume = (
   for (const {key, type, items} of layers) {
     if (type === 'element') {
       for (const item of items) {
-        const {transform, element} = item;
-        const layer = provideTransform(element, transform);
+        const {transform, material, scissor, element} = item;
+        
+        const layer = provideContext(element, item);
         els.push(layer);
       }
     }
@@ -111,7 +123,7 @@ const Aggregate: LiveFunction<any> = (
   items: LayerAggregate[],
 ) => {
   const [item] = items;
-  const {transform, flags} = item;
+  const {transform, material, scissor, flags} = item;
   const {schema, component} = layerAggregator;
 
   const {count, sources, uploadRefs} = useAggregator(schema, items);
@@ -123,16 +135,22 @@ const Aggregate: LiveFunction<any> = (
     DEBUG && console.log(component.name, {props, items, sources});
 
     const element = use(component, props);
-    const layer = provideTransform(element, transform, sources);
+    const layer = provideContext(element, item, sources);
 
-    const upload = useOne(() => uploadRefs ? quote(yeet(uploadRefs)) : null, uploadRefs);
+    const upload = useOne(() => uploadRefs ? quote(quote(yeet(uploadRefs))) : null, uploadRefs);
     return upload ? [upload, layer] : layer;
-  }, [count, sources, transform, flags, uploadRefs]);
+  }, [count, sources, transform, material, scissor, flags, uploadRefs]);
 };
 
 const getItemTypeKey = (item: LayerAggregate) =>
-  ('transform' in item
-    ? (item.transform?.key || 0)
+  ('material' in item && item.material
+    ? getObjectKey(item.material)
+    : 0) ^
+  ('scissor' in item && item.scissor
+    ? getBundleKey(item.scissor)
+    : 0) ^
+  ('transform' in item && item.transform
+    ? (item.transform.key || 0)
     : 0) ^
   mixBits53(item.archetype, item.zIndex ?? 0);
 

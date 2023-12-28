@@ -155,21 +155,27 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
       let {current: started} = startedRef;
       if (started < 0) started = startedRef.current = elapsed;
       if (paused && !pausedRef.current) pausedRef.current = elapsed;
-      if (!paused && pausedRef.current) {
-        startRef.current += elapsed - pausedRef.current;
-        pausedRef.current = 0;
-      }
-
-      flip = !flip;
+      
       const props = flip ? props1 : props2;
+      if (!paused) {
+        if (pausedRef.current) {
+          startRef.current += elapsed - pausedRef.current;
+          pausedRef.current = 0;
+        }
 
-      const time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
-      const [t, max] = getLoopedTime(time, length, rest, repeat, mirror);
+        flip = !flip;
 
-      for (let k in props) props[k] = evaluateKeyframes(script[k], t, ease);
+        const time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
+        const [t, max] = getLoopedTime(time, length, rest, repeat, mirror);
 
-      if (time < max && !paused) useAnimationFrame();
-      else useNoAnimationFrame();
+        for (let k in props) props[k] = evaluateKeyframes(script[k], t, ease);
+
+        if (time < max) useAnimationFrame();
+        else useNoAnimationFrame();
+      }
+      else {
+        useNoAnimationFrame();
+      }
 
       if (render) return tracks ? render(props) : (prop ? render(props[prop]) : null);
       if (children) return extend(children, props);

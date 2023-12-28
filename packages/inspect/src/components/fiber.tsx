@@ -247,6 +247,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   hoveredCursor,
   focusCursor,
   continuation,
+  builtin,
   wide,
   indented = 1,
   indent = 0,
@@ -283,7 +284,14 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   // Resolve node omission
   const isFocused = !!focusDepth || ((focusState != null) ? fiber.id === focusState : true);
-  const shouldRender = isFocused && !skipDepth && (renderDepth < depthLimit) && (builtins || !fiber.f?.isLiveBuiltin);
+  const shouldTerminate = fiber.f?.isLiveReconcile && !builtin;
+  const shouldRenderFull = (
+    isFocused &&
+    !skipDepth &&
+    (renderDepth < depthLimit) &&
+    (builtins || !(fiber.f?.isLiveBuiltin || fiber.f?.isLiveReconcile))
+  );
+  const shouldRender = shouldRenderFull || shouldTerminate;
   const shouldAbsolute = !shouldRender && (parents || depends || precedes || quoted || unquoted);
   const shouldStartOpen = fiber.f !== DEBUG && !fiber.__inspect?.react;
 
@@ -348,7 +356,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   }
 
   // Render node itself
-  let nodeRender = (shouldRender || shouldAbsolute) ? (
+  let nodeRender = (shouldRenderFull || shouldAbsolute) ? (
     <Node
       key={id}
       fiber={fiber}
@@ -478,6 +486,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         wide={true}
         indent={indent}
         continuation
+        builtin={fiber.f?.isLiveBuiltin}
       />
     );
   }

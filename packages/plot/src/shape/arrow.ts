@@ -13,7 +13,6 @@ import {
   ArrowsTrait,
 
   ArrowTrait,
-  LineTrait,
   ROPTrait,
   StrokeTrait,
   ZIndexTrait,
@@ -23,7 +22,6 @@ const Traits = combine(
   ArrowsTrait,
 
   ArrowTrait,
-  LineTrait,
   ROPTrait,
   StrokeTrait,
   ZIndexTrait,

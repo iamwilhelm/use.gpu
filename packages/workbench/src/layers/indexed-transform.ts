@@ -18,7 +18,6 @@ export const IndexedTransform: FC<IndexedTransformProps> = (props: IndexedTransf
   const {matrices, normalMatrices, children} = props;
 
   const transform = useMatrixTransformSources(matrices, normalMatrices);
-  console.log({props, transform})
 
   return (
     provide(MatrixContext, NO_MAT4,

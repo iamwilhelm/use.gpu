@@ -749,6 +749,7 @@ export const makeFiberReconciliation = <F extends ArrowFunction, R>(
     const {next} = fiber;
     reconcileFiberOrder(fiber);
   };
+  Resume.isLiveReconcile = true;
   return makeNextFiber(fiber, Resume, name);
 }
 

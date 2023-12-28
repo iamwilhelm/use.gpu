@@ -192,7 +192,7 @@ export const parseRotation = (vec?: VectorLike | number): vec3 => {
     if (typeof vec === 'number') return vec3.fromValues(0, 0, vec);
     return vec3.fromValues(vec[0] ?? 0, vec[1] ?? 0, vec[2] ?? 0);
   }
-  return defaults;
+  return vec3.fromValues(0, 0, 0);
 };
 
 export const parseScale = (vec?: VectorLike | number): vec3 => {
@@ -200,7 +200,7 @@ export const parseScale = (vec?: VectorLike | number): vec3 => {
     if (typeof vec === 'number') return vec3.fromValues(vec, vec, vec);
     return vec3.fromValues(vec[0] ?? 1, vec[1] ?? 1, vec[2] ?? 1);
   }
-  return defaults;
+  return vec3.fromValues(1, 1, 1);
 };
 
 ///////////////////////////

@@ -1,34 +1,61 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
-import type { TraitProps } from '@use-gpu/traits/live';
+import type { ColorTrait, LineTrait, ROPTrait, SurfaceTrait } from '../types';
 
-import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
-import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
-import { yeet, memo, keyed, useOne, useMemo } from '@use-gpu/live';
-import { vec4 } from 'gl-matrix';
+import { use } from '@use-gpu/live';
+import { SurfaceLayer } from '@use-gpu/workbench';
 
-import { getLineSegments, useInspectHoverable, useTransformContext, useScissorContext, LineLayer, LINE_SCHEMA } from '@use-gpu/workbench';
+import { makeUseTrait, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 
 import {
-  LinesTrait,
+  SurfaceTrait,
 
-  DataContextTrait,
+  ColorTrait,
+  FaceTrait,
   ROPTrait,
   StrokeTrait,
   ZIndexTrait,
 } from '../traits';
 
 const Traits = combine(
-  LinesTrait,
+  SurfaceTrait,
 
-  DataContextTrait,
+  ColorTrait,
+  FaceTrait,
   ROPTrait,
   StrokeTrait,
   ZIndexTrait,
 );
+
 const useTraits = makeUseTrait(Traits);
 
-export type LineProps = TraitProps<typeof Traits>;
+export type SurfaceProps = TraitProps<typeof Traits>;
+
+export const Surface: LiveComponent<SurfaceProps> = (props) => {
+  const {side, shadow, colors} = props;
+
+  const positions = useContext(DataContext) ?? undefined;
+
+  const {loopX, loopY, shaded} = useSurfaceTrait(props);
+  const color = useColorTrait(props);
+  const rop = useROPTrait(props);
+
+  return (
+    use(SurfaceLayer, {
+      positions,
+      color,
+      colors,
+      loopX,
+      loopY,
+      shadow,
+      shaded,
+      side,
+      ...rop,
+    })
+  );
+};
+
+
 
 export const Line: LiveComponent<LineProps> = memo((props) => {
   const parsed = useTraits(props);
@@ -70,9 +97,8 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
+  const {transform, nonlinear, matrix: refs} = useTransformContext();
   const scissor = useScissorContext();
-  const context = useTransformContext();
-  const {transform, nonlinear, matrix: refs} = context;
 
   const attributes = schemaToEmitters(LINE_SCHEMA, parsed);
   const archetype = schemaToArchetype(LINE_SCHEMA, attributes, flags, refs);

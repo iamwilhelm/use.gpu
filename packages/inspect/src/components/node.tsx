@@ -23,6 +23,7 @@ type NodeProps = {
   parents?: boolean,
   depth?: number,
   ooo?: boolean,
+  terminator?: boolean,
   runCount?: boolean,
   onClick?: (e: any) => void,
   onMouseEnter?: (e: any) => void,
@@ -42,6 +43,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   parents,
   depth,
   ooo,
+  terminator,
   runCount,
   onClick,
   onDoubleClick,
@@ -82,7 +84,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   if (hovered !== -1) classes.push('hovering');
   if (hovered === id) classes.push('hovered');
   if (hovered === by) classes.push('by');
-  if (f.isLiveBuiltin) classes.push('builtin');
+  if (f.isLiveBuiltin || f.isLiveReconcile) classes.push('builtin');
   classes.push(`depth-${Math.min(4, depth || 0)}`);
   const className = classes.join(' ');
 

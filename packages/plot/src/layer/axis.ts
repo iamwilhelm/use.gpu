@@ -3,11 +3,10 @@ import type { VectorLike } from '@use-gpu/traits';
 import type { TraitProps } from '@use-gpu/traits/live';
 
 import { makeUseTrait, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
-import { yeet, memo, use, keyed, gather, provide, useContext, useOne, useFiber, useMemo } from '@use-gpu/live';
+import { memo, use, useOne, useMemo } from '@use-gpu/live';
 import {
-  useShader, useSource, useShaderRef,
+  useShader, useShaderRef,
   LineLayer, ArrowLayer, useArrowSegmentsSource,
-  useTransformContext,
 } from '@use-gpu/workbench';
 import { parseVec4, parseIntegerPositive } from '@use-gpu/parse';
 
@@ -34,7 +33,6 @@ const Traits = combine(
   LoopTrait,
   ColorTrait,
   ROPTrait,
-  ZIndexTrait,
   trait({
     origin: parseVec4,
     detail: parseIntegerPositive,
@@ -52,7 +50,6 @@ export const Axis: LiveComponent<AxisProps> = memo((props) => {
     axis, range,
     loop, start, end,
     origin, detail,
-    zIndex,
     ...flags
   } = parsed;
 
@@ -77,11 +74,8 @@ export const Axis: LiveComponent<AxisProps> = memo((props) => {
   const [chunks, loops] = useMemo(() => [[n], loop], [n, loop]);
   const {segments, anchors, trims} = useArrowSegmentsSource(chunks, loops, start, end);
 
-  const transform = useTransformContext();
-
-  const {id} = useFiber();
-  const element = (
-    keyed(start || end ? ArrowLayer : LineLayer, id, {
+  return useMemo(() => (
+    use(start || end ? ArrowLayer : LineLayer, {
       positions,
       segments,
       anchors,
@@ -90,15 +84,7 @@ export const Axis: LiveComponent<AxisProps> = memo((props) => {
 
       ...flags,
     })
-  );
-
-  return yeet({
-    element: {
-      transform,
-      element,
-      zIndex,
-    },
-  });
+  ), [start, end, positions, segments, anchors, trims, n, flags]);
 }, shouldEqual({
   origin: sameShallow(),
   range: sameShallow(sameShallow()),

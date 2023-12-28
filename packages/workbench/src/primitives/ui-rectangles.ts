@@ -1,6 +1,6 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type {
-  TypedArray, ViewUniforms, DeepPartial, Lazy,
+  VectorLike, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, TextureSource, LambdaSource,
 } from '@use-gpu/core';
@@ -23,15 +23,15 @@ import { getUIRectangleVertex } from '@use-gpu/wgsl/instance/vertex/ui-rectangle
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
 
 export type UIRectanglesProps = {
-  rectangle?: number[] | TypedArray,
-  radius?: number[] | TypedArray,
-  border?: number[] | TypedArray,
-  stroke?: number[] | TypedArray,
-  fill?: number[] | TypedArray,
-  uv?: number[] | TypedArray,
-  st?: number[] | TypedArray,
+  rectangle?: VectorLike,
+  radius?: VectorLike,
+  border?: VectorLike,
+  stroke?: VectorLike,
+  fill?: VectorLike,
+  uv?: VectorLike,
+  st?: VectorLike,
   repeat?: number,
-  sdf?: number[] | TypedArray,
+  sdf?: VectorLike,
 
   rectangles?: ShaderSource,
   radiuses?: ShaderSource,

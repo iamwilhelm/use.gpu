@@ -1,6 +1,6 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type {
-  TypedArray, ViewUniforms, DeepPartial, Lazy,
+  VectorLike, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, DataBounds,
 } from '@use-gpu/core';
@@ -39,11 +39,11 @@ export type RawArrowsFlags = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
 
 export type RawArrowsProps = {
-  anchor?: number[] | TypedArray,
-  position?: number[] | TypedArray,
-  uv?: number[] | TypedArray,
-  st?: number[] | TypedArray,
-  color?: number[] | TypedArray,
+  anchor?: VectorLike,
+  position?: VectorLike,
+  uv?: VectorLike,
+  st?: VectorLike,
+  color?: VectorLike,
   size?: number,
   width?: number,
   depth?: number,

@@ -1,6 +1,6 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type {
-  TypedArray, ViewUniforms, DeepPartial, Lazy,
+  VectorLike, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, DataBounds, GPUGeometry,
 } from '@use-gpu/core';
@@ -32,13 +32,13 @@ export type RawFacesFlags = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>
 
 export type RawFacesProps = {
-  position?: number[] | TypedArray,
-  normal?: number[] | TypedArray,
-  tangent?: number[] | TypedArray,
+  position?: VectorLike,
+  normal?: VectorLike,
+  tangent?: VectorLike,
   segment?: number,
-  uv?: number[] | TypedArray,
-  st?: number[] | TypedArray,
-  color?: number[] | TypedArray,
+  uv?: VectorLike,
+  st?: VectorLike,
+  color?: VectorLike,
   zBias?: number,
 
   positions?: ShaderSource,

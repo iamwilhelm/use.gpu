@@ -4,8 +4,9 @@ import type { LineLayerFlags } from '../line-layer';
 import type { FaceLayerFlags } from '../face-layer';
 import type { PointLayerFlags } from './point-layer';
 import type { ArrowLayerFlags } from './arrow-layer';
-import type { TransformContextProps } from '../providers/transform-provider';
 import type { MaterialContextProps } from '../providers/material-provider';
+import type { ScissorContextProps } from '../providers/scissor-provider';
+import type { TransformContextProps } from '../providers/transform-provider';
 import { mat3, mat4 } from 'gl-matrix';
 
 export type LayerType = 'point' | 'line' | 'arrow' | 'face' | 'element';
@@ -19,6 +20,7 @@ export type BaseAggregate = {
   archetype: number,
   transform?: TransformContextProps,
   material?: MaterialContextProps,
+  scissor?: ScissorContextProps,
   zIndex?: number,
 };
 

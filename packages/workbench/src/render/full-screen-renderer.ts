@@ -2,9 +2,9 @@ import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
 import type { UseGPURenderContext } from '@use-gpu/core';
 import type { LightEnv, RenderComponents, VirtualDraw, AggregatedCalls } from '../pass/types';
 
-import { use, yeet, provide, multiGather, memo, useMemo, useOne } from '@use-gpu/live';
+import { use, yeet, provide, reconcile, quote, unquote, multiGather, memo, useMemo, useOne } from '@use-gpu/live';
 
-import { PassContext } from '../providers/pass-provider';
+import { PassContext, VirtualContext } from '../providers/pass-provider';
 
 import { DebugRender } from './forward/debug';
 import { SolidRender } from './forward/solid';
@@ -41,11 +41,11 @@ export const FullScreenRenderer: LC<FullScreenRendererProps> = memo((props: Prop
     children,
   } = props;
 
-  const context = useOne(() => {
+  const virtualContext = useOne(() => {
     const useVariants = (virtual: VirtualDraw, hovered: boolean) =>
       useMemo(() => hovered ? [DebugRender] : COMPONENTS.modes[virtual.mode], [virtual, hovered]);
 
-    return {useVariants};
+    return useVariants;
   });
 
   // Pass aggregrated calls to pass runners
@@ -65,6 +65,21 @@ export const FullScreenRenderer: LC<FullScreenRendererProps> = memo((props: Prop
         calls.post || calls.readback ? use(ReadbackPass, props) : null,
       ];
     }, [calls, overlay, merge]);
+
+  return (
+    reconcile(
+      quote(
+        provide(PassContext, NO_ENV,
+          multiGather(
+            unquote(
+              provide(VirtualContext, virtualContext, children)
+            ),
+            Resume
+          )
+        )
+      )
+    )
+  );
 
   return provide(PassContext, context, multiGather(children, Resume));
 }, 'FullScreenRenderer');

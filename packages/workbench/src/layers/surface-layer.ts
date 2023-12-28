@@ -1,6 +1,6 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type {
-  TypedArray, ViewUniforms, DeepPartial, Lazy,
+  VectorLike, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, RenderPassMode,
 } from '@use-gpu/core';
@@ -21,13 +21,16 @@ import { useShader } from '../hooks/useShader';
 import { getSurfaceIndex, getSurfaceNormal, getSurfaceUV } from '@use-gpu/wgsl/plot/surface.wgsl';
 
 export type SurfaceLayerProps = {
-  position?: number[] | TypedArray,
-  color?: number[] | TypedArray,
-  st?: number[] | TypedArray,
+  position?: VectorLike,
+  color?: VectorLike,
+  uv?: VectorLike,
+  st?: VectorLike,
+  zBias?: VectorLike,
 
   positions?: ShaderSource,
   colors?: ShaderSource,
   sts?: ShaderSource,
+  zBiases?: ShaderSource,
 
   loopX?: boolean,
   loopY?: boolean,
@@ -49,6 +52,8 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     colors,
     st,
     sts,
+    zBias,
+    zBiases,
 
     loopX = false,
     loopY = false,

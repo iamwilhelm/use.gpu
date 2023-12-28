@@ -1,5 +1,6 @@
 import type { LiveFiber } from '@use-gpu/live';
 import type { Cursor } from '@use-gpu/state';
+import type { InspectState, InspectAPI } from './types'
 import { formatValue, isSubNode, YEET, DEBUG, RECONCILE } from '@use-gpu/live';
 
 import React, { memo, useMemo, useLayoutEffect, useRef, PropsWithChildren } from 'react';
@@ -15,6 +16,8 @@ import { Expandable } from './expandable';
 import { IconItem, SVGChevronDown, SVGChevronLeft, SVGChevronRight, SVGNextOpen, SVGNextClosed, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard, SVGViewOutput } from './svg';
 
 type FiberTreeProps = {
+  state: InspectState,
+  api: InspectAPI,
   fiber: LiveFiber<any>,
   skipDepth: number,
   depthLimit: number,
@@ -22,24 +25,18 @@ type FiberTreeProps = {
   builtins: boolean,
   highlight: boolean,
   legend: boolean,
-  expandCursor: Cursor<ExpandState>,
-  selectedCursor: Cursor<SelectState>,
-  hoveredCursor: Cursor<HoverState>,
-  focusCursor: Cursor<FocusState>,
 }
 
 type FiberNavProps = {
-  focusCursor: Cursor<FocusState>,
+  state: InspectState,
+  api: InspectAPI,
 };
 
 type FiberNodeProps = {
+  api: InspectAPI,
   fiber: LiveFiber<any>,
   fibers: Map<number, LiveFiber<any>>,
   by?: LiveFiber<any> | null,
-  expandCursor: Cursor<ExpandState>,
-  selectedCursor: Cursor<SelectState>,
-  hoveredCursor: Cursor<HoverState>,
-  focusCursor: Cursor<FocusState>,
   indent?: number,
   skipDepth?: number,
   focusDepth?: number,
@@ -55,7 +52,7 @@ type FiberNodeProps = {
 
 type FiberReactNodeProps = {
   reactNode: any,
-  expandCursor: Cursor<ExpandState>,
+  expandedCursor: Cursor<ExpandState>,
   indent?: number,
   first?: boolean,
 }
@@ -81,11 +78,11 @@ const getRenderDepth = (fibers: Map<number, LiveFiber<any>>, fiber: LiveFiber<an
 };
 
 export const FiberNav: React.FC<FiberNavProps> = (props: FiberNavProps) => {
-  const {focusCursor} = props;
-  const [focusState, updateFocusState] = focusCursor();
+  const {api: {focusFiber}, state: {focusedCursor}} = props;
+  const [focusState] = focusedCursor();
   const back = focusState ? (
     <TreeBanner>
-      <InlineButton className="icon-left" onClick={() => updateFocusState(null)}>
+      <InlineButton className="icon-left" onClick={() => focusFiber(null)}>
         <IconItem top={0}><SVGChevronLeft /></IconItem> Back to root
       </InlineButton>
     </TreeBanner>
@@ -189,6 +186,8 @@ export const FiberLegend: React.FC = () => {
 
 // Fiber tree including legend
 export const FiberTree: React.FC<FiberTreeProps> = ({
+  state,
+  api,
   fiber,
   skipDepth,
   depthLimit,
@@ -196,20 +195,18 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   builtins,
   highlight,
   legend,
-  expandCursor,
-  selectedCursor,
-  hoveredCursor,
-  focusCursor,
 }) => {
   const {fibers} = usePingContext();
   const by = fibers.get(fiber.by);
-  const [focusedId] = focusCursor();
+  const [focusedId] = state.focusedCursor();
 
   const Wrap = legend ? TreeWrapperWithLegend : TreeWrapper;
 
   return (
     <Wrap style={{paddingTop: focusedId ? 0 : undefined}}>
       <FiberNode
+        state={state}
+        api={api}
         by={by}
         fiber={fiber}
         fibers={fibers}
@@ -220,10 +217,6 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
         runCounts={runCounts}
         builtins={builtins}
         highlight={highlight}
-        expandCursor={expandCursor}
-        selectedCursor={selectedCursor}
-        hoveredCursor={hoveredCursor}
-        focusCursor={focusCursor}
       />
       {(legend ?? true) ? <FiberLegend /> : null}
     </Wrap>
@@ -232,6 +225,8 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
 
 // One node in the tree
 export const FiberNode: React.FC<FiberNodeProps> = memo(({
+  state,
+  api,
   by,
   fiber,
   fibers,
@@ -242,20 +237,23 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   runCounts = false,
   builtins = false,
   highlight = true,
-  expandCursor,
-  selectedCursor,
-  hoveredCursor,
-  focusCursor,
   continuation,
   builtin,
   wide,
   indented = 1,
   indent = 0,
 }) => {
+  const {
+    expandedCursor,
+    selectedCursor,
+    hoveredCursor,
+    focusedCursor,
+  } = state;
+
   let {id, mount, mounts, next, order, host, yeeted, __inspect} = fiber;
-  const [selectState, updateSelectState] = selectedCursor();
-  const [hoverState, updateHoverState] = hoveredCursor();
-  const [focusState, updateFocusState] = focusCursor();
+  const [selectState] = selectedCursor();
+  const [hoverState] = hoveredCursor();
+  const [focusState] = focusedCursor();
 
   // Avoid jumpyness on hover
   const lockedWide = useMemo(() => (!mount && !mounts && !next), []);
@@ -297,29 +295,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   const shouldStartOpen = fiber.f !== DEBUG && !fiber.__inspect?.react;
 
   // Make click/hover handlers
-  const [select, hover, unhover, focus] = useMemo(() => {
-    const root = () => fiber.yeeted && fiber.type === YEET ? fiber.yeeted.root : null;
-
-    const select  = () => updateSelectState({ $set: fiber });
-    const hover   = () => updateHoverState({ $set: {
-      fiber,
-      by: fibers.get(fiber.by) ?? null,
-      deps: host ? Array.from(host.traceDown(fiber)).map(f => f.id) : [],
-      precs: host ? Array.from(host.traceUp(fiber)) : [],
-      root: root(),
-      depth: renderDepth,
-    } });
-    const unhover = (e: any) => e.altKey || updateHoverState({ $set: {
-      fiber: null,
-      by: null,
-      deps: [],
-      precs: [],
-      root: null,
-      depth: 0,
-    } });
-    const focus = (e: any) => { unhover({}); updateFocusState(fiber.id); e.stopPropagation(); };
-    return [select, hover, unhover, focus];
-  }, [fiber, updateSelectState, updateHoverState]);
+  const {select, hover, unhover, focus} = useMemo(() => api.makeHandlers(fiber, fibers, renderDepth), [fiber, fibers, api, renderDepth]);
 
   const rowRef = useRef<HTMLDivElement>(null);
   const out = [] as React.ReactElement[];
@@ -385,6 +361,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     out.push(
       <FiberNode
         key='mount'
+        state={state}
+        api={api}
         fiber={mount}
         fibers={fibers}
         skipDepth={skipDepth && (skipDepth - 1)}
@@ -394,10 +372,6 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         runCounts={runCounts}
         builtins={builtins}
         highlight={highlight}
-        expandCursor={expandCursor}
-        selectedCursor={selectedCursor}
-        hoveredCursor={hoveredCursor}
-        focusCursor={focusCursor}
         indent={indent}
         indented={+!!shouldRender}
         wide={!!next}
@@ -413,6 +387,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         out.push(
           <FiberNode
             key={key}
+            state={state}
+            api={api}
             fiber={sub}
             fibers={fibers}
             skipDepth={skipDepth && (skipDepth - 1)}
@@ -422,10 +398,6 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             runCounts={runCounts}
             builtins={builtins}
             highlight={highlight}
-            expandCursor={expandCursor}
-            selectedCursor={selectedCursor}
-            hoveredCursor={hoveredCursor}
-            focusCursor={focusCursor}
             indent={indent}
             indented={+!!shouldRender}
             wide={order.length > 1 || !!next}
@@ -445,7 +417,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         <FiberReactNode
           key={'react'}
           reactNode={react.root.current}
-          expandCursor={expandCursor}
+          expandedCursor={expandedCursor}
           indent={indent + 1}
           first={true}
         />
@@ -470,6 +442,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
     nextRender = (
       <FiberNode
+        state={state}
+        api={api}
         fiber={next}
         fibers={fibers}
         skipDepth={skipDepth && (skipDepth - 1)}
@@ -479,10 +453,6 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         runCounts={runCounts}
         builtins={builtins}
         highlight={highlight}
-        expandCursor={expandCursor}
-        selectedCursor={selectedCursor}
-        hoveredCursor={hoveredCursor}
-        focusCursor={focusCursor}
         indented={0}
         wide={true}
         indent={indent}
@@ -509,7 +479,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     return (
       <Expandable
         id={id}
-        expandCursor={expandCursor}
+        expandedCursor={expandedCursor}
         initialValue={shouldStartOpen}
       >{
         (expand, onToggle) => (<>
@@ -555,7 +525,7 @@ export const TreeExpand: React.FC<TreeExpandProps> = ({
 
 export const FiberReactNode: React.FC<FiberReactNodeProps> = memo(({
   reactNode,
-  expandCursor,
+  expandedCursor,
   first = false,
   indent = 0,
 }) => {
@@ -563,14 +533,14 @@ export const FiberReactNode: React.FC<FiberReactNodeProps> = memo(({
 
   const {child, sibling, _debugID} = reactNode;
 
-  const childRender = child ? <FiberReactNode reactNode={child} expandCursor={expandCursor} indent={indent + (sibling ? 1 : .1)} /> : null;
-  const siblingRender = sibling ? <FiberReactNode reactNode={sibling} expandCursor={expandCursor} indent={indent} /> : null;
+  const childRender = child ? <FiberReactNode reactNode={child} expandedCursor={expandedCursor} indent={indent + (sibling ? 1 : .1)} /> : null;
+  const siblingRender = sibling ? <FiberReactNode reactNode={sibling} expandedCursor={expandedCursor} indent={indent} /> : null;
 
   if (child) {
     return (
       <Expandable
         id={'react-' + _debugID}
-        expandCursor={expandCursor}
+        expandedCursor={expandedCursor}
         initialValue={true}
       >{
         (expand, onToggle) => (<>

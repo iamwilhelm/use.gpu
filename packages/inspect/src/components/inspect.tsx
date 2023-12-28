@@ -1,5 +1,5 @@
 import type { LiveFiber } from '@use-gpu/live';
-import type { ExpandState, SelectState, HoverState, OptionState, FocusState, PingState, InspectAppearance } from './types';
+import type { ExpandState, SelectState, HoverState, OptionState, FocusState, PingState, InspectAppearance, InspectState, InspectAPI } from './types';
 
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
 import { useUpdateState, useCursor } from '@use-gpu/state/react';
@@ -64,7 +64,7 @@ export const Inspect: React.FC<InspectProps> = ({
 }) => {
   const {close, toolbar, legend, resize, skip, select} = useAppearance();
 
-  const expandCursor = useCursor(useUpdateState<ExpandState>({}));
+  const expandedCursor = useCursor(useUpdateState<ExpandState>({}));
   const selectedCursor = useCursor(useUpdateState<SelectState>(null));
   const optionCursor = useCursor(useUpdateState<OptionState>(
     {
@@ -79,7 +79,14 @@ export const Inspect: React.FC<InspectProps> = ({
   const hoveredCursor = useCursor(useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
   })));
-  const focusCursor = useCursor(useUpdateState<FocusState>(null));
+  const focusedCursor = useCursor(useUpdateState<FocusState>(null));
+
+  const state = useMemo(() => ({
+    expandedCursor,
+    selectedCursor,
+    hoveredCursor,
+    focusedCursor,
+  }), [expandedCursor, selectedCursor, hoveredCursor, focusedCursor]);
 
   let [selectedFiber, updateSelected] = selectedCursor();
   const [depthLimit] = optionCursor.depth();
@@ -92,7 +99,7 @@ export const Inspect: React.FC<InspectProps> = ({
   const [splitBottom, setSplitBottom] = optionCursor.splitBottom();
   const [inspect, updateInspect] = optionCursor.inspect();
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor();
-  const [focusedId, updateFocused] = focusCursor();
+  const [focusedId, updateFocused] = focusedCursor();
 
   if (!select) selectedCursor()[1] = updateSelected = NOP;
 
@@ -127,6 +134,42 @@ export const Inspect: React.FC<InspectProps> = ({
     return () => setHovered(false);
   }, [hoveredFiber, highlight])
 
+  const api: InspectAPI = useMemo(() => {
+    
+    const selectFiber = (fiber: LiveFiber<any> | null = null) =>
+      updateSelected({ $set: fiber });
+
+    const focusFiber = (fiber: LiveFiber<any>) => updateFocused(fiber.id);
+
+    const hoverFiber = (fiber: LiveFiber<any> | null = null, fibers: Map<LiveFiber<any>> | null, renderDepth: number = 0) =>
+      updateHovered({ $set: fiber ? {
+        fiber,
+        by: fibers?.get(fiber.by) ?? null,
+        deps: fiber.host ? Array.from(fiber.host.traceDown(fiber)).map(f => f.id) : [],
+        precs: fiber.host ? Array.from(fiber.host.traceUp(fiber)) : [],
+        root: fiber.yeeted && fiber.type === YEET ? fiber.yeeted.root : null,
+        depth: renderDepth,
+      } : {
+        fiber: null,
+        by: null,
+        deps: [],
+        precs: [],
+        root: null,
+        depth: 0,
+      } });
+    
+    const makeHandlers = (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>, renderDepth: number) => {
+      const select = () => selectFiber(fiber);
+      const hover = () => hoverFiber(fiber, fibers, renderDepth);
+      const unhover = () => hoverFiber(null);
+      const focus = () => focusFiber(fiber);
+
+      return {select, hover, unhover, focus};
+    }
+
+    return {selectFiber, focusFiber, hoverFiber, makeHandlers};
+  }, [updateSelected, updateFocused, updateHovered]);
+
   const tree = (
     <InsetColumnFull>
       {(toolbar ?? true)  ? (
@@ -134,9 +177,11 @@ export const Inspect: React.FC<InspectProps> = ({
           <Options cursor={optionCursor} toggleInspect={onInspect && toggleInspect} />
         </TreeControls>
       ) : null}
-      <FiberNav focusCursor={focusCursor} />
+      <FiberNav state={state} api={api} />
       <TreeView key={focusedId} onClick={() => updateSelected(null)} onDoubleClick={() => updateFocused(null)}>
         <FiberTree
+          state={state}
+          api={api}
           fiber={fiber}
           legend={legend}
           skipDepth={skip}
@@ -144,10 +189,6 @@ export const Inspect: React.FC<InspectProps> = ({
           runCounts={runCounts}
           builtins={builtins}
           highlight={highlight}
-          expandCursor={expandCursor}
-          selectedCursor={selectedCursor}
-          hoveredCursor={hoveredCursor}
-          focusCursor={focusCursor}
         />
       </TreeView>
     </InsetColumnFull>
@@ -159,11 +200,11 @@ export const Inspect: React.FC<InspectProps> = ({
       e.preventDefault();
     }
   };
-
+  
   return (<div className="LiveInspect">
     {open ? (
       <PingProvider fiber={fiber}>
-        <HostHighlight fiber={fiber} findFiber={findFiber} setSelected={setSelected} toggleInspect={toggleInspect} updateHovered={updateHovered} />
+        <HostHighlight fiber={fiber} findFiber={findFiber} toggleInspect={toggleInspect} api={api} />
         <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
           <div style={fullSize
               ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
@@ -182,7 +223,7 @@ export const Inspect: React.FC<InspectProps> = ({
                   : {width: (100 - splitLeft) + '%'}
                 }>
                 <PanelScrollable>
-                  <Panels fiber={selectedFiber} selectFiber={setSelected} fullSize={fullSize} tab={tab} onTab={updateTab} />
+                  <Panels fiber={selectedFiber} api={api} fullSize={fullSize} tab={tab} onTab={updateTab} />
                 </PanelScrollable>
                 {resize ? <Resizer side="top" value={splitBottom} onChange={setSplitBottom} /> : null}
               </RowPanel>
@@ -206,12 +247,11 @@ type HostHighlightProps = {
   fiber: LiveFiber<any>,
   findFiber?: number,
   toggleInspect: () => void,
-  setSelected: (fiber?: LiveFiber<any> | null) => void,
-  updateHovered: (hovered: any) => void,
+  api: InspectAPI,
 };
 
 const HostHighlight = (props: HostHighlightProps) => {
-  const {fiber, findFiber, setSelected, toggleInspect, updateHovered} = props;
+  const {api, fiber, findFiber, toggleInspect} = props;
   const {fibers} = usePingContext();
 
   const {host} = fiber;
@@ -223,38 +263,23 @@ const HostHighlight = (props: HostHighlightProps) => {
       if (fiber) {
         if (active) {
           toggleInspect();
-          return setSelected(fiber);
+          return api.selectFiber(fiber);
         }
 
-        const root = fiber.yeeted && fiber.type === YEET ? fiber.yeeted.root : null;
-        updateHovered({ $set: {
-          fiber,
-          by: fibers.get(fiber.by) ?? null,
-          deps: host ? Array.from(host.traceDown(fiber)).map(f => f.id) : [],
-          precs: host ? Array.from(host.traceUp(fiber)) : [],
-          root,
-          depth: 0,
-        } });
+        api.hoverFiber(fiber, fibers);
       }
       else {
-        updateHovered({ $set: {
-          fiber: null,
-          by: null,
-          deps: [],
-          precs: [],
-          root: null,
-          depth: 0,
-        } });
+        api.hoverFiber(null);
       }
     };
 
     return () => { host.__highlight = () => {}; }
-  }, [host, fibers, setSelected]);
+  }, [host, fibers, api]);
 
   useEffect(() => {
     const find = fibers.get(findFiber!);
-    if (find) setSelected(find);
-  }, [findFiber]);
+    if (find) api.selectFiber(find);
+  }, [findFiber, api]);
 
   return null;
 };

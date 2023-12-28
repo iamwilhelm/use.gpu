@@ -57,3 +57,25 @@ export type InspectProp = {
   enabled: (prop: any) => boolean,
   render: (prop: any) => ReactNode,
 };
+
+type Handler = () => void;
+
+export type InspectState = {
+  expandedCursor: Cursor<ExpandState>,
+  selectedCursor: Cursor<SelectState>,
+  focusedCursor: Cursor<FocusState>,
+  hoveredCursor: Cursor<HoverState>,
+};
+
+export type InspectAPI = {
+  selectFiber: (fiber: LiveFiber<any> | null = null) => void,
+  focusFiber: (fiber: LiveFiber<any>) => void,
+  hoverFiber: (fiber: LiveFiber<any> | null = null, by?: LiveFiber<any> | null, renderDepth?: number) => void,
+  makeHandlers: (fiber: LiveFiber<any>) => {
+    select: Handler,
+    hover: Handler,
+    unhover: Handler,
+    focus: Handler,
+  },
+};
+

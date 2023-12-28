@@ -1,5 +1,5 @@
 import type { LiveFiber } from '@use-gpu/live';
-import type { Action } from '../types';
+import type { Action, InspectAPI } from '../types';
 
 import { formatNode, formatNodeName, YEET } from '@use-gpu/live';
 import { InspectObject } from '../inspect-object';
@@ -15,7 +15,7 @@ const styled: any = _styled;
 type PropsProps = {
   fiber: LiveFiber<any>,
   fibers: Map<number, LiveFiber<any>>,
-  selectFiber: (fiber: LiveFiber<any>) => void,
+  api: InspectAPI,
 };
 
 export const FiberName = styled('span', {
@@ -35,7 +35,7 @@ export const Fiber = styled('div', {
   },
 });
 
-export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
+export const Props: React.FC<PropsProps> = ({fiber, fibers, api}) => {
   // @ts-ignore
   const {id, f, arg, args, yeeted} = fiber;
   const name = formatNodeName(fiber);
@@ -112,7 +112,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
     
     const {to} = quotes.get(quote)!;
     const f = to.mounts.get(fiber.id);
-    if (f) return renderFiberButton(f, selectFiber);
+    if (f) return renderFiberButton(f, fibers, api);
     return null;
   };
 
@@ -127,7 +127,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
         parent = source as any;
       }
       if (parents.length) {
-        return parents.map((fiber) => renderFiberButton(fiber, selectFiber));
+        return parents.map((fiber) => renderFiberButton(fiber, fibers, api));
       }
     }
     return '[Runtime]';
@@ -169,15 +169,19 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
 
 const renderFiberButton = (
   fiber: LiveFiber<any>,
-  selectFiber: (fiber: LiveFiber<any>) => void,
+  fibers: Map<number, LiveFiber<any>>,
+  api: InspectAPI,
 ) => {
   const text = formatNode(fiber);
   const name = formatNodeName(fiber);
   const parts = text.split(name);
   return (
-    <Fiber key={fiber.id} onClick={() => {
-      selectFiber(fiber);
-    }}><div>
+    <Fiber
+      key={fiber.id}
+      onMouseEnter={() => api.hoverFiber(fiber, fibers)}
+      onMouseLeave={() => api.hoverFiber(null)}
+      onClick={() => api.selectFiber(fiber)}
+    ><div>
       {parts[0]}
       <FiberName>{name}</FiberName>
       {parts.slice(1).join(' ')}

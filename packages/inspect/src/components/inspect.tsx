@@ -134,34 +134,49 @@ export const Inspect: React.FC<InspectProps> = ({
     return () => setHovered(false);
   }, [hoveredFiber, highlight])
 
+  const rootId = fiber.id;
+
   const api: InspectAPI = useMemo(() => {
     
     const selectFiber = (fiber: LiveFiber<any> | null = null) =>
       updateSelected({ $set: fiber });
 
-    const focusFiber = (fiber: LiveFiber<any>) => updateFocused(fiber.id);
+    const focusFiber = (fiber: LiveFiber<any> | null = null) => {
+      const id = fiber?.id;
+      updateFocused(id != null && id !== rootId ? id : null);
+    };
 
-    const hoverFiber = (fiber: LiveFiber<any> | null = null, fibers: Map<LiveFiber<any>> | null, renderDepth: number = 0) =>
-      updateHovered({ $set: fiber ? {
-        fiber,
-        by: fibers?.get(fiber.by) ?? null,
-        deps: fiber.host ? Array.from(fiber.host.traceDown(fiber)).map(f => f.id) : [],
-        precs: fiber.host ? Array.from(fiber.host.traceUp(fiber)) : [],
-        root: fiber.yeeted && fiber.type === YEET ? fiber.yeeted.root : null,
-        depth: renderDepth,
-      } : {
-        fiber: null,
-        by: null,
-        deps: [],
-        precs: [],
-        root: null,
-        depth: 0,
-      } });
+    const hoverFiber = (
+      fiber: LiveFiber<any> | null = null,
+      fibers: Map<LiveFiber<any>> | null,
+      renderDepth: number = 0,
+      sticky?: boolean,
+    ) =>
+      updateHovered($apply(prev => {
+        if (sticky && prev.fiber) return prev;
+        if (fiber) return {
+          fiber,
+          by: fibers?.get(fiber.by) ?? null,
+          deps: fiber.host ? Array.from(fiber.host.traceDown(fiber)).map(f => f.id) : [],
+          precs: fiber.host ? Array.from(fiber.host.traceUp(fiber)) : [],
+          root: fiber.yeeted && fiber.type === YEET ? fiber.yeeted.root : null,
+          depth: renderDepth,
+        };
+
+        return {
+          fiber: null,
+          by: null,
+          deps: [],
+          precs: [],
+          root: null,
+          depth: 0,
+        };
+      }));
     
     const makeHandlers = (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>, renderDepth: number) => {
       const select = () => selectFiber(fiber);
-      const hover = () => hoverFiber(fiber, fibers, renderDepth);
-      const unhover = () => hoverFiber(null);
+      const hover = (e: Event) => hoverFiber(fiber, fibers, renderDepth, e.altKey);
+      const unhover = (e: Event) => hoverFiber(null, null, 0, e.altKey);
       const focus = () => focusFiber(fiber);
 
       return {select, hover, unhover, focus};

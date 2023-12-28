@@ -275,10 +275,13 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   const depends  = deps.indexOf(fiber.id) >= 0 || (root === fiber);
   const precedes = precs.indexOf(fiber.id) >= 0 || (yeeted?.root === hoverF && yeeted.value !== undefined);
   const quoted   = (
-    (hoverF?.quote ? hoverF.quotes.get(hoverF.quote).to === fiber : false) ||
-    (fiber?.quote ? fiber.quotes.get(fiber.quote).to === hoverF : false)
+    (hoverF?.quote?.to === fiber) ||
+    (hoverF && fiber?.quote?.to === hoverF)
   );
-  const unquoted = hoverF?.unquote?.to === fiber || !!(hoverF && fiber?.unquote?.to === hoverF);
+  const unquoted = (
+    (hoverF?.unquote?.to === fiber) ||
+    (hoverF && fiber?.unquote?.to === hoverF)
+  );
 
   // Resolve depth-highlighting
   const subnode = hoverState.by ? isSubNode(hoverState.by, fiber) : true;
@@ -293,9 +296,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     !skipDepth &&
     (renderDepth < depthLimit)
   );
-  const shouldRenderFull = !isBuiltin;
-  const shouldTerminate = fiber.f?.isLiveReconcile && !builtin;
-  const shouldRender = (shouldRenderFull || shouldTerminate) && isVisible;
+  const shouldRender = !isBuiltin && isVisible;
+  const shouldTerminate = fiber.f?.isLiveReconcile && !builtin && isVisible;
   const shouldAbsolute = !shouldRender && (parents || depends || precedes || quoted || unquoted);
   const shouldStartOpen = fiber.f !== DEBUG && !fiber.__inspect?.react;
 
@@ -338,7 +340,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   }
 
   // Render node itself
-  let nodeRender = (shouldRenderFull || shouldAbsolute) ? (
+  let nodeRender = (shouldRender || shouldAbsolute) ? (
     <Node
       key={id}
       fiber={fiber}
@@ -468,7 +470,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   }
 
   // Compact omitted row
-  if (!shouldRender) {
+  if (!shouldRender && !shouldTerminate) {
     if (skipDepth) return childRender;
     return (<>
       <TreeRowOmitted indent={indent + 1}>{nodeRender}</TreeRowOmitted>

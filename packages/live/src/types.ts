@@ -152,7 +152,7 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
 
   // Quoting state
   quotes: FiberQuotes<any>,
-  quote: LiveReconciler | null,
+  quote: FiberQuote<any> | null,
   unquote: FiberQuote<any> | null,
 
   // Count number of runs for inspector

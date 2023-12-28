@@ -372,6 +372,7 @@ export const updateFiber = <F extends ArrowFunction>(
     const reconciler = callArgs;
     const quote = fiber.quotes.get(reconciler);
     if (!quote) throw new Error(`Signal to reconciler ${reconciler.displayName} without being provided in ${formatNode(fiber)}`);
+    if (!fiber.quote) fiber.quote = quote;
     visitYeetRoot(quote.to, true);
   }
   // Enter quoted calls
@@ -649,7 +650,7 @@ export const mountFiberQuote = <F extends ArrowFunction>(
 
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
   reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
-  fiber.quote = reconciler;
+  fiber.quote = quote;
 
   const mount = to.mounts!.get(id);
   if (mount!.unquote?.to !== fiber) {
@@ -1188,11 +1189,14 @@ export const disposeFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
 
 // Dispose of a fiber's state and mounts
 export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
-  const {id, next, quotes, quote, unquote, yeeted} = fiber;
+  const {id, next, quote, unquote, yeeted} = fiber;
 
+  if (fiber.type === SIGNAL) {
+    fiber.quote = null;
+  }
   if (fiber.type === QUOTE) {
-    const {to} = quotes.get(quote)!;
-    reconcileFiberCall(to, null, id, true);
+    const {root, to} = quote;
+    if (root) reconcileFiberCall(to, null, id, true);
     pingFiber(to);
     fiber.quote = null;
   }

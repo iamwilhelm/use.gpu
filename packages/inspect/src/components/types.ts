@@ -58,7 +58,7 @@ export type InspectProp = {
   render: (prop: any) => ReactNode,
 };
 
-type Handler = () => void;
+type Handler = (event: Event) => void;
 
 export type InspectState = {
   expandedCursor: Cursor<ExpandState>,

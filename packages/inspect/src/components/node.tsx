@@ -102,7 +102,10 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
       ref={ref}
       className={"fiber-tree-node " + className}
       onClick={handleClick}
-      onDoubleClick={onDoubleClick}
+      onDoubleClick={(e) => {
+        onDoubleClick();
+        e.stopPropagation();
+      }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >

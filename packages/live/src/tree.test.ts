@@ -2,7 +2,7 @@ import type { LiveFiber, Task } from './types';
 import {
   use, keyed, detach, provide, capture, gather, yeet, reconcile, quote, unquote,
   PROVIDE,
-  makeContext, makeCapture,
+  makeContext, makeCapture, makeReconciler,
 } from './builtin';
 import { renderFiber } from './fiber';
 import { memoArgs, useState, useContext, useCapture } from './hooks';
@@ -755,10 +755,12 @@ it("yeets from capture", () => {
 
 it("renders quoted tree", () => {
 
+  const Reconciler = makeReconciler('Test');
+
   const Root = () => {
-    return reconcile([
+    return reconcile(Reconciler, [
       use(Node),
-      quote(use(Tree)),
+      quote(Reconciler, use(Tree)),
       use(Node),
     ]);
   };
@@ -779,13 +781,14 @@ it("renders quoted tree", () => {
 });
 
 it("renders quoted/unquoted trees", () => {
+  const Reconciler = makeReconciler('Test');
 
   const Root = () => {
     return [
-      reconcile(quote(
+      reconcile(Reconciler, quote(Reconciler,
         use(Second,
           use(Second,
-            unquote(use(First, quote(use(Second, unquote(use(First, use(First, quote(use(Second)))))))))
+            unquote(use(First, quote(Reconciler, use(Second, unquote(use(First, use(First, quote(Reconciler, use(Second)))))))))
           )
         )
       )),
@@ -805,14 +808,15 @@ it("renders quoted/unquoted trees", () => {
 });
 
 it("renders quote/unquote pairs", () => {
+  const Reconciler = makeReconciler('Test');
 
   const Root = () => {
-    return reconcile(use(First,
-      quote(
+    return reconcile(Reconciler, use(First,
+      quote(Reconciler,
         use(Second,
           use(Second,
-            unquote(quote(use(Second, unquote(
-              use(First, quote(unquote(use(First, use(First, quote(
+            unquote(quote(Reconciler, use(Second, unquote(
+              use(First, quote(Reconciler, unquote(use(First, use(First, quote(Reconciler,
                 use(Second)
               ))))))
             ))))

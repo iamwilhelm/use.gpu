@@ -1,17 +1,20 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { Culler, LightEnv, Renderable } from './types';
 
-import { use, quote, yeet, memo, gather, useMemo, useOne } from '@use-gpu/live';
+import { use, yeet, memo, gather, useMemo, useOne } from '@use-gpu/live';
 
 import { useRenderContext } from '../providers/render-provider';
 import { useDeviceContext } from '../providers/device-provider';
 import { useViewContext } from '../providers/view-provider';
 import { usePassContext } from '../providers/pass-provider';
+import { QueueReconciler } from '../reconcilers';
 
 import { useInspectable } from '../hooks/useInspectable'
 import { useDepthBlit } from './depth-blit';
 
 import { getRenderPassDescriptor, drawToPass } from './util';
+
+const {quote} = QueueReconciler;
 
 export type DeferredPassProps = {
   env: {

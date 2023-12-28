@@ -1,9 +1,12 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VirtualDraw } from '../pass/types';
-import { memo, use, quote, useMemo } from '@use-gpu/live';
+import { memo, use, useMemo } from '@use-gpu/live';
 
 import { useInspectHoverable } from '../hooks/useInspectable';
 import { useVirtualContext } from '../providers/pass-provider';
+import { PassReconciler } from '../reconcilers';
+
+const {quote} = PassReconciler;
 
 export type VirtualProps = VirtualDraw;
 

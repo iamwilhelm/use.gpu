@@ -71,7 +71,7 @@ export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
   }
 
   if (next) {
-    out.push(formatTree(next, depth + 1));
+    out.push(formatTree(next, depth));
   }
 
   return out.join("\n");

@@ -4,7 +4,7 @@ import type { LightEnv, Renderable } from '../pass';
 import type { BoundLight } from '../light/types';
 import { mat4 } from 'gl-matrix';
 
-import { use, quote, yeet, wrap, memo, useMemo, useOne } from '@use-gpu/live';
+import { use, yeet, wrap, memo, useMemo, useOne } from '@use-gpu/live';
 import {
   makeFrustumPlanes, makeGlobalUniforms, makeOrthogonalMatrix, uploadBuffer,
   VIEW_UNIFORMS,
@@ -12,6 +12,7 @@ import {
 
 import { useDeviceContext } from '../providers/device-provider';
 import { usePassContext } from '../providers/pass-provider';
+import { QueueReconciler } from '../reconcilers';
 
 import { useFrustumCuller } from '../hooks/useFrustumCuller'
 import { useInspectable } from '../hooks/useInspectable'
@@ -20,6 +21,8 @@ import { SHADOW_FORMAT, SHADOW_PAGE } from '../render/light/light-data';
 import { drawToPass } from './util';
 
 import { useDepthBlit } from './depth-blit';
+
+const {quote} = QueueReconciler;
 
 export type ShadowOrthoPassProps = {
   calls: {

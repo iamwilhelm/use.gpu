@@ -6,6 +6,7 @@ import { makeDepthStencilAttachments } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useViewContext } from '../providers/view-provider';
+import { QueueReconciler } from '../reconcilers';
 
 import { useInspectable } from '../hooks/useInspectable'
 
@@ -14,6 +15,8 @@ import { getRenderPassDescriptor, getDrawOrder } from './util';
 
 import { ShadowOrthoPass } from './shadow-ortho-pass';
 import { ShadowOmniPass } from './shadow-omni-pass';
+
+const {quote} = QueueReconciler;
 
 export type ShadowPassProps = {
   env: {

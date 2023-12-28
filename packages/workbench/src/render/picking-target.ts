@@ -9,7 +9,7 @@ import {
 
 import { DeviceContext, RenderContext, PickingContext } from '../providers';
 import {
-  memo, use, provide, quote, yeet, makeContext,
+  memo, use, provide, yeet, makeContext,
   useMemo, useOne, useNoOne, useResource,
   useContext, useNoContext, incrementVersion,
 } from '@use-gpu/live';
@@ -25,6 +25,10 @@ import {
   TEXTURE_FORMAT_SIZES,
   seq,
 } from '@use-gpu/core';
+
+import { QueueReconciler } from '../reconcilers';
+
+const {reconcile, quote} = QueueReconciler;
 
 type OnPick = (index: number) => void;
 

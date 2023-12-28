@@ -4,10 +4,10 @@ import type { TraitProps } from '@use-gpu/traits';
 
 import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
-import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext,
+  TransformContext, QueueReconciler,
   useShaderRef, useShader, useCombinedEpsilonTransform,
 } from '@use-gpu/workbench';
 
@@ -20,6 +20,8 @@ import { mat4 } from 'gl-matrix';
 import { AxesTrait, ObjectTrait } from '../traits';
 
 import { getStereographicPosition } from '@use-gpu/wgsl/transform/stereographic.wgsl';
+
+const {signal} = QueueReconciler;
 
 const Traits = combine(AxesTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);

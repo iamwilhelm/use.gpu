@@ -1,7 +1,10 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 
-import { use, quote, yeet, memo, useContext, useMemo } from '@use-gpu/live';
+import { use, yeet, memo, useContext, useMemo } from '@use-gpu/live';
 import { useInspectable } from '../hooks/useInspectable'
+import { QueueReconciler } from '../reconcilers';
+
+const {quote} = QueueReconciler;
 
 export type DispatchPassProps = {
   calls: {

@@ -2,9 +2,10 @@ import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
 import type { UseGPURenderContext } from '@use-gpu/core';
 import type { LightEnv, RenderComponents, VirtualDraw, AggregatedCalls } from '../pass/types';
 
-import { use, yeet, provide, reconcile, quote, unquote, multiGather, memo, useMemo, useOne } from '@use-gpu/live';
+import { use, yeet, provide, unquote, multiGather, memo, useMemo, useOne } from '@use-gpu/live';
 
 import { PassContext, VirtualContext } from '../providers/pass-provider';
+import { PassReconciler } from '../reconcilers';
 
 import { DebugRender } from './forward/debug';
 import { SolidRender } from './forward/solid';
@@ -13,6 +14,8 @@ import { ColorPass } from '../pass/color-pass';
 import { ComputePass } from '../pass/compute-pass';
 import { DispatchPass } from '../pass/dispatch-pass';
 import { ReadbackPass } from '../pass/readback-pass';
+
+const {reconcile, quote} = PassReconciler;
 
 export type FullScreenRendererProps = {
   overlay?: boolean,

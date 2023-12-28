@@ -3,13 +3,15 @@ import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@u
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 import type { LayerAggregator, LayerAggregate } from './types';
 
+import { use, keyed, fragment, yeet, provide, multiGather, extend, useMemo, useOne } from '@use-gpu/live';
+import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
+import { getBundleKey } from '@use-gpu/shader';
+
 import { DeviceContext } from '../providers/device-provider';
 import { TransformContext } from '../providers/transform-provider';
 import { MaterialContext } from '../providers/material-provider';
 import { ScissorContext } from '../providers/scissor-provider';
-import { use, keyed, fragment, quote, yeet, provide, signal, multiGather, extend, useMemo, useOne } from '@use-gpu/live';
-import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
-import { getBundleKey } from '@use-gpu/shader';
+import { QueueReconciler } from '../reconcilers';
 
 import { useAggregator } from '../hooks/useAggregator';
 
@@ -20,6 +22,8 @@ import { PointLayer } from './point-layer';
 import { ArrowLayer } from './arrow-layer';
 
 import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA, INSTANCE_SCHEMA } from './schemas';
+
+const {quote, signal} = QueueReconciler; 
 
 const DEBUG = false;
 
@@ -137,7 +141,7 @@ const Aggregate: LiveFunction<any> = (
     const element = use(component, props);
     const layer = provideContext(element, item, sources);
 
-    const upload = useOne(() => uploadRefs ? quote(quote(yeet(uploadRefs))) : null, uploadRefs);
+    const upload = useOne(() => uploadRefs ? quote(yeet(uploadRefs)) : null, uploadRefs);
     return upload ? [upload, layer] : layer;
   }, [count, sources, transform, material, scissor, flags, uploadRefs]);
 };

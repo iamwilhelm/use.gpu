@@ -2,17 +2,20 @@ import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
 import type { StorageSource, TextureSource, UseGPURenderContext } from '@use-gpu/core';
 import type { AggregatedCalls, RenderComponents, VirtualDraw } from '../pass/types';
 
-import { use, memo, reconcile, quote, unquote, provide, multiGather, extend, useMemo } from '@use-gpu/live';
+import { use, memo, unquote, provide, multiGather, extend, useMemo } from '@use-gpu/live';
 import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries } from '@use-gpu/core';
 
 import { PassContext, VirtualContext } from '../providers/pass-provider';
 import { useDeviceContext } from '../providers/device-provider';
+import { PassReconciler } from '../reconcilers';
 
 import { ComputePass } from '../pass/compute-pass';
 import { DispatchPass } from '../pass/dispatch-pass';
 import { PickingPass } from '../pass/picking-pass';
 import { ReadbackPass } from '../pass/readback-pass';
 import { ShadowPass } from '../pass/shadow-pass';
+
+const {reconcile, quote} = PassReconciler;
 
 export type RendererProps = {
   entries?: GPUBindGroupLayoutEntry[],

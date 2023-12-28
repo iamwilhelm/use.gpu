@@ -1,6 +1,6 @@
 import type {
   Initial, Setter, Reducer, Key, Task,
-  LiveFunction, LiveComponent, LiveFiber, LiveCapture, LiveContext, LiveElement, LiveNode,
+  LiveFunction, LiveComponent, LiveFiber, LiveCapture, LiveContext, LiveReconciler, LiveElement, LiveNode,
   FunctionCall, DeferredCall, HostInterface, ArrowFunction,
   ReactElementInterop,
 } from './types';
@@ -210,15 +210,20 @@ export const capture = <T, C>(
 
 /** Reconcile quoted calls to a separate tree. */
 export const reconcile = <T>(
+  reconciler: LiveReconciler,
   calls?: LiveNode<any>,
   key?: Key,
-): DeferredCall<() => void> => ({f: RECONCILE, args: calls, key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: RECONCILE, args: [reconciler, calls], key, by: getCurrentFiberID()} as any);
 
-/** Quote a subtree and reconcile it. */
+/** Quote a subtree and reconcile it into the given reconciler context. */
 export const quote = <T>(
+  reconciler: LiveReconciler,
   calls?: LiveNode<any>,
   key?: Key,
-): DeferredCall<() => void> => ({f: QUOTE, args: calls, key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => {
+  if (!reconciler?.reconciler) throw new Error("Missing reconciler for quote");
+  return ({f: QUOTE, args: [reconciler, calls], key, by: getCurrentFiberID()} as any);
+};
 
 /** Escape from quote. */
 export const unquote = <T>(
@@ -226,11 +231,14 @@ export const unquote = <T>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: UNQUOTE, args: calls, key, by: getCurrentFiberID()} as any);
 
+/** Yeet a fast signal() signal. */
+export const signal = (reconciler: LiveReconciler, key?: Key) => {
+  if (!reconciler?.reconciler) throw new Error("Missing reconciler for signal");
+  return ({f: SIGNAL, args: reconciler, key, by: getCurrentFiberID()} as any);
+};
+
 /** Yeet a suspend symbol. */
 export const suspend = (key?: Key) => yeet(SUSPEND, key);
-
-/** Yeet a fast signal() signal. */
-export const signal = (key?: Key) => ({f: SIGNAL, args: null, key, by: getCurrentFiberID()} as any);
 
 /** LOL. Look, _you_ go try to make JSX.Element polymorphic. */
 export const into = (children: any): any => children;
@@ -272,13 +280,25 @@ export const makeContext: MakeContext<unknown> = <T>(initialValue?: T | null, di
   context: true,
 });
 
-/** Make Live capture for holding shared value for child nodes (defaulted, required or optional). */
+/** Make Live capture for holding shared value for child nodes */
 export const makeCapture = <T>(displayName?: string): LiveCapture<T> => ({
   displayName,
   capture: true,
 });
 
-// Tag a component as imperative, always re-rendered from above even if props/state didn't change
+/** Make Live reconciler for incrementally rendering quoted child nodes */
+export const makeReconciler = <T>(displayName?: string): LiveReconciler => {
+  const self = {
+    displayName,
+    reconciler: true,
+    reconcile: (el) => reconcile(self, el),
+    quote: (el) => quote(self, el),
+    signal: () => signal(self),
+  };
+  return self;
+};
+
+/** Tag a component as imperative, always re-rendered from above even if props/state didn't change (deprecated) */
 export const makeImperativeFunction = (
   component: LiveFunction<any>,
   displayName?: string,

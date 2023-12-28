@@ -1,12 +1,15 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { DataBounds, ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
-import { provide, signal, yeet, makeContext, useCallback, useContext, useNoContext, useMemo, useRef } from '@use-gpu/live';
+import { provide, yeet, makeContext, useCallback, useContext, useNoContext, useMemo, useRef } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeGlobalUniforms, uploadBuffer, makeBindGroupLayout } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
 import { useFrustumCuller, useNoFrustumCuller } from '../hooks/useFrustumCuller';
+import { QueueReconciler } from '../reconcilers';
 
 import { mat4, vec3 } from 'gl-matrix';
+
+const {signal} = QueueReconciler;
 
 const DEFAULT_VIEW_CONTEXT = {
   defs: [] as any,

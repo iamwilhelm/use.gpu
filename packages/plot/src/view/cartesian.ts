@@ -5,9 +5,9 @@ import type { TraitProps } from '@use-gpu/traits';
 
 import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
-import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
-import { TransformContext, MatrixContext, useCombinedMatrixTransform } from '@use-gpu/workbench';
+import { TransformContext, MatrixContext, useCombinedMatrixTransform, QueueReconciler } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
@@ -15,6 +15,8 @@ import { swizzleMatrix } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
 import { AxesTrait, ObjectTrait } from '../traits';
+
+const {signal} = QueueReconciler;
 
 const Traits = combine(AxesTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);

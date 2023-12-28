@@ -1,15 +1,18 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { Culler, Renderable } from '../pass';
 
-import { use, quote, yeet, memo, useMemo } from '@use-gpu/live';
+import { use, yeet, memo, useMemo } from '@use-gpu/live';
 
 import { usePickingContext } from '../providers/picking-provider';
 import { useDeviceContext } from '../providers/device-provider';
 import { useViewContext } from '../providers/view-provider';
+import { QueueReconciler } from '../reconcilers';
 
 import { useInspectable } from '../hooks/useInspectable'
 
 import { getRenderPassDescriptor, drawToPass } from './util';
+
+const {quote} = QueueReconciler;
 
 export type PickingPassProps = {
   calls: {

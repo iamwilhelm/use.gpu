@@ -1,9 +1,12 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { ComputeToPass, CommandToBuffer, ComputeCounter } from './types';
 
-import { quote, yeet, memo } from '@use-gpu/live';
+import { yeet, memo } from '@use-gpu/live';
 import { useDeviceContext } from '../providers/device-provider';
 import { useInspectable } from '../hooks/useInspectable'
+import { QueueReconciler } from '../reconcilers';
+
+const {quote} = QueueReconciler;
 
 export type ComputePassProps = {
   calls: {

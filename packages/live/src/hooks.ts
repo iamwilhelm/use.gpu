@@ -24,7 +24,7 @@ export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hoo
 
   const marker = state![pointer];
   if (marker === undefined) state![pointer] = hookType;
-  else if (marker !== hookType) throw new Error("Hooks were not called in the same order as last render.");
+  else if (marker !== hookType) throw new Error(`Hooks were not called in the same order as last render in ${formatNode(fiber)}.`);
 
   return pointer + 1;
 }
@@ -62,7 +62,7 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
  */
 export const useFiber = () => {
   const fiber = getCurrentFiber();
-  if (!fiber) throw new Error("Live Hook called outside of rendering cycle.\n\nMake sure you are not accidentally running two copies of `@use-gpu/live` side-by-side.");
+  if (!fiber) throw new Error(`Live Hook called outside of rendering cycle in ${formatNode(fiber)}.\n\nMake sure you are not accidentally running two copies of '@use-gpu/live' side-by-side. Check your 'node_modules/'.`);
   return fiber;
 }
 export const useNoFiber = () => {};
@@ -389,10 +389,11 @@ export const useContext = <C>(
   const i = pushState(fiber, Hook.CONTEXT);
   const {state, host, context: {values, roots}} = fiber;
   const root = roots.get(context) as number;
+  if (!context) throw new Error(`Context is undefined in ${formatNode(fiber)}.`);
   if (!root) {
     const {initialValue, displayName} = context;
     if (initialValue === undefined) {
-      throw new Error(`Required context '${displayName}' was used without being provided.`);
+      throw new Error(`Required context '${displayName}' was used without being provided in ${formatNode(fiber)}.`);
     }
     state![i] = false;
     state![i + 1] = context;
@@ -425,7 +426,8 @@ export const useCapture = <C>(
   const i = pushState(fiber, Hook.CAPTURE);
   const {state, host, context: {values, roots}} = fiber;
   const root = roots.get(context) as LiveFiber<any>;
-  if (!root) throw new Error(`Capture '${context.displayName}' was used without being provided.`);
+  if (!context) throw new Error(`Context is undefined in ${formatNode(fiber)}.`);
+  if (!root) throw new Error(`Capture '${context.displayName}' was used without being provided in ${formatNode(fiber)}.`);
 
   if (host) {
     if (!state![i]) {
@@ -457,9 +459,7 @@ export const useNoContext = <C>(
 
   const i = pushState(fiber, Hook.CONTEXT);
   const {state, host, context: {values, roots}} = fiber;
-  if (!context) {
-    throw new Error(`Context is undefined.`);
-  }
+  if (!context) throw new Error(`Context is undefined in ${formatNode(fiber)}.`);
 
   const root = roots.get(context)! as number;
   if (state![i]) {
@@ -480,7 +480,7 @@ export const useNoCapture = <C>(
 
   const i = pushState(fiber, Hook.CAPTURE);
   const {state, host, context: {values, roots}} = fiber;
-  if (!context) throw new Error(`Capture is undefined.`);
+  if (!context) throw new Error(`Capture is undefined in ${formatNode(fiber)}.`);
 
   const root = roots.get(context)! as LiveFiber<any>;
   if (state![i] && root) {

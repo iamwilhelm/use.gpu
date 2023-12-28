@@ -1,10 +1,13 @@
 import type { LiveComponent, LiveElement, LiveNode, LiveFiber, Task, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
-import { use, signal, detach, provide, reconcile, quote, unquote, yeet, gather, useCallback, useOne, useResource, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
+import { use, detach, provide, unquote, yeet, gather, useCallback, useOne, useResource, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
 
 import { useRenderContext } from '../providers/render-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { TimeContext, TimeContextProps } from '../providers/time-provider';
 import { LoopContext } from '../providers/loop-provider';
+import { QueueReconciler } from '../reconcilers';
+
+const {reconcile, quote, signal} = QueueReconciler;
 
 export type LoopProps = {
   live?: boolean,

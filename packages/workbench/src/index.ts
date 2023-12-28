@@ -14,6 +14,7 @@ export * from './primitives';
 export * from './providers';
 export * from './queue';
 export * from './raw';
+export * from './reconcilers';
 export * from './render';
 export * from './router';
 export * from './shader';

@@ -88,8 +88,29 @@ export type RenderCallbacks = {
 };
 
 // User=defined context
-export type LiveContext<T> = { initialValue?: T, displayName?: string, context?: true, capture?: false };
-export type LiveCapture<T> = { displayName?: string, capture?: true, context?: false };
+export type LiveContext<T> = {
+  initialValue?: T,
+  displayName?: string,
+  context?: true,
+  capture?: false,
+  reconciler?: false,
+};
+export type LiveCapture<T> = {
+  displayName?: string,
+  context?: false,
+  capture?: true,
+  reconciler?: false,
+};
+export type LiveReconciler<T> = {
+  displayName?: string,
+  capture?: false,
+  context?: false,
+  reconciler?: true,
+
+  reconcile: (el: LiveElement) => LiveElement,
+  quote: (el: LiveElement) => LiveElement,
+  signal: () => LiveElement,
+};
 export type LiveMap<T> = Map<LiveFiber<any>, T>;
 
 // Fiber data structure
@@ -130,7 +151,8 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   fork: boolean,
 
   // Quoting state
-  quote: FiberQuote<any> | null,
+  quotes: FiberQuotes<any>,
+  quote: LiveReconciler | null,
   unquote: FiberQuote<any> | null,
 
   // Count number of runs for inspector
@@ -147,8 +169,9 @@ export type FiberContext = {
   roots: ContextRoots,
 };
 
-export type ContextValues = Map<LiveContext<any> | LiveCapture<any>, any>;
-export type ContextRoots = Map<LiveContext<any> | LiveCapture<any>, number | LiveFiber<any>>;
+export type LiveEnvironment = LiveContext<any> | LiveCapture<any>;
+export type ContextValues = Map<LiveEnvironment, any>;
+export type ContextRoots = Map<LiveEnvironment, number | LiveFiber<any>>;
 
 // Fiber yeet state
 export type FiberYeet<A, B> = {
@@ -167,8 +190,10 @@ export type FiberQuote<F extends ArrowFunction> = {
   root: number,
   from: number,
   to: LiveFiber<F>,
-  scope?: FiberQuote<any>,
+  reconciler?: LiveReconciler,
 };
+
+export type FiberQuotes<F extends ArrowFunction> = Map<LiveReconciler, FiberQuote<F>>;
 
 // Priority queue
 export type FiberQueue = {

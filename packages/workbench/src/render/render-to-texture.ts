@@ -1,9 +1,10 @@
 import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction, PropsWithChildren } from '@use-gpu/live';
 import type { UseGPURenderContext, ColorSpace, TextureTarget } from '@use-gpu/core';
 
-import { use, provide, fence, quote, yeet, useCallback, useContext, useFiber, useMemo, useOne, useNoContext, incrementVersion } from '@use-gpu/live';
+import { use, provide, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, useNoContext, incrementVersion } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
+import { QueueReconciler } from '../reconcilers';
 
 import {
   makeColorState,
@@ -15,6 +16,8 @@ import {
   BLEND_PREMULTIPLY,
   seq,
 } from '@use-gpu/core';
+
+const {quote} = QueueReconciler;
 
 const NO_SAMPLER: Partial<GPUSamplerDescriptor> = {};
 

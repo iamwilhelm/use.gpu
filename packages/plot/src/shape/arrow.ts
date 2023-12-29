@@ -83,7 +83,7 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
   const archetype = schemaToArchetype(ARROW_SCHEMA, attributes, flags, refs);
 
   if (Number.isNaN(count)) debugger;
-  if (!count) return;
+  if (!count || !(position || positions)) return;
 
   const shapes = {
     arrow: {

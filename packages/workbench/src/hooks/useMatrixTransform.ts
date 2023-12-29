@@ -1,4 +1,4 @@
-import type { DataBounds, StorageSource, LambdaSource, TextureSource, TypedArray, UniformAttributeValue } from '@use-gpu/core';
+import type { DataBounds, StorageSource, LambdaSource, TextureSource, TypedArray, UniformAttribute } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import type { RefObject } from '@use-gpu/live';
 import type { TransformContextProps, TransformBounds } from '../providers/transform-provider';
@@ -20,7 +20,7 @@ import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl'
 const NO_MATRIX = mat4.create();
 const MATRIX_BINDING = bundleToAttribute(getCartesianPosition, 'getTransformMatrix');
 
-const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u32'], value: [0, 0, 0, 0] } as UniformAttributeValue;
+const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u32'] } as UniformAttribute;
 
 export const useCombinedMatrix = (
   matrix?: mat4 | null,

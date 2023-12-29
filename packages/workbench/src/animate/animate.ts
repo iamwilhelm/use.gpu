@@ -5,6 +5,7 @@ import type { Keyframe } from './types';
 import { use, extend, fence, useMemo, useOne, useRef } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
+import { getRenderFunc } from '../hooks/useRenderProp';
 
 import mapValues from 'lodash/mapValues';
 
@@ -26,6 +27,7 @@ export type AnimateProps<T> = {
   paused?: boolean,
 
   render?: (value: any) => LiveElement,
+  children?: LiveElement | ((value: any) => LiveElement),
 };
 
 const evaluateKeyframes = <T>(keyframes: Keyframe<T>[], time: number, ease: string) => {
@@ -180,10 +182,11 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
         useNoAnimationFrame();
       }
 
+      const render = getRenderFunc(props);
       if (render) return tracks ? render(props) : (prop ? render(props[prop]) : null);
-      if (children) return extend(children, props);
+      else if (children) return extend(children, props);
 
-      return (children as any) ?? null;
+      return null;
     };
   }, [script, length, render, children]);
 

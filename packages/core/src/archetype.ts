@@ -50,7 +50,9 @@ export const normalizeSchema = <T>(schema: Record<string, string | T>) => {
   return out;
 };
 
-export const adjustSchema = <T>(schema: Record<string, string | T>, formats: Record<string, string>) => {
+export const adjustSchema = <T>(schema: Record<string, string | T>, formats?: Record<string, string>) => {
+  if (!formats) return schema;
+
   const out = {};
   for (const k in schema) {
     const field = schema[k];
@@ -248,11 +250,12 @@ export const schemaToAggregate = (
     }
     else {
       // Sort by descending alignment
+      keys.sort((a, b) => getUniformAlign(schema[b].format) - getUniformAlign(schema[a].format));
+
       const uniforms = keys.map(k => ({
         format: getUniformElementType(schema[k].format) as UniformType,
         name: schema[k].name ?? k,
       }));
-      uniforms.sort((a, b) => getUniformAlign(b.format) - getUniformAlign(a.format));
 
       // Make multi-aggregate
       const aggregateBuffer = makeMultiAggregateBuffer(device, uniforms, alloc, keys);

@@ -1,4 +1,4 @@
-import type { UniformAttribute, UniformAttributeValue } from '@use-gpu/core';
+import type { UniformAttribute } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { useOne, useMemo, useNoMemo, useVersion } from '@use-gpu/live';
@@ -11,7 +11,7 @@ const NO_SOURCES: any[] = [];
 
 // Turn a shader source/constant/lambda into a virtual shader module
 export const useSource = <T = any>(
-  def: UniformAttribute | UniformAttributeValue,
+  def: UniformAttribute,
   source: ShaderSource | T,
 ) => {
   return useMemo(() => getSource(def, source), [def, source]);
@@ -19,7 +19,7 @@ export const useSource = <T = any>(
 
 // Turn a shader source/constant/lambda into a virtual shader module
 export const getSource = <T = any>(
-  def: UniformAttribute | UniformAttributeValue,
+  def: UniformAttribute,
   source: ShaderSource | T,
 ) => {
   const s = source as any;

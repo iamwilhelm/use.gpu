@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type {
   VectorLike, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
+  UniformPipe, UniformAttribute, UniformType,
   VertexData, DataBounds, GPUGeometry,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
@@ -24,6 +24,8 @@ import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
 import { getInstancedFaceIndex } from '@use-gpu/wgsl/instance/index/face.wgsl';
+
+const POSITIONS: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
 
 export type RawFacesFlags = {
   flat?: boolean,
@@ -123,11 +125,11 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     return 0;
   }, [attr.positions, attr.indices, attr.segments, count]);
 
-  const p = useShaderRef(attr.position, attr.positions);
+  const p = useSource(POSITIONS, useShaderRef(attr.position, attr.positions));
   const n = useShaderRef(attr.normal, attr.normals);
   const t = useShaderRef(attr.tangent, attr.tangents);
   const u = useShaderRef(attr.uv, attr.uvs);
-  const s = useShaderRef(attr.st, attr.sts ?? attr.positions);
+  const s = useShaderRef(attr.st, attr.sts ?? p);
   const g = useShaderRef(attr.segment, attr.segments);
   const c = useShaderRef(attr.color, attr.colors);
   const z = useShaderRef(attr.zBias, attr.zBiases);

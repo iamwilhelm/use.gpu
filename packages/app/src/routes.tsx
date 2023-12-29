@@ -21,6 +21,7 @@ import { SceneInstancesPage } from './pages/scene/instances';
 import { SceneShadowPage } from './pages/scene/shadow';
 import { SceneDeferredPage } from './pages/scene/deferred';
 import { Plot2DPage } from './pages/plot/2d';
+import { Plot3DPage } from './pages/plot/3d';
 import { PlotCartesianPage } from './pages/plot/cartesian';
 import { PlotImplicitSurfacePage } from './pages/plot/implicit-surface';
 import { PlotPolarPage } from './pages/plot/polar';
@@ -37,6 +38,8 @@ import { HomePage } from './pages/home';
 import { EmptyPage } from './pages/empty';
 
 export const makePages = () => [
+  {path: "/plot/2d",               title: "Plot - 2D",                         element: <Plot2DPage />},
+  {path: "/plot/3d",               title: "Plot - 3D",                         element: <Plot3DPage />},
   {path: "/geometry/lines",        title: "Geometry - 3D Lines and Arrows",    element: <GeometryLinesPage />},
   {path: "/geometry/faces",        title: "Geometry - 3D Polygons",            element: <GeometryFacesPage />},
   {path: "/geometry/data",         title: "Geometry - Data-driven Layers",     element: <GeometryDataPage />},
@@ -52,7 +55,6 @@ export const makePages = () => [
   {path: "/scene/instances",       title: "Scene - Instances",                 element: <SceneInstancesPage />},
   {path: "/scene/shadow",          title: "Scene - Shadow",                    element: <SceneShadowPage />},
   {path: "/scene/deferred",        title: "Scene - Deferred Renderer",         element: <SceneDeferredPage />},
-  {path: "/plot/2d",               title: "Plot - 2D",                         element: <Plot2DPage />},
   {path: "/plot/cartesian",        title: "Plot - XYZ",                        element: <PlotCartesianPage />},
   {path: "/plot/polar",            title: "Plot - Polar",                      element: <PlotPolarPage />},
   {path: "/plot/spherical",        title: "Plot - Spherical",                  element: <PlotSphericalPage />},

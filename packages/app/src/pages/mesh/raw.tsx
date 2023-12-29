@@ -4,10 +4,9 @@ import React from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, FlatCamera, Data, RawData, Raw, LineSegments,
+  Loop, Pass,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, PointLayer, LineLayer,
-  RenderToTexture,
+  Pick, Cursor,
 } from '@use-gpu/workbench';
 import { RawMesh } from './components/raw-mesh';
 import { makeMesh, makeTexture } from '../../meshes/cube';
@@ -17,7 +16,7 @@ export const MeshRawPage: LC = (props) => {
   const texture = makeTexture();
 
   return (
-    <>
+    <Loop>
       <Cursor cursor='move' />
       <Camera>
         <Pass picking>
@@ -32,7 +31,7 @@ export const MeshRawPage: LC = (props) => {
           />
         </Pass>
       </Camera>
-    </>
+    </Loop>
   );
 };
 

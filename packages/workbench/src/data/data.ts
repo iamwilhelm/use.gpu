@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ArrowFunction, TypedArray, StorageSource, UniformType, Accessor, DataSchema, DataField, DataBounds } from '@use-gpu/core';
+import type { ArrowFunction, TypedArray, StorageSource, DataSchema, DataBounds } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
@@ -7,12 +7,12 @@ import { QueueReconciler } from '../reconcilers';
 import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
-import { yeet, useOne, useMemo, useNoMemo, useCallback, incrementVersion } from '@use-gpu/live';
+import { yeet, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   seq,
   toCPUDims,
   isUniformArrayType,
-  getUniformArrayDepth,
+  getUniformDims,
 
   makeCPUArray,
   copyRecursiveNumberArray,
@@ -24,9 +24,20 @@ import {
   schemaToEmitters,
   getAggregateSummary,
 } from '@use-gpu/core';
-import { toMultiCompositeChunks } from '@use-gpu/parse';
+import { toMultiChunkCounts, toChunkCount, toVertexCount } from '@use-gpu/parse';
 
 const {signal} = QueueReconciler;
+
+type BooleanList = boolean | boolean[] | (<T>(i: number) => boolean);
+
+export type SegmentsInfo = {
+  positions: TypedArray,
+  chunks: number[] | TypedArray,
+  groups: number[] | TypedArray,
+  loops: boolean[] | boolean,
+  starts: boolean[] | boolean,
+  ends: boolean[] | boolean,
+};
 
 export type DataProps = {
   /** WGSL schema of input data + accessors */
@@ -42,15 +53,26 @@ export type DataProps = {
   /** Resample data on every animation frame. */
   live?: boolean,
 
+  /** Global flag or per item `isLoop` accessor */
+  loop?: BooleanList,
+  /** Global flag or per item `hasStart` accessor */
+  start?: BooleanList,
+  /** Global flag or per item `hasEnd` accessor */
+  end?: BooleanList,
+
+  /** Segment decorator(s) */
+  segments?: (args: SegmentsInfo) => Record<string, any>,
+  /** Segments from tensor dimensions */
+  tensor?: number[],
+
   /** Receive 1 source per field, in virtual struct-of-array format. Leave empty to yeet sources instead. */
   render?: (sources: Record<string, StorageSource>) => LiveElement,
   children?: (sources: Record<string, StorageSource>) => LiveElement,
 };
 
-const NO_FIELDS = [] as DataField[];
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
-/** Compose array-of-structs with singular fields `T` into WGSL storage. Returns a struct of virtual storage sources. */
+/** Aggregate array-of-structs with fields `T | T[] | T[][]` into grouped storage sources. */
 export const Data: LiveComponent<DataProps> = (props) => {
   const {
     skip = 0,
@@ -63,42 +85,138 @@ export const Data: LiveComponent<DataProps> = (props) => {
     start,
     end,
     segments,
+    tensor,
     live = false,
   } = props;
 
   const schema = useOne(() => normalizeSchema(propSchema), propSchema);
   const data = propData ? Array.isArray(propData) ? propData : [propData] : null;
   const itemCount = Math.max(0, (count ?? data?.length) - skip);
+
+  if (itemCount === 0) return null;
+
+  const keys = useMemo(
+    () => Object.keys(schema).filter(k => virtual?.[k] ?? data[0][schema[k].prop ?? k] != null),
+    [schema, data, virtual]
+  );
+
+  if (keys.length === 0) return null;
+
+  // Identify an array and index field (if any)
+  const [countKey, indexedKey, isArray, isIndexed] = useMemo(() => {
+    const countKey = keys.find(k => isUniformArrayType(schema[k].format as any));
+    const indexedKey = keys.find(k => schema[k].index);
+
+    const isArray = !!countKey;
+    const isIndexed = !!indexedKey;
+
+    return [countKey ?? keys[0], indexedKey, isArray, isIndexed];
+  }, [schema, ...keys]);
+
+  // Resolve segment flags
+  const [loops, starts, ends] = useMemo(() => {
+    const loops  = resolveSegmentFlag(itemCount, loop, skip);
+    const starts = resolveSegmentFlag(itemCount, start, skip);
+    const ends   = resolveSegmentFlag(itemCount, end, skip);
+
+    return [loops, starts, ends];
+  }, [itemCount, loop, start, end, skip]);
+
+  // Resolve chunk/group counts
+  const [chunks, groups, vertexCount, indexCount] = useMemo(() => {
+    let chunks = null;
+    let groups = null;
+    let vertexCount = itemCount
+    let indexCount = itemCount;
+
+    if (isArray) {
+      if (tensor) {
+        [chunks, groups] = sizeToMultiCompositeChunks(tensor);
+        indexCount = vertexCount = tensor.reduce((a, b) => a * b, 1);
+      }
+      else if (segments) {
+        [vertexCount, chunks, groups] = getMultiChunkCount(schema, countKey, itemCount, data, virtual, skip);
+        if (indexedKey) [indexCount] = getMultiChunkCount(schema, indexKey, itemCount, data, virtual, skip);
+      }
+      else {
+        vertexCount = getVertexCount(schema, countKey, itemCount, data, virtual, skip);
+        if (indexedKey) indexCount = getVertexCount(schema, indexKey, itemCount, data, virtual, skip);
+      }
+    }
+
+    return [chunks, groups, vertexCount, indexedKey ? indexCount : vertexCount];
+  }, [isArray, segments, itemCount, countKey, indexedKey, data, virtual, skip]);
+
   const allocItems = useBufferedSize(itemCount);
+  const allocVertices = useBufferedSize(vertexCount);
+  const allocIndices = useBufferedSize(indexCount);
 
   // Make arrays for merged attributes
   const [fields, attributes, archetype] = useMemo(() => {
     const fields = {};
     const attributes = {};
 
-    for (const k in schema) {
+    let hasSingle = false;
+    let hasPlural = false;
+    
+    for (const k in schema) if (keys.includes(k)) {
       const {format, prop = k, index, unwelded, ref} = schema[k];
       if (ref) throw new Error(`Ref '${k}' not supported in <Data>`);
-      if (index || unwelded) throw new Error(`Use <CompositeData> for indexed and unwelded data`);
-      if (isUniformArrayType(format)) throw new Error(`Use <CompositeData> for array data`);
 
-      const {array, dims} = makeCPUArray(format, allocItems);
+      const isArray = isUniformArrayType(format);
+      const alloc = isArray ? (index || unwelded) ? allocIndices : allocVertices : allocItems;
+      const {array, dims, depth} = makeCPUArray(format, alloc);
+      if (depth > 1 && !segments) throw new Error(`Cannot use nested array without 'segment' handler.`)
 
-      fields[k] = {array, dims, prop};
+      if (isArray) hasPlural = true;
+      else hasSingle = true;
+
+      fields[k] = {array, dims, depth, prop};
       attributes[k] = array;
     }
 
+    if (hasSingle && hasPlural && !segments) throw new Error(`Cannot mix array and non-array data without 'segment' handler`); 
+
     const archetype = schemaToArchetype(schema, attributes);
+    if (attributes.instances) throw new Error(`Reserved attribute name 'instances'.`);
+
     return [fields, attributes, archetype];
-  }, [schema, allocItems]);
+  }, [schema, allocItems, allocVertices, allocIndices]);
+
+  // Get emitters for data + segment data
+  const [mergedSchema, emitters, total, indexed, sparse] = useMemo(() => {
+    if (!isArray || !segments) return [schema, schemaToEmitters(schema, attributes), vertexCount, indexCount, 0];
+
+    const positions = fields[countKey].array;
+
+    const segmentData = segments({
+        chunks: chunks!,
+        groups: groups!,
+        positions,
+        loops,
+        starts,
+        ends,
+    });
+
+    const {count: total, indexed, sparse, schema: segmentSchema, ...rest} = segmentData;
+    for (const k in rest) if (attributes[k]) throw new Error(`Attribute name '${k}' reserved for segment data.`);
+
+    const mergedSchema = {...schema, ...segmentSchema};
+    const emitters = schemaToEmitters(mergedSchema, {...attributes, ...rest});
+
+    return [mergedSchema, emitters, total, indexed, sparse];
+  }, [schema, fields, countKey, attributes, segments, chunks, groups, loops, starts, ends]);
 
   // Blit all data into merged arrays
   const items = useMemo(() => {
+    const slices = [];
+
     for (const k in fields) {
       const accessor = virtual?.[k];
       if (!accessor && !data) continue;
 
       const {array, dims, depth, prop} = fields[k];
+      const slice = k === countKey;
 
       // Keep CPU-only layout, as useAggregator will widen for us
       const dimsIn = toCPUDims(dims);
@@ -106,28 +224,32 @@ export const Data: LiveComponent<DataProps> = (props) => {
       let b = 0;
       let o = 0;
       for (let i = 0; i < itemCount; ++i) {
-        o += copyNumberArray(accessor ? accessor(i + skip) : data[i + skip][prop], array, dimsIn, dimsIn, 0, o, 1);
+        o += copyRecursiveNumberArray(accessor ? accessor(i + skip) : data[i + skip][prop], array, dimsIn, dimsIn, depth, o, 1);
+        if (slice) slices.push((o - b) / dimsIn + ((loops === true || loops?.[i]) ? 3 : 0));
+        b = o;
       }
     }
 
     return [{
-      count: itemCount,
+      count: total,
+      indexed,
+      instanced: itemCount,
+      slices,
       archetype,
-      attributes,
+      attributes: emitters,
     }];
   }, [
     live ? NaN : virtual ? (version ?? NaN) : null, data,
-    itemCount, skip,
-    archetype, attributes,
+    itemCount, skip, total, indexed,
+    archetype, emitters,
   ]);
 
-  // Aggregate into struct buffer
-  const {sources} = useAggregator(schema, items);
-  console.log('item', {item: items[0], emitters, total, indexed, sources})
+  // Aggregate into struct buffers by access policy
+  const {sources} = useAggregator(mergedSchema, items);
 
   // Tag positions with bounds
   useMemo(() => {
-    if (!fields.positions) return null;
+    if (!fields.positions) return NO_BOUNDS;
 
     const {array, dims} = fields.positions;
     const bounds = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
@@ -142,4 +264,75 @@ export const Data: LiveComponent<DataProps> = (props) => {
 
   const view = useRenderProp(props, sources);
   return [trigger, view];
+};
+
+// Resolve loop/start/end flags into array
+const resolveSegmentFlag = (count: number, flag?: Boolean, skip: number = 0) => {
+  if (typeof flag === 'function') {
+    let flags = [];
+    for (let i = 0; i < count; ++i) flags.push((flag as ArrowFunction)(i + skip));
+    return flags;
+  }
+  if (Array.isArray(flag)) {
+    if (skip) return flag(skip, skip + count);
+    else if (flag.length > count) return flag.slice(0, count);
+    return flag;
+  }
+  return flag;
+};
+
+// Get list of inner ragged chunk lengths plus outer ragged groupings
+const getMultiChunkCount = (
+  schema: DataSchema,
+  key: string,
+  itemCount: number,
+  data?: Record<string, any> | (Record<string, any>)[],
+  virtual?: Record<string, (i: number) => any>,
+  skip: number = 0
+) => {
+  const {format, prop} = schema[key];
+  const accessor = virtual?.[key];
+  const dims = getUniformDims(format);
+
+  let i = 0;
+  const get = (accessor
+    ? (i: number) => accessor(i)
+    : (i: number) => data[i][prop]
+  );
+
+  const chunks = [];
+  const groups = [];
+
+  for (let i = 0; i < itemCount; ++i) {
+    const [c, g] = toMultiChunkCounts(get(i + skip), dims);
+    chunks.push(...c);
+    groups.push(...g);
+  }
+
+  const count = chunks.reduce((a, b) => a + b, 0);
+  return [count, chunks, groups];
+};
+
+// Get total vertex count
+const getVertexCount = (
+  schema: DataSchema,
+  key: string,
+  itemCount: number,
+  data?: Record<string, any> | (Record<string, any>)[],
+  virtual?: Record<string, (i: number) => any>,
+  skip: number = 0
+) => {
+  const {format, prop} = schema[key];
+  const accessor = virtual?.[key];
+  const dims = toCPUDims(getUniformDims(format));
+
+  let i = 0;
+  const get = (accessor
+    ? (i: number) => accessor(i)
+    : (i: number) => data[i][prop ?? key]
+  );
+
+  let total = 0;
+  for (let i = 0; i < itemCount; ++i) total += toVertexCount(get(i + skip), dims);
+  return total;
 };

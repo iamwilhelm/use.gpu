@@ -1,4 +1,3 @@
-export * from './composite-data';
 export * from './composite-geometry-data';
 export * from './data';
 export * from './fetch';

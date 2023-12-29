@@ -24,8 +24,6 @@ import {
   parsePositionArray,
   parsePositionMultiArray,
   parsePositionMultiMultiArray,
-  parseChunks,
-  parseMultiChunks,
   parseRotation,
   parseQuaternion,
   parseScale,
@@ -42,6 +40,8 @@ import {
   parseIntegerPositive,
   parseDomain,
   parsePointShape,
+  toChunkCounts,
+  toMultiChunkCounts,
 } from '@use-gpu/parse';
 import { seq } from '@use-gpu/core';
 import { getArrowSegments, getFaceSegments, getFaceSegmentsConcave, getLineSegments } from '@use-gpu/workbench';
@@ -360,7 +360,7 @@ export const SegmentsTrait = combine(
           return seq(rest.reduce((a, b) => a * b, 1)).map(_ => segment);
         }
         if (!pos || props.segments) return;
-        return parseChunks(pos);
+        return toChunkCounts(pos, 4);
       }
     );
   },
@@ -401,7 +401,7 @@ export const FacetedTrait = combine(
           }
         }
         if (!pos || props.segments || props.indices) return;
-        return parseMultiChunks(pos);
+        return toMultiChunkCounts(pos, 4);
       }
     );
     parsed.chunks = chunks;

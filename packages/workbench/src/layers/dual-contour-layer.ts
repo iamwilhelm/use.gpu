@@ -1,9 +1,5 @@
 import type { LiveComponent, Ref } from '@use-gpu/live';
-import type {
-  TypedArray, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, RenderPassMode, StorageSource, DataBounds,
-} from '@use-gpu/core';
+import type { Lazy, RenderPassMode, StorageSource, DataBounds } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/core';
 
@@ -46,7 +42,7 @@ const INDIRECT_OFFSET_1 = { byteOffset: 16 };
 const READ_ONLY_SOURCE = { readWrite: false };
 
 export type DualContourLayerProps = {
-  color?: number[] | TypedArray,
+  color?: VectorLike,
 
   range: VectorLike[],
   values: ShaderSource,

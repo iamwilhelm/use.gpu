@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { DataField, Emit, Time } from '@use-gpu/core';
+import type { DataSchema, Emit, Time } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
 import { seq } from '@use-gpu/core';
@@ -7,19 +7,24 @@ import { vec3 } from 'gl-matrix';
 
 import {
   Loop, Pass,
-  CompositeData, Data, RawData, Raw, LineSegments,
+  Data, RawData, getLineSegments,
   OrbitCamera, OrbitControls, FPSControls,
   Cursor, PointLayer, LineLayer,
 } from '@use-gpu/workbench';
 
 // Line data fields
 
-const lineDataFields = [
-  ['array<vec3<f32>>', (o: any) => o.path],
-  ['vec3<f32>', 'color'],
-  ['f32', 'width'],
-  ['f32', 'zBias'],
-] as DataField[];
+const basicLineSchema = {
+  positions: {format: 'array<vec3<f32>>'},
+  segments: {format: 'array<i8>'},
+} as DataSchema;
+
+const segmentedLineSchema = {
+  positions: {format: 'array<vec3<f32>>', prop: 'path'},
+  colors: {format: 'vec3<f32>', prop: 'color'},
+  widths: {format: 'f32', prop: 'width'},
+  zBiases: {format: 'f32', prop: 'zBias'},
+} as DataSchema;
 
 // Generate a line voxel grid
 
@@ -58,38 +63,26 @@ export const GeometryDataPage: LC = () => {
         <Pass>
 
           <Data
-            fields={[
-              ['vec3<f32>', [-5, -2.5, 0, 5, -2.5, 0, 0, -2.5, -5, 0, -2.5, 5]],
-              ['i32', [1, 2, 1, 2]],
-            ]}
-            render={(positions, segments) =>
-              <LineLayer
-                positions={positions}
-                segments={segments}
-                width={5}
-                depth={1}
-                color={[0.125, 0.25, 0.5, 1]}
-              />
-            }
-          />
+            // Drive LineLayer directly
+            schema={basicLineSchema}
+            data={{
+              positions: [-5, -2.5, 0, 5, -2.5, 0, 0, -2.5, -5, 0, -2.5, 5],
+              segments: [1, 2, 1, 2], // 1 = start, 2 = end, 3 = middle
+            }}
+          >{
+            (props) => <LineLayer {...props} width={5} depth={1} color={[0.125, 0.25, 0.5, 1]} />
+          }</Data>
 
-          <CompositeData
-            fields={lineDataFields}
+          <Data
+            // OR Generate line segment data automatically
+            schema={segmentedLineSchema}
             data={lineData}
-            on={<LineSegments />}
-            render={(positions, colors, widths, zBiases, segments) =>
-              <LineLayer
-                positions={positions}
-                colors={colors}
-                widths={widths}
-                segments={segments}
-                zBiases={zBiases}
-                join='round'
-                depth={0.9}
-              />
-            }
-          />
+            segments={getLineSegments}
+          >{
+            (props) => <LineLayer {...props} join='round' depth={0.9} />
+          }</Data>
 
+          {/*
           <RawData
             format='vec3<f32>'
             length={100}
@@ -104,17 +97,20 @@ export const GeometryDataPage: LC = () => {
                 Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2,
               );
             }}
-            render={(positions) =>
+          >{
+            (positions) =>
               <PointLayer
                 positions={positions}
                 colors={positions}
-                shape='diamondOutlined'
+                shape='diamond'
+                hollow
                 size={50}
                 depth={1}
                 mode={'transparent'}
               />
             }
-          />
+          </RawData>
+          */}
         </Pass>
       </Camera>
     </Loop>

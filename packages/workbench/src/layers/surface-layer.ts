@@ -1,9 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type {
-  VectorLike, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, RenderPassMode,
-} from '@use-gpu/core';
+import type { VectorLike, Lazy } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { PipelineOptions } from '../hooks/usePipelineOptions';
 

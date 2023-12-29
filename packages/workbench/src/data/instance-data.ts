@@ -3,7 +3,7 @@ import type { TypedArray, StorageSource, UniformType, DataField } from '@use-gpu
 import { capture, yeet, useCapture, useNoCapture, useMemo, useOne, useRef, useResource, useNoResource, incrementVersion, makeCapture } from '@use-gpu/live';
 import {
   makeIdAllocator,
-  makeDataArray, copyNumberArrayRange,
+  makeGPUArray, copyNumberArrayRange,
   makeStorageBuffer, uploadBuffer, uploadBufferRange, UNIFORM_ARRAY_DIMS,
   toCPUDims, toGPUDims,
 } from '@use-gpu/core';
@@ -93,7 +93,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
       const fieldBuffers = fs.map(([format, accessor], i) => {
         if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
         const f = format as any as UniformType;
-        const {array, dims} = makeDataArray(f, bufferLength);
+        const {array, dims} = makeGPUArray(f, bufferLength);
 
         if (prevBuffers) {
           const prevArray = prevBuffers[i].array;
@@ -118,7 +118,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
       let indexBuffer, indexSource;
       {
         if (format !== 'u16' && format !== 'u32') throw new Error(`Unknown index format "${format}"`);
-        const {array, dims} = makeDataArray(format, bufferLength);
+        const {array, dims} = makeGPUArray(format, bufferLength);
         const buffer = makeStorageBuffer(device, array.byteLength);
         const source = indexSource = {
           buffer,

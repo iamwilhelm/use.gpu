@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type {
   VectorLike, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
+  UniformPipe, UniformAttribute, UniformType,
   VertexData, LambdaSource, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
@@ -25,6 +25,8 @@ import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions
 
 import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 import { getMaskedColor } from '@use-gpu/wgsl/mask/masked.wgsl';
+
+const POSITIONS: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
 
 export type RawQuadsProps = {
   position?: VectorLike,
@@ -71,13 +73,13 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const vertexCount = 4;
   const instanceCount = useDataLength(count, props.positions);
 
-  const p = useShaderRef(props.position, props.positions);
+  const p = useSource(POSITIONS, useShaderRef(props.position, props.positions));
   const r = useShaderRef(props.rectangle, props.rectangles);
   const c = useShaderRef(props.color, props.colors);
   const d = useShaderRef(props.depth, props.depths);
   const z = useShaderRef(props.zBias, props.zBiases);
   const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts ?? props.positions);
+  const s = useShaderRef(props.st, props.sts ?? p);
 
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
 

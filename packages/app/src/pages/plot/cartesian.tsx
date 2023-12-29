@@ -10,7 +10,7 @@ import {
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Axis, Grid, Label, Line, RangeSampler, Scale, Scissor, Surface, Tick, Transpose,
+  Plot, Cartesian, Axis, Grid, Label, Line, Sampler, Scale, Scissor, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
@@ -124,7 +124,7 @@ export const PlotCartesianPage: LC = () => {
                   />
 
                   <Scissor>
-                    <RangeSampler
+                    <Sampler
                       axes='zx'
                       format='vec4<f32>'
                       size={[10, 20]}
@@ -153,7 +153,7 @@ export const PlotCartesianPage: LC = () => {
                           blend="add"
                         />
                       </Transpose>
-                    </RangeSampler>
+                    </Sampler>
                   </Scissor>
                 </Cartesian>
               </Animate>

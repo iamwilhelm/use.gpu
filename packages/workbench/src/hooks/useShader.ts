@@ -1,4 +1,3 @@
-import type { UniformAttribute, UniformAttributeValue } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
 import { useOne, useMemo, useNoMemo } from '@use-gpu/live';

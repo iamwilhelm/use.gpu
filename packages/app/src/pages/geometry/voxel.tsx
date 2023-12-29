@@ -7,10 +7,9 @@ import React, { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  LinearRGB, Pass, Fetch,
-  CompositeData, Data, RawData, Raw, LineSegments,
+  LinearRGB, Pass,
   OrbitCamera, OrbitControls,
-  Cursor, LineLayer,
+  Cursor,
   AmbientLight, DirectionalLight, PointLight, DomeLight,
   PBRMaterial, GeometryData,
   Loop, Animate, DebugProvider, Environment,
@@ -107,17 +106,13 @@ export const GeometryVoxelPage: LC = () => {
                       </Plot>
                     </Primitive>
 
-                    <VoxData
-                      url={url}
-                      render={(vox: Vox) =>
-                        <VoxModel vox={vox} flat />
-                      }
-                    />
+                    <VoxData url={url}>{
+                      (vox: Vox) => <VoxModel vox={vox} flat />
+                    }</VoxData>
 
                     <Node position={[0, 0, -11]} rotation={[0, 180, 0]}>
-                      <GeometryData
-                        {...planeGeometry}
-                        render={(planeMesh: Record<string, ShaderSource>) =>
+                      <GeometryData {...planeGeometry}>{
+                        (planeMesh: Record<string, ShaderSource>) =>
                           <PBRMaterial albedo={0x808080} roughness={0.7}>
                             <Mesh
                               mesh={planeMesh}
@@ -126,7 +121,7 @@ export const GeometryVoxelPage: LC = () => {
                             />
                           </PBRMaterial>
                         }
-                      />
+                      }</GeometryData>
                     </Node>
                   </Node>
                 </Scene>

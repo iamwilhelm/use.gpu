@@ -10,7 +10,7 @@ import { useStructSources } from '../hooks/useStructSources';
 import { yeet, extend, gather, useOne, useMemo, useNoMemo, incrementVersion } from '@use-gpu/live';
 import {
   makePackedLayout,
-  makeDataArray, normalizeSchema,
+  normalizeSchema,
   makeStorageBuffer, uploadStorage, UNIFORM_ARRAY_DIMS,
   getBoundingBox, toDataBounds,
   isUniformArrayType,
@@ -53,8 +53,8 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
       for (const k in schema) {
         const {name = k, format, index, unwelded, ref} = schema[k];
         if (ref) throw new Error(`Ref '${k}' not supported in <Data>`);
-        if (index || unwelded) throw new Error(`Use <CompositeData> for indexed and unwelded data`);
-        if (isUniformArrayType(format)) throw new Error(`Use <CompositeData> for array data`);
+        if (index || unwelded) throw new Error(`Use <Data> for indexed and unwelded data`);
+        if (isUniformArrayType(format)) throw new Error(`Use <Data> for array data`);
         out.push({name, format});
       }
       return out;

@@ -4,7 +4,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 
 import { provide, yeet, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
 import {
-  makeDataArray, copyNumberArray, emitIntoNumberArray,
+  makeGPUArray, copyNumberArray, emitArray, makeNumberWriter,
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
   getBoundingBox, toDataBounds,
   toCPUDims, toGPUDims,
@@ -57,24 +57,24 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   const device = useContext(DeviceContext);
 
   const {
-    format, length,
+    format,
     data, expr,
-    items = 1,
     interleaved = false,
     sparse = false,
     live = false,
     time = false,
   } = props;
 
-  const t = Math.max(1, Math.round(items) || 0);
-  const count = t * (length ?? (data?.length || 0));
-  const l = useBufferedSize(count);
+  const items = Math.max(1, Math.round(props.items) || 0);
+  const count = (props.length ?? (data?.length || 0));
+  const length = items * count;
+  const alloc = useBufferedSize(count);
 
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
     const f = (format && (format in UNIFORM_ARRAY_DIMS)) ? format as UniformType : 'f32';
 
-    const {array, dims} = makeDataArray(f, l || 1);
+    const {array, dims} = makeGPUArray(f, alloc || 1);
 
     const buffer = makeStorageBuffer(device, array.byteLength);
     const source = {
@@ -87,7 +87,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     };
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
-  }, [device, format, l]);
+  }, [device, format, alloc]);
 
   // Make de-interleaving shader
   let sources: LambdaSource[] | undefined;
@@ -118,7 +118,9 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     let emitted = 0;
 
     if (data) copyNumberArray(data, array, toCPUDims(dims), toGPUDims(dims));
-    if (expr) emitted = emitIntoNumberArray(expr, array, dims, clock!);
+    if (expr) {
+      emitArray(expr, makeNumberWriter(array, dims), count, clock!);
+    }
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
     }
@@ -136,7 +138,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
 
     if (sources) {
       for (const s of sources) {
-        s.length  = source.length / t;
+        s.length  = source.length / items;
         s.size    = source.size.slice(1);
         s.version = source.version;
       }

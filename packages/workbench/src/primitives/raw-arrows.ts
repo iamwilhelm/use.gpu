@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type {
   VectorLike, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
+  UniformPipe, UniformAttribute, UniformType,
   VertexData, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
@@ -31,7 +31,7 @@ import { getAnchorIndex } from '@use-gpu/wgsl/instance/index/anchor.wgsl';
 import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
-const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
+const POSITIONS: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
 
 export type RawArrowsFlags = {
   flat?: boolean,
@@ -92,10 +92,10 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const anchorCount = useDataLength(count, props.anchors);
   const positionCount = useDataLength(count, props.positions);
 
+  const p = useSource(POSITIONS, useShaderRef(props.position, props.positions));
   const a = useShaderRef(props.anchor, props.anchors);
-  const p = useShaderRef(props.position, props.positions);
   const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts ?? props.positions);
+  const s = useShaderRef(props.st, props.sts ?? p);
   const c = useShaderRef(props.color, props.colors);
   const e = useShaderRef(props.size, props.sizes);
   const w = useShaderRef(props.width, props.widths);

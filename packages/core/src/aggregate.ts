@@ -7,7 +7,7 @@ import {
   alignSizeTo,
   castRawArray,
   makeRawArray,
-  makeDataArray,
+  makeGPUArray,
   copyNumberArray,
   fillNumberArray,
   offsetNumberArray,
@@ -43,7 +43,7 @@ export const makeAggregateBuffer = (
   format: UniformType,
   length: number,
 ): AggregateBuffer => {
-  const {array, dims} = makeDataArray(format, length);
+  const {array, dims} = makeGPUArray(format, length);
 
   const buffer = makeStorageBuffer(device, array.byteLength);
   const source = {

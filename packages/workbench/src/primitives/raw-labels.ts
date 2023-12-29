@@ -1,9 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type {
-  TypedArray, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, TextureSource, LambdaSource, DataBounds,
-} from '@use-gpu/core';
+import type { Lazy, TextureSource, LambdaSource, DataBounds } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
@@ -27,18 +23,18 @@ export type RawLabelsProps = {
   index?: number,
   indices?: ShaderSource,
 
-  rectangle?: number[] | TypedArray,
-  uv?: number[] | TypedArray,
-  st?: number[] | TypedArray,
-  layout?: number[] | TypedArray,
-  sdf?: number[] | TypedArray,
+  rectangle?: VectorLike,
+  uv?: VectorLike,
+  st?: VectorLike,
+  layout?: VectorLike,
+  sdf?: VectorLike,
 
-  position?: number[] | TypedArray,
-  placement?: number[] | TypedArray,
+  position?: VectorLike,
+  placement?: VectorLike,
   offset?: number,
   size?: number,
   depth?: number,
-  color?: number[] | TypedArray,
+  color?: VectorLike,
   expand?: number,
 
   rectangles?: ShaderSource,

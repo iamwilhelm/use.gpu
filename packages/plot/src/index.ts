@@ -11,8 +11,8 @@ export * from './shape/face';
 export * from './shape/line';
 export * from './shape/point';
 
-export * from './source/array-sampler';
-export * from './source/range-sampler';
+export * from './source/tensor';
+export * from './source/sampler';
 export * from './source/scale';
 export * from './source/transpose';
 /*

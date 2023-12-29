@@ -1,13 +1,12 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { UniformAttributeValue, VectorLike } from '@use-gpu/core';
 import type { Swizzle } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
-import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
-import { MatrixContext, TransformContext, useCombinedMatrixTransform, useCombinedMatrix, useNoCombinedMatrix } from '@use-gpu/workbench';
+import { MatrixContext, TransformContext, useCombinedMatrixTransform, useCombinedMatrix, useNoCombinedMatrix, QueueReconciler } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
@@ -18,6 +17,8 @@ import { AxesTrait, ObjectTrait } from '../traits';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
+
+const {signal} = QueueReconciler;
 
 const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
 

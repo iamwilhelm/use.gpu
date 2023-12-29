@@ -32,8 +32,8 @@ export type StructDataProps = {
   live?: boolean,
 
   /** Leave empty to yeet source instead. */
-  render?: (...source: ShaderSource[]) => LiveElement,
-  children?: (...source: ShaderSource[]) => LiveElement,
+  render?: (source: StorageSource) => LiveElement,
+  children?: (source: StorageSource) => LiveElement,
 };
 
 export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructDataProps>) => {

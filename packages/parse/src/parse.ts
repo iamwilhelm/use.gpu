@@ -340,9 +340,6 @@ export const parseVec4Array = makeParseVectorArray(4, 0, Float32Array);
 
 export const parseVec4MultiArray = makeParseVectorArray(4, 0, Float32Array);
 
-export const parseChunks = toCompositeChunks;
-export const parseMultiChunks = toMultiCompositeChunks;
-
 //////////////////
 
 export const parsePosition   = makeParseVec4(NO_POSITION);

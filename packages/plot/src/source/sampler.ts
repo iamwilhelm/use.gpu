@@ -17,9 +17,12 @@ import {
 import { useRangeContext, useNoRangeContext } from '../providers/range-provider';
 import { useDataContext, DataContext } from '../providers/data-provider';
 
-export type RangeSamplerProps = {
+export type SamplerProps = {
   /** Sample count up to [width, height, depth, layers] */
-  size: number[],
+  size?: number[],
+  /** Shorthand for size=[length] */
+  length?: number,
+
   /** Axis to sample on (1D) */
   axis?: string,
   /** Axes to sample on (2D+) */
@@ -57,12 +60,13 @@ export type RangeSamplerProps = {
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Up-to-4D array of a WGSL type. Samples a given `expr` on the given `range`. */
-export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
+export const Sampler: LiveComponent<SamplerProps> = (props) => {
   const {
     axis,
     axes = 'xyzw',
     format,
-    size,
+    length: l = 0,
+    size = [l],
     expr,
     children,
     as = 'positions',
@@ -86,11 +90,15 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
 
   const border = padding + +!!origin;
   const padded = size.map(n => n + border * 2);
-  const length = items * padded.reduce((a, b) => a * b, 1);
-  const alloc = useBufferedSize(length);
+
+  const count = padded.reduce((a, b) => a * b, 1);
+  const alloc = useBufferedSize(count);
+  const length = items * count;
 
   // Make tensor array
-  const tensor = useMemo(() => makeTensorArray(format, alloc, size), [format, alloc, size]);
+  const tensor = useMemo(() => makeTensorArray(format, items * alloc, size), [format, items, alloc]);
+  tensor.size = size;
+  tensor.length = length;
 
   const clock = time ? useTimeContext() : useNoTimeContext();
 
@@ -252,7 +260,7 @@ export const RangeSampler: LiveComponent<RangeSamplerProps> = (props) => {
       }
 
       if (sampled) {
-        emitted = emitIntoMultiNumberArray(sampled, array, dims, padded, clock!);
+        emitted = emitIntoMultiNumberArray(sampled, array, dims, count, padded, clock!);
       }
     }
 

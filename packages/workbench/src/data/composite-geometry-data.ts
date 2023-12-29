@@ -8,7 +8,7 @@ import mapObject from 'lodash/zipObject';
 import groupBy from 'lodash/groupBy';
 import { useRenderProp } from '../hooks/useRenderProp';
 
-import { CompositeData } from './composite-data';
+import { Data } from './data';
 
 export type CompositeGeometryDataProps = {
   data: CPUGeometry[],
@@ -52,7 +52,7 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
     const schema = schames[archetype];
     const {topology, attributes, formats, unwelded} = data[0];
 
-    return keyed(CompositeData, archetype, {
+    return keyed(Data, archetype, {
       data: items[archetype],
       schema,
       render: (sources: Record<string, StorageSource>) => {

@@ -15,7 +15,7 @@ fn scaleSDF(sdf: f32, scale: f32) -> f32 {
 
 fn outlineSDF(sdf: f32, scale: f32) -> f32 {
   let outline = getOutline();
-  if (outline > 0) { return min(sdf, -sdf + stroke * scale); }
+  if (outline > 0) { return min(sdf, -sdf + outline * scale); }
   return min(sdf, 0.4 - sdf);
 }
 

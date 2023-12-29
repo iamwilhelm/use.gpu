@@ -7,7 +7,6 @@ import { vec3 } from 'gl-matrix';
 
 import {
   LinearRGB, Pass, Fetch,
-  CompositeData, Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
   Cursor, PointLayer, LineLayer,
   ImageCubeTexture, PrefilteredEnvMap, Environment,

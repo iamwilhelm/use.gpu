@@ -1,9 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type {
-  TypedArray, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, RenderPassMode,
-} from '@use-gpu/core';
+import type { Lazy, UniformAttribute } from '@use-gpu/core';
 import type { PointShape } from '@use-gpu/parse';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { PipelineOptions } from '../hooks/usePipelineOptions';
@@ -37,11 +33,11 @@ export type PointLayerFlags = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 export type PointLayerProps = {
-  position?: number[] | TypedArray,
-  uv?: number[] | TypedArray,
-  st?: number[] | TypedArray,
+  position?: VectorLike,
+  uv?: VectorLike,
+  st?: VectorLike,
   size?: number,
-  color?: number[] | TypedArray,
+  color?: VectorLike,
   depth?: number,
   zBias?: number,
 
@@ -57,7 +53,7 @@ export type PointLayerProps = {
   id?: number,
 } & PointLayerFlags;
 
-const SIZE_BINDING = { name: 'getSize', format: 'f32', value: 1, args: ['u32'] } as UniformAttributeValue;
+const SIZE_BINDING = { name: 'getSize', format: 'f32', value: 1, args: ['u32'] } as UniformAttribute;
 
 /** Draws 2D points with choice of shape. */
 export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLayerProps) => {

@@ -1,7 +1,8 @@
 import type { ArchetypeSchema, Emit, TypedArrayConstructor, VectorLike, VectorLikes } from '@use-gpu/core';
 import { seq, isTypedArray, copyNumberArray, copyNestedNumberArray } from '@use-gpu/core';
 
-const NO_CHUNKS = new Uint16Array(0);
+const NO_CHUNKS = new Uint32Array(0);
+const NO_CHUNK_GROUPS = new Uint32Array(0);
 
 const maybeTypedArray = (
   xs: VectorLike | VectorLikes | VectorLikes[]
@@ -187,40 +188,56 @@ export const toMultiMultiVectorArray = <T extends TypedArrayConstructor>(
   maybeMultiMultiVectorArray(xs, dims, w, ctor)
 );
 
-// Get list of ragged chunk lengths
-export const toCompositeChunks = (
-  xs: VectorLike | VectorLikes | VectorLikes[],
+// Get 1 chunk length
+export const toVertexCount = (
+  xs: number | VectorLike | VectorLikes | VectorLikes[] | null | undefined,
+  dims: number,
 ) => {
-  const n = xs.length;
+  const n = xs?.length;
+  if (!n) return 0;
+
+  const x = xs[0];
+  if (typeof xs === 'number') return 1;
+  if (isTypedArray(xs) || typeof x === 'number') {
+    return n / dims;
+  }
+  if (typeof x?.[0] === 'number') {
+    return n;
+  }
+  return 0;
+};
+
+// Get list of ragged chunk lengths
+export const toChunkCounts = (
+  xs: VectorLike | VectorLikes | VectorLikes[] | null | undefined,
+  dims: number,
+) => {
+  const n = xs?.length;
   if (!n) return NO_CHUNKS;
 
   const x = xs[0];
-  if (
-    isTypedArray(xs) ||
-    typeof x === 'number' ||
-    typeof x?.[0] === 'number'
-  ) {
-    const to = new Uint16Array(1);
-    to[0] = n;
-    return to;
-  }
   if (typeof x?.[0]?.[0] === 'number') {
-    const to = new Uint16Array(n);
+    const to = new Uint32Array(n);
     for (let i = 0; i < n; ++i) to[i] = xs[i].length;
     return to;
   }
-  return NO_CHUNKS;
+  
+  const count = toVertexCount(xs, dims);
+  return count ? [count] : NO_CHUNKS;
 };
 
 // Get list of inner ragged chunk lengths plus outer ragged groupings
-export const toMultiCompositeChunks = (
-  xs: VectorLike | VectorLikes | VectorLikes[],
+export const toMultiChunkCounts = (
+  xs: VectorLike | VectorLikes | VectorLikes[] | null | undefined,
+  dims: number,
 ) => {
-  const n = xs.length;
+  const n = xs?.length;
+  if (!n) return NO_CHUNK_GROUPS;
+
   const x = xs[0];
 
   if (typeof x?.[0]?.[0]?.[0] === 'number') {
-    const groups = new Uint16Array(n);
+    const groups = new Uint32Array(n);
 
     let count = 0;
     for (let i = 0; i < n; ++i) {
@@ -231,7 +248,7 @@ export const toMultiCompositeChunks = (
     }
 
     let o = 0;
-    const to = new Uint16Array(count);
+    const to = new Uint32Array(count);
     for (let i = 0; i < n; ++i) {
       const chunk = xs[i];
       const l = chunk.length;
@@ -243,7 +260,7 @@ export const toMultiCompositeChunks = (
     return [to, groups];
   }
 
-  const chunks = toCompositeChunks(xs, n);
+  const chunks = toChunkCounts(xs, dims);
   return [chunks, [1]];
 };
 

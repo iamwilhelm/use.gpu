@@ -10,7 +10,7 @@ import {
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
-  Plot, Polar, Axis, Grid, Label, Line, RangeSampler, Scale, Surface, Tick, Transpose,
+  Plot, Polar, Axis, Grid, Label, Line, Sampler, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 const π = Math.PI;
 const EPS = 1e-3;
@@ -107,7 +107,7 @@ export const PlotPolarPage: LC = () => {
                   end
                 />
 
-                <RangeSampler
+                <Sampler
                   axes='x'
                   format='vec2<f32>'
                   size={[512]}
@@ -122,7 +122,7 @@ export const PlotPolarPage: LC = () => {
                     depth={0.5}
                     zBias={1}
                   />
-                </RangeSampler>
+                </Sampler>
               </Polar>
             </Animate>
           </Plot>

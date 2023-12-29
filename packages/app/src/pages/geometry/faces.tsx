@@ -8,8 +8,8 @@ import { PickingOverlay } from '../../ui/picking-overlay';
 import earcut from 'earcut';
 
 import {
-  Pass, FlatCamera, Cursor, Pick, Raw,
-  CompositeData, LineSegments, FaceSegments,
+  Pass, FlatCamera, Cursor, Pick,
+  Data, LineSegments, FaceSegments,
   OrbitCamera, OrbitControls,
   LineLayer, FaceLayer,
 } from '@use-gpu/workbench';
@@ -98,7 +98,7 @@ export const GeometryFacesPage: LC = () => {
     <Camera>
       <Pass picking>
 
-        <CompositeData
+        <Data
           fields={convexDataFields}
           data={convexFaceData}
           on={<FaceSegments />}
@@ -116,7 +116,7 @@ export const GeometryFacesPage: LC = () => {
                   side="both"
                 />,
                 hovered ? (
-                  <CompositeData
+                  <Data
                     fields={convexDataFields}
                     data={convexFaceData.slice(index, index + 1)}
                     on={<FaceSegments />}
@@ -136,7 +136,7 @@ export const GeometryFacesPage: LC = () => {
           }
         />
 
-        <CompositeData
+        <Data
           fields={concaveDataFields}
           data={concaveFaceData}
           render={(positions, colors, indices, lookups) =>
@@ -153,7 +153,7 @@ export const GeometryFacesPage: LC = () => {
                   side="both"
                 />,
                 hovered ? (
-                  <CompositeData
+                  <Data
                     fields={concaveDataFields}
                     data={concaveFaceData.slice(index, index + 1)}
                     render={(positions, colors, indices) =>
@@ -172,7 +172,7 @@ export const GeometryFacesPage: LC = () => {
           }
         />
 
-        <CompositeData
+        <Data
           fields={lineDataFields}
           data={lineData}
           on={<LineSegments />}

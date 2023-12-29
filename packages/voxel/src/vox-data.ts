@@ -4,7 +4,7 @@ import type { Vox, VoxShape } from './types';
 
 import { gather, use, yeet, useMemo, useHooks } from '@use-gpu/live';
 import { makeTexture, uploadDataTexture } from '@use-gpu/core';
-import { useDeviceContext, useRawSource, Fetch } from '@use-gpu/workbench';
+import { useDeviceContext, useRenderProp, useRawSource, Fetch } from '@use-gpu/workbench';
 
 import { parseVox, getMipShape } from './lib/vox';
 
@@ -13,6 +13,7 @@ export type VoxDataProps = {
   base?: string,
   data?: ArrayBuffer,
   render?: (vox: Vox) => LiveElement,
+  children?: (vox: Vox) => LiveElement,
 };
 
 const resolveURL = (base: string, url: string) => new URL(url, base).href;
@@ -21,7 +22,8 @@ export const VoxData: LC<VoxDataProps> = (props) => {
   const {
     data,
     url,
-    render
+    render,
+    children,
   } = props;
 
   // Relative URL base for .vox
@@ -114,7 +116,7 @@ export const VoxData: LC<VoxDataProps> = (props) => {
       },
     }), [parsed, shapes, palette, pbr]);
 
-    return useHooks(() => render ? render(vox) : yeet(vox), [render, vox]);
+    return useRenderProp(props, vox);
   };
 
   // Load .vox or use inline data

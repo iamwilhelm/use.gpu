@@ -11,8 +11,7 @@ import {
   Loop, Pass, FlatCamera, Animate, LinearRGB, Environment,
   GeometryData, PBRMaterial, ImageCubeTexture, PrefilteredEnvMap, ShaderLitMaterial,
   OrbitCamera, OrbitControls, PanControls, Suspense,
-  Pick, Cursor, Data, PointLayer, LineLayer,
-  LineSegments, CompositeData,
+  Pick, Cursor, PointLayer, LineLayer,
   AxisHelper, KeyboardContext,
 
   makeSphereGeometry,

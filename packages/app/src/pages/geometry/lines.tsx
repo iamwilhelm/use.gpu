@@ -7,7 +7,7 @@ import { vec3 } from 'gl-matrix';
 import {
   Pass,
   Cursor,
-  CompositeData, getLineSegments, getArrowSegments,
+  Data, getLineSegments, getArrowSegments,
   OrbitCamera, OrbitControls,
   LineLayer, ArrowLayer,
 } from '@use-gpu/workbench';
@@ -35,29 +35,29 @@ const isEnd   = (i: number) => arrowData[i].end;
 
 export const GeometryLinesPage: LC = () => {
   return (<>
-    <InfoBox>Drive &lt;LineLayer&gt; and &lt;ArrowLayer&gt; directly using &lt;CompositeData&gt;.</InfoBox>
+    <InfoBox>Drive &lt;LineLayer&gt; and &lt;ArrowLayer&gt; directly using &lt;Data&gt;.</InfoBox>
     <Camera>
       <Cursor cursor='move' />
       <Pass>
 
-        <CompositeData
+        <Data
           schema={lineSchema}
           data={lineData}
           loop={isLineLoop}
           segments={getLineSegments}
         >{
           (props) => <LineLayer {...props} depth={0.5} />
-        }</CompositeData>
+        }</Data>
 
-        <CompositeData
+        <Data
           schema={lineSchema}
           data={zigzagData}
           segments={getLineSegments}
         >{
           (props) => <LineLayer {...props} depth={0.5} join='round' />
-        }</CompositeData>
+        }</Data>
 
-        <CompositeData
+        <Data
           schema={lineSchema}
           data={arrowData}
           loop={isArrowLoop}
@@ -70,7 +70,7 @@ export const GeometryLinesPage: LC = () => {
               {...props}
               depth={0.5}
             />
-        }</CompositeData>
+        }</Data>
 
       </Pass>
     </Camera>

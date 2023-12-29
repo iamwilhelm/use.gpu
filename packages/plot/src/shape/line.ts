@@ -79,7 +79,7 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
   const archetype = schemaToArchetype(schema, attributes, flags, refs);
 
   if (Number.isNaN(count)) debugger;
-  if (!count) return;
+  if (!count || !(position || positions)) return;
 
   const shapes = {
     line: {

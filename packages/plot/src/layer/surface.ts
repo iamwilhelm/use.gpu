@@ -4,7 +4,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import { memo, use, useOne } from '@use-gpu/live';
 import { makeUseTrait, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { adjustSchema } from '@use-gpu/core';
-import { useInspectHoverable, CompositeData, SurfaceLayer, SURFACE_SCHEMA } from '@use-gpu/workbench';
+import { useInspectHoverable, Data, SurfaceLayer, SURFACE_SCHEMA } from '@use-gpu/workbench';
 
 import {
   SurfaceTrait,
@@ -59,7 +59,7 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
 
   const schema = useOne(() => adjustSchema(SURFACE_SCHEMA, formats), formats);
 
-  return use(CompositeData, {
+  return use(Data, {
     schema,
     data: parsed,
     tensor: size ?? tensor,

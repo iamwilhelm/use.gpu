@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type {
   VectorLike, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
+  UniformPipe, UniformAttribute, UniformType,
   VertexData, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
@@ -26,6 +26,8 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
 import { getInstancedIndex } from '@use-gpu/wgsl/instance/instanced-index.wgsl';
+
+const POSITIONS: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
 
 export type RawLinesFlags = {
   join?: 'miter' | 'round' | 'bevel',
@@ -103,9 +105,9 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const instanceCount = useDataLength(count, props.positions, -1);
 
   // Instanced draw (repeated or random access)
-  const p = useShaderRef(props.position, props.positions);
+  const p = useSource(POSITIONS, useShaderRef(props.position, props.positions));
   const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts ?? props.positions);
+  const s = useShaderRef(props.st, props.sts ?? p);
   const g = useShaderRef(null, props.segments);
   const c = useShaderRef(props.color, props.colors);
   const w = useShaderRef(props.width, props.widths);

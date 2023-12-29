@@ -74,7 +74,7 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
   const archetype = schemaToArchetype(FACE_SCHEMA, attributes, flags, refs);
 
   if (Number.isNaN(count)) debugger;
-  if (!count) return;
+  if (!count || !(position || positions)) return;
 
   const shapes = {
     face: {

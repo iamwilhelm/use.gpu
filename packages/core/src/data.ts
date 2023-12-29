@@ -1,6 +1,6 @@
 import type { Lazy, Emitter, VectorEmitter, Emit, TypedArray, TensorArray, VectorLike, UniformType, UniformAttribute } from './types';
 
-import { getUniformArrayType, getUniformDims, getUniformAlign, toCPUDims, toGPUDims } from './uniform';
+import { getUniformArrayType, getUniformArrayDepth, getUniformDims, getUniformAlign, toCPUDims, toGPUDims } from './uniform';
 import { isTypedArray } from './buffer';
 
 type NumberMapper = (x: number) => number;
@@ -17,22 +17,24 @@ export const makeRawArray = (byteSize: number) => new ArrayBuffer(byteSize);
 export const makeCPUArray = (type: UniformType, length: number) => {
   const ctor  = getUniformArrayType(type);
   const dims  = getUniformDims(type);
+  const depth = getUniformArrayDepth(type);
 
   const n = length * toCPUDims(dims);
 
   const array = new ctor(n);
-  return {array, dims};
+  return {array, dims, depth};
 };
 
-export const makeDataArray = (type: UniformType, length: number) => {
+export const makeGPUArray = (type: UniformType, length: number) => {
   const ctor  = getUniformArrayType(type);
   const dims  = getUniformDims(type);
+  const depth = getUniformArrayDepth(type);
   const align = getUniformAlign(type);
 
   const n = alignSizeTo(length * toGPUDims(dims), align || 4);
 
   const array = new ctor(n);
-  return {array, dims};
+  return {array, dims, depth, length};
 };
 
 export const makeTensorArray = (type: UniformType, lengthOrData: number | VectorLike, size?: number[]): TensorArray => {
@@ -63,7 +65,6 @@ export const castRawArray = (buffer: ArrayBuffer | TypedArray, type: UniformType
   const array = new ctor(buffer.buffer ?? buffer);
   return {array, dims};
 };
-
 
 // Copy packed scalar/vec2/vec3/vec4 with vec3-to-vec4 extension for WGSL.
 // Extends to matrix types via repetition.
@@ -519,39 +520,139 @@ export const getUnweldedArray = (
   return to;
 };
 
-export const makeExprEmitter = (to: VectorLike, dims: number): {
+export const makeNumberWriter = (to: VectorLike, dims: number, fields?: number[], stride?: number): {
   emit: Emit,
   emitted: () => number,
   reset: () => void,
 } => {
   let i = 0;
-  const emitted = () => i / toGPUDims(dims);
-  const reset = () => i = 0;
+  let f = 0;
+  const d = toGPUDims(dims);
+  const emitted = () => i / d;
+  const reset = () => { i = 0; f = 0; }
+  let emit;
 
-  if (dims === 1)   return {reset, emitted, emit: (a: number) => { to[i++] = a; }};
-  if (dims === 2)   return {reset, emitted, emit: (a: number, b: number) => { to[i++] = a; to[i++] = b; }};
-  if (dims === 3)   return {reset, emitted, emit: (a: number, b: number, c: number) => { to[i++] = a; to[i++] = b; to[i++] = c; }};
-  if (dims === 3.5) return {reset, emitted, emit: (a: number, b: number, c: number) => { to[i++] = a; to[i++] = b; to[i++] = c; i++; }}; // !
-  if (dims === 4)   return {reset, emitted, emit: (a: number, b: number, c: number, d: number) => { to[i++] = a; to[i++] = b; to[i++] = c; to[i++] = d; }};
-  if (dims !== Math.round(dims)) throw new Error(`Unsupported expr emitter dims ${dims}`);
+  const step = stride ?? d;
+
+  if (fields?.length > 1) {
+    const n = fields.length;
+
+    if      (dims === 1)   emit = (a: number) => {
+      to[i + fields[f++]] = a;
+      if (f === n) { f = 0; i += step; }
+    };
+    else if (dims === 2)   emit = (a: number, b: number) => {
+      const o = i + fields[f++];
+      to[o    ] = a;
+      to[o + 1] = b;
+      if (f === n) { f = 0; i += step; }
+    };
+    else if (dims === 3)   emit = (a: number, b: number, c: number) => {
+      const o = i + fields[f++];
+      to[o    ] = a;
+      to[o + 1] = b;
+      to[o + 2] = c;
+      if (f === n) { f = 0; i += step; }
+    };
+    else if (dims === 3.5) emit = (a: number, b: number, c: number) => {
+      const o = i + fields[f++];
+      to[o    ] = a;
+      to[o + 1] = b;
+      to[o + 2] = c;
+      to[o + 3] = 0;
+      if (f === n) { f = 0; i += step; }  // !
+    };
+    else if (dims === 4)   emit = (a: number, b: number, c: number, d: number) => {
+      const o = i + fields[f++];
+      to[o    ] = a;
+      to[o + 1] = b;
+      to[o + 2] = c;
+      to[o + 3] = d;
+      if (f === n) { f = 0; i += step; }
+    };
+
+    if (dims !== d) throw new Error(`Unsupported expr emitter dims ${dims}`);
+
+    return {
+      reset,
+      emitted,
+      emit: emit ?? ((...args: number[]) => {
+        const o = i + fields[f++];
+        const n = args.length;
+        for (let j = 0; j < n; ++j) to[o + j] = args[j];
+        if (f === n) { f = 0; i += step; }        
+      }),
+    };
+  }
+  else {
+    if      (dims === 1)   emit = (a: number) => { to[i++] = a; };
+    else if (dims === 2)   emit = (a: number, b: number) => { to[i] = a; to[i + 1] = b; i += 2; };
+    else if (dims === 3)   emit = (a: number, b: number, c: number) => { to[i] = a; to[i + 1] = b; to[i + 2] = c; i += 3 };
+    else if (dims === 3.5) emit = (a: number, b: number, c: number) => { to[i] = a; to[i + 1] = b; to[i + 2] = c; i += 4; }; // !
+    else if (dims === 4)   emit = (a: number, b: number, c: number, d: number) => { to[i] = a; to[i + 1] = b; to[i + 2] = c; to[i + 3] = d; i += 4; };
+
+    if (dims !== d) throw new Error(`Unsupported expr emitter dims ${dims}`);
+
+    return {
+      reset,
+      emitted,
+      emit: emit ?? ((...args: number[]) => {
+        const n = args.length;
+        for (let j = 0; j < n; ++j) to[i + j] = args[j];
+        i += step;
+      }),
+    };
+  }
+}
+
+export const makeNumberSplitter = (to: VectorLike[], dims: number) => {
+  const n = to.length;
+  let i = 0;
+
+  const writers = to.map((t) => makeNumberWriter(t, dims));
+  const emits = writers.map(({emit}) => emit);
+  const emit = (a: number, b: number, c: number, d: number) => emits[i++ % n](a, b, c, d);
+
   return {
-    reset,
-    emitted,
-    emit: (...args: number[]) => {
-      const n = args.length;
-      for (let j = 0; j < n; ++j) to[i++] = args[j];
-    },
+    reset: () => writers.forEach(writer => writer.reset()),
+    emitted: writers[0].emitted,
+    emit,
   };
-}
+};
 
-export const emitIntoNumberArray = <T>(expr: Emitter, to: VectorLike, dims: number, props?: T) => {
-  const {emit, emitted} = makeExprEmitter(to, dims);
-  const n = to.length / Math.ceil(dims);
-  for (let i = 0; i < n; i++) expr(emit, i, props);
+export const makeNumberReader = (from: VectorLike, dims: number) => {
+  const d = toCPUDims(dims);
+  
+  const reader = (
+    (d === 1) ? (emit: Emit, i: number) => { emit(from[i]) } :
+    (d === 2) ? (emit: Emit, i: number) => { const i2 = i*2; emit(from[i2], from[i2+1]); } :
+    (d === 3) ? (emit: Emit, i: number) => { const i3 = i*3; emit(from[i3], from[i3+1], from[i3+2]); } :
+    (d === 4) ? (emit: Emit, i: number) => { const i4 = i*4; emit(from[i4], from[i4+1], from[i4+2], from[i4+3]); } :
+    null
+  );
+  if (!reader) throw new Error(`Unsupported reader dims '${dims}'`);
+
+  return reader;
+};
+
+export const emitArray = <T>(
+  expr: Emitter,
+  writer: Writer,
+  length: number,
+  props?: T,
+) => {
+  const {emit, emitted} = writer;
+  for (let i = 0; i < length; i++) expr(emit, i, props);
   return emitted();
-}
+};
 
-export const emitIntoMultiNumberArray = <T>(expr: Emitter, to: VectorLike, dims: number, size: number[], props?: T) => {
+export const emitMultiArray = <T>(
+  expr: Emitter,
+  writer: Writer,
+  length: number,
+  size: number[],
+  props?: T,
+) => {
   const n = size.length;
 
   const index = size.map(_ => 0);
@@ -598,6 +699,7 @@ export const emitIntoMultiNumberArray = <T>(expr: Emitter, to: VectorLike, dims:
     };
   }
 
-  return emitIntoNumberArray(nest, to, dims);
+  const {emit, emitted} = writer;
+  for (let i = 0; i < length; i++) expr(emit, i, props);
+  return emitted();
 }
-

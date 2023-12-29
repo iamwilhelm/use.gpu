@@ -329,6 +329,14 @@ export type TensorArray = {
 export type VectorEmitter = (to: TypedArray, count: number, toIndex?: number, stride?: number) => void;
 export type VectorRefEmitter = (from: Lazy<number | number[] | TypedArray>, to: TypedArray, count: number, toIndex?: number, stride?: number) => void;
 
+export type Writer = {
+  emit: Emit,
+  emitted: () => number,
+  reset: () => void,
+};
+
+export type Emit = <T extends Array = any[]>(...args: T) => void;
+
 export type Emitter<T extends Array = any[]> = {
   (emit: Emit, ...args: T): void;
 };
@@ -347,8 +355,6 @@ export interface Emitter<T = Time> {
 };
 */
 
-export type Emit = (...args: number[]) => void;
-export type Accessor = (i: number) => any;
 export type Time = {
   timestamp: number,
   elapsed: number,

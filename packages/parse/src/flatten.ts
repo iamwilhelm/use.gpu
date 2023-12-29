@@ -199,7 +199,7 @@ export const toVertexCount = (
   const x = xs[0];
   if (typeof xs === 'number') return 1;
   if (isTypedArray(xs) || typeof x === 'number') {
-    return n / dims;
+    return (n / dims) | 0;
   }
   if (typeof x?.[0] === 'number') {
     return n;

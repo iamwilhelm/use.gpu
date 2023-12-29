@@ -19,7 +19,7 @@ type InfoBoxProps = {
 };
 
 export const InfoBox = ({children}: InfoBoxProps) => {
-  const root = document.querySelector('#use-gpu')!;
+  const root = document.querySelector('#use-gpu .canvas')!;
   return (
     use(HTML, {
       container: root,

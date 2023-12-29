@@ -242,14 +242,6 @@ export const Plot2DPage: LC = () => {
                 </Transform>
               </Transform>
 
-              <Transform position={[0, 240]}>
-                <Line
-                  position={[0, 0], [100, 0]}
-                  width={10}
-                  color={'#ffffff'}
-                />
-              </Transform>
-
               <Cartesian
                 range={[[0, 100], [0, 100]]}
                 position={[400, 400, 0]}

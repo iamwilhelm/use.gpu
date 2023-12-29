@@ -47,7 +47,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     zoom: initialZoom = 1,
     x: initialX = 0,
     y: initialY = 0,
-    zoomSpeed = 1/80,
+    zoomSpeed = 1/120,
     centered = true,
 
     minX = null,

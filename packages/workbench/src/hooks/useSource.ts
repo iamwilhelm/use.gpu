@@ -24,6 +24,8 @@ export const getSource = <T = any>(
 ) => {
   const s = source as any;
   let shader;
+  
+  if (s == null) return null;
 
   // ParsedBundle | ParsedModule
   if (s.module || s.table) shader = s as ShaderModule;

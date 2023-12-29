@@ -2,7 +2,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { DeepPartial, UniformAttribute } from '@use-gpu/core';
 import type { SlideTrait, TransitionTrait, SlideInfo } from './types';
 
-import { fragment, unquote, quote, gather, fence, yeet, use, wrap, provide, useFiber, useMemo, useOne, useRef } from '@use-gpu/live';
+import { fragment, unquote, gather, fence, yeet, use, wrap, provide, useFiber, useMemo, useOne, useRef } from '@use-gpu/live';
 import { Layout } from '@use-gpu/layout';
 import { PresentReconciler } from './reconcilers';
 

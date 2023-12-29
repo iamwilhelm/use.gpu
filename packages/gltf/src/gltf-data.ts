@@ -4,7 +4,7 @@ import type { GLTF, GLTFAccessorData, GLTFBufferData, GLTFBufferViewData, GLTFIm
 
 import { use, gather, fence, suspend, yeet, useCallback, useContext, useOne, useMemo, useState } from '@use-gpu/live';
 
-import { DeviceContext, Fetch, getShader } from '@use-gpu/workbench';
+import { DeviceContext, Fetch, getShader, useRenderProp } from '@use-gpu/workbench';
 import { makeDynamicTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, toDataBounds, UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
 
 import { parseBinaryGLTF, parseTextGLTF, toScene, toNode, toMesh, toMaterial } from './parse';
@@ -42,7 +42,6 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
     data,
     url,
     unbound,
-    render
   } = props;
 
   // Relative URL base for GLTF resources
@@ -299,7 +298,8 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         data,
         bound,
       };
-      return render ? render(gltfBound) : yeet(gltfBound);
+      
+      return useRenderProp(props, gltfBound);
     };
 
     // Load external assets

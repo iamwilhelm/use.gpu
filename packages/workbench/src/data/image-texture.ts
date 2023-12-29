@@ -7,6 +7,7 @@ import { ImageLoader } from './image-loader';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useSuspenseContext } from '../providers/suspense-provider';
+import { useRenderProp } from '../hooks/useRenderProp';
 
 import { getEquiToCubeSample } from '@use-gpu/wgsl/render/sample/equi-to-cube.wgsl';
 
@@ -90,7 +91,7 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
 
       return source;
     }, [resource, sampler]);
-
-    return useHooks(() => render ? (source ? render(source) : null) : yeet(source), [render, source]);
+    
+    return useRenderProp(props, source);
   });
 };

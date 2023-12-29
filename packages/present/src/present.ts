@@ -15,6 +15,7 @@ import { clamp } from '@use-gpu/core';
 
 import { resolveSlides } from './lib/slides';
 import { PresentContext, PresentAPI } from './providers/present-provider';
+
 import { PresentReconciler } from './reconcilers';
 import { makeUseTransition } from './hooks';
 import { Stage } from './stage';
@@ -125,7 +126,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
   });
 
   return (
-    // Reconcile the quoted presentation to extract a gather reduction over only the <Slide> and <Step> nodes, which unquote.
+    // Reconcile the presentation to extract a gather reduction over only the <Slide> and <Step> nodes.
     reconcile(
       gather(
         quote(

@@ -55,16 +55,15 @@ export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<Envir
 
   const environment = map || !((preset as any) in PRESETS)
     ? (useNoShader(), map ?? null)
-    : useShader(getDefaultEnvironment, PRESETS[preset as any] ?? [SH_DIFFUSE_PARK, SH_SPECULAR_PARK]);
+    : useShader(getDefaultEnvironment, PRESETS[preset as any] ?? PRESETS.park);
 
   const parent = useMaterialContext();
   const material = useMemo(() => {
+    if (!environment) return parent;
 
-    const applyEnvironment = environment
-      ? bindBundle(applyPBREnvironment, {
-          sampleEnvironment: getSource(SAMPLE_ENVIRONMENT, environment),
-        })
-      : null;
+    const applyEnvironment = bindBundle(applyPBREnvironment, {
+      sampleEnvironment: getSource(SAMPLE_ENVIRONMENT, environment),
+    });
 
     return patch(parent, {
       shaded: {
@@ -72,6 +71,8 @@ export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<Envir
       }
     });
   }, [parent, environment]);
+
+  console.log({material, map})
 
   return (
     provide(EnvironmentContext, environment,

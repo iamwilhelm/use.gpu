@@ -12,8 +12,7 @@ import {
   FaceLayer, FaceLayerProps,
   PBRMaterial,
   TransformContext,
-  useMatrixTransform, useNoMatrixTransform,
-  useMatrixBounds, useNoMatrixBounds,
+  useCombinedMatrixTransform, useNoCombinedMatrixTransform,
   useRawSource, useNoRawSource,
 } from '@use-gpu/workbench';
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl'
@@ -93,14 +92,14 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
 
   let view: LiveElement = render;
   if (matrix) {
-    const bounds = useMatrixBounds(matrix);
-    const transform = useMatrixTransform(matrix, bounds);
+    const [context] = useCombinedMatrixTransform(matrix);
 
-    view = provide(TransformContext, transform, view);
+    view = provide(TransformContext, context, view);
   }
   else {
     useNoMatrixBounds();
     useNoMatrixTransform();
+    useNoCombinedMatrixTransform();
   }
 
   return view;

@@ -4,8 +4,10 @@ import type { XY, ColorSpace, TextureSource } from '@use-gpu/core';
 import { use, yeet, gather, keyed, wrap, suspend, useMemo, useHooks } from '@use-gpu/live';
 import { Suspense } from '@use-gpu/workbench';
 import { makeDynamicTexture, uploadDataTexture, uploadExternalTexture, updateMipArrayTextureChain } from '@use-gpu/core';
+
 import { useDeviceContext } from '../providers/device-provider';
 import { useSuspenseContext } from '../providers/suspense-provider';
+import { useRenderProp } from '../hooks/useRenderProp';
 
 import { ImageLoader } from './image-loader';
 
@@ -95,6 +97,6 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
       return source;
     }, [resources, sampler]);
 
-    return useHooks(() => render ? (source ? render(source) : null) : yeet(source), [render, source]);
+    return useRenderProp(props, source);
   });
 };

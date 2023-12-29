@@ -56,7 +56,7 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getSurface, getLight, defines, colorInput, colorSpace]);
+  }, [vertexShader, fragmentShader, getVertex, getSurface, getLight, applyLights, applyEnvironment, defines, colorInput, colorSpace]);
 
   // Inline the render fiber
   const call = {

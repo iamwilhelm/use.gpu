@@ -26,44 +26,46 @@ type EnvMapControlsProps = {
 
 export const ENVIRONMENTS = {
   park:
-    use(ImageCubeTexture, {
-      urls: [
+    <ImageCubeTexture
+      urls={[
         "/textures/cube/park2/px.jpg",
         "/textures/cube/park2/nx.jpg",
         "/textures/cube/park2/py.jpg",
         "/textures/cube/park2/ny.jpg",
         "/textures/cube/park2/pz.jpg",
         "/textures/cube/park2/nz.jpg",
-      ],
-      format: "jpg",
-    }),
+      ]}
+      format="jpg"
+    />,
 
   pisa:
-    use(ImageCubeTexture, {
-      urls: [
+    <ImageCubeTexture
+      urls={[
         "/textures/cube/pisaRGBM16/px.png",
         "/textures/cube/pisaRGBM16/nx.png",
         "/textures/cube/pisaRGBM16/py.png",
         "/textures/cube/pisaRGBM16/ny.png",
         "/textures/cube/pisaRGBM16/pz.png",
         "/textures/cube/pisaRGBM16/nz.png",
-      ],
-      format: 'rgbm16',
-    }),
+      ]}
+      format='rgbm16'
+    />,
 
   road:
-    use(ImageTexture, {
-      url: '/textures/equi/rural_asphalt_road_1k.hdr',
-      format: 'hdr',
-      render: (texture: TextureSource) => use(PanoramaMap, {texture, gain: 0.5}),
-    }),
+    <ImageTexture
+      url='/textures/equi/rural_asphalt_road_1k.hdr'
+      format='hdr'
+    >{
+      (texture: TextureSource) => <PanoramaMap texture={texture} gain={0.5} />
+    }</ImageTexture>,
 
   field:
-    use(ImageTexture, {
-      url: '/textures/equi/graveyard_pathways_1k.hdr',
-      format: 'hdr',
-      render: (texture: TextureSource) => use(PanoramaMap, {texture}),
-    }),
+    <ImageTexture
+      url='/textures/equi/graveyard_pathways_1k.hdr'
+      format='hdr'
+    >{
+      (texture: TextureSource) => <PanoramaMap texture={texture} />
+    }</ImageTexture>,
 } as Record<string, any>;
 
 export const EnvMapControls: LC<EnvMapControlsProps> = (props: EnvMapControlsProps) => {

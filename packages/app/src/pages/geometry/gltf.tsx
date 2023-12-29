@@ -34,7 +34,7 @@ export const GeometryGLTFPage: LC = () => {
       <Gather
         children={[
           <Gather
-            children={<Suspense>{envMap}</Suspense>}
+            children={envMap}
             then={([texture]: TextureSource[]) => (
               <PrefilteredEnvMap
                 texture={texture}
@@ -42,7 +42,7 @@ export const GeometryGLTFPage: LC = () => {
             )}
           />
         ]}
-        then={([cubeMap]: TextureSource[]) => (
+        then={([cubeMap]: TextureSource[]) => (console.log({cubeMap}),
           <Loop>
             <LinearRGB>
               <Cursor cursor='move' />
@@ -79,18 +79,15 @@ export const GeometryGLTFPage: LC = () => {
                   <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
                   <DomeLight intensity={0.15} />
 
-                  <Scene>
-                    <Node position={[0, -0.1, 0]}>
-                      <GLTFData
-                        url={url}
-                        render={(gltf: GLTF) =>
-                          <Environment map={cubeMap} preset={envPreset}>
-                            <GLTFModel gltf={gltf} />
-                          </Environment>
-                        }
-                      />
-                    </Node>
-                  </Scene>
+                  <Environment map={cubeMap} preset={envPreset}>
+                    <Scene>
+                      <Node position={[0, -0.1, 0]}>
+                        <GLTFData url={url}>{
+                          (gltf: GLTF) => <GLTFModel gltf={gltf} />
+                        }</GLTFData>
+                      </Node>
+                    </Scene>
+                  </Environment>
                 </Pass>
               </Camera>
             </LinearRGB>

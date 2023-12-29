@@ -318,11 +318,11 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         },
       });
 
-      return [
+      return useMemo(() => [
         debug ? use(DebugAtlas, {atlas}) : null,
         use(Queue, {nested: true, children: use(Compute, {children: dispatches}) }),
         render ? render(boundCubeMap, target) : yeet(boundCubeMap),
-      ];
+      ], [debug, atlas, dispatches, render, target, boundCubeMap]);
     })
   );
 };

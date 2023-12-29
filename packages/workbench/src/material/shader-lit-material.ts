@@ -76,6 +76,7 @@ export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithCh
 
   const {useMaterial} = useLightContext();
   const applyLights = useMaterial(apply);
+  const applyEnvironment = environment;
 
   const getLight = getLitFragment;
   const getSurface = surface;
@@ -92,10 +93,11 @@ export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithCh
       getSurface,
       getLight,
       applyLights,
-      applyEnvironment: environment,
+      applyEnvironment,
     },
-  }), [getSurface, getLight, getDepth, getFragment]);
+  }), [getSurface, getLight, getDepth, getFragment, applyLights, applyEnvironment]);
 
   const view = render ? render(context) : children;
   return render ?? children ? provide(MaterialContext, context, [signal(), view]) : yeet(context);
-}
+};
+

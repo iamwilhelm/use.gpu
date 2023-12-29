@@ -1,5 +1,5 @@
 import type { LC, LiveElement, Ref } from '@use-gpu/live';
-import type { TextureSource, StorageSource, LambdaSource } from '@use-gpu/core';
+import type { GPUGeometry, TextureSource, StorageSource, LambdaSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { PipelineOptions } from '@use-gpu/workbench';
 
@@ -376,8 +376,8 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
 
   return gather(
     use(GeometryData, geometry),
-    ([mesh]: Record<string, StorageSource>[]) => {
-      const {positions, normals, uvs} = mesh;
+    ([mesh]: GPUGeometry[]) => {
+      const {attributes: {positions, uvs}} = mesh;
       const mips = shape.length;
 
       const DEBUG_STEPS = useDebugContext()?.voxel?.iterations;
@@ -478,7 +478,6 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
             use(FaceLayer, {
               positions: getPosition,
               uvs,
-              normals,
               fragDepth: true,
               shaded: true,
               blend,
@@ -491,7 +490,6 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
             use(FaceLayer, {
               positions: getPosition,
               uvs,
-              normals,
               fragDepth: true,
               shaded: true,
               side: 'back',

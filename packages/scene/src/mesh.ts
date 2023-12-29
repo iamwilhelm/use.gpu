@@ -10,20 +10,15 @@ import { Primitive } from './primitive';
 
 export type MeshProps = {
   id?: number,
-  mesh: GPUGeometry,
+  geometry: GPUGeometry,
   shaded?: boolean,
   side?: 'front' | 'back' | 'both',
 };
 
 export const Mesh: LiveComponent<MeshProps> = memo((props: PropsWithChildren<MeshProps>) => {
-  const {
-    mesh,
-    ...rest
-  } = props;
-
   return (
     wrap(Primitive,
-      use(FaceLayer, {...rest, ...mesh})
+      use(FaceLayer, props)
     )
   );
 }, 'Mesh');

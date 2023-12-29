@@ -1,5 +1,5 @@
 import type { LiveElement } from '@use-gpu/live';
-import { yeet, useHooks, useNoHooks, useOne, useNoOne } from '@use-gpu/live';
+import { yeet, useHooks, useNoHooks, useOne, useNoOne, formatValue } from '@use-gpu/live';
 
 export type RenderProp<T> = {
   render?: (t: T) => LiveElement,
@@ -8,6 +8,7 @@ export type RenderProp<T> = {
 
 export const useRenderProp = <T>(props: RenderProp<T>, arg: T): LiveElement => {
   const call = getRenderFunc(props);
+  if (!call && props.children)  throw new Error(`Expected render function as children, got: ${formatValue(props.children)}`);
 
   const rendered = call ? useHooks(() => call(arg), [call, arg]) : useNoHooks();
   const returned = !call ? useOne(() => yeet(arg), arg) : useNoOne();
@@ -17,5 +18,7 @@ export const useRenderProp = <T>(props: RenderProp<T>, arg: T): LiveElement => {
 
 export const getRenderFunc = <T>(props: RenderProp<T>): LiveElement => {
   const {render, children} = props;
-  return typeof children === 'function' ? children : render;
+  if (typeof children === 'function') return children;
+  if (render) return render;
+  return null;
 };

@@ -7,7 +7,7 @@ import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { swizzleTo, chainTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext, QueueReconciler,
+  MatrixContext, TransformContext, QueueReconciler,
   useShaderRef, useShader, useCombinedEpsilonTransform,
 } from '@use-gpu/workbench';
 
@@ -153,8 +153,10 @@ export const Polar: LiveComponent<PolarProps> = (props: PropsWithChildren<PolarP
 
   return [
     signal(),
-    provide(TransformContext, context,
-      provide(RangeContext, rangeMemo, children ?? [])
+    provide(MatrixContext, null,
+      provide(TransformContext, context,
+        provide(RangeContext, rangeMemo, children ?? [])
+      )
     )
   ];
 };

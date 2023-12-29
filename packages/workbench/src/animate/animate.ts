@@ -143,8 +143,8 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
   }, [script, duration]);
 
   const Run = useMemo(() => {
-    let props1 = mapValues(script, () => null);
-    let props2 = mapValues(script, () => null);
+    let values1 = mapValues(script, () => null);
+    let values2 = mapValues(script, () => null);
     let flip = false;
 
     return () => {
@@ -158,7 +158,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
       if (started < 0) started = startedRef.current = elapsed;
       if (paused && !pausedRef.current) pausedRef.current = elapsed;
       
-      const props = flip ? props1 : props2;
+      const values = flip ? values1 : values2;
       if (!paused) {
         // Deduct pause time from elapsed on resume
         if (pausedRef.current) {
@@ -173,7 +173,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
         const time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
         const [t, max] = getLoopedTime(time, length, rest, repeat, mirror);
 
-        for (let k in props) props[k] = evaluateKeyframes(script[k], t, ease);
+        for (let k in values) values[k] = evaluateKeyframes(script[k], t, ease);
 
         if (time < max) useAnimationFrame();
         else useNoAnimationFrame();
@@ -183,8 +183,8 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
       }
 
       const render = getRenderFunc(props);
-      if (render) return tracks ? render(props) : (prop ? render(props[prop]) : null);
-      else if (children) return extend(children, props);
+      if (render) return tracks ? render(values) : (prop ? render(values[prop]) : null);
+      else if (typeof children === 'object') return extend(children, values);
 
       return null;
     };

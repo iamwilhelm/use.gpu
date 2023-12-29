@@ -1,5 +1,6 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Vox } from '@use-gpu/voxel';
+import type { GPUGeometry } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { Keyframe } from '@use-gpu/workbench';
 
@@ -90,7 +91,7 @@ export const GeometryVoxelPage: LC = () => {
                             second={{ detail: 3, divide: 48, end: true }}
                             depth={0.5}
                             zBias={1}
-                            color={0x404040}
+                            color={'#404040'}
                           />
                           <Grid
                             origin={[0, 0, 0]}
@@ -100,7 +101,7 @@ export const GeometryVoxelPage: LC = () => {
                             second={{ detail: 3, divide: 48, end: true }}
                             depth={0.5}
                             zBias={1}
-                            color={0x404040}
+                            color={'#404040'}
                           />
                         </Cartesian>
                       </Plot>
@@ -112,15 +113,14 @@ export const GeometryVoxelPage: LC = () => {
 
                     <Node position={[0, 0, -11]} rotation={[0, 180, 0]}>
                       <GeometryData {...planeGeometry}>{
-                        (planeMesh: Record<string, ShaderSource>) =>
-                          <PBRMaterial albedo={0x808080} roughness={0.7}>
+                        (planeMesh: GPUGeometry) =>
+                          <PBRMaterial albedo={'#808080'} roughness={0.7}>
                             <Mesh
-                              mesh={planeMesh}
+                              geometry={planeMesh}
                               side="both"
                               shaded
                             />
                           </PBRMaterial>
-                        }
                       }</GeometryData>
                     </Node>
                   </Node>

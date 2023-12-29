@@ -7,7 +7,7 @@ import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext, QueueReconciler,
+  MatrixContext, TransformContext, QueueReconciler,
   useShaderRef, useShader, useCombinedEpsilonTransform,
 } from '@use-gpu/workbench';
 
@@ -121,8 +121,10 @@ export const Stereographic: LiveComponent<StereographicProps> = (props: PropsWit
 
   return [
     signal(),
-    provide(TransformContext, context,
-      provide(RangeContext, rangeMemo, children ?? [])
+    provide(MatrixContext, null,
+      provide(TransformContext, context,
+        provide(RangeContext, rangeMemo, children ?? [])
+      )
     )
   ];
 };

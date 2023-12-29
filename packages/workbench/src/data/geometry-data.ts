@@ -3,7 +3,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { StorageSource, CPUGeometry, GPUGeometry } from '@use-gpu/core';
 
 import { use, yeet, useMemo } from '@use-gpu/live';
-import mapObject from 'lodash/zipObject';
+import mapValues from 'lodash/mapValues';
 import { useRenderProp } from '../hooks/useRenderProp';
 
 import { Data } from './data';
@@ -23,24 +23,27 @@ export const GeometryData: LiveComponent<GeometryDataProps> = (props: GeometryDa
   } = props;
 
   const schema = useMemo(() =>
-    mapObject(item.attributes, (_, k) => ({
+    mapValues(attributes, (_, k) => ({
       format: `array<${formats[k]}>`,
       index: k === 'indices',
-      unwelded: !!item.unwelded[k],
+      unwelded: !!unwelded?.[k],
     })),
     [attributes, formats],
   );
+  console.log(attributes, schema)
 
   return (
     use(Data, {
-      fields,
+      schema,
+      data: attributes,
       render: (sources: StorageSource[]) => {
         const out = {
-          attributes: sources,
           count,
           topology,
+          attributes: sources,
           unwelded,
         };
+        console.log('useRenderProp <GeometryData>', out, props)
         return useRenderProp(props, out);
       },
     })

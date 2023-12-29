@@ -96,7 +96,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
   if (itemCount === 0) return null;
 
   const keys = useMemo(
-    () => Object.keys(schema).filter(k => virtual?.[k] ?? data[0][schema[k].prop ?? k] != null),
+    () => Object.keys(schema).filter(k => virtual?.[k] ?? data?.[0][schema[k].prop ?? k] != null),
     [schema, data, virtual]
   );
 
@@ -224,7 +224,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
       let b = 0;
       let o = 0;
       for (let i = 0; i < itemCount; ++i) {
-        o += copyRecursiveNumberArray(accessor ? accessor(i + skip) : data[i + skip][prop], array, dimsIn, dimsIn, depth, o, 1);
+        o += copyRecursiveNumberArray(accessor ? accessor(i + skip) : data?.[i + skip][prop], array, dimsIn, dimsIn, depth, o, 1);
         if (slice) slices.push((o - b) / dimsIn + ((loops === true || loops?.[i]) ? 3 : 0));
         b = o;
       }
@@ -262,6 +262,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
 
   const trigger = useOne(() => signal(), items);
 
+  console.log('useRenderProp <Data>', sources)
   const view = useRenderProp(props, sources);
   return [trigger, view];
 };
@@ -297,7 +298,7 @@ const getMultiChunkCount = (
   let i = 0;
   const get = (accessor
     ? (i: number) => accessor(i)
-    : (i: number) => data[i][prop]
+    : data ? (i: number) => data[i][prop] : () => 0
   );
 
   const chunks = [];
@@ -329,7 +330,7 @@ const getVertexCount = (
   let i = 0;
   const get = (accessor
     ? (i: number) => accessor(i)
-    : (i: number) => data[i][prop ?? key]
+    : data ? (i: number) => data[i][prop ?? key] : () => 0
   );
 
   let total = 0;

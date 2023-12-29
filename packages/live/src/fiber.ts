@@ -466,8 +466,8 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
         if (nextMount !== mount) {
           if (order.length) {
             order.length = 0;
-            fiber.host?.visit(fiber.next!);
           }
+          fiber.host?.visit(fiber.next!);
 
           mounts.set(key, nextMount);
         }
@@ -605,98 +605,6 @@ export const reconcileFiberOrder = <F extends ArrowFunction>(
   pingFiber(fiber);
 }
 
-// Generalized mounting of reduction-like continuations
-export const mountFiberReduction = <F extends ArrowFunction, R, T>(
-  fiber: LiveFiber<F>,
-  calls: LiveElement[] | LiveElement,
-  mapper: ((t: T) => R) | undefined,
-  gather: FiberGather<R>,
-  Next?: LiveFunction<any>,
-  fallback?: R,
-) => {
-  if (!fiber.next) {
-    const Resume = makeFiberReduction(fiber, gather, fallback);
-    fiber.next = makeNextFiber(fiber, Resume, 'Resume', true);
-    fiber.yeeted = makeYeetState(fiber, fiber.next, gather, mapper);
-    fiber.path = [...fiber.path, 0];
-  }
-
-  calls = reactInterop(calls, fiber) as any;
-
-  if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
-  else mountFiberCall(fiber, calls as any);
-
-  mountFiberContinuation(fiber, use(fiber.next.f, Next));
-}
-
-// Mount quoted calls on a fiber's continuation
-export const mountFiberQuote = <F extends ArrowFunction>(
-  fiber: LiveFiber<F>,
-  reconciler: LiveReconciler,
-  calls: LiveElement | LiveElement[],
-) => {
-  const {quotes} = fiber;
-  const quote = quotes.get(reconciler);
-  if (!quote) throw new Error(`Reconciler '${reconciler.displayName}' was used without being provided in ${formatNode(fiber)}`);
-
-  const {id, mounts, lookup, order} = fiber;
-  let {root, to, to: {next}} = quote;
-
-  if (!next) {
-    next = to.next = makeFiberTailReconciliation(to);
-    next.unquote = null;
-    to.fork = true;
-  }
-
-  const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
-  reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
-  fiber.quote = quote;
-
-  const mount = to.mounts!.get(id);
-  if (mount!.unquote?.to !== fiber) {
-    mount!.unquote = makeQuoteState(root, to, fiber, reconciler);
-  }
-
-  // Flush immediate tail reconciler
-  const nextNext = next?.next;
-  if (nextNext) console.warn('Quote nextNext');
-  flushMount(to.next, to.next, true);
-}
-
-// Mount unquoted calls on a fiber's origin
-export const mountFiberUnquote = <F extends ArrowFunction>(
-  fiber: LiveFiber<F>,
-  calls: LiveElement | LiveElement[],
-) => {
-  if (!fiber.unquote) throw new Error(`Can't unquote outside of quote in ${formatNode(fiber)}`);
-
-  const {id, unquote, mounts, lookup, order} = fiber;
-  let {root, to, to: {next}, reconciler} = unquote;
-
-  if (!next) {
-    next = to.next = makeFiberTailReconciliation(to);
-    next.unquote = null;
-    to.fork = true;
-  }
-
-  const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
-  reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
-
-  const mount = to.mounts!.get(id);
-  const {quotes} = mount;
-
-  if (quotes.get(reconciler!)?.to !== fiber) {
-    const quote = makeQuoteState(root, to, fiber);
-    mount.quotes = new Map(mount.quotes);
-    mount.quotes.set(reconciler!, quote);
-  }
-
-  // Flush immediate tail reconciler
-  const nextNext = next?.next;
-  if (nextNext) console.warn('Unquote nextNext');
-  flushMount(to.next, to.next, true);
-}
-
 // Wrap a live function to act as a reduction continuation of a prior fiber
 export const makeFiberReduction = <F extends ArrowFunction, R>(
   fiber: LiveFiber<F>,
@@ -743,7 +651,6 @@ export const makeFiberTailReconciliation = <F extends ArrowFunction, R>(
 const toArray = <T>(x: T | T[] | undefined): T[] => Array.isArray(x) ? x : x != null ? [x] : [];
 const NO_ARRAY: any[] = [];
 const NO_RECORD: Record<string, any> = {};
-
 
 // Map-reduce a fiber
 export const mapReduceFiberCalls = <F extends ArrowFunction, R, T>(
@@ -992,6 +899,87 @@ const multiGatherMergeInto = <T>(a: Record<string, T[]>, b: Record<string, T | T
     else list.push(v as T);
   }
 }
+// Generalized mounting of reduction-like continuations
+export const mountFiberReduction = <F extends ArrowFunction, R, T>(
+  fiber: LiveFiber<F>,
+  calls: LiveElement[] | LiveElement,
+  mapper: ((t: T) => R) | undefined,
+  gather: FiberGather<R>,
+  Next?: LiveFunction<any>,
+  fallback?: R,
+) => {
+  if (!fiber.next) {
+    const Resume = makeFiberReduction(fiber, gather, fallback);
+    fiber.next = makeNextFiber(fiber, Resume, 'Resume', true);
+    fiber.yeeted = makeYeetState(fiber, fiber.next, gather, mapper);
+    fiber.path = [...fiber.path, 0];
+  }
+
+  calls = reactInterop(calls, fiber) as any;
+
+  if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
+  else mountFiberCall(fiber, calls as any);
+
+  mountFiberContinuation(fiber, use(fiber.next.f, Next));
+}
+
+// Mount quoted calls on a fiber's continuation
+export const mountFiberQuote = <F extends ArrowFunction>(
+  fiber: LiveFiber<F>,
+  reconciler: LiveReconciler,
+  calls: LiveElement | LiveElement[],
+) => {
+  const {quotes} = fiber;
+  const quote = quotes.get(reconciler);
+  if (!quote) throw new Error(`Reconciler '${reconciler.displayName}' was used without being provided in ${formatNode(fiber)}`);
+
+  const {id, mounts, lookup, order} = fiber;
+  let {root, to, to: {next}} = quote;
+
+  if (!next) {
+    next = to.next = makeFiberTailReconciliation(to);
+    next.unquote = null;
+    to.fork = true;
+  }
+
+  const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
+  reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
+  fiber.quote = quote;
+
+  const mount = to.mounts!.get(id);
+  if (mount!.unquote?.to !== fiber) {
+    mount!.unquote = makeQuoteState(root, to, fiber, reconciler);
+  }
+}
+
+// Mount unquoted calls on a fiber's origin
+export const mountFiberUnquote = <F extends ArrowFunction>(
+  fiber: LiveFiber<F>,
+  calls: LiveElement | LiveElement[],
+) => {
+  if (!fiber.unquote) throw new Error(`Can't unquote outside of quote in ${formatNode(fiber)}`);
+
+  const {id, unquote, mounts, lookup, order} = fiber;
+  let {root, to, to: {next}, reconciler} = unquote;
+
+  if (!next) {
+    next = to.next = makeFiberTailReconciliation(to);
+    next.unquote = null;
+    to.fork = true;
+  }
+
+  const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
+  reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
+
+  const mount = to.mounts!.get(id);
+  const {quotes} = mount;
+
+  if (quotes.get(reconciler!)?.to !== fiber) {
+    const quote = makeQuoteState(root, to, fiber);
+    mount.quotes = new Map(mount.quotes);
+    mount.quotes.set(reconciler!, quote);
+  }
+}
 
 // Morph one call on a fiber
 export const morphFiberCall = <F extends ArrowFunction>(
@@ -1052,6 +1040,7 @@ export const provideFiber = <F extends ArrowFunction>(
   let {context: {roots, values}, args: [context, value, calls]} = fiber;
 
   if (roots.get(context) !== fiber.id) {
+    if (fiber.next) throw new Error(`Mounting context on existing continuation`);
     if (!context.context) throw new Error(`'${context.displayName}' is not a context`);
 
     fiber.context = makeContextState(fiber, fiber.context, fiber.id, context, value);
@@ -1094,7 +1083,8 @@ export const captureFiber = <F extends ArrowFunction>(
   bustFiberDeps(fiber);
   pingFiber(fiber);
 
-  if (roots.get(capture) !== fiber.id) {
+  if (!fiber.next || roots.get(capture) !== fiber.next) {
+    if (fiber.next) throw new Error(`Mounting capture on existing continuation`);
     if (!capture.capture) throw new Error(`'${capture.displayName}' is not a capture`);
 
     const registry = new Map<LiveFiber<any>, any>();
@@ -1126,6 +1116,7 @@ export const reconcileFiber = <F extends ArrowFunction>(
   pingFiber(fiber);
 
   if (quotes.get(reconciler)?.root !== id) {
+    if (fiber.next) throw new Error(`Mounting reconciler on existing continuation`);
     if (!reconciler.reconciler) throw new Error(`'${reconciler.displayName}' is not a reconciler`);
 
     // Dummy fiber to act as new tree root, never called directly
@@ -1142,7 +1133,7 @@ export const reconcileFiber = <F extends ArrowFunction>(
 
   // Flush immediate tail reconciler
   const nextNext = fiber.next?.next;
-  if (nextNext) flushMount(nextNext, nextNext, true);
+  //flushMount(nextNext, nextNext, true);
 }
 
 // Detach a fiber by mounting a subcontext manually and delegating the triggering of its execution
@@ -1195,14 +1186,14 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
     fiber.quote = null;
   }
   if (fiber.type === QUOTE) {
-    const {root, to} = quote;
-    if (root) reconcileFiberCall(to, null, id, true);
+    const {to} = quote;
+    if (to.bound) reconcileFiberCall(to, null, id, true);
     pingFiber(to);
     fiber.quote = null;
   }
   if (fiber.type === UNQUOTE) {
     const {to} = unquote!;
-    reconcileFiberCall(to, null, id, true);
+    if (to.bound) reconcileFiberCall(to, null, id, true);
     pingFiber(to);
   }
 

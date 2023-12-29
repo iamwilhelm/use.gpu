@@ -78,9 +78,9 @@ export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildre
 
   return [
     signal(),
-    provide(TransformContext, context,
       provide(MatrixContext, combined,
-        provide(RangeContext, g, children ?? [])
+        provide(RangeContext, g,
+          provide(TransformContext, context, children ?? [])
       )
     )
   ];

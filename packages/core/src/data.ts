@@ -313,7 +313,7 @@ export const spreadNumberArray = (
   for (let i = 0; i < n; ++i) {
     const l = slices[i];
     fillNumberArray(from ?? i, to, fromDims, toDims, f, t, l, stride);
-    f++;
+    f += fromDims;
     t += l * step;
   }
   return t - toIndex;

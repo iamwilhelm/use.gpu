@@ -3,7 +3,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { TraitProps } from '@use-gpu/traits/live';
 
 import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
-import { schemaToArchetype, schemaToAttributes } from '@use-gpu/core';
+import { adjustSchema, schemaToArchetype, schemaToAttributes } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
@@ -55,6 +55,9 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
       lookup,
       lookups,
 
+      schema: _,
+      formats,
+      tensor,
       ...flags
   } = parsed;
 
@@ -66,8 +69,9 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
   const context = useTransformContext();
   const {transform, nonlinear, matrix: refs} = context;
 
-  const attributes = schemaToAttributes(POINT_SCHEMA, parsed);
-  const archetype = schemaToArchetype(POINT_SCHEMA, attributes, flags, refs);
+  const schema = useOne(() => adjustSchema(POINT_SCHEMA, formats), formats);
+  const attributes = schemaToAttributes(schema, parsed);
+  const archetype = schemaToArchetype(schema, attributes, flags, refs);
 
   const count = positions ? (attributes.positions?.length / 4) || 0 : 1;
   if (Number.isNaN(count)) debugger;
@@ -80,6 +84,7 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
       attributes,
       flags,
       refs,
+      schema,
       transform: nonlinear ?? context,
       zIndex,
     },

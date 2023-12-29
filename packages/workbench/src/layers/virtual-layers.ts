@@ -129,7 +129,8 @@ const Aggregate: LiveFunction<any> = (
 
     const upload = useOne(() => uploadRefs ? quote(yeet(uploadRefs)) : null, uploadRefs);
     return upload ? [upload, layer] : layer;
-  }, [count, sources, transform, material, scissor, flags, uploadRefs]);
+    // Excluse flags and contexts because they are factored into the archetype
+  }, [count, sources, uploadRefs]);
 };
 
 const getItemTypeKey = (item: LayerAggregate) =>

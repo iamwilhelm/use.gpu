@@ -3,7 +3,7 @@ import type { DataBounds, TypedArray, StorageSource, VectorLike, UniformType, Em
 
 import { provide, yeet, signal, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
-  makeTensorArray, emitIntoMultiNumberArray, updateTensor,
+  makeTensorArray, emitMultiArray, makeNumberWriter, updateTensor,
   getBoundingBox, toDataBounds,
   toCPUDims, toGPUDims,
 } from '@use-gpu/core';
@@ -51,6 +51,9 @@ export type SamplerProps = {
   time?: boolean,
   /** Resample `data` or `expr` on every animation frame. */
   live?: boolean,
+
+  /** Inject into DataContext under this key(s) */
+  as?: string | string[],
 
   /** Leave empty to yeet source instead. */
   render?: (source: StorageSource) => LiveElement,
@@ -260,7 +263,8 @@ export const Sampler: LiveComponent<SamplerProps> = (props) => {
       }
 
       if (sampled) {
-        emitted = emitIntoMultiNumberArray(sampled, array, dims, count, padded, clock!);
+        const emit = makeNumberWriter(tensor, dims);
+        emitted = emitMultiArray(sampled, emit, count, padded, clock!);
       }
     }
 

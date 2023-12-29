@@ -42,7 +42,7 @@ export type TensorProps = {
   /** Resample `data` or `expr` on every animation frame. */
   live?: boolean,
 
-  /** Inject into DataContext under this key */
+  /** Inject into DataContext under this key(s) */
   as?: string | string[],
 
   /** Omit to provide data context instead. */
@@ -76,6 +76,7 @@ export const Tensor: LiveComponent<TensorProps> = (props) => {
 
   // Make tensor array
   const tensors = useMemo(() => seq(items).map(i => makeTensorArray(format, alloc)), [format, alloc]);
+  const arrays = useOne(() => tensors.map(({array}) => array), tensors);
 
   // Provide time for expr
   const clock = time && expr ? useTimeContext() : useNoTimeContext();
@@ -87,7 +88,7 @@ export const Tensor: LiveComponent<TensorProps> = (props) => {
     const d = toCPUDims(dims);
 
     let emitted = 0;
-    const emit = split ? makeNumberSplitter(tensors, dims) : makeNumberWriter(tensor, dims);
+    const emit = split ? makeNumberSplitter(arrays, dims) : makeNumberWriter(arrays[0], dims);
     if (data) {
       const expr = makeNumberReader(data, dims);
       emitted = emitArray(expr, emit, count);
@@ -131,5 +132,5 @@ export const Tensor: LiveComponent<TensorProps> = (props) => {
       : ({...dataContext, [as]: value}),
     [dataContext, value, as]) : useNoMemo();
 
-  return render ? render(tensor) : children ? provide(DataContext, context, children) : yeet(tensor);
+  return render ? render(value) : children ? provide(DataContext, context, children) : yeet(value);
 };

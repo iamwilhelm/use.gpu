@@ -82,6 +82,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
 
     ...rest
   } = props;
+  //for (const k in props) useMemo(() => console.log(`${k} changed`), [props[k]]);
 
   const s = useShaderRef(size, sizes);
   const o = useShaderRef(outline);

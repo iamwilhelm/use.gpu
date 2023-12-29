@@ -24,6 +24,7 @@ export type EmbedProps =
     key: number,
     layout: Rectangle,
     origin: Rectangle,
+    z: number,
     clip: ShaderModule | null,
     mask: ShaderModule | null,
     transform: ShaderModule | null,
@@ -70,12 +71,13 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: PropsWithChildren<E
       render: memoLayout((
         layout: Rectangle,
         origin: Rectangle,
+        z: number,
         clip: ShaderModule | null,
         mask: ShaderModule | null,
         transform: ShaderModule | null,
       ) => {
         const view = render
-          ? render(id, layout, origin, clip, mask, transform)
+          ? render(id, layout, origin, z, clip, mask, transform)
           : (
             provide(LayoutContext, layout,
               provide(TransformContext, {transform}, children),

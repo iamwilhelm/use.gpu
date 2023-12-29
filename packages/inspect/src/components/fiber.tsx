@@ -179,7 +179,7 @@ export const FiberLegend: React.FC = () => {
           </TreeLegendItem>
         </TreeLegendGroup>
       </TreeLegendColumns>
-      <TreeTip><Muted>Double click to focus a fiber in the tree</Muted></TreeTip>
+      <TreeTip><Muted>Double click to focus a sub-tree</Muted></TreeTip>
     </div></TreeLegend>
   </>)
 };

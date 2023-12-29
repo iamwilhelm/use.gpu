@@ -10,8 +10,6 @@ import { useMatrixContext, useNoMatrixContext } from '../providers/matrix-provid
 import { getShader } from './useShader';
 import { getSource } from './useSource';
 
-import { useCombinedTransform } from './useCombinedTransform';
-
 import { vec3, mat3, mat4 } from 'gl-matrix';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';

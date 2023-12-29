@@ -27,7 +27,7 @@ export const LayoutDisplayPage: LC = () => {
         <UI>
           <Layout>
 
-            <Absolute fill={WHITE_TRANSPARENT} left={0} right={0} top={0} bottom={0} />
+            <Absolute left={0} right={0} top={0} bottom={0} />
             <Flex width="100%" height="100%">
 
               <Block width="40%" contain>

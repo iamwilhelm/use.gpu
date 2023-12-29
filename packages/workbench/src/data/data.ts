@@ -7,7 +7,7 @@ import { QueueReconciler } from '../reconcilers';
 import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
-import { yeet, useOne, useMemo, useNoMemo } from '@use-gpu/live';
+import { yeet, useLog, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   seq,
   toCPUDims,
@@ -24,7 +24,7 @@ import {
   schemaToEmitters,
   getAggregateSummary,
 } from '@use-gpu/core';
-import { toMultiChunkCounts, toChunkCount, toVertexCount } from '@use-gpu/parse';
+import { sizeToMultiCompositeChunks, toMultiChunkCounts, toChunkCount, toVertexCount } from '@use-gpu/parse';
 
 const {signal} = QueueReconciler;
 
@@ -97,7 +97,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
 
   const keys = useMemo(
     () => Object.keys(schema).filter(k => virtual?.[k] ?? data?.[0][schema[k].prop ?? k] != null),
-    [schema, data, virtual]
+    [schema, propData, virtual]
   );
 
   if (keys.length === 0) return null;
@@ -136,11 +136,11 @@ export const Data: LiveComponent<DataProps> = (props) => {
       }
       else if (segments) {
         [vertexCount, chunks, groups] = getMultiChunkCount(schema, countKey, itemCount, data, virtual, skip);
-        if (indexedKey) [indexCount] = getMultiChunkCount(schema, indexKey, itemCount, data, virtual, skip);
+        if (indexedKey) [indexCount] = getMultiChunkCount(schema, indexedKey, itemCount, data, virtual, skip);
       }
       else {
         vertexCount = getVertexCount(schema, countKey, itemCount, data, virtual, skip);
-        if (indexedKey) indexCount = getVertexCount(schema, indexKey, itemCount, data, virtual, skip);
+        if (indexedKey) indexCount = getVertexCount(schema, indexedKey, itemCount, data, virtual, skip);
       }
     }
 
@@ -166,7 +166,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
       const isArray = isUniformArrayType(format);
       const alloc = isArray ? (index || unwelded) ? allocIndices : allocVertices : allocItems;
       const {array, dims, depth} = makeCPUArray(format, alloc);
-      if (depth > 1 && !segments) throw new Error(`Cannot use nested array without 'segment' handler.`)
+      if (depth > 1 && !segments && !tensor) throw new Error(`Cannot use nested array without 'segment' handler.`)
 
       if (isArray) hasPlural = true;
       else hasSingle = true;
@@ -239,7 +239,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
       attributes: emitters,
     }];
   }, [
-    live ? NaN : virtual ? (version ?? NaN) : null, data,
+    live ? NaN : virtual ? (version ?? NaN) : null, propData,
     itemCount, skip, total, indexed,
     archetype, emitters,
   ]);
@@ -262,7 +262,6 @@ export const Data: LiveComponent<DataProps> = (props) => {
 
   const trigger = useOne(() => signal(), items);
 
-  console.log('useRenderProp <Data>', sources)
   const view = useRenderProp(props, sources);
   return [trigger, view];
 };

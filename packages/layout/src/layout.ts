@@ -5,21 +5,25 @@ import type { FitInto, LayoutElement, LayoutPicker } from './types';
 
 import { parsePlacement } from '@use-gpu/parse';
 import { useProp } from '@use-gpu/traits/live';
-import { memo, signal, provide, gather, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
+import { memo, provide, gather, yeet, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 
 import {
   DebugContext, MouseContext, WheelContext, ViewContext,
   LayoutContext, useTransformContext,
   useInspectable, useInspectHoverable, useInspectorSelect, Inspector,
   useShader, useNoShader,
+  QueueReconciler,
 } from '@use-gpu/workbench';
 
 import { chainTo } from '@use-gpu/shader/wgsl';
 import { getLayoutPosition } from '@use-gpu/wgsl/layout/layout.wgsl';
 
-import { makeBoxInspectLayout } from './lib/util';
 import { UIRectangle } from './shape/ui-rectangle';
+import { INSPECT_STYLE, ARCHETYPES } from './lib/constants';
+
 import { mat4, vec2, vec3 } from 'gl-matrix';
+
+const {signal} = QueueReconciler;
 
 export type LayoutProps = {
   width?: number,
@@ -105,7 +109,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
     if (pick) pickers.push((x: number, y: number, scroll: boolean = false) =>
       pick(x, y, layout[0], layout[1], layout[2], layout[3], scroll));
 
-    const el = render(layout, layout, null, null, transform);
+    const el = render(layout, layout, 0, null, null, transform);
 
     if (Array.isArray(el)) out.push(...el);
     else if (el) out.push(el);
@@ -123,7 +127,18 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
       offsets,
     },
   });
-  if (hovered) out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0], [0, 0, 0, 0], null, null, transform));
+  if (hovered) out.push(yeet({
+    count: 1,
+    archetype: ARCHETYPES.inspect,
+
+    attributes: {
+      rectangle: layout,
+      uv: [0, 0, 1, 1],
+      repeat: 0,
+      ...INSPECT_STYLE.parent,
+    },
+    transform,
+  }));
 
   // Add scroll listener
   out.push(keyed(Scroller, -2, pickers, flip, shift));

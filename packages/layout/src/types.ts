@@ -27,42 +27,10 @@ export type GapLike = number | number[];
 export type AlignmentLike = Alignment | Alignment[];
 export type AnchorLike = Anchor | Anchor[];
 
-/*
-export type BoxTrait = {
-  grow: number,
-  shrink: number,
-  margin: MarginLike,
-  inline: Base,
-  flex: Anchor,
-};
-
-export type ElementTrait = {
-  width: Dimension,
-  height: Dimension,
-  aspect: number | null,
-
-  radius: MarginLike,
-  border: MarginLike,
-  stroke: ColorLike,
-  fill: ColorLike,
-
-  image: ShaderSource,
-  image: Partial<ImageTrait>,
-};
-
-export type ImageTrait = {
-  image: ShaderSource,
-  width: Dimension,
-  height: Dimension,
-  fit: Fit,
-  repeat: Repeat,
-  align: AnchorLike,
-};
-*/
-
 export type LayoutRenderer = (
   box: Rectangle,
   origin: Rectangle,
+  z: number,
   clip: ShaderModule | null,
   mask: ShaderModule | null,
   transform: ShaderModule | null,
@@ -160,38 +128,33 @@ export type InlineLine = {
   gap: number,
 };
 
-export const ARCHETYPES = {
-  glyphs: 1,
-  textured: 2,
-  solid: 3,
-};
-
-export type UIAggregate = {
-  id: string | number,
-  count: number,
-
-  rectangles?: number[],
-  colors?: number[],
-  uvs?: number[],
-  sts?: number[],
-  repeats?: number[],
-  borders?: number[],
-  strokes?: number[],
-  fills?: number[],
-  radiuses?: number[],
-  sdfs?: number[],
-
-  rectangle?: number[],
-  color?: number[],
-  uv?: number[],
-  st?: number[],
-  repeat?: number,
-  border?: number[],
-  stroke?: number[],
-  fill?: number[],
-  radius?: number[],
-  sdf?: number[],
-
+export type UIAggregate = LayoutShaders & {
   archetype?: number,
   bounds: Rectangle,
-} & LayoutShaders;
+  count: number,
+  zIndex?: number,
+  
+  attributes: {
+    rectangles?: number[],
+    colors?: number[],
+    uvs?: number[],
+    sts?: number[],
+    repeats?: number[],
+    borders?: number[],
+    strokes?: number[],
+    fills?: number[],
+    radii?: number[],
+    sdfs?: number[],
+
+    rectangle?: number[],
+    color?: number[],
+    uv?: number[],
+    st?: number[],
+    repeat?: number,
+    border?: number[],
+    stroke?: number[],
+    fill?: number[],
+    radius?: number[],
+    sdf?: number[],
+  },
+};

@@ -8,7 +8,7 @@ import { LayoutContext, getAlignmentAnchor } from '@use-gpu/workbench';
 
 import { evaluateDimension, parseAnchorXY } from '../parse';
 import { getOriginProjection } from '../lib/util';
-import { ARCHETYPES } from '../types';
+import { ARCHETYPES } from '../lib/constants';
 
 const UV_SQUARE = [0, 0, 1, 1] as Rectangle;
 const NO_RECTANGLE = [0, 0, 0, 0] as Rectangle;
@@ -21,9 +21,9 @@ const REPEAT_FLAG = {
 };
 
 export type UIRectangleProps = {
-  id: number,
   layout?: Rectangle,
   origin?: Rectangle,
+  zIndex?: number,
 
   image?: Partial<ImageTrait>,
 
@@ -39,7 +39,6 @@ export type UIRectangleProps = {
 
 export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
   const {
-    id,
     image,
 
     fill,
@@ -51,6 +50,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
     clip,
     mask,
     transform,
+    zIndex = 0,
   } = props;
 
   let layout: Rectangle = NO_RECTANGLE;
@@ -174,48 +174,50 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         }
       }
 
-      render = {
-        id,
+      const attributes = {
         rectangle: layout,
         radius,
         border,
         stroke,
         fill,
-
-        texture: sampledTexture ?? image?.texture,
-        repeat: (repeat != null ? REPEAT_FLAG[repeat] : repeat) ?? 0,
         uv,
         st,
+        repeat: (repeat != null ? REPEAT_FLAG[repeat] : repeat) ?? 0,
+      };
+
+      return yeet({
+        count: 1,
+        archetype: ARCHETYPES.textured,
 
         bounds: layout,
-        count: 1,
         transform,
-        archetype: ARCHETYPES.textured,
-      };
+        texture: sampledTexture ?? image?.texture,
+      });
     }
     else {
-      render = {
-        id,
+      const attributes = {
         rectangle: layout,
         radius,
         border,
         stroke,
         fill,
-
         st,
-
-        bounds: layout,
+      };
+      
+      return yeet({
         count: 1,
+        archetype: ARCHETYPES.solid,
+
+        attributes,
+        bounds: layout,
         clip,
         mask,
         transform,
-        archetype: ARCHETYPES.solid,
-      };
+      });
     }
 
     return yeet(render);
   }, [
-    id,
     image,
 
     fill,

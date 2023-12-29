@@ -130,7 +130,7 @@ export const updateAggregateBuffer = (
       indexed = count,
       instanced = 1,
       attributes: {
-        [key]: values,
+        [key]: values = 0,
       },
     } = item;
 

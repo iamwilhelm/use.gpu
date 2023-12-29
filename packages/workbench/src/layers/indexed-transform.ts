@@ -5,6 +5,7 @@ import { provide } from '@use-gpu/live';
 import { MatrixContext } from '../providers/matrix-provider';
 import { TransformContext } from '../providers/transform-provider';
 import { useMatrixTransformSources } from '../hooks/useMatrixTransform';
+import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { mat4 } from 'gl-matrix';
 
 const NO_MAT4 = mat4.create();
@@ -18,6 +19,7 @@ export const IndexedTransform: FC<IndexedTransformProps> = (props: IndexedTransf
   const {matrices, normalMatrices, children} = props;
 
   const transform = useMatrixTransformSources(matrices, normalMatrices);
+  const context = useCombinedTransform(transform);
 
   return (
     provide(MatrixContext, NO_MAT4,

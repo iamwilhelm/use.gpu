@@ -12,6 +12,7 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useShader } from '../hooks/useShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
+import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
@@ -30,7 +31,7 @@ export type UIRectanglesProps = {
   sdf?: VectorLike,
 
   rectangles?: ShaderSource,
-  radiuses?: ShaderSource,
+  radii?: ShaderSource,
   borders?: ShaderSource,
   strokes?: ShaderSource,
   fills?: ShaderSource,
@@ -72,7 +73,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const instanceCount = useDataLength(count, props.rectangles);
 
   const r = useShaderRef(props.rectangle, props.rectangles);
-  const a = useShaderRef(props.radius, props.radiuses);
+  const a = useShaderRef(props.radius, props.radii);
   const b = useShaderRef(props.border, props.borders);
   const s = useShaderRef(props.stroke, props.strokes);
   const f = useShaderRef(props.fill, props.fills);
@@ -86,7 +87,8 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const m = mask;
   const t = useNativeColorTexture(texture);
 
-  const getVertex = useShader(getUIRectangleVertex, [r, a, b, s, f, u, v, p, d, xf, c]);
+  const boundVertex = useShader(getUIRectangleVertex, [r, a, b, s, f, u, v, p, d, xf, c]);
+  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, props.instance, props.instances, instanceCount);
   const getPicking = usePickingShader(props);
   const getFragment = useShader(getUIFragment, [t, m]);
 
@@ -106,14 +108,15 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
 
   const defines: Record<string, any> = useMemo(() => ({
     ...defs,
+    ...instanceDefs,
     HAS_EDGE_BLEED: true,
     HAS_MASK: !!mask,
     DEBUG_SDF: debugContours,
-  }), [defs, debugContours, mask]);
+  }), [defs, instanceDefs, debugContours, mask]);
 
   return useDraw({
     vertexCount,
-    instanceCount,
+    instanceCount: totalCount,
 
     links,
     defines,

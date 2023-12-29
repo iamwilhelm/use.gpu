@@ -12,7 +12,7 @@ import {
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
-  Plot, Spherical, Stereographic, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
+  Plot, Spherical, Stereographic, Axis, Grid, Label, Line, Sampler, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 
 import { PlotControls } from '../../ui/plot-controls';
@@ -41,6 +41,7 @@ export const PlotStereographicPage: LC = () => {
 
   const view = (normalize: number) => (
     <Loop>
+      <LinearRGB>
       <Camera>
         <Pass>
           <Plot>
@@ -123,7 +124,7 @@ export const PlotStereographicPage: LC = () => {
                     depth={0.5}
                   />
 
-                  <Sampled
+                  <Sampler
                     axes='x'
                     format='vec3<f32>'
                     size={[1024]}
@@ -134,11 +135,11 @@ export const PlotStereographicPage: LC = () => {
                   >
                     <Line
                       width={4}
-                      color={0x3090FF}
+                      color={'#3090FF'}
                       depth={0.5}
                       zBias={1}
                     />
-                  </Sampled>
+                  </Sampler>
                 </Spherical>
 
                 <Spherical
@@ -164,6 +165,7 @@ export const PlotStereographicPage: LC = () => {
           </Plot>
         </Pass>
       </Camera>
+      </LinearRGB>
     </Loop>
   );
 

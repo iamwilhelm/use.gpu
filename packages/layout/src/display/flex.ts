@@ -35,11 +35,10 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
   const {
     wrap = false,
     snap = true,
-    ref,
     children,
   } = props;
 
-  const { width, height, aspect, radius, border, stroke, fill, image } = useElementTrait(props);
+  const { width, height, aspect, radius, border, stroke, fill, image, zIndex } = useElementTrait(props);
   const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionX);
@@ -52,7 +51,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
 
-  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
+  const c = useImplicitElement(radius, border, stroke, fill, image, children);
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
@@ -108,11 +107,12 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
           render: (
             box: Rectangle,
             origin: Rectangle,
+            z: number,
             clip?: ShaderModule | null,
             mask?: ShaderModule | null,
             transform?: ShaderModule | null,
           ) => (
-            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform, ref}, hovered) : null
+            sizes.length ? use(BoxLayout, inside, {box, origin, z: z + zIndex, clip, mask, transform}, hovered) : null
           ),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
@@ -132,7 +132,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
         fit: memoFit(fit),
         prefit: memoFit(fit),
       });
-    }, [props, els, hovered, ref]);
+    }, [props, els, hovered, zIndex]);
   };
 
   return c ? gather(c, Resume) : null;

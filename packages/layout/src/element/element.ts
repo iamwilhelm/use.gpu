@@ -16,7 +16,6 @@ import { memoLayout } from '../lib/util';
 import { UIRectangle } from '../shape/ui-rectangle';
 
 export type ElementProps = Partial<BoxTrait> & Partial<ElementTrait> & Partial<RefProps> & {
-  id?: number,
   snap?: boolean,
   absolute?: boolean,
   under?: boolean,
@@ -33,14 +32,13 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
     children,
   } = props;
 
-  const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
+  const { width, height, radius, border, stroke, fill, image, zIndex } = useElementTrait(props);
   const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const w = typeof width === 'number' ? width : 0;
   const h = typeof height === 'number' ? height : 0;
 
-  const {id: fiberId} = useFiber();
-  const id = props.id ?? fiberId;
+  const {id} = useFiber();
   const sizing = [w, h, w, h];
 
   const hovered = useInspectHoverable();
@@ -53,12 +51,12 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
     let render = memoLayout((
       layout: Rectangle,
       origin: Rectangle,
+      z: number,
       clip: ShaderModule | null,
       mask: ShaderModule | null,
       transform: ShaderModule | null,
     ): LiveElement => (
       keyed(UIRectangle, id, {
-        id,
         layout,
         origin,
 
@@ -71,6 +69,7 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
         clip,
         mask,
         transform,
+        zIndex: z + zIndex,
       })
     ));
 
@@ -98,7 +97,6 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
 };
 
 export const useImplicitElement = (
-  id: number,
   radius: MarginLike,
   border: MarginLike,
   stroke: ColorLike,
@@ -108,7 +106,7 @@ export const useImplicitElement = (
 ) =>
   useMemo(() => {
     const element = (stroke || fill || image) ? (
-      use(Element, {id, radius, border, stroke, fill, image, absolute: true, under: true})
+      use(Element, {radius, border, stroke, fill, image, absolute: true, under: true})
     ) : null;
     return element && children ? [element, children] : element ?? children;
-  }, [id, radius, border, stroke, fill, image, children]);
+  }, [radius, border, stroke, fill, image, children]);

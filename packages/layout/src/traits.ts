@@ -6,6 +6,7 @@ import {
 } from '@use-gpu/traits/live';
 import {
   parseNumber,
+  parseInteger,
   parseColor,
 } from '@use-gpu/parse';
 import {
@@ -50,6 +51,7 @@ const ElementTrait = trait({
   fill: optional(parseColor),
 
   image: optional(makeParseTrait(ImageTrait)),
+  zIndex: parseInteger,
 });
 
 export const useBoxTrait     = makeUseTrait(BoxTrait);

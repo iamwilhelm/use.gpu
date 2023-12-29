@@ -28,106 +28,108 @@ export const PlotPolarPage: LC = () => {
 
   return (
     <Loop>
-      <FlatCamera relative>
-        <Pass>
-          <Plot>
-            <Animate
-              loop
-              mirror
-              delay={0}
-              keyframes={[
-                [0, 0],
-                [1, 0],
-                [10, 1],
-                [11, 1],
-              ]}
-              prop='bend'
-            >
-              <Polar
-                on="x"
-                range={[[-π, π], [0, 1]]}
-                scale={[1, 1/2, 1/2]}
+      <LinearRGB>
+        <FlatCamera relative>
+          <Pass>
+            <Plot>
+              <Animate
+                loop
+                mirror
+                delay={0}
+                keyframes={[
+                  [0, 0],
+                  [1, 0],
+                  [10, 1],
+                  [11, 1],
+                ]}
+                prop='bend'
               >
-                <Grid
-                  axes='xy'
-                  width={2}
-                  first={{ unit: π, base: 2, divide: 8, end: true }}
-                  second={{ detail: 64, divide: 5 }}
-                  depth={0.5}
-                  zBias={-1}
-                />
-
-                <Axis
-                  axis='x'
-                  width={5}
-                  color={[0.75, 0.75, 0.75, 1]}
-                  depth={0.5}
-                  detail={64}
-                />
-                <Scale
-                  unit={π}
-                  base={2}
-                  divide={4}
-                  axis='x'
+                <Polar
+                  on="x"
+                  range={[[-π, π], [0, 1]]}
+                  scale={[1, 1/2, 1/2]}
                 >
-                  <Tick
-                    size={20}
+                  <Grid
+                    axes='xy'
+                    width={2}
+                    first={{ unit: π, base: 2, divide: 8, end: true }}
+                    second={{ detail: 64, divide: 5 }}
+                    depth={0.5}
+                    zBias={-1}
+                  />
+
+                  <Axis
+                    axis='x'
                     width={5}
-                    offset={[0, 1, 0]}
                     color={[0.75, 0.75, 0.75, 1]}
                     depth={0.5}
+                    detail={64}
                   />
-                  <Label
-                    placement='bottom'
-                    color='#80808080'
-                    size={24}
-                    offset={16}
-                    expand={5}
-                    depth={0.5}
-                    format={thetaFormatter}
-                    blend="alpha"
-                  />
-                  <Label
-                    placement='bottom'
-                    color='#ffffff'
-                    size={24}
-                    offset={16}
-                    expand={0}
-                    depth={0.5}
-                    format={thetaFormatter}
-                  />
-                </Scale>
+                  <Scale
+                    unit={π}
+                    base={2}
+                    divide={4}
+                    axis='x'
+                  >
+                    <Tick
+                      size={20}
+                      width={5}
+                      offset={[0, 1, 0]}
+                      color={[0.75, 0.75, 0.75, 1]}
+                      depth={0.5}
+                    />
+                    <Label
+                      placement='bottom'
+                      color='#80808080'
+                      size={24}
+                      offset={16}
+                      expand={5}
+                      depth={0.5}
+                      format={thetaFormatter}
+                      blend="alpha"
+                    />
+                    <Label
+                      placement='bottom'
+                      color='#ffffff'
+                      size={24}
+                      offset={16}
+                      expand={0}
+                      depth={0.5}
+                      format={thetaFormatter}
+                    />
+                  </Scale>
 
-                <Axis
-                  axis='y'
-                  width={5}
-                  color={[0.75, 0.75, 0.75, 1]}
-                  detail={8}
-                  depth={0.5}
-                  end
-                />
-
-                <Sampler
-                  axes='x'
-                  format='vec2<f32>'
-                  size={[512]}
-                  expr={(emit, θ) => {
-                    const r = Math.cos(θ * 8) * .4 + .6;
-                    emit(θ, r);
-                  }}
-                >
-                  <Line
-                    width={4}
-                    color={'#3090FF'}
+                  <Axis
+                    axis='y'
+                    width={5}
+                    color={[0.75, 0.75, 0.75, 1]}
+                    detail={8}
                     depth={0.5}
-                    zBias={1}
+                    end
                   />
-                </Sampler>
-              </Polar>
-            </Animate>
-          </Plot>
-        </Pass>
-      </FlatCamera>
+
+                  <Sampler
+                    axes='x'
+                    format='vec2<f32>'
+                    size={[512]}
+                    expr={(emit, θ) => {
+                      const r = Math.cos(θ * 8) * .4 + .6;
+                      emit(θ, r);
+                    }}
+                  >
+                    <Line
+                      width={4}
+                      color={'#3090FF'}
+                      depth={0.5}
+                      zBias={1}
+                    />
+                  </Sampler>
+                </Polar>
+              </Animate>
+            </Plot>
+          </Pass>
+        </FlatCamera>
+      </LinearRGB>
     </Loop>
   );
 };

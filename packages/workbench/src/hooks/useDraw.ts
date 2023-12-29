@@ -9,11 +9,15 @@ import { PassReconciler } from '../reconcilers';
 const {quote} = PassReconciler;
 
 export const useDraw = (props: VirtualDraw) => {
-  const memo = Object.values(props);
-  return useHooks(() => {
-    const useVariants = useVariantContext();
+  const useVariants = useVariantContext();
 
-    const hovered = useInspectHoverable();
+  const hovered = useInspectHoverable();
+  const memo = Object.values(props);
+  memo.push(hovered);
+  memo.push(useVariants);
+
+  return useHooks(() => {
+
     const variants = useVariants(props, hovered);
 
     if (Array.isArray(variants)) {

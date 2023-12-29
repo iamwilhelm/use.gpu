@@ -77,6 +77,7 @@ export const Text: LiveComponent<TextProps> = memo((props) => {
     render: memoInline((
       lines: InlineLine[],
       origin: Rectangle,
+      z: number,
       clip: ShaderModule | null,
       mask: ShaderModule | null,
       transform: ShaderModule | null,
@@ -100,6 +101,7 @@ export const Text: LiveComponent<TextProps> = memo((props) => {
         clip,
         mask,
         transform,
+        zIndex: z,
       })
     )),
   });

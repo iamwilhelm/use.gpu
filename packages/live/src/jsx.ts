@@ -1,6 +1,6 @@
 import { formatNodeName } from './debug';
 import {
-  capture, fence, gather, multiGather, mapReduce, morph, provide, yeet, quote, unquote, reconcile, suspend, signal,
+  capture, fence, gather, multiGather, mapReduce, morph, provide, yeet, quoteTo, unquote, reconcileTo, suspend, signalTo,
   CAPTURE, FENCE, GATHER, MULTI_GATHER, MAP_REDUCE, MORPH, PROVIDE, YEET, FRAGMENT, QUOTE, UNQUOTE, RECONCILE, SUSPEND, SIGNAL,
 } from './builtin';
 import { getCurrentFiberBy } from './current';
@@ -67,13 +67,13 @@ export const createElement = (type: ArrowFunction, props: any, ...children: any[
         return yeet(toChildren(props?.children ?? children), props?.key);
 
       case SIGNAL:
-        return signal(props?.key);
+        return signalTo(props?.reconciler, props?.key);
 
       case SUSPEND:
         return suspend(props?.key);
 
       case QUOTE:
-        return quote(toChildren(props?.children ?? children), props?.key);
+        return quoteTo(props?.reconciler, toChildren(props?.children ?? children), props?.key);
 
       case UNQUOTE:
         return unquote(toChildren(props?.children ?? children), props?.key);

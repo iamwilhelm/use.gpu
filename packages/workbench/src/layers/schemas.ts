@@ -118,3 +118,15 @@ export const SURFACE_SCHEMA = {
     debug: {format: 'f32'},
   }),
 };
+
+export const UI_SCHEMA = expandArrays({
+  rectangles: {format: 'vec4<f32>', single: 'rectangle'},
+  radii:      {format: 'vec4<f32>', single: 'radius'},
+  borders:    {format: 'vec4<f32>', single: 'border'},
+  strokes:    {format: 'vec4<f32>', single: 'stroke'},
+  fills:      {format: 'vec4<f32>', single: 'fill'},
+  uvs:        {format: 'vec4<f32>', single: 'uv'},
+  sts:        {format: 'vec4<f32>', single: 'st'},
+  sdfs:       {format: 'vec4<f32>', single: 'sdf'},
+  repeats:    {format: 'i8',        single: 'repeat'},
+});

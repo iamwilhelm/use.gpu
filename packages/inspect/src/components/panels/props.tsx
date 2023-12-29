@@ -184,8 +184,8 @@ const renderFiberButton = (
   return (
     <Fiber
       key={fiber.id}
-      onMouseEnter={() => api.hoverFiber(fiber, fibers)}
-      onMouseLeave={() => api.hoverFiber(null)}
+      onMouseEnter={(e) => api.hoverFiber(fiber, fibers, 0, e.altKey)}
+      onMouseLeave={(e) => api.hoverFiber(null, null, 0, e.altKey)}
       onClick={() => api.selectFiber(fiber)}
     ><div>
       {parts[0]}

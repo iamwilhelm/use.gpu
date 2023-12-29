@@ -700,6 +700,6 @@ export const emitMultiArray = <T>(
   }
 
   const {emit, emitted} = writer;
-  for (let i = 0; i < length; i++) expr(emit, i, props);
+  for (let i = 0; i < length; i++) nest(emit, i, props);
   return emitted();
 }

@@ -33,7 +33,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
   } = props;
 
   const { width, height, aspect, radius, border, stroke, fill, image } = useElementTrait(props);
-  const { margin: blockMargin, grow, shrink, inline, flex } = useBoxTrait(props);
+  const { margin: blockMargin, grow, shrink, inline, flex, zIndex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionY);
   const padding = useProp(props.padding, parseMargin);
@@ -48,7 +48,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
 
-  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
+  const c = useImplicitElement(radius, border, stroke, fill, image, children);
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
@@ -105,11 +105,12 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
           render: (
             box: Rectangle,
             origin: Rectangle,
+            z: number,
             clip?: ShaderModule | null,
             mask?: ShaderModule | null,
             transform?: ShaderModule | null,
           ) => (
-            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform}, hovered) : null
+            sizes.length ? use(BoxLayout, inside, {box, origin, z: z + zIndex, clip, mask, transform}, hovered) : null
           ),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
@@ -127,7 +128,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
         fit: memoFit(fit),
         prefit: memoFit(fit),
       });
-    }, [props, els, hovered]);
+    }, [props, els, hovered, zIndex]);
   };
 
   return gather(c, Resume);

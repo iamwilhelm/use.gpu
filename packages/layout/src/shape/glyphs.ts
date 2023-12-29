@@ -8,13 +8,11 @@ import { use, yeet, useContext, useMemo } from '@use-gpu/live';
 import { SDFFontProvider, useSDFFontContext } from '@use-gpu/workbench';
 import { evaluateDimension } from '../parse';
 import { getOriginProjectionX, getOriginProjectionY } from '../lib/util';
-import { ARCHETYPES } from '../types';
+import { ARCHETYPES } from '../lib/constants';
 
 const BLACK = [0, 0, 0, 1];
 
 export type GlyphsProps = {
-  id: number,
-
   color?: XYZW,
   opacity?: number,
   size?: number,
@@ -30,6 +28,7 @@ export type GlyphsProps = {
   lines: InlineLine[],
 
   origin: Rectangle,
+  zIndex: number,
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
   transform?: ShaderModule | null,
@@ -37,7 +36,6 @@ export type GlyphsProps = {
 
 export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   const {
-    id,
     color = BLACK,
     opacity = 1,
     expand = 0,
@@ -56,6 +54,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     clip,
     mask,
     transform,
+    zIndex,
   } = props;
 
   const sdfFont = useSDFFontContext();
@@ -139,9 +138,10 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
         }
       }, start, end);
     }
+    
+    if (!count) return null;
 
-    const render = count ? {
-      id,
+    const attributes = {
       rectangles,
       uvs,
       sts,
@@ -149,15 +149,21 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       border: [expand, Math.min(size / 32, 1.0) * 0.25, 0, 0],
       sdf: [radius, scale, size, 0],
       fill,
-      texture,
+    };
+
+    return yeet({
       count,
+      archetype: ARCHETYPES.glyphs,
+
+      attributes,
+      bounds,
+      texture,
       clip,
       mask,
       transform,
-      bounds,
-      archetype: ARCHETYPES.glyphs,
-    } : null;
+      zIndex,
+    });
 
     return yeet(render);
-  }, [props, sdfFont]);
+  }, [props, sdfFont, zIndex]);
 };

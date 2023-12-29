@@ -37,6 +37,7 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
           render: (
             box: Rectangle,
             origin: Rectangle,
+            z: number,
             parentClip: ShaderModule | null,
             parentMask: ShaderModule | null,
             parentTransform: ShaderModule | null,
@@ -44,6 +45,7 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
             use(TransformLayout,
               box,
               origin,
+              z,
               parentClip,
               parentMask,
               parentTransform,
@@ -69,6 +71,7 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
 const TransformLayout = (
   box: Rectangle,
   origin: Rectangle,
+  z: number,
   parentClip: ShaderModule | null,
   parentMask: ShaderModule | null,
   parentTransform: ShaderModule | null,
@@ -114,5 +117,5 @@ const TransformLayout = (
     [pclip, inverse],
   );
 
-  return render(box, box, xclip, xmask, xform);
+  return render(box, box, z, xclip, xmask, xform);
 };

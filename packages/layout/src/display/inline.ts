@@ -32,11 +32,10 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
   const {
     wrap = true,
     snap = true,
-    ref,
     children,
   } = props;
 
-  const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
+  const { margin, grow, shrink, inline, flex, zIndex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionX);
   const padding = useProp(props.padding, parseMargin);
@@ -100,16 +99,18 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
             render: memoLayout((
               box: Rectangle,
               origin: Rectangle,
+              z: number,              
               clip: ShaderModule | null,
               mask: ShaderModule | null,
               transform: ShaderModule | null,
             ) => {
-              const el = use(InlineLayout, inline, {box, origin, clip, mask, transform, ref}, hovered);
+              const el = use(InlineLayout, inline, {box, origin, z, clip, mask, transform}, hovered);
               if (sizes.length) return [
                 el,
                 use(BoxLayout, inside, {
                   box,
                   origin,
+                  z: z + zIndex,
                   clip,
                   mask,
                   transform,
@@ -131,7 +132,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
         fit: memoFit(fit),
         prefit: memoFit(fit),
       });
-    }, [props, els, hovered, ref]);
+    }, [props, els, hovered, zIndex]);
   };
 
   return children ? gather(children, Resume) : null;

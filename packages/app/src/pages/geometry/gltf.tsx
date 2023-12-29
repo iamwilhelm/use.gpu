@@ -18,6 +18,7 @@ import { GLTFData, GLTFModel } from '@use-gpu/gltf';
 import { Scene, Node } from '@use-gpu/scene';
 
 import { EnvMapControls } from '../../ui/envmap-controls';
+import { InfoBox } from '../../ui/info-box';
 
 // @ts-ignore
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -29,7 +30,8 @@ export const GeometryGLTFPage: LC = () => {
 
   const root = document.querySelector('#use-gpu .canvas');
 
-  return (
+  return (<>
+    <InfoBox>Load a .glb model using the GLTF package. Supports PBR materials.</InfoBox>
     <EnvMapControls container={root} render={(envPreset, envMap) => (
       <Gather
         children={[
@@ -95,7 +97,7 @@ export const GeometryGLTFPage: LC = () => {
         )}
       />
     )}/>
-  );
+  </>);
 };
 
 const Camera = ({children}: PropsWithChildren<object>) => (

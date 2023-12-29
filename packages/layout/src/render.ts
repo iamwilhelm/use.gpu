@@ -9,6 +9,7 @@ import { toMurmur53 } from '@use-gpu/state';
 
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
 import { INSPECT_STYLE } from './lib/constants';
+import { ARCHETYPES } from './lib/constants';
 
 const NO_OBJECT: any = {};
 
@@ -43,7 +44,7 @@ export const BoxLayout = memoRender((
   inspect?: boolean,
 ) => {
   const {sizes, offsets, renders, clip, mask, transform, inverse} = inside;
-  const {box, origin, clip: parentClip, mask: parentMask, transform: parentTransform, ref} = outside;
+  const {box, origin, z, clip: parentClip, mask: parentMask, transform: parentTransform, ref} = outside;
 
   const [left, top, right, bottom] = box;
   const out = [] as LiveElement[];
@@ -92,7 +93,7 @@ export const BoxLayout = memoRender((
     const b = t + h;
 
     const layout = [l, t, r, b] as Rectangle;
-    const el = render(layout, origin, xclip, xmask, xform);
+    const el = render(layout, origin, z, xclip, xmask, xform);
 
     if (Array.isArray(el)) {
       if (el.length > 1) out.push(fragment(el as any[]));
@@ -103,17 +104,22 @@ export const BoxLayout = memoRender((
 
   if (inspect) {
     let i = 0;
-    const next = () => useFiber().id.toString() + '-' + i++;
     const yeets = [] as UIAggregate[];
-    yeets.push({
-      id: next(),
+    
+    const attributes = {
       rectangle: box,
       uv: [0, 0, 1, 1],
-      count: 1,
       repeat: 0,
+      ...INSPECT_STYLE.parent,
+    };
+
+    yeets.push({
+      count: 1,
+      archetype: ARCHETYPES.inspect,
+
+      attributes,
       transform: parentTransform,
       bounds: box,
-      ...INSPECT_STYLE.parent,
     });
 
     const [left, top] = box;
@@ -131,15 +137,20 @@ export const BoxLayout = memoRender((
       const b = t + h;
       const layout = [l, t, r, b] as Rectangle;
 
-      yeets.push({
-        id: next(),
+      const attributes = {
         rectangle: layout,
         uv: [0, 0, 1, 1],
-        count: 1,
         repeat: 0,
+        ...INSPECT_STYLE.child,
+      };
+
+      yeets.push({
+        count: 1,
+        archetype: ARCHETYPES.inspect,
+
+        attributes,
         transform: xform,
         bounds: layout,
-        ...INSPECT_STYLE.child,
       });
     }
 
@@ -156,7 +167,7 @@ export const InlineLayout = (
   inspect?: boolean,
 ) => {
   let {ranges, sizes, offsets, renders, key} = inline;
-  const {box, origin, clip, mask, transform, ref} = outside;
+  const {box, origin, z, clip, mask, transform, ref} = outside;
 
   let [left, top, right, bottom] = box;
 
@@ -168,7 +179,7 @@ export const InlineLayout = (
 
   const out: LiveElement[] = [];
   const flush = (render: InlineRenderer) => {
-    const el = render(lines, origin, clip!, mask!, transform!, hash);
+    const el = render(lines, origin, z, clip!, mask!, transform!, hash);
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);
     lines = [];
@@ -204,14 +215,19 @@ export const InlineLayout = (
 
   if (inspect) {
     let i = 0;
-    const next = () => useFiber().id.toString() + '-' + i++;
     const yeets = [] as UIAggregate[];
-    yeets.push({
-      id: next(),
+    
+    const attributes = {
       rectangle: box,
       uv: [0, 0, 1, 1],
-      count: 1,
       repeat: 0,
+    };
+
+    yeets.push({
+      count: 1,
+      archetype: ARCHETYPES.inspect,
+
+      attributes,
       transform,
       bounds: box,
       ...INSPECT_STYLE.parent,
@@ -232,12 +248,17 @@ export const InlineLayout = (
 
       const layout = [l, t, r, b] as Rectangle;
 
-      yeets.push({
-        id: next(),
+      const attributes = {
         rectangle: layout,
         uv: [0, 0, 1, 1],
-        count: 1,
         repeat: 0,
+      };
+
+      yeets.push({
+        count: 1,
+        archetype: ARCHETYPES.inspect,
+
+        attributes,
         transform,
         bounds: layout,
         ...INSPECT_STYLE.child

@@ -22,6 +22,7 @@ import { Scene, Node, Mesh, Primitive } from '@use-gpu/scene';
 import { Plot, Cartesian, Grid } from '@use-gpu/plot';
 
 import { VoxControls } from '../../ui/vox-controls';
+import { InfoBox } from '../../ui/info-box';
 
 // @ts-ignore
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -143,7 +144,8 @@ export const GeometryVoxelPage: LC = () => {
 
   const root = document.querySelector('#use-gpu .canvas');
 
-  return (
+  return (<>
+    <InfoBox>Raytrace a .vox model using the Voxel package. Composes with the existing lighting and shadow components.</InfoBox>
     <VoxControls
       container={root}
       hasShowIterations
@@ -151,7 +153,7 @@ export const GeometryVoxelPage: LC = () => {
         view(showIterations)
       }
     />
-  );
+  </>);
 };
 
 const Camera = ({children}: PropsWithChildren<object>) => (

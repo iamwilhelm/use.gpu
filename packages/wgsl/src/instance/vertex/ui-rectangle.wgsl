@@ -15,10 +15,10 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
 @optional @link fn applyTransform(p: vec4<f32>) -> vec4<f32> { return p; }
 @optional @link fn getClip(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
 
-@export fn getUIRectangleVertex(vertexIndex: u32, instanceIndex: u32) -> UIVertex {
+@export fn getUIRectangleVertex(vertexIndex: u32, elementIndex: u32) -> UIVertex {
   // Layout clipping for overflow
-  var rectangle = getRectangle(instanceIndex);
-  var clip = getClip(instanceIndex);
+  var rectangle = getRectangle(elementIndex);
+  var clip = getClip(elementIndex);
 
   var clipUV = vec4<f32>(-1.0, -1.0, 2.0, 2.0);
   if (length(clip) > 0.0) {
@@ -59,14 +59,14 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
     }
   }
 
-  var radius = getRadius(instanceIndex);
-  var border = getBorder(instanceIndex);
-  var fill = getFill(instanceIndex);
-  var stroke = getStroke(instanceIndex);
-  var uv4 = getUV(instanceIndex);
-  var st4 = getST(instanceIndex);
-  var repeat = getRepeat(instanceIndex);
-  var sdfConfig = getSDFConfig(instanceIndex);
+  var radius = getRadius(elementIndex);
+  var border = getBorder(elementIndex);
+  var fill = getFill(elementIndex);
+  var stroke = getStroke(elementIndex);
+  var uv4 = getUV(elementIndex);
+  var st4 = getST(elementIndex);
+  var repeat = getRepeat(elementIndex);
+  var sdfConfig = getSDFConfig(elementIndex);
 
   // Fragment shader mode
   var mode: i32;
@@ -141,6 +141,6 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
     border,
     stroke,
     fill,
-    instanceIndex,
+    elementIndex,
   );
 }

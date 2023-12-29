@@ -11,6 +11,7 @@ import { isHorizontal, memoFit } from '../lib/util';
 import { useInspectHoverable } from '@use-gpu/workbench';
 
 import { INSPECT_STYLE } from '../lib/constants';
+import { ARCHETYPES } from '../lib/constants';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 import { chainTo } from '@use-gpu/shader/wgsl';
@@ -60,11 +61,12 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
       render: (
         layout: Rectangle,
         origin: Rectangle,
+        z: number,
         clip?: ShaderModule,
         mask?: ShaderModule,
         transform?: ShaderModule,
       ) => (
-        use(Render, sizeRef, scrollRef, overflow, size, track, thumb, isX, layout, origin, clip, mask, transform, hovered)
+        use(Render, sizeRef, scrollRef, overflow, size, track, thumb, isX, layout, origin, z, clip, mask, transform, hovered)
       ),
       /*
       pick: (x: number, y: number, l: number, t: number, r: number, b: number, scroll?: boolean) => {
@@ -96,6 +98,7 @@ const Render = (
 
   layout: Rectangle,
   origin: Rectangle,
+  z: number,
   clip?: ShaderModule,
   mask?: ShaderModule,
   transform?: ShaderModule,
@@ -134,33 +137,41 @@ const Render = (
 
     const yeets: UIAggregate[] = [];
     if (showTrack) yeets.push({
-      id: id.toString() + '-0',
-      rectangle: trackBox,
-      bounds: trackBox,
-      uv: [0, 0, 1, 1],
-      fill:   track as any,
-      radius: [size/2, size/2, size/2, size/2] as Rectangle,
-      ...(inspect ? INSPECT_STYLE.parent : undefined),
+      count: 1,
+      archetype: ARCHETYPES.scroll,
 
+      bounds: trackBox,
       clip,
       mask,
       transform,
-      count: 1,
+      zIndex: z,
+
+      attributes: {
+        rectangle: trackBox,
+        uv: [0, 0, 1, 1],
+        fill:   track as any,
+        radius: [size/2, size/2, size/2, size/2] as Rectangle,
+        ...(inspect ? INSPECT_STYLE.parent : undefined),
+      },
     });
     if (showThumb) yeets.push({
-      id: id.toString() + '-1',
-      rectangle: thumbBox,
-      bounds: thumbBox,
-      uv: [0, 0, 1, 1],
-      fill:   thumb as any,
-      radius: [size/2, size/2, size/2, size/2] as Rectangle,
-      ...(inspect ? INSPECT_STYLE.parent : undefined),
+      count: 1,
+      archetype: ARCHETYPES.scroll,
 
+      bounds: thumbBox,
       clip,
       mask,
-      transform: transform ? chainTo(transform, thumbTransform) : thumbTransform,
-      count: 1,
+      transform,
+      zIndex: z,
+
+      attributes: {
+        rectangle: thumbBox,
+        uv: [0, 0, 1, 1],
+        fill:   thumb as any,
+        radius: [size/2, size/2, size/2, size/2] as Rectangle,
+        ...(inspect ? INSPECT_STYLE.parent : undefined),
+      },
     });
     return yeet(yeets);
-  }, [...sizeRef, thumbTransform, overflow, isX, layout, origin, clip, mask, transform, inspect]);
+  }, [...sizeRef, thumbTransform, overflow, isX, layout, origin, z, clip, mask, transform, inspect]);
 }

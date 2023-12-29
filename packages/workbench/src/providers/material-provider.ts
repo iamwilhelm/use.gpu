@@ -21,19 +21,17 @@ import { getMaterialSurface } from '@use-gpu/wgsl/instance/surface/material.wgsl
 const getSurface = bindBundle(getMaterialSurface, {
   getMaterial: getDefaultPBRMaterial,
 });
-const getLight = bindBundle(getLitFragment, {
-  applyLights: DEFAULT_LIGHT_CONTEXT.bindMaterial(applyPBRMaterial),
-  applyEnvironment: bindBundle(applyPBREnvironment, {
-    sampleEnvironment: bindBundle(getDefaultEnvironment, { SH_DIFFUSE, SH_SPECULAR }),
-  }),
-});
 export const DEFAULT_MATERIAL_CONTEXT = {
   solid: {
     getFragment: getPassThruColor,
   },
   shaded: {
     getSurface,
-    getLight,
+    getLight: getLitFragment,
+    applyLights: DEFAULT_LIGHT_CONTEXT.bindMaterial(applyPBRMaterial),
+    applyEnvironment: bindBundle(applyPBREnvironment, {
+      sampleEnvironment: bindBundle(getDefaultEnvironment, { SH_DIFFUSE, SH_SPECULAR }),
+    }),
   },
 };
 

@@ -263,7 +263,7 @@ export const Sampler: LiveComponent<SamplerProps> = (props) => {
       }
 
       if (sampled) {
-        const emit = makeNumberWriter(tensor, dims);
+        const emit = makeNumberWriter(array, dims);
         emitted = emitMultiArray(sampled, emit, count, padded, clock!);
       }
     }

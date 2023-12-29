@@ -36,13 +36,16 @@ export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
 type Layout<T> = (
   box: Rectangle,
   origin: Rectangle,
+  z: number,
   clip: ShaderModule | null,
   mask: ShaderModule | null,
   transform: ShaderModule | null,
 ) => T;
+
 export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
   let lastBox: Rectangle | undefined;
   let lastOrigin: Rectangle | undefined;
+  let lastZ: number | undefined;
   let lastClip: ShaderModule | null | undefined;
   let lastMask: ShaderModule | null | undefined;
   let lastTransform: ShaderModule | null | undefined;
@@ -51,6 +54,7 @@ export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
   return (
     box: Rectangle,
     origin: Rectangle,
+    z: number,
     clip: ShaderModule | null,
     mask: ShaderModule | null,
     transform: ShaderModule | null,
@@ -58,13 +62,14 @@ export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
     if (
       lastBox && sameBox(lastBox, box) &&
       lastOrigin && sameBox(lastOrigin, origin) &&
+      lastZ === z &&
       lastClip === clip &&
       lastMask === mask &&
       lastTransform === transform
     ) {
       return value!;
     }
-    value = f(box, origin, clip, mask, transform);
+    value = f(box, origin, z, clip, mask, transform);
     lastBox = box;
     lastOrigin = origin;
     lastClip = clip;
@@ -203,11 +208,12 @@ export const makeBoxInspectLayout = (
 ) => (
   box: Rectangle,
   origin: Rectangle,
+  z: number,
   parentClip?: ShaderModule | null,
   parentMask?: ShaderModule | null,
   parentTransform?: ShaderModule | null,
 ) => {
-  let out = renders ? makeBoxLayout(sizes, offsets, renders, clip, mask, transform, inverse)(box, origin, parentClip, parentMask, parentTransform) : [];
+  let out = renders ? makeBoxLayout(sizes, offsets, renders, clip, mask, transform, inverse)(box, origin, z, parentClip, parentMask, parentTransform) : [];
 
   const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
   /*
@@ -333,71 +339,6 @@ export const makeInlineLayout = (
 
   if (last) flush(last);
 
-  return out;
-};
-
-export const makeInlineInspectLayout = (
-  id: number,
-  ranges: XY[],
-  sizes: XY[],
-  offsets: [number, number, number][],
-  renders?: InlineRenderer[],
-  key?: number,
-) => (
-  box: Rectangle,
-  origin: Rectangle,
-  clip?: ShaderModule | null,
-  mask?: ShaderModule | null,
-  transform?: ShaderModule | null,
-) => {
-  let out = renders ? makeInlineLayout(ranges, sizes, offsets, renders, key)(box, origin, clip, mask, transform) : [];
-
-  let i = 0;
-  const next = () => id.toString() + '-' + i++;
-  const yeets = [] as UIAggregate[];
-  yeets.push({
-    id: next(),
-    rectangle: box,
-    uv: [0, 0, 1, 1],
-    count: 1,
-    repeat: 0,
-    //clip,
-    //mask,
-    transform,
-    bounds: box,
-    ...INSPECT_STYLE.parent,
-  });
-
-  const [left, top] = box;
-  const n = ranges.length;
-  for (let i = 0; i < n; ++i) {
-    const range = ranges[i];
-    const size = sizes[i];
-    const offset = offsets[i];
-
-    const [x, y, gap] = offset;
-    const l = left + x;
-    const t = top + y;
-    const r = l + size[0];
-    const b = t + size[1];
-
-    const layout = [l, t, r, b] as Rectangle;
-
-    yeets.push({
-      id: next(),
-      rectangle: layout,
-      uv: [0, 0, 1, 1],
-      count: 1,
-      repeat: 0,
-      //clip,
-      //mask,
-      transform,
-      bounds: layout,
-      ...INSPECT_STYLE.child
-    });
-  }
-
-  out = [...out, yeet(yeets)];
   return out;
 };
 

@@ -2,11 +2,15 @@ import type { Lazy, DataBounds } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { TransformContextProps } from '../providers/transform-provider';
 
-import { useMemo, useRef } from '@use-gpu/live';
+import { useMemo, useNoMemo } from '@use-gpu/live';
 import { chainTo, getBundleKey } from '@use-gpu/shader/wgsl';
-import { useTransformContext, TransformBounds } from '../providers/transform-provider';
+import { useTransformContext, useNoTransformContext, TransformBounds } from '../providers/transform-provider';
 import { getShader } from '../hooks/useShader';
-import { useCombinedMatrix, useMatrixBounds, useNoMatrixBounds, useMatrixTransform, useNoMatrixTransform } from './useMatrixTransform';
+import {
+  useCombinedMatrix, useNoCombinedMatrix,
+  useMatrixBounds, useNoMatrixBounds,
+  useMatrixTransform, useNoMatrixTransform,
+} from './useMatrixTransform';
 
 import { getChainDifferential } from '@use-gpu/wgsl/transform/diff-chain.wgsl';
 import { getEpsilonDifferential } from '@use-gpu/wgsl/transform/diff-epsilon.wgsl';
@@ -68,6 +72,21 @@ export const useCombinedMatrixTransform = (
   }, [props, parent]);
 
   return [context, combined];
+};
+
+export const useNoCombinedTransform = () => {
+  useNoTransformContext();
+  useNoMemo();
+};
+
+export const useNoCombinedEpsilonTransform = useNoCombinedTransform;
+
+export const useNoCombinedMatrixTransform = () => {
+  useNoCombinedMatrix();
+  useNoMatrixBounds();
+  useNoMatrixTransform();
+  useNoTransformContext();
+  useNoMemo();
 };
 
 export const chainTransform = (

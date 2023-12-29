@@ -4,7 +4,7 @@ import type { ShaderSource } from '@use-gpu/shader/wgsl';
 import type { LayerAggregator, LayerAggregate } from './types';
 
 import { use, keyed, fragment, yeet, provide, multiGather, extend, useMemo, useOne } from '@use-gpu/live';
-import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
+import { mixBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -113,7 +113,7 @@ const Aggregate: LiveFunction<any> = (
   items: LayerAggregate[],
 ) => {
   const [item] = items;
-  const {transform, material, scissor, flags} = item;
+  const {flags} = item;
   const {schema, component} = layerAggregator;
 
   const {count, sources, uploadRefs} = useAggregator(item.schema ?? schema, items);
@@ -129,7 +129,7 @@ const Aggregate: LiveFunction<any> = (
 
     const upload = useOne(() => uploadRefs ? quote(yeet(uploadRefs)) : null, uploadRefs);
     return upload ? [upload, layer] : layer;
-    // Excluse flags and contexts because they are factored into the archetype
+    // Exclude flags and contexts because they are factored into the archetype
   }, [count, sources, uploadRefs]);
 };
 
@@ -143,7 +143,7 @@ const getItemTypeKey = (item: LayerAggregate) =>
   ('transform' in item && item.transform
     ? (item.transform.key || 0)
     : 0) ^
-  mixBits53(item.archetype, item.zIndex ?? 0);
+  mixBits53(item.archetype, item.zIndex || 0);
 
 type Partition = {
   key: number,

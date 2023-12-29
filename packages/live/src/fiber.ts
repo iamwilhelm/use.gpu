@@ -263,8 +263,8 @@ export const pingFiber = <F extends ArrowFunction>(
 ) => {
   // Notify host / dev tool of update
   const {host} = fiber;
-  if (active) pingFiberCount(fiber);
   if (host?.__ping) host.__ping(fiber, active);
+  if (active) pingFiberCount(fiber);
 }
 
 const BY_MAP = new WeakMap<any, number>();
@@ -468,6 +468,7 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
             order.length = 0;
           }
           fiber.host?.visit(fiber.next!);
+          pingFiber(fiber, false);
 
           mounts.set(key, nextMount);
         }
@@ -601,36 +602,10 @@ export const reconcileFiberOrder = <F extends ArrowFunction>(
   bustFiberQuote(fiber);
   bustFiberYeet(fiber, true);
   visitYeetRoot(fiber, true);
-
-  pingFiber(fiber);
-}
-
-// Wrap a live function to act as a reduction continuation of a prior fiber
-export const makeFiberReduction = <F extends ArrowFunction, R>(
-  fiber: LiveFiber<F>,
-  gather: FiberGather<R | typeof SUSPEND>,
-  fallback?: R,
-) => (
-  Next?: LiveFunction<any>
-) => {
-  const {next} = fiber;
-  if (!next) return null;
-  if (!Next) return null;
-
-  const LOG = LOGGING.fiber;
-  LOG && console.log('Reducing', formatNode(fiber));
-
-  const ref = useOne(() => ({current: fallback}));
-  const value = gather(fiber, true);
-  const nextValue = (value === SUSPEND)
-    ? ref.current as any
-    : ref.current = (value as R);
-
-  return Next(nextValue);
 }
 
 // Make a reconciling tail for a fiber. Used to fix order in case of rekeying.
-export const makeFiberTailReconciliation = <F extends ArrowFunction, R>(
+export const makeResolveFiber = <F extends ArrowFunction, R>(
   fiber: LiveFiber<F>,
   name: string = 'Resolve',
 ) => {
@@ -640,11 +615,9 @@ export const makeFiberTailReconciliation = <F extends ArrowFunction, R>(
   if (!lookup) fiber.lookup = new Map();
   if (!order)  fiber.order  = [];
 
-  const Resume = () => {
-    const {next} = fiber;
-    reconcileFiberOrder(fiber);
-  };
+  const Resume = () => reconcileFiberOrder(fiber);
   Resume.isLiveReconcile = true;
+
   return makeNextFiber(fiber, Resume, name);
 }
 
@@ -923,6 +896,30 @@ export const mountFiberReduction = <F extends ArrowFunction, R, T>(
   mountFiberContinuation(fiber, use(fiber.next.f, Next));
 }
 
+// Wrap a live function to act as a reduction continuation of a prior fiber
+export const makeFiberReduction = <F extends ArrowFunction, R>(
+  fiber: LiveFiber<F>,
+  gather: FiberGather<R | typeof SUSPEND>,
+  fallback?: R,
+) => (
+  then?: LiveFunction<any>
+) => {
+  const {next} = fiber;
+  if (!next) return null;
+  if (!then) return null;
+
+  const LOG = LOGGING.fiber;
+  LOG && console.log('Reducing', formatNode(fiber));
+
+  const ref = useOne(() => ({current: fallback}));
+  const value = gather(fiber, true);
+  const nextValue = (value === SUSPEND)
+    ? ref.current as any
+    : ref.current = (value as R);
+
+  return then(nextValue);
+};
+
 // Mount quoted calls on a fiber's continuation
 export const mountFiberQuote = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
@@ -937,7 +934,7 @@ export const mountFiberQuote = <F extends ArrowFunction>(
   let {root, to, to: {next}} = quote;
 
   if (!next) {
-    next = to.next = makeFiberTailReconciliation(to);
+    next = to.next = makeResolveFiber(to);
     next.unquote = null;
     to.fork = true;
   }
@@ -963,7 +960,7 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
   let {root, to, to: {next}, reconciler} = unquote;
 
   if (!next) {
-    next = to.next = makeFiberTailReconciliation(to);
+    next = to.next = makeResolveFiber(to);
     next.unquote = null;
     to.fork = true;
   }
@@ -1078,7 +1075,7 @@ export const captureFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
   if (!fiber.args) return;
-  let {context: {roots, values}, args: [capture, calls, Next]} = fiber;
+  let {context: {roots, values}, args: [capture, calls, then]} = fiber;
 
   bustFiberDeps(fiber);
   pingFiber(fiber);
@@ -1103,7 +1100,7 @@ export const captureFiber = <F extends ArrowFunction>(
   }
 
   inlineFiberCall(fiber, calls);
-  mountFiberContinuation(fiber, use(fiber.next.f, Next));
+  mountFiberContinuation(fiber, use(fiber.next.f, then));
 }
 
 // Provide a value for a context on a fiber
@@ -1187,14 +1184,19 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
   }
   if (fiber.type === QUOTE) {
     const {to} = quote;
-    if (to.bound) reconcileFiberCall(to, null, id, true);
-    pingFiber(to);
+    if (to.bound) {
+      reconcileFiberCall(to, null, id, true);
+      pingFiber(to, false);
+    }
+
     fiber.quote = null;
   }
   if (fiber.type === UNQUOTE) {
     const {to} = unquote!;
-    if (to.bound) reconcileFiberCall(to, null, id, true);
-    pingFiber(to);
+    if (to.bound) {
+      reconcileFiberCall(to, null, id, true);
+      pingFiber(to, false);
+    }
   }
 
   disposeFiberMounts(fiber);

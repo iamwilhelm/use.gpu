@@ -6,16 +6,19 @@ import { wgsl } from '@use-gpu/shader/wgsl';
 import { clamp } from '@use-gpu/core';
 
 import {
-  Loop, Pass, FlatCamera, ArrayData, Data2, DataShader, RawData,
+  Loop, Pass, Data, DataShader,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, Fetch,
+  Pick, Cursor,
   PointLayer,
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
+  Plot, Cartesian, Grid,
 } from '@use-gpu/plot';
+
 import { BinaryControls } from '../../ui/binary-controls';
+import { InfoBox } from '../../ui/info-box';
+
 import { vec3 } from 'gl-matrix';
 
 let t = 0;
@@ -108,7 +111,8 @@ const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
 
 // uint8 -> f32 conversion for positions
 // Could just use a Float32Array but we're feeling frugal.
-// Because u8 doesn't exist in WGSL, vec4<u8> arrives as a vec4<u32> after polyfilling
+//
+// As u8 doesn't exist in WGSL, vec4<u8> arrives as a vec4<u32> after polyfilling by @use-gpu/shader
 const positionShader = wgsl`
   @link fn getData(i: u32) -> vec4<u32>;
 
@@ -174,16 +178,19 @@ export const GeometryBinaryPage: LC = () => {
 
   const root = document.querySelector('#use-gpu .canvas');
 
-  return (
+  return (<>
+    <InfoBox>Load a dataset using &lt;Data&gt; and color it using a custom &lt;DataShader&gt;. Render with &lt;PointLayer&gt;.</InfoBox>
     <BinaryControls
       container={root}
       render={({mode, buffer, gamma, transparent}) => {
         const data = useMemo(() => buffer ? arrayBufferToXYZ(buffer) : null, [buffer]);
 
+        const grey = Math.pow(0.25, gamma);
+        const gridColor = useMemo(() => [grey, grey, grey, 1], grey);
+
         const viz = useMemo(() => data ? (
-          <Data2
-            {...data.values}
-            render={({positions, counts}) => (
+          <Data {...data.values}>{
+            ({positions, counts}) => (
               <Gather
                 children={[
                   <DataShader
@@ -209,53 +216,51 @@ export const GeometryBinaryPage: LC = () => {
                   />
                 )}
               />
-            )}
-          />
+            )
+          }</Data>
         ) : null, [data, mode, transparent]);
 
         const view = useMemo(() => (
           <Camera>
             <Pass>
-              <Plot>
-                <Cartesian
-                  range={RANGE}
-                >
-                  {viz}
-                  <Grid
-                    color="#202020"
-                    axes='xy'
-                    width={2}
-                    first={GRID}
-                    second={GRID}
-                    depth={0.5}
-                    zBias={-5}
-                    auto
-                  />
-                  <Grid
-                    color="#202020"
-                    axes='xz'
-                    width={2}
-                    first={GRID}
-                    second={GRID}
-                    depth={0.5}
-                    zBias={-5}
-                    auto
-                  />
-                  <Grid
-                    color="#202020"
-                    axes='yz'
-                    width={2}
-                    first={GRID}
-                    second={GRID}
-                    depth={0.5}
-                    zBias={-5}
-                    auto
-                  />
-                </Cartesian>
-              </Plot>
+              <Cartesian
+                range={RANGE}
+              >
+                {viz}
+                <Grid
+                  color={gridColor}
+                  axes='xy'
+                  width={2}
+                  first={GRID}
+                  second={GRID}
+                  depth={0.5}
+                  zBias={-5}
+                  auto
+                />
+                <Grid
+                  color={gridColor}
+                  axes='xz'
+                  width={2}
+                  first={GRID}
+                  second={GRID}
+                  depth={0.5}
+                  zBias={-5}
+                  auto
+                />
+                <Grid
+                  color={gridColor}
+                  axes='yz'
+                  width={2}
+                  first={GRID}
+                  second={GRID}
+                  depth={0.5}
+                  zBias={-5}
+                  auto
+                />
+              </Cartesian>
             </Pass>
           </Camera>
-        ), [viz]);
+        ), [viz, gridColor]);
 
         return (
           <Loop>
@@ -267,7 +272,7 @@ export const GeometryBinaryPage: LC = () => {
         );
       }}
     />
-  );
+  </>);
 }
 
 const Camera = ({children}: PropsWithChildren<object>) => (

@@ -1,5 +1,4 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { ShaderSource } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/traits';
 
 import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
@@ -62,6 +61,10 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       starts,
       end,
       ends,
+
+      schema: _,
+      formats,
+      tensor,
 
       segments,
       slices,

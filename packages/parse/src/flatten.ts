@@ -156,7 +156,7 @@ export const toVectorArray = <T extends TypedArrayConstructor>(
   w: number = 0,
   ctor: T = Float32Array,
 ): T | null => (
-  toScalarArray(xs) ??
+  toScalarArray(xs, ctor) ??
   maybeVectorArray(xs, dims, w, ctor)
 );
 
@@ -164,7 +164,7 @@ export const toMultiScalarArray = <T extends TypedArrayConstructor>(
   xs: VectorLike,
   ctor: T = Float32Array
 ): T | null => (
-  toScalarArray(xs) ??
+  toScalarArray(xs, ctor) ??
   maybeMultiScalarArray(xs, ctor)
 );
 
@@ -174,7 +174,7 @@ export const toMultiVectorArray = <T extends TypedArrayConstructor>(
   w: number = 0,
   ctor: T = Float32Array
 ): T | null => (
-  toVectorArray(xs) ??
+  toVectorArray(xs, dims, w, ctor) ??
   maybeMultiVectorArray(xs, dims, w, ctor)
 );
 
@@ -184,7 +184,7 @@ export const toMultiMultiVectorArray = <T extends TypedArrayConstructor>(
   w: number = 0,
   ctor: T = Float32Array
 ): T | null => (
-  toMultiVectorArray(xs) ??
+  toMultiVectorArray(xs, dims, w, ctor) ??
   maybeMultiMultiVectorArray(xs, dims, w, ctor)
 );
 
@@ -192,7 +192,7 @@ export const toMultiMultiVectorArray = <T extends TypedArrayConstructor>(
 export const toVertexCount = (
   xs: number | VectorLike | VectorLikes | VectorLikes[] | null | undefined,
   dims: number,
-) => {
+): number => {
   const n = xs?.length;
   if (!n) return 0;
 
@@ -211,7 +211,7 @@ export const toVertexCount = (
 export const toChunkCounts = (
   xs: VectorLike | VectorLikes | VectorLikes[] | null | undefined,
   dims: number,
-) => {
+): VectorLike => {
   const n = xs?.length;
   if (!n) return NO_CHUNKS;
 
@@ -221,7 +221,10 @@ export const toChunkCounts = (
     for (let i = 0; i < n; ++i) to[i] = xs[i].length;
     return to;
   }
-  
+  if (typeof x?.[0]?.[0]?.[0] === 'number') {
+    return toMultiChunkCounts(xs)[0];
+  }
+
   const count = toVertexCount(xs, dims);
   return count ? [count] : NO_CHUNKS;
 };
@@ -230,7 +233,7 @@ export const toChunkCounts = (
 export const toMultiChunkCounts = (
   xs: VectorLike | VectorLikes | VectorLikes[] | null | undefined,
   dims: number,
-) => {
+): VectorLike[] => {
   const n = xs?.length;
   if (!n) return NO_CHUNK_GROUPS;
 

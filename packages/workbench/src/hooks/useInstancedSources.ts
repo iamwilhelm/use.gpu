@@ -32,7 +32,7 @@ export const getInstancedSources = (
 
   const sources = {};
   for (const {name} of uniforms) {
-    sources[name] = getLambdaSource(bindEntryPoint(instances, name), index);
+    sources[name] = getLambdaSource(bindEntryPoint(instances, name), indices);
   };
 
   return [sources, instances];

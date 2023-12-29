@@ -189,6 +189,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         count: 1,
         archetype: schemaToArchetype(UI_SCHEMA, attributes),
 
+        attributes,
         bounds: layout,
         transform,
         texture: sampledTexture ?? image?.texture,

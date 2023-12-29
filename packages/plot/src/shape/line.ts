@@ -1,5 +1,4 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { ShaderSource } from '@use-gpu/shader';
 import type { TraitProps } from '@use-gpu/traits/live';
 
 import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
@@ -30,7 +29,7 @@ const useTraits = makeUseTrait(Traits);
 
 export type LineProps = TraitProps<typeof Traits>;
 
-export const Line: LiveComponent<LineProps> = memo((props) => {
+export const RawLine: LiveComponent<LineProps> = (props) => {
   const parsed = useTraits(props);
   const {
       position,
@@ -58,6 +57,7 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       schema: _,
       formats,
       tensor,
+
       segments,
       slices,
       unwelds,
@@ -95,7 +95,9 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
     },
   };
   return yeet(shapes);
-}, shouldEqual({
+};
+
+export const Line = memo(RawLine, shouldEqual({
   position: sameShallow(sameShallow()),
   color: sameShallow(),
 }), 'Line');

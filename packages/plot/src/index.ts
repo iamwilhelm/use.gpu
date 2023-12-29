@@ -10,6 +10,7 @@ export * from './shape/arrow';
 export * from './shape/face';
 export * from './shape/line';
 export * from './shape/point';
+export * from './shape/polygon';
 
 export * from './source/tensor';
 export * from './source/sampler';

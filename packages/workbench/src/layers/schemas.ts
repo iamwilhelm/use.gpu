@@ -68,7 +68,7 @@ export const LINE_SCHEMA = {
   ...MATRIX_SCHEMA,
   ...LINE_SEGMENTS_SCHEMA,
   ...expandArrays({
-    positions: {format: 'array<vec4<f32>>', single: 'position'},
+    positions: {format: 'array<vec4<f32>>'},
     widths:    {format: 'f32', single: 'width'},
     depths:     {format: 'f32', single: 'depth'},
   }),
@@ -87,7 +87,7 @@ export const ARROW_SCHEMA = {
   ...MATRIX_SCHEMA,
   ...ARROW_SEGMENTS_SCHEMA,
   ...expandArrays({
-    positions: {format: 'array<vec4<f32>>', single: 'position'},
+    positions: {format: 'array<vec4<f32>>'},
     widths:    {format: 'f32', single: 'width'},
     sizes:     {format: 'f32', single: 'size'},
     depths:     {format: 'f32', single: 'depth'},
@@ -104,7 +104,7 @@ export const FACE_SCHEMA = {
   ...MATRIX_SCHEMA,
   ...FACE_SEGMENTS_SCHEMA,
   ...expandArrays({
-    positions: {format: 'array<vec4<f32>>', single: 'position'},
+    positions: {format: 'array<vec4<f32>>'},
   }),
 };
 
@@ -114,7 +114,7 @@ export const SURFACE_SCHEMA = {
   colors:     {format: 'array<vec4<f32>>'},
   zBiases:    {format: 'array<f32>'},
   ...expandArrays({
-    positions: {format: 'array<vec4<f32>>', single: 'position'},
+    positions: {format: 'array<vec4<f32>>'},
     debug: {format: 'f32'},
   }),
 };

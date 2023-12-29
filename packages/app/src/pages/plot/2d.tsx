@@ -8,7 +8,7 @@ import {
   Cursor, Animate,
 } from '@use-gpu/workbench';
 import {
-  Plot, Layer, Cartesian, Axis, Grid, Point, Line, Arrow, Face, Transform,
+  Plot, Layer, Cartesian, Axis, Grid, Point, Line, Arrow, Face, Transform, Polygon,
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
@@ -53,13 +53,13 @@ export const Plot2DPage: LC = () => {
               />
 
               <Line
-                position={[[100, 50], [150, 150]]}
+                positions={[[100, 50], [150, 150]]}
                 width={5}
                 color={'#c00040'}
               />
 
               <Line
-                position={[[150, 50], [200, 150], [250, 50]]}
+                positions={[[150, 50], [200, 150], [250, 50]]}
                 width={5}
                 color={'#c04000'}
               />
@@ -102,7 +102,7 @@ export const Plot2DPage: LC = () => {
                     [[550, 250], [500, 350], [600, 350]],
                   ]}
                   width={10}
-                  color={['#40a0ff', '#a0407f']}
+                  color={'#40a0ff'}
                   join="round"
                   loop
                 />
@@ -115,7 +115,7 @@ export const Plot2DPage: LC = () => {
                     [[550, 250], [500, 350], [600, 350]],
                   ]}
                   width={10}
-                  color={['#a040ff', '#40a07f']}
+                  color={'#a0407f'}
                   join="round"
                   depth={1}
                   loop
@@ -158,7 +158,7 @@ export const Plot2DPage: LC = () => {
 
               <Transform>
                 <Arrow
-                  position={[[100, 200], [250, 300]]}
+                  positions={[[100, 200], [250, 300]]}
                   width={10}
                   color={"#3090ff"}
                   end
@@ -182,62 +182,60 @@ export const Plot2DPage: LC = () => {
 
               <Transform position={[620, 50]} scale={[0.8, 0.8]}>
                 <Face
-                  position={[[0, 0], [50, 0], [100, 100], [50, 100]]}
+                  positions={[[0, 0], [50, 0], [100, 100], [50, 100]]}
                   color={"#823456"}
                 />
 
                 <Face
-                  position={[[100, 0], [150, 0], [200, 100], [150, 100]]}
+                  positions={[[100, 0], [150, 0], [200, 100], [150, 100]]}
                   color={"#823456"}
                 />
               </Transform>
 
               <Transform position={[650, 200]} scale={[0.8, 0.8]}>
                 <Face
-                  position={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
+                  positions={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
                   color={"#823456"}
                   concave
                 />
                 <Line
-                  position={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
+                  positions={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
                   color={"#ffffff"}
                   width={2}
                   zIndex={2}
                   loop
                 />
                 <Transform position={[0, 120]}>
-                  <Face
-                    position={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
-                    color={"#348256"}
-                    concave
-                  />
-                  <Line
-                    position={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
-                    color={"#ffffff"}
+                  <Polygon
+                    positions={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
+                    fill={"#348256"}
+                    stroke={"#ffffff"}
                     width={2}
-                    zIndex={2}
-                    loop
                   />
                 </Transform>
 
-                <Transform position={[0, 240]}>
-                  <Face
+                <Transform position={[-25, 240]}>
+                  <Polygon
                     positions={[[
                       [[0, 0], [150, 0], [150, 150], [0, 150]],
                       [[75, 45], [105, 75], [75, 105], [45, 75]],
                     ]]}
-                    color={"#348256"}
-                    concave
+                    fill={"#345682"}
+                    stroke={"#ffffff"}
+                    width={2}
                   />
-                  <Line
-                    positions={[
+                </Transform>
+
+                <Transform position={[50, 315]}>
+                  <Polygon
+                    positions={[[
                       [[0, 0], [150, 0], [150, 150], [0, 150]],
                       [[75, 45], [105, 75], [75, 105], [45, 75]],
-                    ]}
-                    color={"#ffffff"}
+                    ]]}
+                    fill={"#345682"}
+                    stroke={"#ffffff"}
                     width={2}
                     zIndex={2}
-                    loop
                   />
                 </Transform>
               </Transform>

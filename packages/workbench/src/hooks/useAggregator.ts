@@ -22,7 +22,7 @@ export const useAggregator = (
   items: Record<string, AggregateValue>[],
 ) => {
   const device = useDeviceContext();
-  const {archetype, count, indexed, instanced, indexOffsets} = useOne(() => getAggregateSummary(items), items);
+  const {archetype, count, indexed, instanced, offsets} = useOne(() => getAggregateSummary(items), items);
 
   const allocInstances = useBufferedSize(instanced);
   const allocVertices = useBufferedSize(count);
@@ -33,7 +33,7 @@ export const useAggregator = (
     [archetype, allocInstances, allocVertices, allocIndices]
   );
 
-  return useOne(() => aggregate(items, count, indexed, instanced, indexOffsets), items);
+  return useOne(() => aggregate(items, count, indexed, instanced, offsets), items);
 };
 
 export const makeAggregator = (

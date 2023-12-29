@@ -178,12 +178,6 @@ export const PointTrait = trait(
   },
 );
 
-export const PositionTrait = trait(
-  {
-    position: optional(parsePosition),
-  }
-);
-
 export const ROPTrait = trait(
   {
     alphaToCoverage: optional(parseBoolean),
@@ -271,7 +265,7 @@ export const ColorsTrait = ({composite}: {composite?: boolean} = {}) => {
   return (
     props: {
       color?: number,
-      colors?: number,
+      colors?: VectorLike | VectorLike[],
       opacity?: number,
     },
     parsed: {
@@ -568,8 +562,7 @@ export const VerticesTrait = trait({
 });
 
 export const CompositeVerticesTrait = trait({
-  position: optional(parsePositionArray),
-  positions: optional(parsePositionMultiArray),
+  positions: optional(parsePositionMultiMultiArray),
   depth: optional(parseScalarArrayLike),
   depths: optional(parseMultiScalarArray),
   zBias: optional(parseScalarArrayLike),
@@ -582,7 +575,6 @@ export const CompositeVerticesTrait = trait({
 });
 
 export const FacetedVerticesTrait = trait({
-  position: optional(parsePositionArray),
   positions: optional(parsePositionMultiMultiArray),
   depth: optional(parseScalarArrayLike),
   depths: optional(parseMultiScalarArray),

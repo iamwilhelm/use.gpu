@@ -3,7 +3,7 @@ import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@u
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 import type { LayerAggregator, LayerAggregate } from './types';
 
-import { use, keyed, fragment, yeet, provide, multiGather, extend, useMemo, useOne } from '@use-gpu/live';
+import { use, keyed, fragment, yeet, provide, multiGather, quoteTo, signalTo, reconcileTo, extend, useMemo, useOne } from '@use-gpu/live';
 import { mixBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 
@@ -12,6 +12,7 @@ import { TransformContext } from '../providers/transform-provider';
 import { MaterialContext } from '../providers/material-provider';
 import { ScissorContext } from '../providers/scissor-provider';
 import { QueueReconciler } from '../reconcilers';
+import { LayerReconciler } from '../reconcilers';
 
 import { useAggregator } from '../hooks/useAggregator';
 
@@ -22,8 +23,6 @@ import { PointLayer } from './point-layer';
 import { ArrowLayer } from './arrow-layer';
 
 import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA, INSTANCE_SCHEMA } from './schemas';
-
-const {quote, signal} = QueueReconciler; 
 
 const DEBUG = false;
 
@@ -81,7 +80,7 @@ const provideContext = (
 const Resume = (
   aggregates: Record<string, LayerAggregate[]>,
 ) => useOne(() => {
-  const els: LiveElement[] = [signal()];
+  const els: LiveElement[] = [signalTo(QueueReconciler)];
 
   const types = Object.keys(aggregates);
   types.sort((a, b) => (ORDER[a] || 0) - (ORDER[b] || 0));
@@ -127,7 +126,7 @@ const Aggregate: LiveFunction<any> = (
     const element = use(component, props);
     const layer = provideContext(element, item, sources);
 
-    const upload = useOne(() => uploadRefs ? quote(yeet(uploadRefs)) : null, uploadRefs);
+    const upload = useOne(() => uploadRefs ? quoteTo(QueueReconciler, yeet(uploadRefs)) : null, uploadRefs);
     return upload ? [upload, layer] : layer;
     // Exclude flags and contexts because they are factored into the archetype
   }, [count, sources, uploadRefs]);

@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { Rectangle } from '@use-gpu/core';
 
-import { provide, useContext, useNoContext, useMemo } from '@use-gpu/live';
+import { provide, wrap, useContext, useNoContext, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext, LayoutContext,
@@ -9,6 +9,7 @@ import {
 } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
+import { Plot } from '../plot';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { mat4, vec3 } from 'gl-matrix';
@@ -59,7 +60,7 @@ export const Embedded: LiveComponent<EmbeddedProps> = (props: PropsWithChildren<
 
   return (
     provide(TransformContext, context,
-      provide(RangeContext, range, children ?? [])
+      provide(RangeContext, range, wrap(Plot, children ?? []))
     )
   );
 };

@@ -1,5 +1,4 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { ShaderSource } from '@use-gpu/shader';
 import type { TraitProps } from '@use-gpu/traits/live';
 
 import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
@@ -16,7 +15,6 @@ import {
   PointsTrait,
 
   MarkerTrait,
-  PositionTrait,
   PointTrait,
   ROPTrait,
   ZIndexTrait,
@@ -26,7 +24,6 @@ const Traits = combine(
   PointsTrait,
 
   MarkerTrait,
-  PositionTrait,
   PointTrait,
   ROPTrait,
   ZIndexTrait,

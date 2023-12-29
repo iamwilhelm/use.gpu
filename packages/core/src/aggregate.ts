@@ -137,7 +137,7 @@ export const updateAggregateBuffer = (
     const c = single ? instanced : unwelded ? indexed : count;
 
     if (typeof values === 'function') values(array, b, c, stride);
-    else if (offsets && offsets !== true) offsetNumberArray(values, array, offsets[i], dimsIn, dimsOut, 0, b, c, stride);
+    else if (offsets) offsetNumberArray(values, array, offsets[i], dimsIn, dimsOut, 0, b, c, stride);
     else copyNumberArray(values, array, dimsIn, dimsOut, 0, b, c, stride);
 
     b += c * step;

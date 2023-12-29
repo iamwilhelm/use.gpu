@@ -54,9 +54,10 @@ export const UILayers: LC<UILayersProps> = ({
   }
   const layers = partitioner.resolve();
 
+  console.log('-------')
   const els = layers.flatMap((layer, i): LiveElement => {
-    if ((layer[0] as any)?.f) return (layer as any);
-    return keyed(Layer, layer[0]?.id, layer);
+    if ((layer.items[0] as any)?.f) return (layer.items as any);
+    return keyed(Layer, layer.key, layer.items);
   });
   els.push(signal());
 
@@ -70,16 +71,16 @@ const Layer: LiveFunction<any> = (
   const {transform, clip, mask, texture} = item;
 
   const {count, sources} = useAggregator(UI_SCHEMA, items);
-  //const {sdf2d: {contours}} = useDebugContext();
+  const {sdf2d: {contours}} = useDebugContext();
 
   return useMemo(() => {
-    const props = {count, transform, clip, mask, texture, ...sources};
+    const props = {count, transform, clip, mask, texture, debugContours: contours, ...sources};
 
     DEBUG && console.log('UIRectangles', {props, items, sources});
 
     return use(UIRectangles, props);
     // Exclude flags and contexts because they are factored into the archetype
-  }, [count, sources]);
+  }, [count, sources, contours]);
 };
 
 const getItemTypeKey = (item: LayerAggregate) =>
@@ -132,11 +133,11 @@ const makePartitioner = () => {
       }
     }
 
-    const partition = {key, items: [item], bounds: bounds ?? [0, 0, 0, 0]};
+    const partition = {key: layer ? layer.key + 1 : key, items: [item], bounds: bounds ?? [0, 0, 0, 0]};
     last.set(key, layers.length);
     layers.push(partition);
   };
 
-  const resolve = () => layers.map(l => l.items);
+  const resolve = () => layers;
   return {push, resolve};
 }

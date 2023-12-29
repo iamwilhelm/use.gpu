@@ -269,7 +269,7 @@ export const Sampler: LiveComponent<SamplerProps> = (props) => {
     }
 
     const l = !sparse ? length : emitted;
-    const s = !sparse ? (items > 1 ? [items, ...padded] : padded) : (items > 1  ? [items, emitted / items] : [emitter / items]);
+    const s = !sparse ? (items > 1 ? [items, ...padded] : padded) : (items > 1  ? [items, emitted / items] : [emitted / items]);
     updateTensor(tensor, l, s);
 
     return {...tensor};

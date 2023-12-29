@@ -1,5 +1,4 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { ShaderSource } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/traits';
 
 import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
@@ -28,7 +27,7 @@ const useTraits = makeUseTrait(Traits);
 
 export type FaceProps = TraitProps<typeof Traits>;
 
-export const Face: LiveComponent<FaceProps> = memo((props) => {
+export const RawFace: LiveComponent<FaceProps> = (props) => {
 
   const parsed = useTraits(props);
   const {
@@ -54,6 +53,10 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
       chunks,
       groups,
       concave,
+
+      schema: _,
+      formats,
+      tensor,
 
       segments,
       indices,
@@ -90,7 +93,9 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
   };
 
   return yeet(shapes);
-}, shouldEqual({
+};
+
+export const Face = memo(RawFace, shouldEqual({
   position: sameShallow(sameShallow()),
   color: sameShallow(),
 }), 'Face');

@@ -28,6 +28,8 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
       getVertex,
       getSurface,
       getLight,
+      applyLights,
+      applyEnvironment,
     },
     defines,
     ...rest
@@ -47,7 +49,7 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
     const links = {
       getVertex,
       getSurface,
-      getLight,
+      getLight: bindBundle(getLight, {applyLights, applyEnvironment}),
       getScissor: defines?.HAS_SCISSOR ? getScissorColor : null,
       toColorSpace: getNativeColor(colorInput, colorSpace),
     };

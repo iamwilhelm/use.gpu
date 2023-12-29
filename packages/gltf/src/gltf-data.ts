@@ -231,7 +231,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
             format,
             length: count,
             size: [count],
-            bounds: min && max ? toDataBounds([min, max]) : undefined,
+            bounds: min && max ? toDataBounds({min, max}) : undefined,
           };
         },
         ({bufferView}) => bufferSources[bufferView ?? -1],

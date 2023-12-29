@@ -2,14 +2,17 @@ import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ColorLike, XYZW } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
-import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
+import { provide, yeet, useMemo, useOne } from '@use-gpu/live';
 
-import { useShader } from '../hooks/useShader';
 import { useLightContext } from '../providers/light-provider';
 import { MaterialContext } from '../providers/material-provider';
+import { QueueReconciler } from '../reconcilers';
+import { useShader } from '../hooks/useShader';
 
 import { getSolidSurface } from '@use-gpu/wgsl/instance/surface/solid.wgsl';
 import { getSolidFragment } from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
+
+const {signal} = QueueReconciler;
 
 export type ShaderFlatMaterialProps = {
   /** Flat shader, for both lit and unlit passes (e.g. shadow map).

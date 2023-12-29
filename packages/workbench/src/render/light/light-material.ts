@@ -56,11 +56,8 @@ export const LightMaterial: LC<LightMaterialProps> = (props: PropsWithChildren<L
         return {useLight, useMaterial};
       }, [useLight, shadows]);
 
-      // Fence so that lights are never suspended
       return (
-        provide(LightContext, context,
-          fence(children, (v: any) => yeet(v))
-        )
+        provide(LightContext, context, children)
       );
     },
     then,

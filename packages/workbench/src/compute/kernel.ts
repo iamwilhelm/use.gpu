@@ -12,8 +12,11 @@ import { useShaderRefs } from '../hooks/useShaderRef';
 import { useComputeContext } from '../providers/compute-provider';
 import { useFeedbackContext, useNoFeedbackContext } from '../providers/feedback-provider';
 import { RenderContext } from '../providers/render-provider';
+import { PassReconciler } from '../reconcilers';
 
 import { dispatch } from '../queue/dispatch';
+
+const {quote} = PassReconciler;
 
 export type KernelProps = {
   shader: ShaderModule,
@@ -96,11 +99,11 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     if (swap) for (const t of targets) if (t.swap) t.swap();
   };
 
-  return yeet(dispatch({
+  return dispatch({
     shader: dispatchKernel,
     size: dataSize,
     group: workgroupSize,
     shouldDispatch,
     onDispatch,
-  }));
+  });
 };

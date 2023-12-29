@@ -247,6 +247,7 @@ export const checkLambdaType = (
   let t = toName;
 
   if (f === t) return true;
+  if (t === 'auto') return true;
   if (t == null) {
     console.warn(`Unable to determine lambda format for uniform ${uniform.name} -> bundle ${getBundleEntry(bundle)}`)
     return true;

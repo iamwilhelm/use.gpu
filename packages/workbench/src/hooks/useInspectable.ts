@@ -1,4 +1,4 @@
-import { useCallback, useOne, useFiber, useState } from '@use-gpu/live';
+import { useCallback, useOne, useFiber, useState, useNoOne, useNoState } from '@use-gpu/live';
 
 export type Inspector = (data: Record<string, any>) => void;
 
@@ -32,3 +32,6 @@ export const useInspectorSelect = () => {
   const highlight = fiber.host?.__highlight ?? NOP;
   return highlight;
 }
+
+export const useNoInspectable = useNoOne;
+export const useNoInspectHoverable = useNoState;

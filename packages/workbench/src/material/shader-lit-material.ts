@@ -2,16 +2,19 @@ import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ColorLike, XYZW } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
-import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
+import { provide, yeet, useMemo, useOne } from '@use-gpu/live';
 
+import { useLightContext } from '../providers/light-provider';
+import { MaterialContext } from '../providers/material-provider';
+import { QueueReconciler } from '../reconcilers';
 import { useShader, useNoShader } from '../hooks/useShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useLightContext } from '../providers/light-provider';
-import { MaterialContext } from '../providers/material-provider';
 
 import { getLitFragment } from '@use-gpu/wgsl/instance/fragment/lit.wgsl';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
+
+const {signal} = QueueReconciler;
 
 export type ShaderLitMaterialProps = {
   /** Flat shader, for unlit passes (e.g. shadow map)
@@ -74,7 +77,7 @@ export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithCh
   const {useMaterial} = useLightContext();
   const applyLights = useMaterial(apply);
 
-  const getLight = applyLights ? useShader(getLitFragment, [applyLights, environment]) : useNoShader();
+  const getLight = getLitFragment;
   const getSurface = surface;
   const getFragment = fragment;
   const getDepth = depth;
@@ -88,6 +91,8 @@ export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithCh
       getFragment,
       getSurface,
       getLight,
+      applyLights,
+      applyEnvironment: environment,
     },
   }), [getSurface, getLight, getDepth, getFragment]);
 

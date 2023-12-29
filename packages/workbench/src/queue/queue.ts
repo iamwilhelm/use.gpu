@@ -1,11 +1,11 @@
 import type { LiveFiber, LC, PropsWithChildren, LiveElement, ArrowFunction, DeferredCall } from '@use-gpu/live';
 
 import {
-  gather, signal, yeet, unquote, makeReconciler,
+  gather, yeet, unquote, makeReconciler,
 } from '@use-gpu/live';
 import { QueueReconciler } from '../reconcilers';
 
-const {reconcile, quote} = QueueReconciler;
+const {reconcile, quote, signal} = QueueReconciler;
 
 export type QueueProps = {
   nested?: boolean,

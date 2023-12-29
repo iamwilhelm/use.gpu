@@ -3,15 +3,19 @@ import type { TypedArray, StorageSource, Emit, Time } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { useDeviceContext } from '../providers/device-provider';
+import { QueueReconciler } from '../reconcilers';
 
-import { yeet, signal, useMemo, useNoMemo, useOne, useHooks } from '@use-gpu/live';
+import { yeet, useMemo, useNoMemo, useOne, useHooks } from '@use-gpu/live';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { incrementVersion } from '@use-gpu/live';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
 import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
+
 import { useRenderProp } from '../hooks/useRenderProp';
+
+const {signal} = QueueReconciler;
 
 export type StructDataProps = {
   /** Set/override input length */

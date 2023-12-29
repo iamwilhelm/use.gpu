@@ -2,8 +2,8 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { VirtualDraw } from '../pass/types';
 import { memo, use, useMemo } from '@use-gpu/live';
 
-import { useInspectHoverable } from '../hooks/useInspectable';
-import { useVariantContext } from '../providers/pass-provider';
+import { useInspectHoverable, useNoInspectHoverable } from '../hooks/useInspectable';
+import { useVariantContext, useNoVariantContext } from '../providers/pass-provider';
 import { PassReconciler } from '../reconcilers';
 
 const {quote} = PassReconciler;
@@ -25,4 +25,9 @@ export const useDraw = (props: VirtualDraw) => {
     const component = variants;
     return quote(use(component, props));
   }
+};
+
+export const useNoDraw = () => {
+  useNoVariantContext();
+  useNoInspectHoverable();
 };

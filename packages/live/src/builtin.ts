@@ -209,14 +209,14 @@ export const capture = <T, C>(
 ): DeferredCall<() => void> => ({f: CAPTURE, args: [context, calls, then], key, by: getCurrentFiberID()} as any);
 
 /** Reconcile quoted calls to a separate tree. */
-export const reconcile = <T>(
+export const reconcileTo = <T>(
   reconciler: LiveReconciler,
   calls?: LiveNode<any>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: RECONCILE, args: [reconciler, calls], key, by: getCurrentFiberID()} as any);
 
 /** Quote a subtree and reconcile it into the given reconciler context. */
-export const quote = <T>(
+export const quoteTo = <T>(
   reconciler: LiveReconciler,
   calls?: LiveNode<any>,
   key?: Key,
@@ -231,8 +231,8 @@ export const unquote = <T>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: UNQUOTE, args: calls, key, by: getCurrentFiberID()} as any);
 
-/** Yeet a fast signal() signal. */
-export const signal = (reconciler: LiveReconciler, key?: Key) => {
+/** Signal = quote yeet an empty value */
+export const signalTo = (reconciler: LiveReconciler, key?: Key) => {
   if (!reconciler?.reconciler) throw new Error("Missing reconciler for signal");
   return ({f: SIGNAL, args: reconciler, key, by: getCurrentFiberID()} as any);
 };
@@ -291,9 +291,9 @@ export const makeReconciler = <T>(displayName?: string): LiveReconciler => {
   const self = {
     displayName,
     reconciler: true,
-    reconcile: (el) => reconcile(self, el),
-    quote: (el) => quote(self, el),
-    signal: () => signal(self),
+    reconcile: (el) => reconcileTo(self, el),
+    quote: (el) => quoteTo(self, el),
+    signal: () => signalTo(self),
   };
   return self;
 };

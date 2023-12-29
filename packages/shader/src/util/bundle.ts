@@ -69,8 +69,8 @@ export const makeDeclarationToAttribute = (
     const {type, name, parameters, attr} = d.func;
     return {name, format: toTypeString(type), args: toArgTypes(parameters), attr};
   }
-  if (d.variable) {
-    const {type, name, parameters, attr} = d.variable;
+  if (d.variable || d.constant) {
+    const {type, name, parameters, attr} = d.variable ?? d.constant;
     return {name, format: toTypeString(type), args: null, attr};
   }
   if (d.struct) {
@@ -120,7 +120,7 @@ export const makeBundleToAttributes = (
     const {table: {externals}} = module;
 
     const out: UniformAttribute[] = [];
-    for (const d of externals) if (d.func ?? d.variable) {
+    for (const d of externals) if (d.func ?? d.variable ?? d.constant) {
       const attr = toAttribute(d);
       if (!(bundle as any).links?.[attr.name]) out.push(resolveBundleType(bundle, attr));
     }
@@ -148,7 +148,8 @@ export const makeBundleToAttribute = (
     if (name != null) for (const d of externals) {
       if (
         d.func?.name === entry ||
-        d.variable?.name === entry
+        d.variable?.name === entry ||
+        d.constant?.name === entry
       ) return resolveBundleType(bundle, toAttribute(d));
       if (d.struct?.name === entry) {
         return toAttribute(d);
@@ -158,7 +159,8 @@ export const makeBundleToAttribute = (
     for (const d of exports) {
       if (
         d.func?.name === entry ||
-        d.variable?.name === entry
+        d.variable?.name === entry ||
+        d.constant?.name === entry
       ) return resolveBundleType(bundle, toAttribute(d));
       if (d.struct?.name === entry) {
         return toAttribute(d);

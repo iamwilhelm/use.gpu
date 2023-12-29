@@ -504,7 +504,7 @@ export const makeUnweldEmitter = (
   stride?: number,
 ) => unweldNumberArray(from, to, indices, fromDims, toDims, fromIndex, toIndex, count, stride);
 
-export const getUnweldedArray = (
+export const toUnweldedArray = (
   from: VectorLike | number,
   indices: TypedArray,
   fromDims: number = 1,

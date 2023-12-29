@@ -22,5 +22,9 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
       calls.post || calls.readback ? use(ReadbackPass, {calls}) : null,
     ], calls);
 
+  return (
+    multiGather(children, Resume)
+  );
+
   return multiGather(children, Resume);
 }, 'Compute');

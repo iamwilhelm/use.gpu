@@ -3,7 +3,7 @@ import type { StorageSource, TextureSource, UniformAttribute } from '@use-gpu/co
 import type { Light, BoundLight } from '../../light/types';
 import type { LightEnv } from '../../pass/types';
 
-import { provide, capture, yeet, signal, makeCapture, useCallback, useCapture, useFiber, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
+import { provide, capture, yeet, makeCapture, useCallback, useCapture, useFiber, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
 import {
   makeIdAllocator,
   makeUniformLayout, makeLayoutData, makeLayoutFiller,
@@ -14,6 +14,7 @@ import { scrambleBits53, mixBits53 } from '@use-gpu/state';
 import { bindBundle, bundleToAttribute, getBundleKey } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../../providers/device-provider';
+import { QueueReconciler } from '../../reconcilers';
 import { useBufferedSize } from '../../hooks/useBufferedSize';
 
 import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
@@ -21,6 +22,8 @@ import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
 import { POINT_LIGHT } from '../../light/types';
 
 import { vec2, vec4 } from 'gl-matrix';
+
+const {signal} = QueueReconciler;
 
 type Queued = {id: number, data: Light};
 

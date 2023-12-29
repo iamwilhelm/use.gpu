@@ -5,6 +5,8 @@ import type { LightEnv, RenderComponents } from '../pass/types';
 import { use, yeet, memo, useMemo, useOne } from '@use-gpu/live';
 import { extractBindings } from '@use-gpu/shader/wgsl';
 
+import { PassReconciler } from '../reconcilers';
+
 import { DebugRender } from './forward/debug';
 import { ShadedRender } from './forward/shaded';
 import { ShadowRender } from './forward/shadow';
@@ -19,6 +21,8 @@ import { LightMaterial } from './light/light-material';
 
 import lightBinding from '@use-gpu/wgsl/use/light.wgsl';
 import shadowBinding from '@use-gpu/wgsl/use/shadow.wgsl';
+
+const {quote} = PassReconciler;
 
 const DEFAULT_PASSES = [
   use(ColorPass, {}),
@@ -73,7 +77,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     shadows,
     children,
     then: (light: LightEnv) =>
-      useOne(() => yeet({ env: { light }}), light),
+      useOne(() => quote(yeet({ env: { light }})), light),
   }) : children;
 
   // Prepare bind group layout for lighting/shadows

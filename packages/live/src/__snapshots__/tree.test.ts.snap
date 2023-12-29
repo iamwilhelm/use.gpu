@@ -39,9 +39,9 @@ exports[`render reordering 2`] = `
 
 exports[`renders quote/unquote pairs 1`] = `
 "<Root >
-  <Reconcile displayName={Test} reconciler={true} reconcile={reconcile(…) reconcile(self, el)} quote={quote(…) quote(self, el)} signal={signal(…) signal(self)} <First <Quote … …>>>
+  <Reconcile displayName={Test} reconciler={true} reconcile={reconcile(…) reconcileTo(self, el)} quote={quote(…) quoteTo(self, el)} signal={signal(…) signalTo(self)} <First <Quote … …>>>
     <First <Quote displayName={…} reconciler={…} reconcile={…} quote={…} signal={…} <Second …>>>
-      <Quote displayName={Test} reconciler={true} reconcile={reconcile(…) reconcile(self, el)} quote={quote(…) quote(self, el)} signal={signal(…) signal(self)} <Second <Unquote …>>>
+      <Quote displayName={Test} reconciler={true} reconcile={reconcile(…) reconcileTo(self, el)} quote={quote(…) quoteTo(self, el)} signal={signal(…) signalTo(self)} <Second <Unquote …>>>
         <First <Quote displayName={…} reconciler={…} reconcile={…} quote={…} signal={…} <Unquote …>>>
           <First <First <Quote … …>>>
             <First <Quote displayName={…} reconciler={…} reconcile={…} quote={…} signal={…} <Second >>>
@@ -62,9 +62,9 @@ exports[`renders quote/unquote pairs 1`] = `
 
 exports[`renders quoted tree 1`] = `
 "<Root >
-  <Reconcile displayName={Test} reconciler={true} reconcile={reconcile(…) reconcile(self, el)} quote={quote(…) quote(self, el)} signal={signal(…) signal(self)} [<Node >,<Quote … …>,…]>
+  <Reconcile displayName={Test} reconciler={true} reconcile={reconcile(…) reconcileTo(self, el)} quote={quote(…) quoteTo(self, el)} signal={signal(…) signalTo(self)} [<Node >,<Quote … …>,…]>
     <Node >
-    <Quote displayName={Test} reconciler={true} reconcile={reconcile(…) reconcile(self, el)} quote={quote(…) quote(self, el)} signal={signal(…) signal(self)} <Tree >>
+    <Quote displayName={Test} reconciler={true} reconcile={reconcile(…) reconcileTo(self, el)} quote={quote(…) quoteTo(self, el)} signal={signal(…) signalTo(self)} <Tree >>
     <Node >
   <Root(Test) >
     <Tree >
@@ -76,8 +76,8 @@ exports[`renders quoted tree 1`] = `
 
 exports[`renders quoted/unquoted trees 1`] = `
 "<Root >
-  <Reconcile displayName={Test} reconciler={true} reconcile={reconcile(…) reconcile(self, el)} quote={quote(…) quote(self, el)} signal={signal(…) signal(self)} <Quote displayName={…} reconciler={…} reconcile={…} quote={…} signal={…} <Second …>>>
-    <Quote displayName={Test} reconciler={true} reconcile={reconcile(…) reconcile(self, el)} quote={quote(…) quote(self, el)} signal={signal(…) signal(self)} <Second <Second …>>>
+  <Reconcile displayName={Test} reconciler={true} reconcile={reconcile(…) reconcileTo(self, el)} quote={quote(…) quoteTo(self, el)} signal={signal(…) signalTo(self)} <Quote displayName={…} reconciler={…} reconcile={…} quote={…} signal={…} <Second …>>>
+    <Quote displayName={Test} reconciler={true} reconcile={reconcile(…) reconcileTo(self, el)} quote={quote(…) quoteTo(self, el)} signal={signal(…) signalTo(self)} <Second <Second …>>>
       <First <Quote displayName={…} reconciler={…} reconcile={…} quote={…} signal={…} <Second …>>>
         <First <First <Quote … …>>>
           <First <Quote displayName={…} reconciler={…} reconcile={…} quote={…} signal={…} <Second >>>

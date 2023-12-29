@@ -1,6 +1,5 @@
 import React from '@use-gpu/live';
 
-import { GeometryDataPage } from './pages/geometry/data';
 import { GeometryFacesPage } from './pages/geometry/faces';
 import { GeometryGLTFPage } from './pages/geometry/gltf';
 import { GeometryLinesPage } from './pages/geometry/lines';
@@ -42,7 +41,6 @@ export const makePages = () => [
   {path: "/plot/3d",               title: "Plot - 3D",                         element: <Plot3DPage />},
   {path: "/geometry/lines",        title: "Geometry - 3D Lines and Arrows",    element: <GeometryLinesPage />},
   {path: "/geometry/faces",        title: "Geometry - 3D Polygons",            element: <GeometryFacesPage />},
-  {path: "/geometry/data",         title: "Geometry - Data-driven Layers",     element: <GeometryDataPage />},
   {path: "/geometry/gltf",         title: "Geometry - GLTF",                   element: <GeometryGLTFPage />},
   {path: "/geometry/voxel",        title: "Geometry - Voxels",                 element: <GeometryVoxelPage />},
   {path: "/geometry/binary",       title: "Geometry - Byte Histogram",         element: <GeometryBinaryPage />},

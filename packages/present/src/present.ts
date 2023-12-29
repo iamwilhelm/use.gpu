@@ -2,7 +2,7 @@ import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ColorLike, Rectangle, XYZW } from '@use-gpu/core';
 import type { ParsedEffect, SlideInfo, SlideEase, ResolvedSlide } from './types';
 
-import { reconcile, quote, gather, provide, use, keyed, useMemo, useOne, useRef, useState } from '@use-gpu/live';
+import { gather, provide, use, keyed, useMemo, useOne, useRef, useState } from '@use-gpu/live';
 import {
   useTimeContext,
   LoopContext,
@@ -15,8 +15,11 @@ import { clamp } from '@use-gpu/core';
 
 import { resolveSlides } from './lib/slides';
 import { PresentContext, PresentAPI } from './providers/present-provider';
+import { PresentReconciler } from './reconcilers';
 import { makeUseTransition } from './hooks';
 import { Stage } from './stage';
+
+const {reconcile, quote} = PresentReconciler;
 
 export type PresentProps = {
   step?: number,
@@ -148,5 +151,3 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
     )
   );
 };
-
-

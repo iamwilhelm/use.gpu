@@ -15,7 +15,8 @@ import { useShader, getShader } from '../hooks/useShader';
 import { useDerivedSource, getDerivedSource } from '../hooks/useDerivedSource';
 import { useRawSource } from '../hooks/useRawSource';
 import { useScratchSource } from '../hooks/useScratchSource';
-import { useInspectable } from '../hooks/useInspectable'
+import { useInspectable } from '../hooks/useInspectable';
+import { getRenderFunc } from '../hooks/useRenderProp';
 
 import { pmremInit } from '@use-gpu/wgsl/pmrem/pmrem-init.wgsl';
 import { pmremCopy } from '@use-gpu/wgsl/pmrem/pmrem-copy.wgsl';
@@ -43,6 +44,7 @@ export type PrefilteredEnvMapProps = {
   gain?: number,
   debug?: boolean,
   render?: (cubeMap: ShaderSource | null, textureMap: TextureSource | null) => LiveElement,
+  children?: (cubeMap: ShaderSource | null, textureMap: TextureSource | null) => LiveElement,
 };
 
 // Based on
@@ -79,9 +81,9 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
     gain = 1,
     texture,
     debug,
-    render,
   } = props;
 
+  const render = getRenderFunc(props);
   if (!texture) return render ? render(null, null) : yeet(null);
 
   const device = useDeviceContext();

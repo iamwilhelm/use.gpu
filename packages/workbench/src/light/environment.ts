@@ -59,7 +59,6 @@ export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<Envir
 
   const parent = useMaterialContext();
   const material = useMemo(() => {
-    if (!parent.shaded?.getLight) return parent;
 
     const applyEnvironment = environment
       ? bindBundle(applyPBREnvironment, {
@@ -69,9 +68,7 @@ export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<Envir
 
     return patch(parent, {
       shaded: {
-        getLight: $set(bindBundle(parent.shaded.getLight, {
-          applyEnvironment,
-        })) as any
+        applyEnvironment: $set(applyEnvironment),
       }
     });
   }, [parent, environment]);

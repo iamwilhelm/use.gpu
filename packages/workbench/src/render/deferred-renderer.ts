@@ -5,6 +5,8 @@ import type { LightEnv, RenderComponents, VirtualDraw } from '../pass/types';
 import { use, yeet, memo, useMemo, useOne } from '@use-gpu/live';
 import { extractBindings } from '@use-gpu/shader/wgsl';
 
+import { PassReconciler } from '../reconcilers';
+
 import { DebugRender } from './forward/debug';
 import { PickingRender } from './forward/picking';
 import { ShadedRender } from './forward/shaded';
@@ -24,6 +26,8 @@ import { LightMaterial } from './light/light-material';
 
 import lightBinding from '@use-gpu/wgsl/use/light.wgsl';
 import shadowBinding from '@use-gpu/wgsl/use/shadow.wgsl';
+
+const {quote} = PassReconciler;
 
 const DEFAULT_PASSES = [
   use(DeferredPass, {}),
@@ -78,10 +82,10 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
     shadows,
     children,
     then: (light: LightEnv) =>
-      useMemo(() => [
+      useMemo(() => quote([
         yeet({ env: { light }}),
         use(LightRender, {...light, shadows}),
-      ], [light, shadows]),
+      ]), [light, shadows]),
   });
 
   // Prepare bind group layout for lighting/shadows

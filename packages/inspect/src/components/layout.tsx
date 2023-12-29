@@ -227,7 +227,7 @@ export const TreeWrapper = styled('div', {
 });
 
 export const TreeWrapperWithLegend = styled(TreeWrapper, {
-  minHeight: 'calc(100% - 110px)',
+  minHeight: 'calc(100% - 130px)',
 });
 
 export const TreeToggle = styled('div', {

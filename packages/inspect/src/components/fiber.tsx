@@ -122,7 +122,7 @@ export const FiberLegend: React.FC = () => {
           <TreeLegendItem>
             <Node
               fiber={fiber}
-              hovered={0}
+              parents={true}
             />
             <span>Rendered By</span>
           </TreeLegendItem>

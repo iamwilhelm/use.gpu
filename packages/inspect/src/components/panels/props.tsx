@@ -144,7 +144,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, api}) => {
   useLayoutEffect(() => {
     const h = getHistory();
     const q = getQuote();
-    if (h.length !== history.length) setHistory(h);
+    if (h.map(h => h?.key).join('/') !== history.map(h => h?.key).join('/')) setHistory(h);
     if (q?.key !== quote?.key) setQuote(q);
   });
 

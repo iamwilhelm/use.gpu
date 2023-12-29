@@ -92,8 +92,8 @@ const Render = (
 
   overflow: OverflowMode,
   size: number,
-  track: ColorLike,
-  thumb: ColorLike,
+  track: TypedArray,
+  thumb: TypedArray,
   isX: boolean,
 
   layout: Rectangle,
@@ -174,7 +174,7 @@ const Render = (
         bounds: thumbBox,
         clip,
         mask,
-        transform,
+        transform: transform ? chainTo(transform, thumbTransform) : thumbTransform,
         zIndex: z,
       });
     }

@@ -303,7 +303,7 @@ export const TreeRowOmitted: FC<TreeIndentProps> = ({ indent, children }: TreeIn
   <TreeRowOmittedChunk css={{
     paddingLeft: indent ? `${indent * 20}px` : 0,
   }}>
-    {children}
+    <div style={{height: 0}}>{children}</div>
   </TreeRowOmittedChunk>
 );
 
@@ -318,6 +318,7 @@ export const TreeIndent: FC<TreeIndentProps> = ({ indent, children }: TreeIndent
 const TreeRowInner = styled('div', {
   display: 'flex',
   height: '20px',
+  clear: 'left',
 });
 
 export const DOMMock = styled('div', {

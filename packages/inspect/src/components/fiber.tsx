@@ -359,9 +359,10 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       onMouseLeave={unhover}
       ref={rowRef}
       ooo={ooo}
+      absolute={shouldAbsolute}
     />
   ) : null;
-  if (shouldAbsolute) nodeRender = <div style={{position: 'absolute'}}>{nodeRender}</div>;
+  //if (shouldAbsolute) nodeRender = <div style={{position: 'absolute'}}>{nodeRender}</div>;
 
   // Render single child
   if (mount) {

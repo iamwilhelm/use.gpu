@@ -4,11 +4,11 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { ImageTrait, Fit, Repeat, Anchor } from '../types';
 
 import { use, yeet, memo, useContext, useMemo, useNoContext } from '@use-gpu/live';
-import { LayoutContext, getAlignmentAnchor } from '@use-gpu/workbench';
+import { LayoutContext, getAlignmentAnchor, UI_SCHEMA } from '@use-gpu/workbench';
+import { schemaToArchetype } from '@use-gpu/core';
 
 import { evaluateDimension, parseAnchorXY } from '../parse';
 import { getOriginProjection } from '../lib/util';
-import { ARCHETYPES } from '../lib/constants';
 
 const UV_SQUARE = [0, 0, 1, 1] as Rectangle;
 const NO_RECTANGLE = [0, 0, 0, 0] as Rectangle;
@@ -187,7 +187,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
 
       return yeet({
         count: 1,
-        archetype: ARCHETYPES.textured,
+        archetype: schemaToArchetype(UI_SCHEMA, attributes),
 
         bounds: layout,
         transform,
@@ -206,7 +206,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
       
       return yeet({
         count: 1,
-        archetype: ARCHETYPES.solid,
+        archetype: schemaToArchetype(UI_SCHEMA, attributes),
 
         attributes,
         bounds: layout,

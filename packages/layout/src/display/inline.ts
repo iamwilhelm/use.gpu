@@ -35,7 +35,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
     children,
   } = props;
 
-  const { margin, grow, shrink, inline, flex, zIndex } = useBoxTrait(props);
+  const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionX);
   const padding = useProp(props.padding, parseMargin);
@@ -110,7 +110,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
                 use(BoxLayout, inside, {
                   box,
                   origin,
-                  z: z + zIndex,
+                  z,
                   clip,
                   mask,
                   transform,
@@ -132,7 +132,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
         fit: memoFit(fit),
         prefit: memoFit(fit),
       });
-    }, [props, els, hovered, zIndex]);
+    }, [props, els, hovered]);
   };
 
   return children ? gather(children, Resume) : null;

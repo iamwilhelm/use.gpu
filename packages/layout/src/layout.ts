@@ -6,6 +6,7 @@ import type { FitInto, LayoutElement, LayoutPicker } from './types';
 import { parsePlacement } from '@use-gpu/parse';
 import { useProp } from '@use-gpu/traits/live';
 import { memo, provide, gather, yeet, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
+import { schemaToArchetype } from '@use-gpu/core';
 
 import {
   DebugContext, MouseContext, WheelContext, ViewContext,
@@ -13,6 +14,7 @@ import {
   useInspectable, useInspectHoverable, useInspectorSelect, Inspector,
   useShader, useNoShader,
   QueueReconciler,
+  UI_SCHEMA,
 } from '@use-gpu/workbench';
 
 import { chainTo } from '@use-gpu/shader/wgsl';
@@ -127,18 +129,21 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
       offsets,
     },
   });
-  if (hovered) out.push(yeet({
-    count: 1,
-    archetype: ARCHETYPES.inspect,
-
-    attributes: {
+  if (hovered) {
+    const attributes = {
       rectangle: layout,
       uv: [0, 0, 1, 1],
       repeat: 0,
       ...INSPECT_STYLE.parent,
-    },
-    transform,
-  }));
+    };
+    
+    out.push(yeet({
+      count: 1,
+      archetype: schemaToArchetype(UI_SCHEMA, attributes),
+      attributes,
+      transform,
+    }));
+  }
 
   // Add scroll listener
   out.push(keyed(Scroller, -2, pickers, flip, shift));

@@ -39,6 +39,7 @@ export type LayoutRenderer = (
 export type RenderInside = {
   sizes: XY[],
   offsets: XY[],
+  z: number,
   renders: LayoutRenderer[],
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
@@ -66,6 +67,7 @@ export type RenderOutside = {
 export type InlineRenderer = (
   lines: InlineLine[],
   origin: Rectangle,
+  z: number,
   clip: ShaderModule | null,
   mask: ShaderModule | null,
   transform: ShaderModule | null,

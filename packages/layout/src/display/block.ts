@@ -32,8 +32,8 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
     children,
   } = props;
 
-  const { width, height, aspect, radius, border, stroke, fill, image } = useElementTrait(props);
-  const { margin: blockMargin, grow, shrink, inline, flex, zIndex } = useBoxTrait(props);
+  const { width, height, aspect, radius, border, stroke, fill, image, zIndex } = useElementTrait(props);
+  const { margin: blockMargin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionY);
   const padding = useProp(props.padding, parseMargin);

@@ -26,7 +26,7 @@ const KEYFRAMES = [
 export const Plot2DPage: LC = () => {
 
   return (<>
-    <InfoBox>Draw 2D shapes using the plot API and animate their transforms like CSS.</InfoBox>
+    <InfoBox>Draw 2D shapes using the plot API and animate their transforms like CSS and SVG.</InfoBox>
     <Loop>
       <Cursor cursor="move" />
       <Camera>

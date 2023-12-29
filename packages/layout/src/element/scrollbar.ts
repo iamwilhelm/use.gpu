@@ -6,12 +6,12 @@ import type { Direction, OverflowMode, FitInto, UIAggregate } from '../types';
 import { useProp } from '@use-gpu/traits/live';
 import { parseColor } from '@use-gpu/parse';
 import { keyed, yeet, use, useFiber, useMemo } from '@use-gpu/live';
+import { schemaToArchetype } from '@use-gpu/core';
+import { useInspectHoverable, UI_SCHEMA } from '@use-gpu/workbench';
+
 import { evaluateDimension } from '../parse';
 import { isHorizontal, memoFit } from '../lib/util';
-import { useInspectHoverable } from '@use-gpu/workbench';
-
 import { INSPECT_STYLE } from '../lib/constants';
-import { ARCHETYPES } from '../lib/constants';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 import { chainTo } from '@use-gpu/shader/wgsl';
@@ -136,42 +136,48 @@ const Render = (
     const showThumb = showTrack && f < 1;
 
     const yeets: UIAggregate[] = [];
-    if (showTrack) yeets.push({
-      count: 1,
-      archetype: ARCHETYPES.scroll,
-
-      bounds: trackBox,
-      clip,
-      mask,
-      transform,
-      zIndex: z,
-
-      attributes: {
+    if (showTrack) {
+      const attributes = {
         rectangle: trackBox,
         uv: [0, 0, 1, 1],
         fill:   track as any,
         radius: [size/2, size/2, size/2, size/2] as Rectangle,
         ...(inspect ? INSPECT_STYLE.parent : undefined),
-      },
-    });
-    if (showThumb) yeets.push({
-      count: 1,
-      archetype: ARCHETYPES.scroll,
+      };
+      
+      yeets.push({
+        count: 1,
+        archetype: schemaToArchetype(UI_SCHEMA, attributes),
 
-      bounds: thumbBox,
-      clip,
-      mask,
-      transform,
-      zIndex: z,
-
-      attributes: {
+        attributes,
+        bounds: trackBox,
+        clip,
+        mask,
+        transform,
+        zIndex: z,
+      });
+    }
+    if (showThumb) {
+      const attributes = {
         rectangle: thumbBox,
         uv: [0, 0, 1, 1],
         fill:   thumb as any,
         radius: [size/2, size/2, size/2, size/2] as Rectangle,
         ...(inspect ? INSPECT_STYLE.parent : undefined),
-      },
-    });
+      };
+
+      yeets.push({
+        count: 1,
+        archetype: schemaToArchetype(UI_SCHEMA, attributes),
+
+        attributes,
+        bounds: thumbBox,
+        clip,
+        mask,
+        transform,
+        zIndex: z,
+      });
+    }
     return yeet(yeets);
   }, [...sizeRef, thumbTransform, overflow, isX, layout, origin, z, clip, mask, transform, inspect]);
 }

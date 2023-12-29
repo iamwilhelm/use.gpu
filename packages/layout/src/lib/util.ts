@@ -59,6 +59,7 @@ export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
     mask: ShaderModule | null,
     transform: ShaderModule | null,
   ) => {
+    if (z !== z) debugger;
     if (
       lastBox && sameBox(lastBox, box) &&
       lastOrigin && sameBox(lastOrigin, origin) &&
@@ -72,6 +73,7 @@ export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
     value = f(box, origin, z, clip, mask, transform);
     lastBox = box;
     lastOrigin = origin;
+    lastZ = z;
     lastClip = clip;
     lastMask = mask;
     lastTransform = transform;
@@ -82,6 +84,7 @@ export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
 type Inline<T> = (
   lines: InlineLine[],
   origin: Rectangle,
+  z: number,
   clip: ShaderModule | null,
   mask: ShaderModule | null,
   transform: ShaderModule | null,
@@ -90,6 +93,7 @@ type Inline<T> = (
 export const memoInline = <T>(f: Inline<T>): Inline<T> => {
   let lastHash: number | undefined;
   let lastOrigin: Rectangle | undefined;
+  let lastZ: number | undefined;
   let lastClip: ShaderModule | null | undefined;
   let lastMask: ShaderModule | null | undefined;
   let lastTransform: ShaderModule | null | undefined;
@@ -98,6 +102,7 @@ export const memoInline = <T>(f: Inline<T>): Inline<T> => {
   return (
     lines: InlineLine[],
     origin: Rectangle,
+    z: number,
     clip: ShaderModule | null,
     mask: ShaderModule | null,
     transform: ShaderModule | null,
@@ -107,15 +112,17 @@ export const memoInline = <T>(f: Inline<T>): Inline<T> => {
     if (
       lastHash && lastHash === hash &&
       lastOrigin && sameBox(lastOrigin, origin) &&
+      lastZ === z &&
       lastClip === clip &&
       lastMask === mask &&
       lastTransform === transform
     ) {
       return value!;
     }
-    value = f(lines, origin, clip, mask, transform);
+    value = f(lines, origin, z, clip, mask, transform);
     lastHash = hash;
     lastOrigin = origin;
+    lastZ = z;
     lastClip = clip;
     lastMask = mask;
     lastTransform = transform;
@@ -290,6 +297,7 @@ export const makeInlineLayout = (
 ) => (
   box: Rectangle,
   origin: Rectangle,
+  z: number,
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
   transform?: ShaderModule | null,
@@ -307,7 +315,7 @@ export const makeInlineLayout = (
 
   const out: LiveElement[] = [];
   const flush = (render: InlineRenderer) => {
-    const el = render(lines, origin, clip!, mask!, transform!, key);
+    const el = render(lines, origin, z, clip!, mask!, transform!, key);
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);
 

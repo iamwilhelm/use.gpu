@@ -213,6 +213,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
           render: memoLayout((
             box: Rectangle,
             origin: Rectangle,
+            z: number,
             parentClip: ShaderModule | null,
             parentMask: ShaderModule | null,
             parentTransform: ShaderModule | null,
@@ -228,6 +229,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
             const outside = {
               box,
               origin,
+              z,
               clip: parentClip,
               mask: parentMask,
               transform: parentTransform,

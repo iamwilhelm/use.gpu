@@ -5,10 +5,10 @@ import type { FontMetrics } from '@use-gpu/glyph';
 import type { InlineLine } from '../types';
 
 import { use, yeet, useContext, useMemo } from '@use-gpu/live';
-import { SDFFontProvider, useSDFFontContext } from '@use-gpu/workbench';
+import { SDFFontProvider, useSDFFontContext, UI_SCHEMA } from '@use-gpu/workbench';
 import { evaluateDimension } from '../parse';
 import { getOriginProjectionX, getOriginProjectionY } from '../lib/util';
-import { ARCHETYPES } from '../lib/constants';
+import { schemaToArchetype } from '@use-gpu/core';
 
 const BLACK = [0, 0, 0, 1];
 
@@ -153,7 +153,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
     return yeet({
       count,
-      archetype: ARCHETYPES.glyphs,
+      archetype: schemaToArchetype(UI_SCHEMA, attributes),
 
       attributes,
       bounds,

@@ -6,10 +6,11 @@ import type { LayoutRenderer, RenderInside, RenderOutside, RenderInline, InlineR
 import { memoArgs, yeet, fragment, use, useFiber, useMemo, useNoMemo } from '@use-gpu/live';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 import { toMurmur53 } from '@use-gpu/state';
+import { schemaToArchetype } from '@use-gpu/core';
+import { UI_SCHEMA } from '@use-gpu/workbench';
 
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
 import { INSPECT_STYLE } from './lib/constants';
-import { ARCHETYPES } from './lib/constants';
 
 const NO_OBJECT: any = {};
 
@@ -115,7 +116,7 @@ export const BoxLayout = memoRender((
 
     yeets.push({
       count: 1,
-      archetype: ARCHETYPES.inspect,
+      archetype: schemaToArchetype(UI_SCHEMA, attributes),
 
       attributes,
       transform: parentTransform,
@@ -146,7 +147,7 @@ export const BoxLayout = memoRender((
 
       yeets.push({
         count: 1,
-        archetype: ARCHETYPES.inspect,
+        archetype: schemaToArchetype(UI_SCHEMA, attributes),
 
         attributes,
         transform: xform,
@@ -221,16 +222,16 @@ export const InlineLayout = (
       rectangle: box,
       uv: [0, 0, 1, 1],
       repeat: 0,
+      ...INSPECT_STYLE.parent,
     };
 
     yeets.push({
       count: 1,
-      archetype: ARCHETYPES.inspect,
+      archetype: schemaToArchetype(UI_SCHEMA, attributes),
 
       attributes,
       transform,
       bounds: box,
-      ...INSPECT_STYLE.parent,
     });
 
     const [left, top] = box;
@@ -252,16 +253,16 @@ export const InlineLayout = (
         rectangle: layout,
         uv: [0, 0, 1, 1],
         repeat: 0,
+        ...INSPECT_STYLE.child
       };
 
       yeets.push({
         count: 1,
-        archetype: ARCHETYPES.inspect,
+        archetype: schemaToArchetype(UI_SCHEMA, attributes),
 
         attributes,
         transform,
         bounds: layout,
-        ...INSPECT_STYLE.child
       });
     }
 

@@ -5,7 +5,7 @@ import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, A
 import type { TraitProps } from '@use-gpu/traits';
 
 import { useProp } from '@use-gpu/traits/live';
-import { use, memo, gather, yeet, useFiber, useOne, useMemo } from '@use-gpu/live';
+import { keyed, fragment, use, memo, gather, yeet, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { getInlineMinMax, fitInline, resolveInlineBlockElements } from '../lib/inline';
 import { makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
@@ -104,8 +104,8 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
               mask: ShaderModule | null,
               transform: ShaderModule | null,
             ) => {
-              const el = use(InlineLayout, inline, {box, origin, z, clip, mask, transform}, hovered);
-              if (sizes.length) return [
+              const el = keyed(InlineLayout, id, inline, {box, origin, z, clip, mask, transform}, hovered);
+              if (blockSizes.length) return fragment([
                 el,
                 use(BoxLayout, inside, {
                   box,
@@ -115,7 +115,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
                   mask,
                   transform,
                 })
-              ];
+              ], id);
               return el;
             }),
             pick: makeBoxPicker(id, pickSizes, pickOffsets as any, pickPickers),

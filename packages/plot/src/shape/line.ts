@@ -6,7 +6,7 @@ import { schemaToArchetype, schemaToEmitters, adjustSchema } from '@use-gpu/core
 import { yeet, memo, keyed, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
-import { getLineSegments, useInspectHoverable, useTransformContext, useScissorContext, LineLayer, LINE_SCHEMA } from '@use-gpu/workbench';
+import { getLineSegments, useInspectHoverable, useTransformContext, useScissorContext, LineLayer, LINE_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
 import {
   LinesTrait,
@@ -16,6 +16,8 @@ import {
   StrokeTrait,
   ZIndexTrait,
 } from '../traits';
+
+const {quote} = LayerReconciler;
 
 const Traits = combine(
   LinesTrait,
@@ -94,7 +96,7 @@ export const RawLine: LiveComponent<LineProps> = (props) => {
       zIndex,
     },
   };
-  return yeet(shapes);
+  return quote(yeet(shapes));
 };
 
 export const Line = memo(RawLine, shouldEqual({

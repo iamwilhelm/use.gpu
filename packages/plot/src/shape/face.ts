@@ -6,7 +6,7 @@ import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
-import { getFaceSegments, useInspectHoverable, useTransformContext, FACE_SCHEMA } from '@use-gpu/workbench';
+import { getFaceSegments, useInspectHoverable, useTransformContext, FACE_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
 import {
   FacesTrait,
@@ -15,6 +15,8 @@ import {
   ROPTrait,
   ZIndexTrait,
 } from '../traits';
+
+const {quote} = LayerReconciler;
 
 const Traits = combine(
   FacesTrait,
@@ -92,7 +94,7 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
     },
   };
 
-  return yeet(shapes);
+  return quote(yeet(shapes));
 };
 
 export const Face = memo(RawFace, shouldEqual({

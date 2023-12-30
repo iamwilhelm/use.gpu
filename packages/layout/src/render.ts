@@ -3,14 +3,16 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { XY, XYZW, Rectangle } from '@use-gpu/core';
 import type { LayoutRenderer, RenderInside, RenderOutside, RenderInline, InlineRenderer, InlineLine, UIAggregate } from './types';
 
-import { memoArgs, yeet, fragment, use, useFiber, useMemo, useNoMemo } from '@use-gpu/live';
+import { memoArgs, yeet, fragment, use, useFiber, useMemo, useNoMemo, QUOTE } from '@use-gpu/live';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 import { toMurmur53 } from '@use-gpu/state';
 import { schemaToArchetype } from '@use-gpu/core';
-import { UI_SCHEMA } from '@use-gpu/workbench';
+import { UI_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
 import { INSPECT_STYLE } from './lib/constants';
+
+const {quote} = LayerReconciler;
 
 const NO_OBJECT: any = {};
 
@@ -96,11 +98,8 @@ export const BoxLayout = memoRender((
     const layout = [l, t, r, b] as Rectangle;
     const el = render(layout, origin, z, xclip, xmask, xform);
 
-    if (Array.isArray(el)) {
-      if (el.length > 1) out.push(fragment(el as any[]));
-      else out.push(el[0] as any);
-    }
-    else out.push(el);
+    if (Array.isArray(el)) for (const e of el) out.push(e);
+    else if (el) out.push(el);
   }
 
   if (inspect) {
@@ -155,11 +154,10 @@ export const BoxLayout = memoRender((
       });
     }
 
-    out.push(yeet(yeets));
+    out.push(quote(yeet(yeets)));
   }
 
-  if (out.length === 1 && Array.isArray(out[0])) return out[0];
-  return out;
+  return out.length ? out.length === 1 ? out[0] : out : null;
 }, 'BoxLayout');
 
 export const InlineLayout = (
@@ -179,10 +177,11 @@ export const InlineLayout = (
   let hash = miniHash(key || -1, miniHash(left, top));
 
   const out: LiveElement[] = [];
+  const els: LiveElement[] = [];
   const flush = (render: InlineRenderer) => {
     const el = render(lines, origin, z, clip!, mask!, transform!, hash);
-    if (Array.isArray(el)) out.push(...(el as any[]));
-    else out.push(el);
+    if (Array.isArray(el)) els.push(...(el as any[]));
+    else els.push(el);
     lines = [];
   };
 
@@ -213,6 +212,8 @@ export const InlineLayout = (
   }
 
   if (last) flush(last);
+
+  if (els.length) out.push(quote(els));
 
   if (inspect) {
     let i = 0;
@@ -266,10 +267,10 @@ export const InlineLayout = (
       });
     }
 
-    out.push(yeet(yeets));
+    out.push(quote(yeet(yeets)));
   }
 
-  return out;
+  return out.length ? out.length === 1 ? out[0] : out : null;
 };
 
 const rot = (a: number, b: number) => ((a << b) | (a >>> (32 - b))) >>> 0;

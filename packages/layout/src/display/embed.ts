@@ -6,13 +6,15 @@ import type { TraitProps } from '@use-gpu/traits';
 
 import { useProp } from '@use-gpu/traits/live';
 import { use, memo, gather, provide, yeet, useContext, useFiber } from '@use-gpu/live';
-import { LayoutContext, TransformContext } from '@use-gpu/workbench';
+import { LayoutContext, TransformContext, LayerReconciler } from '@use-gpu/workbench';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { memoFit, memoLayout } from '../lib/util';
 import { evaluateDimension } from '../parse';
 
 import { BoxTrait, useBoxTrait } from '../traits';
 import { parseDimension, parseMargin } from '../parse';
+
+const {quote} = LayerReconciler;
 
 export type EmbedProps =
   TraitProps<typeof BoxTrait> &
@@ -84,7 +86,7 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: PropsWithChildren<E
               id,
             )
           );
-        return yeet(view);
+        return quote(yeet(view));
       }),
     };
   };

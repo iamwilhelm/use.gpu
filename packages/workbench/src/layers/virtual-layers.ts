@@ -3,7 +3,7 @@ import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@u
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 import type { LayerAggregator, LayerAggregate } from './types';
 
-import { use, keyed, fragment, yeet, provide, multiGather, quoteTo, signalTo, reconcileTo, extend, useMemo, useOne } from '@use-gpu/live';
+import { use, keyed, fragment, yeet, provide, multiGather, unquote, extend, useMemo, useOne } from '@use-gpu/live';
 import { mixBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 
@@ -11,8 +11,7 @@ import { DeviceContext } from '../providers/device-provider';
 import { TransformContext } from '../providers/transform-provider';
 import { MaterialContext } from '../providers/material-provider';
 import { ScissorContext } from '../providers/scissor-provider';
-import { QueueReconciler } from '../reconcilers';
-import { LayerReconciler } from '../reconcilers';
+import { LayerReconciler, QueueReconciler } from '../reconcilers';
 
 import { useAggregator } from '../hooks/useAggregator';
 
@@ -44,43 +43,19 @@ const ORDER = {};
 
 /** Aggregate (point / line / face) geometry from children to produce merged layers. */
 export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props: VirtualLayersProps) => {
+  const {reconcile, quote} = LayerReconciler;
+
   const {zBias, items, children} = props;
-  return items ? Resume(items) : children ? multiGather(children, Resume) : null;
-};
-
-const provideContext = (
-  element: LiveElement,
-  item?: LayerAggregate,
-  refSources?: Record<string, ShaderSource>,
-) => {
-  if (!element) return null;
-  const {material, scissor, transform} = item;
-
-  const hasRefTransform = !!refSources?.matrices;
-  const hasTransform = !!transform?.key;
-  const hasMaterial = !!material;
-  const hasScissor = !!scissor;
-
-  let view = element;
-  if (hasRefTransform) {
-    view = use(IndexedTransform, {...refSources, children: view});
-  }
-  if (hasTransform) {
-    view = provide(TransformContext, transform, view, element.key);
-  }
-  if (hasMaterial) {
-    view = provide(MaterialContext, material, view, element.key);
-  }
-  if (hasScissor) {
-    view = provide(ScissorContext, scissor, view, element.key);
-  }
-  return view;
+  return items ? Resume(items) : children ? (
+    reconcile(quote(multiGather(unquote(children), Resume)))
+  ) : null;
 };
 
 const Resume = (
   aggregates: Record<string, LayerAggregate[]>,
 ) => useOne(() => {
-  const els: LiveElement[] = [signalTo(QueueReconciler)];
+  const {signal} = QueueReconciler;
+  const els: LiveElement[] = [signal()];
 
   const types = Object.keys(aggregates);
   types.sort((a, b) => (ORDER[a] || 0) - (ORDER[b] || 0));
@@ -114,6 +89,7 @@ const Aggregate: LiveFunction<any> = (
   const [item] = items;
   const {flags} = item;
   const {schema, component} = layerAggregator;
+  const {quote} = QueueReconciler;
 
   const {count, sources, uploadRefs} = useAggregator(item.schema ?? schema, items);
 
@@ -126,10 +102,39 @@ const Aggregate: LiveFunction<any> = (
     const element = use(component, props);
     const layer = provideContext(element, item, sources);
 
-    const upload = useOne(() => uploadRefs ? quoteTo(QueueReconciler, yeet(uploadRefs)) : null, uploadRefs);
+    const upload = useOne(() => uploadRefs ? quote(yeet(uploadRefs)) : null, uploadRefs);
     return upload ? [upload, layer] : layer;
     // Exclude flags and contexts because they are factored into the archetype
   }, [count, sources, uploadRefs]);
+};
+
+const provideContext = (
+  element: LiveElement,
+  item?: LayerAggregate,
+  refSources?: Record<string, ShaderSource>,
+) => {
+  if (!element) return null;
+  const {material, scissor, transform} = item;
+
+  const hasRefTransform = !!refSources?.matrices;
+  const hasTransform = !!transform?.key;
+  const hasMaterial = !!material;
+  const hasScissor = !!scissor;
+
+  let view = element;
+  if (hasRefTransform) {
+    view = use(IndexedTransform, {...refSources, children: view});
+  }
+  if (hasTransform) {
+    view = provide(TransformContext, transform, view, element.key);
+  }
+  if (hasMaterial) {
+    view = provide(MaterialContext, material, view, element.key);
+  }
+  if (hasScissor) {
+    view = provide(ScissorContext, scissor, view, element.key);
+  }
+  return view;
 };
 
 const getItemTypeKey = (item: LayerAggregate) =>

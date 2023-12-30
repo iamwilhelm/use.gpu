@@ -5,7 +5,7 @@ import type { LayoutElement, FitInto, Dimension, Direction, MarginLike, Margin }
 import type { TraitProps } from '@use-gpu/traits';
 
 import { useProp, shouldEqual, sameArray, sameShallow } from '@use-gpu/traits/live';
-import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
+import { keyed, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { isHorizontal, makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
@@ -110,7 +110,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
             mask?: ShaderModule | null,
             transform?: ShaderModule | null,
           ) => (
-            sizes.length ? use(BoxLayout, inside, {box, origin, z: z + zIndex, clip, mask, transform}, hovered) : null
+            sizes.length ? keyed(BoxLayout, id, inside, {box, origin, z: z + zIndex, clip, mask, transform}, hovered) : null
           ),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };

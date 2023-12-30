@@ -5,7 +5,7 @@ import type { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentL
 import type { TraitProps } from '@use-gpu/traits';
 
 import { useProp } from '@use-gpu/traits/live';
-import { use, yeet, memo, gather, useFiber, useMemo } from '@use-gpu/live';
+import { keyed, yeet, memo, gather, useFiber, useMemo } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
 import { makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
@@ -112,7 +112,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
             mask?: ShaderModule | null,
             transform?: ShaderModule | null,
           ) => (
-            sizes.length ? use(BoxLayout, inside, {box, origin, z: z + zIndex, clip, mask, transform}, hovered) : null
+            sizes.length ? keyed(BoxLayout, id, inside, {box, origin, z: z + zIndex, clip, mask, transform}, hovered) : null
           ),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };

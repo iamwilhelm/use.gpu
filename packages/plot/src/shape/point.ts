@@ -6,7 +6,9 @@ import { adjustSchema, schemaToArchetype, schemaToAttributes } from '@use-gpu/co
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
-import { useInspectHoverable, useTransformContext, POINT_SCHEMA } from '@use-gpu/workbench';
+import { useInspectHoverable, useTransformContext, POINT_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
+
+const {quote} = LayerReconciler;
 
 //import { PointLayer } from '@use-gpu/workbench';
 //import { DataContext } from '../providers/data-provider';
@@ -87,7 +89,7 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
     },
   };
 
-  return yeet(shapes);
+  return quote(yeet(shapes));
 }, shouldEqual({
   position: sameShallow(sameShallow()),
   color: sameShallow(),

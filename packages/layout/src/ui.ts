@@ -7,10 +7,10 @@ import {
   useAggregator, useBufferedSize,
   SDFFontProvider,
   UIRectangles,
-  QueueReconciler,
+  QueueReconciler, LayerReconciler,
   UI_SCHEMA,
 } from '@use-gpu/workbench';
-import { use, keyed, wrap, fragment, yeet, gather, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, wrap, fragment, yeet, gather, unquote, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { mixBits53, hashBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 import { overlapBounds, joinBounds } from './lib/util';
@@ -28,15 +28,20 @@ export type UILayersProps = {
 };
 
 export const UI: LC<UIProps> = (props) => {
+  const {reconcile, quote} = LayerReconciler;
   const {children} = props;
 
   return (
-    gather(
-      wrap(SDFFontProvider, children),
-      (items: (UIAggregate | null)[]) => {
-        if (!Array.isArray(items)) items = [items];
-        return UILayers({items});
-      },
+    reconcile(
+      quote(
+        gather(
+          wrap(SDFFontProvider, unquote(children)),
+          (items: (UIAggregate | null)[]) => {
+            if (!Array.isArray(items)) items = [items];
+            return UILayers({items});
+          }
+        )
+      )
     )
   );
 };
@@ -44,6 +49,7 @@ export const UI: LC<UIProps> = (props) => {
 export const UILayers: LC<UILayersProps> = ({
   items,
 }: UILayersProps) => {
+  const {signal} = QueueReconciler;
   if (items.length === 0) return null;
 
   const partitioner = makePartitioner();

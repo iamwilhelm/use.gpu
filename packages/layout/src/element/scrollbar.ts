@@ -15,9 +15,11 @@ import { INSPECT_STYLE } from '../lib/constants';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 import { chainTo } from '@use-gpu/shader/wgsl';
-import { useShader } from '@use-gpu/workbench';
+import { useShader, LayerReconciler } from '@use-gpu/workbench';
 
 import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
+
+const {quote} = LayerReconciler;
 
 export type ScrollBarProps = {
   direction?: Direction,
@@ -66,7 +68,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
         mask?: ShaderModule,
         transform?: ShaderModule,
       ) => (
-        use(Render, sizeRef, scrollRef, overflow, size, track, thumb, isX, layout, origin, z, clip, mask, transform, hovered)
+        quote(use(Bar, sizeRef, scrollRef, overflow, size, track, thumb, isX, layout, origin, z, clip, mask, transform, hovered))
       ),
       /*
       pick: (x: number, y: number, l: number, t: number, r: number, b: number, scroll?: boolean) => {
@@ -86,7 +88,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
   });
 };
 
-const Render = (
+const Bar = (
   sizeRef: XYZW,
   scrollRef: XY,
 
@@ -105,8 +107,6 @@ const Render = (
 
   inspect?: boolean,
 ) => {
-  const {id} = useFiber();
-
   const shift = useMemo(() => isX
     ? () => [scrollRef[0] / sizeRef[2] * sizeRef[0], 0]
     : () => [0, scrollRef[1] / sizeRef[3] * sizeRef[1]],

@@ -4,7 +4,7 @@ import type { Rectangle } from '@use-gpu/core';
 import type { LayoutElement, FitInto, Dimension, Direction } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
-import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
+import { memo, gather, keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
 import { makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
@@ -75,7 +75,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
             mask?: ShaderModule | null,
             transform?: ShaderModule | null,
           ) => (
-            sizes.length ? use(BoxLayout, inside, {box, origin, z: z + zIndex, clip, mask, transform}, hovered) : null
+            sizes.length ? keyed(BoxLayout, id, inside, {box, origin, z: z + zIndex, clip, mask, transform}, hovered) : null
           ),
           pick: makeBoxPicker(id, sizes, offsets, pickers, undefined, undefined, false),
         };

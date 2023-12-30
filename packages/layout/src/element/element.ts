@@ -4,9 +4,9 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 import type { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoXY, ImageTrait } from '../types';
 
-import { use, keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
+import { use, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { evaluateDimension } from '../parse';
-import { useInspectHoverable } from '@use-gpu/workbench';
+import { useInspectHoverable, LayerReconciler } from '@use-gpu/workbench';
 
 import type { BoxTrait, ElementTrait, RefProps } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
@@ -14,6 +14,8 @@ import { INSPECT_STYLE } from '../lib/constants';
 import { memoLayout } from '../lib/util';
 
 import { UIRectangle } from '../shape/ui-rectangle';
+
+const {quote} = LayerReconciler;
 
 export type ElementProps = Partial<BoxTrait> & Partial<ElementTrait> & Partial<RefProps> & {
   snap?: boolean,
@@ -38,10 +40,11 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
   const w = typeof width === 'number' ? width : 0;
   const h = typeof height === 'number' ? height : 0;
 
-  const {id} = useFiber();
   const sizing = [w, h, w, h];
 
   const hovered = useInspectHoverable();
+
+  const {id} = useFiber();
 
   const fit = (into: AutoXY) => {
     const w = width != null ? evaluateDimension(width, into[0] || 0, snap) : into[0] || 0;
@@ -56,7 +59,7 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
       mask: ShaderModule | null,
       transform: ShaderModule | null,
     ): LiveElement => (
-      keyed(UIRectangle, id, {
+      quote(use(UIRectangle, {
         layout,
         origin,
 
@@ -70,8 +73,9 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
         mask,
         transform,
         zIndex: z + zIndex,
-      })
-    ));
+      }),
+      id
+    )));
 
     return {
       size,

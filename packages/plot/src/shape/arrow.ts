@@ -6,7 +6,7 @@ import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
-import { getArrowSegments, useInspectHoverable, useTransformContext, ARROW_SCHEMA } from '@use-gpu/workbench';
+import { getArrowSegments, useInspectHoverable, useTransformContext, ARROW_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
 import {
   ArrowsTrait,
@@ -16,6 +16,8 @@ import {
   StrokeTrait,
   ZIndexTrait,
 } from '../traits';
+
+const {quote} = LayerReconciler;
 
 const Traits = combine(
   ArrowsTrait,
@@ -100,7 +102,7 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
     },
   };
 
-  return yeet(shapes);
+  return quote(yeet(shapes));
 }, shouldEqual({
   position: sameShallow(sameShallow()),
   color: sameShallow(),

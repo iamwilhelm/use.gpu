@@ -13,7 +13,7 @@ import {
   LayoutContext, useTransformContext,
   useInspectable, useInspectHoverable, useInspectorSelect, Inspector,
   useShader, useNoShader,
-  QueueReconciler,
+  QueueReconciler, LayerReconciler,
   UI_SCHEMA,
 } from '@use-gpu/workbench';
 
@@ -24,8 +24,6 @@ import { UIRectangle } from './shape/ui-rectangle';
 import { INSPECT_STYLE, ARCHETYPES } from './lib/constants';
 
 import { mat4, vec2, vec3 } from 'gl-matrix';
-
-const {signal} = QueueReconciler;
 
 export type LayoutProps = {
   width?: number,
@@ -129,6 +127,8 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
       offsets,
     },
   });
+
+  const {quote} = LayerReconciler;
   if (hovered) {
     const attributes = {
       rectangle: layout,
@@ -137,12 +137,12 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
       ...INSPECT_STYLE.parent,
     };
     
-    out.push(yeet({
+    out.push(quote(yeet({
       count: 1,
       archetype: schemaToArchetype(UI_SCHEMA, attributes),
       attributes,
       transform,
-    }));
+    })));
   }
 
   // Add scroll listener
@@ -197,6 +197,7 @@ export const Scroller = (pickers: any[], flip: [number, number], shift: [number,
     }
   }, wheel);
 
+  const {signal} = QueueReconciler;
   return useOne(() => signal(), version);
 }
 

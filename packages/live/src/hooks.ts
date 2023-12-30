@@ -65,7 +65,8 @@ export const useFiber = () => {
   if (!fiber) throw new Error(`Live Hook called outside of rendering cycle in ${formatNode(fiber)}.\n\nMake sure you are not accidentally running two copies of '@use-gpu/live' side-by-side. Check your 'node_modules/'.`);
   return fiber;
 }
-export const useNoFiber = () => {};
+
+export const useFiberId = () => useFiber().id;
 
 export const useNoHook = (hookType: Hook) => () => {
   const fiber = useFiber();
@@ -493,35 +494,6 @@ export const useNoCapture = <C>(
 
   state![i + 1] = undefined;
 }
-
-/**
- * Detect context on a fiber without depending on it
- */
-export const useHasContext = <C>(
-  context: LiveContext<C>,
-): boolean => {
-  const fiber = useFiber();
-
-  const {context: {roots}} = fiber;
-  const root = roots.get(context);
-  return !!root;
-}
-
-/**
- * Detect context on a fiber without depending on it
- */
-export const useHasCapture = <C>(
-  capture: LiveCapture<C>,
-): boolean => {
-  const fiber = useFiber();
-
-  const {context: {roots}} = fiber;
-  const root = roots.get(capture);
-  return !!root;
-}
-
-export const useNoHasContext = () => {};
-export const useNoHasCapture = () => {};
 
 /**
  * Memoize a hook with given dependencies

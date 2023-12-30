@@ -6,11 +6,13 @@ import type { Base, InlineLine } from '../types';
 
 import { useProp } from '@use-gpu/traits/live';
 import { parseColor, parseNumber } from '@use-gpu/parse';
-import { memo, keyed, yeet, useFiber } from '@use-gpu/live';
+import { memo, use, yeet, useFiber } from '@use-gpu/live';
 
-import { useFontFamily, useFontText, useFontHeight } from '@use-gpu/workbench';
+import { useFontFamily, useFontText, useFontHeight, LayerReconciler } from '@use-gpu/workbench';
 import { Glyphs } from '../shape/glyphs';
 import { memoInline } from '../lib/util';
+
+const {quote} = LayerReconciler;
 
 export type TextProps = {
   /*
@@ -69,7 +71,6 @@ export const Text: LiveComponent<TextProps> = memo((props) => {
   const color = useProp(props.color, parseColor, BLACK);
   const opacity = useProp(props.opacity, parseNumber, 1);
 
-  const {id} = useFiber();
   return yeet({
     spans,
     height,
@@ -82,8 +83,7 @@ export const Text: LiveComponent<TextProps> = memo((props) => {
       mask: ShaderModule | null,
       transform: ShaderModule | null,
     ) => (
-      keyed(Glyphs, id, {
-        id,
+      use(Glyphs, {
         font,
         color: color as any,
         opacity,

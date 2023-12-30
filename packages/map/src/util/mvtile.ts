@@ -1,10 +1,9 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { MVTStyleSheet, MVTStyleProperties } from '../types';
+import type { VectorTile } from 'mapbox-vector-tile';
 
-import { gather, use, yeet, useMemo, useOne } from '@use-gpu/live';
-import { cutPolygon, cutPolygons, getRingArea } from './tess';
+import { cutPolygons } from './tesselate';
 import earcut from 'earcut';
-import { VectorTile } from 'mapbox-vector-tile';
 
 type Vec2 = {x: number, y: number};
 
@@ -27,10 +26,27 @@ export const getMVTShapes = (
   const {layers} = mvt;
 
   const shapes = {
-    point: [] as any[],
-    line: [] as any[],
-    face: [] as any[],
-    label: [] as any[],
+    point: {
+      positions: [],
+      color: [],
+      width: [],
+      depth: [],
+      zBias: [],
+    },
+    line: {
+      positions: [],
+      color: [],
+      width: [],
+      depth: [],
+      zBias: [],
+    },
+    face: {
+      positions: [],
+      color: [],
+      width: [],
+      depth: [],
+      zBias: [],
+    },
   };
 
   const addPoint = (
@@ -39,23 +55,24 @@ export const getMVTShapes = (
     style: MVTStyleProperties,
     toPoint4: (xy: XY) => XYZW,
   ) => {
+    return;
     const positions = geometry.map(({x, y}: Vec2) => toPoint4([x, y]));
-    const count = positions.length / 4;
     if (style.point) {
       if (properties.name) {
+        /*
         shapes.label.push({
           position: positions,
           text: properties.name,
           color: style.point.color,
         });
+        */
       }
       else {
-        shapes.point.push({
-          count,
-          positions,
-          color: style.point.color,
-          size: style.point.size,
-        });
+        shapes.point.positions.push(positions);
+        shapes.point.color.push(style.point.color);
+        shapes.point.size.push(style.point.size);
+        shapes.point.depth.push(style.point.depth);
+        shapes.point.zBias.push(style.point.zBias);
       }
     }
   }
@@ -66,26 +83,27 @@ export const getMVTShapes = (
     style: MVTStyleProperties,
     toPoint4: (xy: XY) => XYZW,
   ) => {
-    const positions = geometry.flatMap((path) => path.flatMap(({x, y}: Vec2) => toPoint4([x, y])));
-    const count = geometry.reduce((a, b) => a + b.length, 0);
+    const positions = geometry.map((path) => path.map(({x, y}: Vec2) => toPoint4([x, y])));
 
     if (properties.name) {
+      /*
       shapes.label.push({
         positions,
         text: properties.name,
         color: style.line.color,
       });
+      */
     }
     else {
-      shapes.line.push({
-        count,
-        positions,
-        segments: geometry.flatMap((path) => path.map((_, i) => i === 0 ? 1 : i === path.length - 1 ? 2 : 3)),
-        color: style.line.color,
-        width: style.line.width,
-        depth: style.line.depth,
-        zBias: style.line.zBias,
-      });
+      shapes.line.positions.push(...positions);
+
+      const n = geometry.length;
+      for (let i = 0; i < n; ++i) {
+        shapes.line.color.push(style.line.color);
+        shapes.line.width.push(style.line.width);
+        shapes.line.depth.push(style.line.depth);
+        shapes.line.zBias.push(style.line.zBias);
+      }
     }
   }
 
@@ -100,54 +118,29 @@ export const getMVTShapes = (
     if (tesselate > 0) geometry = tesselateGeometry(geometry, [0, 0, extent, extent], tesselate);
 
     if (style.face.fill) {
-      for (const polygon of geometry) {
-        const polygon4 = polygon.map((ring: XY[]) => ring.map((p: XY, i: number) => toPoint4(p)));
+      const positions = geometry.map(polygon => polygon.map((ring: XY[]) => ring.map((p: XY, i: number) => toPoint4(p))));
 
-        const data = earcut.flatten(polygon4);
-        if (!data.vertices.length) continue;
-
-        const triangles = earcut(data.vertices, data.holes, data.dimensions);
-        if (!triangles.length) continue;
-
-        shapes.face.push({
-          count: data.vertices.length / 4,
-          positions: data.vertices,
-          indices: triangles,
-          color: style.face.fill,
-          zBias: style.face.zBias,
-          cullMode: 'back',
-        });
+      shapes.face.positions.push(...positions);
+      const n = geometry.length;
+      for (let i = 0; i < n; ++i) {
+        shapes.face.color.push(style.face.fill);
+        shapes.face.depth.push(style.face.depth);
+        shapes.face.zBias.push(style.face.zBias);
       }
     }
 
     if (style.face.stroke) {
-      originalGeometry.map((polygon: XY[][]) => polygon.map((ring: XY[]) => {
-        ring.push(ring[0]);
-      }));
+      const positions = originalGeometry.flatMap(polygon => polygon.map((ring: XY[]) => ring.map((p: XY, i: number) => toPoint4(p))));
+      shapes.line.positions.push(...positions);
 
-      for (const polygon of originalGeometry) {
-        const polygon4 = polygon.flatMap((ring: XY[]) => ring.flatMap((p: XY, i: number) => toPoint4(p)));
-        shapes.line.push({
-          count: polygon4.length / 4,
-          positions: polygon4,
-          segments: polygon.flatMap((path: XY[]) => path.map((p: XY, i: number) => {
-            const next = path[i + 1] ?? path[i + 1 - path.length];
-            return (
-              (p[0] <= 0 && next[0] <= 0) || (p[0] >= extent && next[0] >= extent) ||
-              (p[1] <= 0 && next[1] <= 0) || (p[1] >= extent && next[1] >= extent) ? 0 :
-              i === 0 ? 1 :
-              i === path.length - 1 ? 2 :
-              3
-            );
-          })),
-          color: style.face.stroke,
-          width: style.face.width,
-          depth: style.face.depth,
-          zBias: style.face.zBias + style.face.width,
-        });
+      const n = geometry.length;
+      for (let i = 0; i < n; ++i) {
+        shapes.line.color.push(style.line.stroke);
+        shapes.line.width.push(style.line.width);
+        shapes.line.depth.push(style.line.depth);
+        shapes.line.zBias.push(style.line.zBias);
       }
     }
-
   };
 
   const toPoint4 = ([x, y]: XY): XYZW => [
@@ -170,6 +163,11 @@ export const getMVTShapes = (
     //console.log("layer", name, layer, length)
 
     for (let i = 0; i < length; ++i) {
+      if (i == 0) continue;
+
+
+
+
       const feature = layer.feature(i);
       const {type: t, properties, extent} = feature;
 
@@ -215,7 +213,9 @@ export const getMVTShapes = (
     }
   }
 
-  //console.log({unstyled})
+  if (!shapes.point.positions.length) delete shapes.point;
+  if (!shapes.line.positions.length)  delete shapes.line;
+  if (!shapes.face.positions.length)  delete shapes.face;
 
   return shapes;
 };

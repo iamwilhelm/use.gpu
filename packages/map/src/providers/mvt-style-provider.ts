@@ -3,10 +3,8 @@ import type { ColorLike } from '@use-gpu/core';
 import type { MVTStyleProperties } from '../types';
 
 import { patch } from '@use-gpu/state';
-import { parseNumber, parseColor } from '@use-gpu/parse';
+import { parseColor } from '@use-gpu/parse';
 import { provide, makeContext, useContext, useNoContext, useOne } from '@use-gpu/live';
-
-import { DEFAULT_STYLE_SHEET } from '../style';
 
 export type MVTStyleContextProps = Record<string, MVTStyleProperties>;
 
@@ -40,45 +38,39 @@ const DEFAULT_STYLE: MVTStyleProperties = {
   },
 };
 
-for (let k in DEFAULT_STYLE_SHEET) {
-  // @ts-ignore
-  DEFAULT_STYLE_SHEET[k] = patch(DEFAULT_STYLE_SHEET[k], {$apply: x => patch(DEFAULT_STYLE, x)});
-}
-
-export const MVTStyleContext = makeContext<MVTStyleContextProps>(patch({
+export const MVTStyleContext = makeContext<MVTStyleContextProps>({
   default: DEFAULT_STYLE,
-} as MVTStyleContextProps, DEFAULT_STYLE_SHEET), 'MVTStyleContext');
+}, 'MVTStyleContext');
 
 export const useMVTStyleContext = () => useContext<MVTStyleContextProps>(MVTStyleContext);
 export const useNoMVTStyleContext = () => useNoContext(MVTStyleContext);
 
-export type MVTStyleProps = {
-  styles: MVTStyleContextProps,
+export type MVTStylesProps = {
+  styles: DeepPartial<MVTStyleContextProps>,
 };
 
-export const MVTStyle: LiveComponent<MVTStyleProps> = (props: PropsWithChildren<MVTStyleProps>) => {
+export const MVTStyles: LiveComponent<MVTStylesProps> = (props: PropsWithChildren<MVTStylesProps>) => {
   const {styles, children} = props;
 
   const context = useOne(() => {
     const parseStyle = (style: any, def: any) => {
       const out = patch(def, style);
-      if (style.face.fill) out.face.fill = parseColor(style.face.fill);
-      if (style.face.stroke) out.face.stroke = parseColor(style.face.stroke);
-      if (style.point.color) out.point.color = parseColor(style.point.color);
-      if (style.line.color) out.line.color = parseColor(style.line.color);
+      if (style.face?.fill) out.face.fill = parseColor(style.face.fill);
+      if (style.face?.stroke) out.face.stroke = parseColor(style.face.stroke);
+      if (style.point?.color) out.point.color = parseColor(style.point.color);
+      if (style.line?.color) out.line.color = parseColor(style.line.color);
       return out;
     };
 
     const out: MVTStyleContextProps = {
       default: parseStyle(styles.default ?? {}, DEFAULT_STYLE),
     };
-    const def = out.default;
 
-    for (const k in styles) {
-      if (k !== 'default') {
-        out[k] = parseStyle(styles[k], def);
-      }
+    const def = out.default;
+    for (const k in styles) if (k !== 'default') {
+      out[k] = parseStyle(styles[k], def);
     }
+
     return out;
   }, styles);
 

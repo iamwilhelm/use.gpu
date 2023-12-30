@@ -41,8 +41,8 @@ export type PolygonProps = TraitProps<typeof Traits> &
 export const Polygon: LiveComponent<PolygonProps> = memo((props) => {
   const {fill, fills, stroke, strokes} = props;
   return [
-    use(RawFace, {...props, color: fill, colors: fills, concave: true}),
-    use(RawLine, {...props, color: stroke, colors: strokes, loop: true}),
+    fill ?? fills ? use(RawFace, {...props, color: fill, colors: fills, concave: true}) : null,
+    stroke ?? strokes ? use(RawLine, {...props, color: stroke, colors: strokes, loop: true}) : null,
   ];
 }, shouldEqual({
   position: sameShallow(sameShallow()),

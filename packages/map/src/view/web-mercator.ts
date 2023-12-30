@@ -1,7 +1,6 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { Swizzle } from '@use-gpu/plot';
 
-import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
 import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
@@ -21,6 +20,8 @@ import { GeographicTrait } from '../traits';
 import { EARTH_CIRCUMFERENCE, toRad } from '../util/tiles';
 
 import { getWebMercatorPosition } from '@use-gpu/wgsl/transform/web-mercator.wgsl';
+
+const {signal} = QueueReconciler;
 
 const Traits = combine(AxesTrait, GeographicTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);

@@ -13,8 +13,9 @@ import {
   Plot, Spherical, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 import {
-  WebMercator, MVTiles, MapboxProvider, MapTileProvider,
+  WebMercator, MVTiles, MVTStyles, MapboxProvider, MapTileProvider,
 } from '@use-gpu/map';
+import { parseColor } from '@use-gpu/parse';
 
 import { PlotControls } from '../../ui/plot-controls';
 
@@ -35,6 +36,40 @@ const thetaFormatter = (θ: number) => {
 
 const USE_MAPBOX = false;
 
+export const styleSheet = {
+  water: {
+    face: {
+      stroke: parseColor('#a0a7ff'),
+      fill: parseColor('#30407f'),
+      width: 3,
+      depth: 0.5,
+      zBias: 3,
+    }
+  },
+  admin: {
+    line: {
+      color: parseColor('#8087ff'),
+      width: 2,
+      depth: 0.5,
+      zBias: 2,
+    },
+  },
+  road: {
+    line: {
+      color: parseColor('#50579f'),
+      width: 2,
+      depth: 0.5,
+      zBias: 2,
+    },
+  },
+  background: {
+    face: {
+      fill: parseColor('#0a0a10'),
+      zBias: -100,
+    }
+  },
+};
+
 // @ts-ignore
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -44,7 +79,7 @@ const accessToken = process.env.MAPBOX_TOKEN;
 export const MapWebMercatorPage: LC = () => {
 
   const base = isDevelopment ? '/' : '/demo/';
-  const url = base + "tiles/:zoom-:x-:y.mvt";
+  const url = base + "tiles/{zoom}-{x}-{y}.mvt";
 
   const tracks = {
     zoom: [
@@ -98,6 +133,7 @@ export const MapWebMercatorPage: LC = () => {
           <Pass>
             <Plot>
               <Animate
+                paused
                 loop
                 delay={1}
                 speed={2}
@@ -115,15 +151,17 @@ export const MapWebMercatorPage: LC = () => {
                   scissor
                   native
                 >
-                  {USE_MAPBOX ? (
-                    <MapboxProvider accessToken={accessToken}>
-                      <MVTiles />
-                    </MapboxProvider>
-                  ) : (
-                    <MapTileProvider url={url}>
-                      <MVTiles detail={3} />
-                    </MapTileProvider>
-                  )}
+                  <MVTStyles styles={styleSheet}>
+                    {USE_MAPBOX ? (
+                      <MapboxProvider accessToken={accessToken}>
+                        <MVTiles detail={2} />
+                      </MapboxProvider>
+                    ) : (
+                      <MapTileProvider url={url}>
+                        <MVTiles detail={2} maxLevel={3} />
+                      </MapTileProvider>
+                    )}
+                  </MVTStyles>
                 </WebMercator>
                 <WebMercator
                   bend={0}
@@ -151,6 +189,7 @@ export const MapWebMercatorPage: LC = () => {
                     color={[0.75, 0.75, 0.75, 1]}
                     depth={0.5}
                     detail={64}
+                    zBias={20}
                   />
                   <Scale
                     unit={360}
@@ -174,6 +213,7 @@ export const MapWebMercatorPage: LC = () => {
                     color={[0.75, 0.75, 0.75, 1]}
                     detail={32}
                     depth={0.5}
+                    zBias={20}
                   />
                   <Scale
                     origin={[45, 0, 0]}

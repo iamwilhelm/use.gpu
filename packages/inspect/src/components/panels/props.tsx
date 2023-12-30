@@ -136,7 +136,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, api}) => {
         return parents.map((fiber) => renderFiberButton(fiber, fibers, api));
       }
     }
-    return '[Runtime]';
+    return null;
   };
 
   let [quote, setQuote] = useState(getQuote);
@@ -144,7 +144,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, api}) => {
   useLayoutEffect(() => {
     const h = getHistory();
     const q = getQuote();
-    if (h.map(h => h?.key).join('/') !== history.map(h => h?.key).join('/')) setHistory(h);
+    if (h?.map(h => h?.key).join('/') !== history?.map(h => h?.key).join('/')) setHistory(h);
     if (q?.key !== quote?.key) setQuote(q);
   });
 
@@ -168,8 +168,10 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, api}) => {
       <div>{quote}</div>
     </>) : null}
     <Spacer />
-    <div><b>Rendered By</b></div>
-    <div>{history}</div>
+    {history ? (<>
+      <div><b>Rendered By</b></div>
+      <div>{history}</div>
+    </>) : null}
   </>);
 }
 

@@ -88,6 +88,7 @@ export const AxisTrait = trait(
   {
     axis:  parseAxis,
     range: optional(parseRange),
+    zBias: optional(parseNumber),
   },
   {
     axis: 'x',
@@ -118,6 +119,7 @@ export const GridTrait = trait(
   {
     axes:  parseAxes,
     range: optional(parseRanges),
+    zBias: optional(parseNumber),
   },
   {
     axes: 'xy',

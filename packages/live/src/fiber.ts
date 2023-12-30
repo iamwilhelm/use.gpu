@@ -939,6 +939,8 @@ export const mountFiberQuote = <F extends ArrowFunction>(
     to.fork = true;
   }
 
+  pingFiber(to, false);
+
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
   reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
   fiber.quote = quote;
@@ -964,6 +966,8 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
     next.unquote = null;
     to.fork = true;
   }
+
+  pingFiber(to, false);
 
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
   reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);

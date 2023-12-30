@@ -120,7 +120,7 @@ const maybeMultiMultiVectorArray = <T extends TypedArrayConstructor>(
     const groups = chunk.length;
 
     for (let j = 0; j < groups; j++) {
-      n += chunk[i].length;
+      n += chunk[j].length;
     }
   }
 

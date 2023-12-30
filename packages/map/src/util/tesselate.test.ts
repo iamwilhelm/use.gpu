@@ -1,4 +1,4 @@
-import { cutPolygon, cutRing, assembleCutRing, getRingArea, pointInRing } from './tess';
+import { cutPolygon, cutRing, assembleCutRing, getRingArea, pointInRing } from './tesselate';
 
 describe("tesselate", () => {
 

@@ -75,6 +75,7 @@ export const LayoutGlyphPage: LC = () => {
               active={true}
               zoom={2}
               minZoom={0.25}
+              maxZoom={400}
               anchor={[0, 0]}
               render={(x, y, zoom) =>
                 <Morph>
@@ -288,7 +289,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
 
   return (
     <DebugProvider debug={{sdf2d: {subpixel, contours, preprocess, postprocess, solidify: true}}}>
-      <InfoBox>Extremely zoomable &lt;Flex&gt; layout with diagrams inside the pixels. Use &lt;Sampler&gt; to produce dense and sparse data sets.</InfoBox>
+      <InfoBox>Extremely zoomable diagram with detail inside the pixels. Use &lt;Sampler&gt; to produce dense and sparse data sets and render them in a &lt;Flex&gt; layout.</InfoBox>
       <LinearRGB backgroundColor={BACKGROUND}>
         <Pass>
           <UI>

@@ -34,18 +34,21 @@ export const Plot2DPage: LC = () => {
           <Plot>
             <Transform position={[100, 100]}>
 
+              {/* Single point */}
               <Point
                 position={[50, 50]}
                 size={20}
                 color={'#ffffff'}
               />
 
+              {/* Multiple points */}
               <Point
                 positions={[[50, 100], [50, 130], [50, 160], [50, 190], [50, 220]]}
                 size={10}
                 color={'#3090ff'}
               />
 
+              {/* Single line / polyline */}
               <Point
                 positions={[[50, 250], [50, 280]]}
                 size={10}
@@ -64,6 +67,7 @@ export const Plot2DPage: LC = () => {
                 color={'#c04000'}
               />
 
+              {/* Multiple polylines */}
               <Line
                 positions={[
                   [[300, 50], [350, 150], [400, 50], [450, 150]],
@@ -83,6 +87,7 @@ export const Plot2DPage: LC = () => {
                 join="miter"
               />
 
+              {/* Transforms */}
               <Transform position={[0, 400]}>
                 <Line
                   positions={[
@@ -122,9 +127,10 @@ export const Plot2DPage: LC = () => {
                 />
               </Transform>
 
+              {/* Animated transform */}
               <Transform position={[150, 650]} scale={1.2}>
                 <Animate keyframes={KEYFRAMES} prop="rotation" ease="linear">
-                  <Transform rotation={30}>
+                  <Transform>
                     <Line
                       positions={[
                         [[-50, -50], [50, -50], [50, 50], [-50, 50]],
@@ -156,6 +162,7 @@ export const Plot2DPage: LC = () => {
                 </Animate>
               </Transform>
 
+              {/* Arrows */}
               <Transform>
                 <Arrow
                   positions={[[100, 200], [250, 300]]}
@@ -180,6 +187,7 @@ export const Plot2DPage: LC = () => {
                 />
               </Transform>
 
+              {/* Convex faces */}
               <Transform position={[620, 50]} scale={[0.8, 0.8]}>
                 <Face
                   positions={[[0, 0], [50, 0], [100, 100], [50, 100]]}
@@ -192,6 +200,7 @@ export const Plot2DPage: LC = () => {
                 />
               </Transform>
 
+              {/* Polygons / concave faces */}
               <Transform position={[650, 200]} scale={[0.8, 0.8]}>
                 <Face
                   positions={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
@@ -214,6 +223,7 @@ export const Plot2DPage: LC = () => {
                   />
                 </Transform>
 
+                {/* Polygons with holes */}
                 <Transform position={[-25, 240]}>
                   <Polygon
                     positions={[[
@@ -240,6 +250,30 @@ export const Plot2DPage: LC = () => {
                 </Transform>
               </Transform>
 
+              {/* Multiple polygons with holes */}
+              <Transform position={[650, 600]}>
+                <Polygon
+                  positions={[
+                    [
+                      [[0, 0], [50, 0], [50, 50], [0, 50]],
+                      [[10, 10], [40, 10], [40, 40], [10, 40]],
+                    ],
+                    [
+                      [[60, 0], [110, 0], [110, 50], [60, 50]],
+                      [[70, 10], [100, 10], [100, 40], [70, 40]],
+                    ],
+                    [
+                      [[0, 60], [50, 60], [50, 110], [0, 110]],
+                      [[10, 70], [40, 70], [40, 100], [10, 100]],
+                    ],
+                  ]}
+                  fill={["#345682", "#a47622", "#7496c2"]}
+                  width={2}
+                  zIndex={2}
+                />
+              </Transform>
+
+              {/* Integrates with rest of plot API */}
               <Cartesian
                 range={[[0, 100], [0, 100]]}
                 position={[400, 400, 0]}

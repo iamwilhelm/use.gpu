@@ -210,7 +210,7 @@ export const generateConcaveIndices = (
     if (axis === 0) {
       const nd = n * dims;
       for (let i = 0; i < nd; i += dims) {
-        let f = baseVertex + i;
+        let f = baseVertex * dims + i;
         scratch[o]     = positions[f];
         scratch[o + 1] = positions[f + 1];
         o += 2;
@@ -219,7 +219,7 @@ export const generateConcaveIndices = (
     else if (axis === 1) {
       const nd = n * dims;
       for (let i = 0; i < nd; i += dims) {
-        let f = baseVertex + i;
+        let f = baseVertex * dims + i;
         scratch[o]     = positions[f + 2];
         scratch[o + 1] = positions[f];
         o += 2;
@@ -228,7 +228,7 @@ export const generateConcaveIndices = (
     else {
       const nd = n * dims;
       for (let i = 0; i < nd; i += dims) {
-        let f = baseVertex + i;
+        let f = baseVertex * dims + i;
         scratch[o]     = positions[f + 1];
         scratch[o + 1] = positions[f + 2];
         o += 2;

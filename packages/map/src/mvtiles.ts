@@ -1,8 +1,9 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 
+import { clamp } from '@use-gpu/core';
 import { gather, use, keyed, yeet, memo, useAwait, useCallback, useOne, useMemo } from '@use-gpu/live';
 import { VirtualLayers, useLayoutContext, useForceUpdate } from '@use-gpu/workbench';
-import { useRangeContext } from '@use-gpu/plot';
+import { useRangeContext, Point, Line, Face } from '@use-gpu/plot';
 
 import { useTileContext } from './providers/tile-provider';
 import { MVTStyleContextProps, useMVTStyleContext } from './providers/mvt-style-provider';
@@ -22,12 +23,13 @@ const getDownKey = (x: number, y: number, zoom: number, dx: number, dy: number) 
 
 export type MVTilesProps = {
   minLevel?: number,
+  maxLevel?: number,
   detail?: number,
 };
 
 export type MVTileProps = {
   tiles: {
-    cache: LRU<any, any>,
+    cache: LRU<number, LiveElement[]>,
     loaded: Map<number, number>,
     flipY: boolean,
     styles: MVTStyleContextProps,
@@ -41,6 +43,7 @@ export type MVTileProps = {
 export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MVTilesProps>) => {
   const {
     minLevel = 0,
+    maxLevel = Infinity,
     detail = 1,
     children,
   } = props;
@@ -62,7 +65,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
   const dx = Math.abs(maxX - minX) / 2;
   const dy = Math.abs(maxY - minY) / 2;
 
-  const zoom = Math.max(minLevel, Math.ceil(-Math.log2(Math.min(dx, dy) / detail)));
+  const zoom = clamp(Math.ceil(-Math.log2(Math.min(dx, dy) / detail)), minLevel, maxLevel);
   const tile = Math.pow(2, zoom);
 
   const minIX = Math.floor((minX * .5 + .5) * tile);
@@ -115,7 +118,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
     }
   }
 
-  return use(VirtualLayers, { children: out });
+  return out;
 };
 
 const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
@@ -125,27 +128,49 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
   const [x, y, zoom] = parseKey(key);
   const upKey = getUpKey(x, y, zoom);
 
-  const run = useCallback(async () => (
-    cache.get(key) ?? fetch(getMVT(x, y, zoom))
-      .then(res => res.arrayBuffer())
-      .then(ab => {
-        //URLS.add(getMVT(x, y, zoom).split('?')[0]);
-        const mvt = new VectorTile(new Uint8Array(ab));
-        const shapes = getMVTShapes(x, y, zoom, mvt, styles, flipY, tesselate);
+  const run = useCallback(async () => {
+    const cached = cache.get(key);
+    if (cached) return cached;
+    
+    const url = getMVT(x, y, zoom);
+    //URLS.add(url.split('?')[0]);
 
-        cache.set(key, shapes);
-        loaded.set(upKey, (loaded.get(upKey) || 0) + 1);
-        forceUpdate();
-        //console.log({URLS: JSON.stringify(Array.from(URLS))})
+    try {
+      const res = await fetch(url);
+      let ab = await res.arrayBuffer();
 
-        return shapes;
-      })
-      .catch(e => console.error('Tile', {x, y, zoom}, e))
-  ), [key, styles, flipY]);
+      // MVT may be gzipped
+      const bytes = new Uint8Array(ab);
+      if (bytes[0] === 0x1f && bytes[1] === 0x8b) {
+        const gunzip = new DecompressionStream('gzip');
+        const stream = new Blob([ab]).stream().pipeThrough(gunzip);
+        ab = await new Response(stream).arrayBuffer();
+      }
 
-  let s: any;
-  let [shapes] = useAwait(run);
-  if (!shapes && (s = cache.get(key))) shapes = s;
+      // Load raw MVT
+      const mvt = new VectorTile(new Uint8Array(ab));
+      const shapes = getMVTShapes(x, y, zoom, mvt, styles, flipY, tesselate);
 
-  return !hide ? yeet(shapes) : null;
+      const out = [];
+      if (shapes.point) out.push(use(Point, shapes.point));
+      if (shapes.line)  out.push(use(Line,  shapes.line));
+      if (shapes.face)  out.push(use(Face,  shapes.face));
+
+      cache.set(key, out);
+      loaded.set(upKey, (loaded.get(upKey) || 0) + 1);
+      forceUpdate();
+      //console.log({URLS: JSON.stringify(Array.from(URLS))})
+
+      return out;
+    }
+    catch (e) {
+      console.error('Tile', {zoom, x, y}, e);
+    }
+  }, [key, styles, flipY]);
+
+  let e: LiveElement[];
+  let [elements] = useAwait(run);
+  if (!elements && (e = cache.get(key))) elements = e;
+
+  return !hide ? elements : null;
 }, 'MVTile');

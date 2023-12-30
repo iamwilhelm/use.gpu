@@ -16,10 +16,10 @@ import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
-import { getUIRectangleVertex } from '@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl';
-import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
+import { getSDFRectangleVertex } from '@use-gpu/wgsl/instance/vertex/sdf-rectangle.wgsl';
+import { getSDFRectangleFragment } from '@use-gpu/wgsl/instance/fragment/sdf-rectangle.wgsl';
 
-export type UIRectanglesProps = {
+export type SDFRectanglesProps = {
   rectangle?: VectorLike,
   radius?: VectorLike,
   border?: VectorLike,
@@ -51,7 +51,7 @@ export type UIRectanglesProps = {
   id?: number,
 } & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
-export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRectanglesProps) => {
+export const SDFRectangles: LiveComponent<SDFRectanglesProps> = memo((props: SDFRectanglesProps) => {
   const {
     id = 0,
     count = 1,
@@ -87,10 +87,10 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const m = mask;
   const t = useNativeColorTexture(texture);
 
-  const boundVertex = useShader(getUIRectangleVertex, [r, a, b, s, f, u, v, p, d, xf, c]);
+  const boundVertex = useShader(getSDFRectangleVertex, [r, a, b, s, f, u, v, p, d, xf, c]);
   const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, props.instance, props.instances, instanceCount);
   const getPicking = usePickingShader(props);
-  const getFragment = useShader(getUIFragment, [t, m]);
+  const getFragment = useShader(getSDFRectangleFragment, [t, m]);
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
@@ -125,4 +125,4 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     pipeline,
     mode,
   });
-}, 'UIRectangles');
+}, 'SDFRectangles');

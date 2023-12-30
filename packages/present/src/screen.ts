@@ -4,7 +4,7 @@ import type { ParsedEffect } from './types';
 import type { ColorLike } from '@use-gpu/traits';
 
 import { memo, use, useOne, useMemo } from '@use-gpu/live';
-import { useShader, useCombinedTransform, useLayoutContext, usePipelineOptions, useShaderRef, UIRectangles, Virtual } from '@use-gpu/workbench';
+import { useShader, useCombinedTransform, useLayoutContext, usePipelineOptions, useShaderRef, SDFRectangles, Virtual } from '@use-gpu/workbench';
 import { getBundleKey } from '@use-gpu/shader/wgsl';
 
 import { usePresentTransition } from './hooks';

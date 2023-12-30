@@ -13,7 +13,7 @@ import { useBoxTrait, useElementTrait } from '../traits';
 import { INSPECT_STYLE } from '../lib/constants';
 import { memoLayout } from '../lib/util';
 
-import { UIRectangle } from '../shape/ui-rectangle';
+import { SDFRectangle } from '../shape/sdf-rectangle';
 
 const {quote} = LayerReconciler;
 
@@ -59,7 +59,7 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
       mask: ShaderModule | null,
       transform: ShaderModule | null,
     ): LiveElement => (
-      quote(use(UIRectangle, {
+      quote(use(SDFRectangle, {
         layout,
         origin,
 

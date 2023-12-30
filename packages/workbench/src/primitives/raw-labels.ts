@@ -15,7 +15,7 @@ import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getLabelVertex } from '@use-gpu/wgsl/instance/vertex/label.wgsl';
-import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
+import { getSDFRectangleFragment } from '@use-gpu/wgsl/instance/fragment/sdf-rectangle.wgsl';
 
 const DEFINES = {DEBUG_SDF: false};
 
@@ -104,7 +104,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
 
   const getVertex = useShader(getLabelVertex, [i, r, u, s, l, a, positions, c, o, z, d, f, e, q]);
   const getPicking = usePickingShader(props);
-  const getFragment = useShader(getUIFragment, [t], DEFINES);
+  const getFragment = useShader(getSDFRectangleFragment, [t], DEFINES);
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
 

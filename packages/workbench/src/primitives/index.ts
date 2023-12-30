@@ -12,5 +12,5 @@ export * from './raw-full-screen';
 export * from './raw-labels';
 export * from './raw-lines';
 export * from './raw-quads';
-export * from './ui-rectangles';
+export * from './sdf-rectangles';
 export * from './readback';

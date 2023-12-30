@@ -4,7 +4,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
 @optional @link fn getTexture(uv: vec2<f32>) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
 @optional @link fn getMask(color: vec4<f32>, uv: vec4<f32>, st: vec4<f32>) -> vec4<f32> { return color; }
 
-@export fn getUIFragment(
+@export fn getSDFRectangleFragment(
   uv: vec2<f32>,
   textureUV: vec2<f32>,
   textureST: vec2<f32>,

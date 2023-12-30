@@ -7,10 +7,10 @@ import { useContext, useMemo, useNoContext, useNoMemo } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { getSource } from '../hooks/useSource';
 
-import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
+import { getSDFRectangleFragment } from '@use-gpu/wgsl/instance/fragment/sdf-rectangle.wgsl';
 import { toLinear4, toGamma4 } from '@use-gpu/wgsl/use/gamma.wgsl';
 
-const TEXTURE_BINDING = bundleToAttribute(getUIFragment, 'getTexture');
+const TEXTURE_BINDING = bundleToAttribute(getSDFRectangleFragment, 'getTexture');
 
 export const useNativeColorTexture = (
   texture?: ShaderSource,

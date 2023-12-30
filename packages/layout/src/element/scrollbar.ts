@@ -13,7 +13,7 @@ import { evaluateDimension } from '../parse';
 import { isHorizontal, memoFit } from '../lib/util';
 import { INSPECT_STYLE } from '../lib/constants';
 
-import { UIRectangle } from '../shape/ui-rectangle';
+import { SDFRectangle } from '../shape/sdf-rectangle';
 import { chainTo } from '@use-gpu/shader/wgsl';
 import { useShader, LayerReconciler } from '@use-gpu/workbench';
 

@@ -239,10 +239,10 @@ declare module "@use-gpu/wgsl/instance/fragment/solid.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/fragment/ui.wgsl" {
+declare module "@use-gpu/wgsl/instance/fragment/sdf-rectangle.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getUIFragment: ParsedBundle;
+  export const getSDFRectangleFragment: ParsedBundle;
   export default __module;
 }
 
@@ -372,10 +372,10 @@ declare module "@use-gpu/wgsl/instance/vertex/tick.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl" {
+declare module "@use-gpu/wgsl/instance/vertex/sdf-rectangle.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getUIRectangleVertex: ParsedBundle;
+  export const getSDFRectangleVertex: ParsedBundle;
   export default __module;
 }
 

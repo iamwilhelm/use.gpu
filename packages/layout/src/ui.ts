@@ -6,7 +6,7 @@ import {
   useDeviceContext, useDebugContext,
   useAggregator, useBufferedSize,
   SDFFontProvider,
-  UIRectangles,
+  SDFRectangles,
   QueueReconciler, LayerReconciler,
   UI_SCHEMA,
 } from '@use-gpu/workbench';
@@ -82,9 +82,9 @@ const Layer: LiveFunction<any> = (
   return useMemo(() => {
     const props = {count, transform, clip, mask, texture, debugContours: contours, ...sources};
 
-    DEBUG && console.log('UIRectangles', {props, items, sources});
+    DEBUG && console.log('SDFRectangles', {props, items, sources});
 
-    return use(UIRectangles, props);
+    return use(SDFRectangles, props);
     // Exclude flags and contexts because they are factored into the archetype
   }, [count, sources, contours]);
 };

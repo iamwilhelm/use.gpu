@@ -20,7 +20,7 @@ import {
 import { chainTo } from '@use-gpu/shader/wgsl';
 import { getLayoutPosition } from '@use-gpu/wgsl/layout/layout.wgsl';
 
-import { UIRectangle } from './shape/ui-rectangle';
+import { SDFRectangle } from './shape/sdf-rectangle';
 import { INSPECT_STYLE, ARCHETYPES } from './lib/constants';
 
 import { mat4, vec2, vec3 } from 'gl-matrix';

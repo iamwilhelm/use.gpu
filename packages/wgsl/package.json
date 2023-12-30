@@ -185,10 +185,10 @@
       "import": "./src/instance/fragment/solid.wgsl",
       "require": "./src/instance/fragment/solid.wgsl"
     },
-    "./instance/fragment/ui.wgsl": {
-      "types": "./src/instance/fragment/ui.wgsl.d.ts",
-      "import": "./src/instance/fragment/ui.wgsl",
-      "require": "./src/instance/fragment/ui.wgsl"
+    "./instance/fragment/sdf-rectangle.wgsl": {
+      "types": "./src/instance/fragment/sdf-rectangle.wgsl.d.ts",
+      "import": "./src/instance/fragment/sdf-rectangle.wgsl",
+      "require": "./src/instance/fragment/sdf-rectangle.wgsl"
     },
     "./instance/identity.wgsl": {
       "types": "./src/instance/identity.wgsl.d.ts",
@@ -280,10 +280,10 @@
       "import": "./src/instance/vertex/tick.wgsl",
       "require": "./src/instance/vertex/tick.wgsl"
     },
-    "./instance/vertex/ui-rectangle.wgsl": {
-      "types": "./src/instance/vertex/ui-rectangle.wgsl.d.ts",
-      "import": "./src/instance/vertex/ui-rectangle.wgsl",
-      "require": "./src/instance/vertex/ui-rectangle.wgsl"
+    "./instance/vertex/sdf-rectangle.wgsl": {
+      "types": "./src/instance/vertex/sdf-rectangle.wgsl.d.ts",
+      "import": "./src/instance/vertex/sdf-rectangle.wgsl",
+      "require": "./src/instance/vertex/sdf-rectangle.wgsl"
     },
     "./layout/clip.wgsl": {
       "types": "./src/layout/clip.wgsl.d.ts",

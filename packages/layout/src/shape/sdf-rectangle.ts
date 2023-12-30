@@ -20,7 +20,7 @@ const REPEAT_FLAG = {
   'xy':   3,
 };
 
-export type UIRectangleProps = {
+export type SDFRectangleProps = {
   layout?: Rectangle,
   origin?: Rectangle,
   zIndex?: number,
@@ -37,7 +37,7 @@ export type UIRectangleProps = {
   transform?: ShaderModule | null,
 };
 
-export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
+export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
   const {
     image,
 
@@ -176,7 +176,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
 
       const attributes = {
         rectangle: layout,
-        radius,
+        radius: radius ?? NO_RECTANGLE,
         border,
         stroke,
         fill,
@@ -198,7 +198,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
     else {
       const attributes = {
         rectangle: layout,
-        radius,
+        radius: radius ?? NO_RECTANGLE,
         border,
         stroke,
         fill,

@@ -306,7 +306,8 @@ const getMultiChunkCount = (
   for (let i = 0; i < itemCount; ++i) {
     const [c, g] = toMultiChunkCounts(get(i + skip), dims);
     chunks.push(...c);
-    groups.push(...g);
+    if (g) groups.push(...g)
+    else groups.push(c.length);
   }
 
   const count = chunks.reduce((a, b) => a + b, 0);

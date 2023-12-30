@@ -15,7 +15,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
 @optional @link fn applyTransform(p: vec4<f32>) -> vec4<f32> { return p; }
 @optional @link fn getClip(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
 
-@export fn getUIRectangleVertex(vertexIndex: u32, elementIndex: u32) -> UIVertex {
+@export fn getSDFRectangleVertex(vertexIndex: u32, elementIndex: u32) -> UIVertex {
   // Layout clipping for overflow
   var rectangle = getRectangle(elementIndex);
   var clip = getClip(elementIndex);

@@ -1,8 +1,7 @@
 import type { ArchetypeSchema, Emit, TypedArrayConstructor, VectorLike, VectorLikes } from '@use-gpu/core';
 import { seq, isTypedArray, copyNumberArray, copyNestedNumberArray } from '@use-gpu/core';
 
-const NO_CHUNKS = new Uint32Array(0);
-const NO_CHUNK_GROUPS = new Uint32Array(0);
+const NO_CHUNKS = [new Uint32Array(0), null];
 
 const maybeTypedArray = (
   xs: VectorLike | VectorLikes | VectorLikes[]
@@ -219,14 +218,14 @@ export const toChunkCounts = (
   if (typeof x?.[0]?.[0] === 'number') {
     const to = new Uint32Array(n);
     for (let i = 0; i < n; ++i) to[i] = xs[i].length;
-    return to;
+    return [to, null];
   }
   if (typeof x?.[0]?.[0]?.[0] === 'number') {
-    return toMultiChunkCounts(xs)[0];
+    return toMultiChunkCounts(xs);
   }
 
   const count = toVertexCount(xs, dims);
-  return count ? [count] : NO_CHUNKS;
+  return count ? [[count], null] : NO_CHUNKS;
 };
 
 // Get list of inner ragged chunk lengths plus outer ragged groupings
@@ -235,7 +234,7 @@ export const toMultiChunkCounts = (
   dims: number,
 ): VectorLike[] => {
   const n = xs?.length;
-  if (!n) return NO_CHUNK_GROUPS;
+  if (!n) return NO_CHUNKS;
 
   const x = xs[0];
 
@@ -263,8 +262,7 @@ export const toMultiChunkCounts = (
     return [to, groups];
   }
 
-  const chunks = toChunkCounts(xs, dims);
-  return [chunks, [1]];
+  return toChunkCounts(xs, dims);
 };
 
 export const sizeToMultiCompositeChunks = (size: number[]) => {

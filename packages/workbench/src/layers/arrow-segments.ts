@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { StorageSource } from '@use-gpu/core';
+import type { StorageSource, TypedArray, VectorLike } from '@use-gpu/core';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
 import { accumulateChunks, generateChunkSegments, generateChunkAnchors, alignSizeTo } from '@use-gpu/core';
@@ -18,9 +18,10 @@ export type ArrowSegmentsData = {
 
 /** Make index data for arrow segments/anchor/trim data */
 export const getArrowSegments = ({
-  chunks, loops, starts, ends,
+  chunks, groups, loops, starts, ends,
 }: {
-  chunks: number[] | TypedArray,
+  chunks: VectorLike,
+  groups: VectorLike | null,
   loops?: boolean[] | boolean | null,
   starts?: boolean[] | boolean | null,
   ends?: boolean[] | boolean | null,
@@ -28,12 +29,12 @@ export const getArrowSegments = ({
   const count = accumulateChunks(chunks, loops);
 
   const segments = new Int8Array(alignSizeTo(count, 4));
+  const slices = new Uint32Array(groups?.length ?? chunks.length);
+  const unwelds = loops ? new Uint32Array(count, 2) : undefined;
   const anchors = new Uint32Array(count * 4);
   const trims = new Uint32Array(count * 4);
-  const slices = new Uint16Array(alignSizeTo(chunks.length, 2));
-  const unwelds = loops ? new Uint16Array(alignSizeTo(count, 2)) : undefined;
 
-  generateChunkSegments(segments, slices, unwelds, chunks, loops, starts, ends);
+  generateChunkSegments(segments, slices, unwelds, chunks, groups, loops, starts, ends);
   const sparse = generateChunkAnchors(anchors, trims, chunks, loops, starts, ends);
 
   return {
@@ -49,14 +50,15 @@ export const getArrowSegments = ({
 }
 
 export const useArrowSegmentsSource = (
-  chunks: number[] | TypedArray,
+  chunks: VectorLike,
+  groups: VectorLike | null,
   loops?: boolean[] | boolean | null,
   starts?: boolean[] | boolean | null,
   ends?: boolean[] | boolean | null,
 ) => {
   const {count, sparse, segments, anchors, trims, slices} = useMemo(
-    () => getArrowSegments({chunks, loops, starts, ends}),
-    [chunks, loops, starts, ends]
+    () => getArrowSegments({chunks, groups, loops, starts, ends}),
+    [chunks, groups, loops, starts, ends]
   );
 
   // Bind as shader storage

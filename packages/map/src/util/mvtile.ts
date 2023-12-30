@@ -95,10 +95,11 @@ export const getMVTShapes = (
       */
     }
     else {
-      shapes.line.positions.push(...positions);
+      shapes.line.positions.push(positions);
+      console.log('l', positions)
 
       const n = geometry.length;
-      for (let i = 0; i < n; ++i) {
+      for (let i = 0; i < 1; ++i) {
         shapes.line.color.push(style.line.color);
         shapes.line.width.push(style.line.width);
         shapes.line.depth.push(style.line.depth);
@@ -118,7 +119,7 @@ export const getMVTShapes = (
     if (tesselate > 0) geometry = tesselateGeometry(geometry, [0, 0, extent, extent], tesselate);
 
     if (style.face.fill) {
-      const positions = geometry.map(polygon => polygon.map((ring: XY[]) => ring.map((p: XY, i: number) => toPoint4(p))));
+      const positions = geometry.map(polygon => polygon.map((ring: XY[]) => ring.map((p: XY) => toPoint4(p))));
 
       shapes.face.positions.push(...positions);
       const n = geometry.length;
@@ -130,15 +131,16 @@ export const getMVTShapes = (
     }
 
     if (style.face.stroke) {
-      const positions = originalGeometry.flatMap(polygon => polygon.map((ring: XY[]) => ring.map((p: XY, i: number) => toPoint4(p))));
-      shapes.line.positions.push(...positions);
+      const positions = originalGeometry.flatMap(polygon => polygon.map((ring: XY[]) => ring.map((p: XY) => toPoint4(p))));
+      shapes.line.positions.push(positions);
+      console.log('f', positions)
 
       const n = geometry.length;
-      for (let i = 0; i < n; ++i) {
-        shapes.line.color.push(style.line.stroke);
-        shapes.line.width.push(style.line.width);
-        shapes.line.depth.push(style.line.depth);
-        shapes.line.zBias.push(style.line.zBias);
+      for (let i = 0; i < 1; ++i) {
+        shapes.line.color.push(style.face.stroke);
+        shapes.line.width.push(style.face.width);
+        shapes.line.depth.push(style.face.depth);
+        shapes.line.zBias.push(style.face.zBias + 1);
       }
     }
   };
@@ -151,7 +153,7 @@ export const getMVTShapes = (
   ];
   const style = styles['background'];
   if (style) {
-    addPolygon([[[[0, 0], [256, 0], [256, 256], [0, 256]]]], {}, style, 256, toPoint4);
+   // addPolygon([[[[0, 0], [256, 0], [256, 256], [0, 256]]]], {}, style, 256, toPoint4);
   }
 
   //const unstyled: string[] = [];
@@ -163,11 +165,6 @@ export const getMVTShapes = (
     //console.log("layer", name, layer, length)
 
     for (let i = 0; i < length; ++i) {
-      if (i == 0) continue;
-
-
-
-
       const feature = layer.feature(i);
       const {type: t, properties, extent} = feature;
 

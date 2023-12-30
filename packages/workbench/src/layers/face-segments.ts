@@ -14,15 +14,17 @@ export type FaceSegmentsData = {
 
 export const getFaceSegments = ({
   chunks,
+  groups,
 }: {
   chunks: VectorLike,
+  groups: VectorLike | null,
 }) => {
   const count = accumulateChunks(chunks);
 
   const segments = new Int8Array(alignSizeTo(count, 4));
-  const slices = new Uint16Array(alignSizeTo(chunks.length, 2));
+  const slices = new Uint32Array(groups?.length ?? chunks.length);
 
-  generateChunkFaces(segments, slices, chunks);
+  generateChunkFaces(segments, slices, chunks, groups);
 
   return {count, segments, slices};
 };
@@ -38,7 +40,7 @@ export const getFaceSegmentsConcave = ({
   const count = accumulateChunks(chunks);
 
   const indices = new Uint32Array(count * 3);
-  const slices = new Uint16Array(alignSizeTo(groups.length, 2));
+  const slices = new Uint32Array(groups?.length ?? chunks.length);
 
   const indexed = generateConcaveIndices(indices, slices, chunks, groups, positions, dims);
 

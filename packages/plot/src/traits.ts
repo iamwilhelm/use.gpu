@@ -348,7 +348,7 @@ export const SegmentsTrait = combine(
       chunks?: TypedArray,
     },
   ) => {
-    parsed.chunks = useProp(
+    const [chunks, groups] = useProp(
       props.positions ?? props.position,
       (pos) => {
         if (parsed.tensor) {
@@ -359,6 +359,8 @@ export const SegmentsTrait = combine(
         return toChunkCounts(pos, 4);
       }
     );
+    parsed.chunks = chunks;
+    parsed.groups = groups;
   },
 );
 
@@ -387,7 +389,7 @@ export const FacetedTrait = combine(
           const [segment, group, ...rest] = parsed.tensor;
           if (rest.length === 0) {
             const chunks = seq(group).map(_ => segment);
-            return [chunks, [1]];
+            return [chunks, [chunks.length]];
           }
           else {
             const planes = rest.reduce((a, b) => a * b, 1);
@@ -471,12 +473,12 @@ export const LineSegmentsTrait = combine(
       slices?: TypedArray,
     },
   ) => {
-    const {chunks, loop, loops} = parsed;
+    const {chunks, groups, loop, loops} = parsed;
     if (!chunks) return;
 
     const l = loop || loops;
 
-    const line = useMemo(() => getLineSegments({chunks, loops: l}), [chunks, l]);
+    const line = useMemo(() => getLineSegments({chunks, groups, loops: l}), [chunks, l]);
     for (const k in line) parsed[k] = line[k];
   },
 );
@@ -504,14 +506,14 @@ export const ArrowSegmentsTrait = combine(
       unwelds?: TypedArray,
     },
   ) => {
-    const {chunks, loop, loops, start, starts, end, ends} = parsed;
+    const {chunks, groups, loop, loops, start, starts, end, ends} = parsed;
     if (!chunks) return;
 
     const l = loop || loops;
     const s = start || starts;
     const e = end || ends;
 
-    const arrow = useMemo(() => getArrowSegments({chunks, loops: l, starts: s, ends: e}), [chunks, l, s, e]);
+    const arrow = useMemo(() => getArrowSegments({chunks, groups, loops: l, starts: s, ends: e}), [chunks, l, s, e]);
     for (const k in arrow) parsed[k] = arrow[k];
   },
 );

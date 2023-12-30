@@ -209,17 +209,18 @@ export const Plot2DPage: LC = () => {
                 />
                 <Line
                   positions={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
-                  color={"#ffffff"}
-                  width={2}
+                  color={"#c27496"}
+                  width={5}
                   zIndex={2}
                   loop
                 />
+
                 <Transform position={[0, 120]}>
                   <Polygon
                     positions={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
                     fill={"#348256"}
-                    stroke={"#ffffff"}
-                    width={2}
+                    stroke={"#74c296"}
+                    width={5}
                   />
                 </Transform>
 
@@ -231,7 +232,7 @@ export const Plot2DPage: LC = () => {
                       [[75, 45], [105, 75], [75, 105], [45, 75]],
                     ]]}
                     fill={"#345682"}
-                    stroke={"#ffffff"}
+                    stroke={"#7496c2"}
                     width={2}
                   />
                 </Transform>
@@ -243,7 +244,7 @@ export const Plot2DPage: LC = () => {
                       [[75, 45], [105, 75], [75, 105], [45, 75]],
                     ]]}
                     fill={"#345682"}
-                    stroke={"#ffffff"}
+                    stroke={"#7496c2"}
                     width={2}
                     zIndex={2}
                   />
@@ -268,8 +269,10 @@ export const Plot2DPage: LC = () => {
                     ],
                   ]}
                   fill={["#345682", "#a47622", "#7496c2"]}
+                  stroke={["#5476a2", "#c49642", "#94b6e2"]}
                   width={2}
                   zIndex={2}
+                  depth={0.75}
                 />
               </Transform>
 

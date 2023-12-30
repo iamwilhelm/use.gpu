@@ -17,11 +17,13 @@ export const accumulateChunks = (
   return count;
 };
 
+/** Generate segment data for line-likes */
 export const generateChunkSegments = (
   to: VectorLike,
   slices: VectorLike | null | undefined,
   unwelds: VectorLike | null | undefined,
   chunks: VectorLike,
+  groups: VectorLike | null,
   loops: VectorLike | boolean[] | boolean = false,
   starts: VectorLike | boolean[] | boolean = false,
   ends: VectorLike | boolean[] | boolean = false,
@@ -29,6 +31,8 @@ export const generateChunkSegments = (
   let pos = 0;
   let n = chunks.length;
   let o = 0;
+  let k = 0;
+  let g = 0;
 
   const hasLoop = !!loops;
   const hasStart = !!starts;
@@ -42,6 +46,7 @@ export const generateChunkSegments = (
 
     const b = pos;
 
+    // Make an unlooped 1-3-…-3-2 mask or looped 0-3-…-3-0-0 mask
     if (l) to[pos++] = 0;
     if (c) {
       if (c === 1) to[pos++] = 0;
@@ -64,7 +69,15 @@ export const generateChunkSegments = (
     }
     if (l) to[pos++] = 0;
 
-    if (slices) slices[i] = pos - b;
+    // Accumulate final chunk lengths into per group slice length
+    if (slices) {
+      if (g === 0) slices[k] = pos - b;
+      else slices[k] += pos - b;
+
+      if (!groups || (++g === groups[k])) { k++; g = 0; }
+    }
+
+    // Generate looped unweld indices
     if (unwelds) {
       const n = pos - b;
       const z = l ? c - 1 : 0;
@@ -79,6 +92,42 @@ export const generateChunkSegments = (
   while (pos < to.length) to[pos++] = 0;
 }
 
+/** Generate segment data for face-likes */
+export const generateChunkFaces = (
+  to: VectorLike,
+  slices: VectorLike | null | undefined,
+  chunks: VectorLike,
+  groups: VectorLike | null,
+) => {
+  let pos = 0;
+  let n = chunks.length;
+  let k = 0;
+  let g = 0;
+
+  for (let i = 0; i < n; ++i) {
+    const c = chunks[i];
+
+    // Generate 1-2-3-…-(N-2)-0-0 mask
+    const b = pos;
+    if (c) {
+      for (let i = 0; i < c - 2; ++i) to[pos++] = i + 1;
+      if (c > 1) to[pos++] = 0;
+      to[pos++] = 0;
+    }
+
+    // Accumulate chunk lengths into per group slice length
+    if (slices) {
+      if (g === 0) slices[k] = pos - b;
+      else slices[k] += pos - b;
+
+      if (!groups || (++g === groups[k])) { k++; g = 0; }
+    }
+  }
+
+  while (pos < to.length) to[pos++] = 0;
+}
+
+/** Generate anchor data for arrow-likes */
 export const generateChunkAnchors = (
   anchors: VectorLike,
   trims: VectorLike,
@@ -110,6 +159,7 @@ export const generateChunkAnchors = (
     const end = pos + c - 1 + (l ? 2 : 0);
     pos += c + (l ? 3 : 0);
 
+    // Store chunk start and end per vertex for trimming
     for (let j = start; j <= end; ++j) {
       trims[j * 4] = start;
       trims[j * 4 + 1] = end;
@@ -117,6 +167,7 @@ export const generateChunkAnchors = (
       trims[j * 4 + 3] = 0;
     }
 
+    // Add start and/or end anchor per chunk
     if (s) {
       anchors[o++] = start;
       anchors[o++] = start + 1;
@@ -134,39 +185,17 @@ export const generateChunkAnchors = (
   return o / 4;
 }
 
-export const generateChunkFaces = (
-  to: VectorLike,
-  slices: VectorLike | null | undefined,
-  chunks: VectorLike,
-) => {
-  let pos = 0;
-  let n = chunks.length;
-
-  for (let i = 0; i < n; ++i) {
-    const c = chunks[i];
-
-    const b = pos;
-    if (c) {
-      for (let i = 0; i < c - 2; ++i) to[pos++] = i + 1;
-      if (c > 1) to[pos++] = 0;
-      to[pos++] = 0;
-    }
-
-    if (slices) slices[i] = pos - b;
-  }
-
-  while (pos < to.length) to[pos++] = 0;
-}
-
+/** Triangulate concave polygons with holes */
 export const generateConcaveIndices = (
   to: VectorLike,
   slices: VectorLike | null | undefined,
   chunks: VectorLike,
-  groups: VectorLike,
+  groups: VectorLike | null,
   positions: VectorLike,
   dims: number,
 ) => {
-  let g = groups.length;
+  const gs = groups ?? [chunks.length];
+  let g = gs.length;
 
   // Convert XYZ to dominant 2D plane
   const scratch = [];
@@ -195,17 +224,20 @@ export const generateConcaveIndices = (
 
   const holes: number[] = [];
 
+  // Each group 1 is boundary + N holes
   let baseChunk = 0;
   let baseVertex = 0;
   let baseIndex = 0;
   for (let i = 0; i < g; ++i) {
+    // Count vertices and hole indices
     let n = 0;
-    for (let j = 0; j < groups[i]; ++j) {
+    for (let j = 0; j < gs[i]; ++j) {
       n += chunks[baseChunk + j];
       holes.push(n);
     }
     holes.pop();
 
+    // Copy 2D positions into scratch buffer
     let o = 0;
     if (axis === 0) {
       const nd = n * dims;
@@ -235,6 +267,7 @@ export const generateConcaveIndices = (
       }
     }
 
+    // Triangulate and add to index buffer
     const indices = earcut(scratch, holes);
     offsetNumberArray(indices, to, baseVertex, 1, 1, 0, baseIndex, indices.length);
 
@@ -243,7 +276,7 @@ export const generateConcaveIndices = (
 
     slices[i] = n;
 
-    baseChunk += groups[i];
+    baseChunk += gs[i];
     baseVertex += n;
     baseIndex += indices.length;
   }

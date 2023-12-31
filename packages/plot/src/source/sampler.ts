@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { DataBounds, TensorArray, VectorLike, Emit, Emitter } from '@use-gpu/core';
 
-import { provide, yeet, deprecated, memo, useOne, useMemo, useNoMemo } from '@use-gpu/live';
+import { provide, yeet, deprecated, memo, useOne, useMemo, useNoMemo, useRef } from '@use-gpu/live';
 import {
   makeTensorArray, emitMultiArray, makeNumberWriter, updateTensor,
   getBoundingBox, toDataBounds,
@@ -109,172 +109,173 @@ export const Sampler: LiveComponent<SamplerProps> = memo((props) => {
     [format, alloc, items]
   );
   const arrays = useOne(() => tensors.map(({array}) => array), tensors);
+  const {dims} = tensors[0];
 
   const clock = time ? useTimeContext() : useNoTimeContext();
 
-  // Refresh and upload data
-  const refresh = () => {
-    const [tensor] = tensors;
-    const {array, dims} = tensor;
-    let emitted = 0;
+  const [sampled, emit] = useMemo(() => {
+    if (!size.length || !expr) return [null, null];
 
-    if (expr && size.length) {
-      const n = size.length;
-      let sampled: Emitter<any>;
-      if (n === 1) {
-        const c = +!!(centered === true || (centered as any)[0]);
-        let [min, max] = range[0];
-        let step = (max - min) / (size[0] - 1 + c);
-        let align = origin ? (min - origin[0]) % step : 0;
-        if (c) min += step / 2;
-        min -= step * border + align;
+    const n = size.length;
+    let sampled: Emitter<any>;
+    if (n === 1) {
+      const c = +!!(centered === true || (centered as any)[0]);
+      let [min, max] = range[0];
+      let step = (max - min) / (size[0] - 1 + c);
+      let align = origin ? (min - origin[0]) % step : 0;
+      if (c) min += step / 2;
+      min -= step * border + align;
 
-        if (index) {
-          sampled = (<T>(emit: Emit, i: number, t: T) =>
-            expr(emit, min + i * step, i - border, t)) as any;
-        }
-        else {
-          sampled = (<T>(emit: Emit, i: number, t: T) =>
-            expr(emit, min + i * step, i - border, t)) as any;
-        }
-      }
-      else if (n === 2) {
-        const cx = +!!(centered === true || (centered as any)[0]);
-        const cy = +!!(centered === true || (centered as any)[1]);
-
-        let [minX, maxX] = range[0];
-        let [minY, maxY] = range[1];
-        let stepX = (maxX - minX) / (size[0] - 1 + cx);
-        let stepY = (maxY - minY) / (size[1] - 1 + cy);
-        let alignX = origin ? (minX - origin[0]) % stepX : 0;
-        let alignY = origin ? (minY - origin[1]) % stepY : 0;
-        if (cx) minX += stepX / 2;
-        if (cy) minY += stepY / 2;
-        minX -= stepX * border + alignX;
-        minY -= stepY * border + alignY;
-
-        if (index) {
-          sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
-            expr(
-              emit,
-              minX + i * stepX,
-              minY + j * stepY,
-              i - border,
-              j - border,
-              t,
-            )) as any;
-        }
-        else {
-          sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
-            expr(
-              emit,
-              minX + i * stepX,
-              minY + j * stepY,
-              t,
-            )) as any;
-        }
-      }
-      else if (n === 3) {
-        const cx = +!!(centered === true || (centered as any)[0]);
-        const cy = +!!(centered === true || (centered as any)[1]);
-        const cz = +!!(centered === true || (centered as any)[2]);
-
-        let [minX, maxX] = range[0];
-        let [minY, maxY] = range[1];
-        let [minZ, maxZ] = range[2];
-        let stepX = (maxX - minX) / (size[0] - 1 + cx);
-        let stepY = (maxY - minY) / (size[1] - 1 + cy);
-        let stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
-        if (cx) minX += stepX / 2;
-        if (cy) minY += stepY / 2;
-        if (cz) minZ += stepZ / 2;
-        minX -= stepX * border;
-        minY -= stepY * border;
-        minZ -= stepZ * border;
-
-        if (index) {
-          sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
-            expr(
-              emit,
-              minX + i * stepX,
-              minY + j * stepY,
-              minZ + k * stepZ,
-              i - border,
-              j - border,
-              k - border,
-              t,
-            )) as any;
-        }
-        else {
-          sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
-            expr(
-              emit,
-              minX + i * stepX,
-              minY + j * stepY,
-              minZ + k * stepZ,
-              t,
-            )) as any;
-        }
-      }
-      else if (n === 4) {
-        const cx = +!!(centered === true || (centered as any)[0]);
-        const cy = +!!(centered === true || (centered as any)[1]);
-        const cz = +!!(centered === true || (centered as any)[2]);
-        const cw = +!!(centered === true || (centered as any)[3]);
-
-        let [minX, maxX] = range[0];
-        let [minY, maxY] = range[1];
-        let [minZ, maxZ] = range[2];
-        let [minW, maxW] = range[3];
-        let stepX = (maxX - minX) / (size[0] - 1 + cx);
-        let stepY = (maxY - minY) / (size[1] - 1 + cy);
-        let stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
-        let stepW = (maxW - minW) / (size[3] - 1 + cw);
-        if (cx) minX += stepX / 2;
-        if (cy) minY += stepY / 2;
-        if (cz) minZ += stepZ / 2;
-        if (cw) minW += stepW / 2;
-        minX -= stepX * border;
-        minY -= stepY * border;
-        minZ -= stepZ * border;
-        minW -= stepW * border;
-
-        if (index) {
-          sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
-            expr(
-              emit,
-              minX + i * stepX,
-              minY + j * stepY,
-              minZ + k * stepZ,
-              minW + l * stepW,
-              i - border,
-              j - border,
-              k - border,
-              l - border,
-              t,
-            )) as any;
-        }
-        else {
-          sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
-            expr(
-              emit,
-              minX + i * stepX,
-              minY + j * stepY,
-              minZ + k * stepZ,
-              minW + l * stepW,
-              t,
-            )) as any;
-        }
+      if (index) {
+        sampled = (<T>(emit: Emit, i: number, t: T) =>
+          expr(emit, min + i * step, i - border, t)) as any;
       }
       else {
-        throw new Error("Cannot sample across more than 4 dimensions");
-      }
-
-      if (sampled) {
-        const emit = split ? makeNumberSplitter(arrays, dims) : makeNumberWriter(array, dims);
-        emitted = emitMultiArray(sampled, emit, count, padded, clock!);
+        sampled = (<T>(emit: Emit, i: number, t: T) =>
+          expr(emit, min + i * step, i - border, t)) as any;
       }
     }
+    else if (n === 2) {
+      const cx = +!!(centered === true || (centered as any)[0]);
+      const cy = +!!(centered === true || (centered as any)[1]);
+
+      let [minX, maxX] = range[0];
+      let [minY, maxY] = range[1];
+      let stepX = (maxX - minX) / (size[0] - 1 + cx);
+      let stepY = (maxY - minY) / (size[1] - 1 + cy);
+      let alignX = origin ? (minX - origin[0]) % stepX : 0;
+      let alignY = origin ? (minY - origin[1]) % stepY : 0;
+      if (cx) minX += stepX / 2;
+      if (cy) minY += stepY / 2;
+      minX -= stepX * border + alignX;
+      minY -= stepY * border + alignY;
+
+      if (index) {
+        sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
+          expr(
+            emit,
+            minX + i * stepX,
+            minY + j * stepY,
+            i - border,
+            j - border,
+            t,
+          )) as any;
+      }
+      else {
+        sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
+          expr(
+            emit,
+            minX + i * stepX,
+            minY + j * stepY,
+            t,
+          )) as any;
+      }
+    }
+    else if (n === 3) {
+      const cx = +!!(centered === true || (centered as any)[0]);
+      const cy = +!!(centered === true || (centered as any)[1]);
+      const cz = +!!(centered === true || (centered as any)[2]);
+
+      let [minX, maxX] = range[0];
+      let [minY, maxY] = range[1];
+      let [minZ, maxZ] = range[2];
+      let stepX = (maxX - minX) / (size[0] - 1 + cx);
+      let stepY = (maxY - minY) / (size[1] - 1 + cy);
+      let stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
+      if (cx) minX += stepX / 2;
+      if (cy) minY += stepY / 2;
+      if (cz) minZ += stepZ / 2;
+      minX -= stepX * border;
+      minY -= stepY * border;
+      minZ -= stepZ * border;
+
+      if (index) {
+        sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
+          expr(
+            emit,
+            minX + i * stepX,
+            minY + j * stepY,
+            minZ + k * stepZ,
+            i - border,
+            j - border,
+            k - border,
+            t,
+          )) as any;
+      }
+      else {
+        sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
+          expr(
+            emit,
+            minX + i * stepX,
+            minY + j * stepY,
+            minZ + k * stepZ,
+            t,
+          )) as any;
+      }
+    }
+    else if (n === 4) {
+      const cx = +!!(centered === true || (centered as any)[0]);
+      const cy = +!!(centered === true || (centered as any)[1]);
+      const cz = +!!(centered === true || (centered as any)[2]);
+      const cw = +!!(centered === true || (centered as any)[3]);
+
+      let [minX, maxX] = range[0];
+      let [minY, maxY] = range[1];
+      let [minZ, maxZ] = range[2];
+      let [minW, maxW] = range[3];
+      let stepX = (maxX - minX) / (size[0] - 1 + cx);
+      let stepY = (maxY - minY) / (size[1] - 1 + cy);
+      let stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
+      let stepW = (maxW - minW) / (size[3] - 1 + cw);
+      if (cx) minX += stepX / 2;
+      if (cy) minY += stepY / 2;
+      if (cz) minZ += stepZ / 2;
+      if (cw) minW += stepW / 2;
+      minX -= stepX * border;
+      minY -= stepY * border;
+      minZ -= stepZ * border;
+      minW -= stepW * border;
+
+      if (index) {
+        sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
+          expr(
+            emit,
+            minX + i * stepX,
+            minY + j * stepY,
+            minZ + k * stepZ,
+            minW + l * stepW,
+            i - border,
+            j - border,
+            k - border,
+            l - border,
+            t,
+          )) as any;
+      }
+      else {
+        sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
+          expr(
+            emit,
+            minX + i * stepX,
+            minY + j * stepY,
+            minZ + k * stepZ,
+            minW + l * stepW,
+            t,
+          )) as any;
+      }
+    }
+    else {
+      throw new Error("Cannot sample across more than 4 dimensions");
+    }
+
+    const emit = split ? makeNumberSplitter(arrays, dims) : makeNumberWriter(arrays[0], dims);
+    return [sampled, emit];
+  }, [centered, range, size, border, arrays, dims]);
+
+  const refresh = () => {
+    const [tensor] = tensors;
+
+    emit.reset();
+    const emitted = sampled ? emitMultiArray(sampled, emit, count, padded, clock!) : 0;
 
     const l = !sparse ? length : emitted;
     const s = !sparse ? padded : [emitted / items];

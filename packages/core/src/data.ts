@@ -656,52 +656,62 @@ export const emitMultiArray = <T>(
   props?: T,
 ) => {
   const n = size.length;
-
-  const index = size.map(_ => 0);
-  const increment = () => {
-    for (let i = 0; i < n; ++i) {
-      let c = index[i];
-      if (c === size[i] - 1) index[i] = 0;
-      else {
-        index[i] = c + 1;
-        break;
-      }
-    }
-  };
+  const {emit, emitted} = writer;
 
   let nest: Emitter;
   if (n === 1) {
-    nest = (emit: Emit) => {
-      expr(emit, index[0], props);
-      increment();
-    };
+    for (let i = 0; i < length; i++) {
+      expr(emit, i, props);
+    }
   }
   else if (n === 2) {
-    nest = (emit: Emit) => {
-      expr(emit, index[0], index[1], props);
-      increment();
-    };
+    const [w, h] = size;
+    for (let j = 0; j < h; j++) {
+      for (let i = 0; i < w; i++) {
+        expr(emit, i, j, props);
+      }
+    }
   }
   else if (n === 3) {
-    nest = (emit: Emit) => {
-      expr(emit, index[0], index[1], index[2], props);
-      increment();
-    };
+    const [w, h, d] = size;
+    for (let k = 0; k < d; k++) {
+      for (let j = 0; j < h; j++) {
+        for (let i = 0; i < w; i++) {
+          expr(emit, i, j, k, props);
+        }
+      }
+    }
   }
   else if (n === 4) {
-    nest = (emit: Emit) => {
-      expr(emit, index[0], index[1], index[2], index[3], props);
-      increment();
-    };
+    const [w, h, d, s] = size;
+    for (let l = 0; l < s; l++) {
+      for (let k = 0; k < d; k++) {
+        for (let j = 0; j < h; j++) {
+          for (let i = 0; i < w; i++) {
+            expr(emit, i, j, k, l, props);
+          }
+        }
+      }
+    }
   }
   else {
-    nest = (emit: Emit) => {
+    const index = size.map(_ => 0);
+    const increment = () => {
+      for (let i = 0; i < n; ++i) {
+        let c = index[i];
+        if (c === size[i] - 1) index[i] = 0;
+        else {
+          index[i] = c + 1;
+          break;
+        }
+      }
+    };
+
+    for (let i = 0; i < length; i++) {
       expr(emit, ...index, props);
       increment();
-    };
+    }
   }
 
-  const {emit, emitted} = writer;
-  for (let i = 0; i < length; i++) nest(emit, i, props);
   return emitted();
 }

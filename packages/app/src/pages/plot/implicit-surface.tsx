@@ -22,27 +22,26 @@ import { SurfaceControls } from '../../ui/surface-controls';
 
 import { InfoBox } from '../../ui/info-box';
 
-let t = 0;
-let π = Math.PI;
+const π = Math.PI;
+const τ = π * 2;
 
 const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
 const f = (x: number, y: number, z: number, t: number) => {
-  x = x * 2;
-  y = y * 2;
-  z = z * 2;
-
   //return Math.sqrt(x*x + (y-6)*(y-6) + z*z) - 3.5;
   //return Math.max(Math.abs(x)/1.5, Math.abs(y - 6)*2 - Math.cos(t / 3) * .5, Math.abs(z*.59)) - 3.02 - Math.cos(t / 5)*.65;
 
   const f = Math.cos(t * .5) * .5 + .5;
 
-  const cx = Math.cos(x);
-  const sx = Math.sin(x);
-  const cy = Math.cos(y);
-  const sy = Math.sin(y);
-  const cz = Math.cos(z);
-  const sz = Math.sin(z);
+  const x2 = x * 2;
+  const y2 = y * 2;
+  const z2 = z * 2;
+  const cx = Math.cos(x2);
+  const sx = Math.sin(x2);
+  const cy = Math.cos(y2);
+  const sy = Math.sin(y2);
+  const cz = Math.cos(z2);
+  const sz = Math.sin(z2);
 
   const swirl = sx * cy + sy * cz + sz * cx;
   const grid = cx + cy + cz;
@@ -62,6 +61,10 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) =>
   const t = time.elapsed / 1000;
   const e = 1e-3;
 
+  const f = Math.cos(t * .5) * .5 + .5;
+
+  /*
+  // Numerical gradient is slower but works for any function
   const v  = f(x, y, z, t);
   const vx = f(x + e, y, z, t);
   const vy = f(x, y + e, z, t);
@@ -70,6 +73,29 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) =>
   const nx = vx - v;
   const ny = vy - v;
   const nz = vz - v;
+  */
+  
+  // d/dx d/dy d/dz
+  const x2 = x * 2;
+  const y2 = y * 2;
+  const z2 = z * 2;
+  const cx = Math.cos(x2);
+  const sx = Math.sin(x2);
+  const cy = Math.cos(y2);
+  const sy = Math.sin(y2);
+  const cz = Math.cos(z2);
+  const sz = Math.sin(z2);
+
+  const swirlX = cx * cy - sz * sx;
+  const swirlY = sx * -sy + cy * cz;
+  const swirlZ = sy * -sz + cz * cx;
+  const gridX = -sx;
+  const gridY = -sy;
+  const gridZ = -sz;
+
+  const nx = lerp(swirlX, gridX, f);
+  const ny = lerp(swirlY, gridY, f);
+  const nz = lerp(swirlZ, gridZ, f);
 
   const nl = 1/Math.sqrt(nx*nx + ny*ny + nz*nz);
 

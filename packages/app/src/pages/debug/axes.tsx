@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { TextureSource } from '@use-gpu/core';
+import type { GPUGeometry, TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
@@ -7,11 +7,10 @@ import { wgsl } from '@use-gpu/shader/wgsl';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, FlatCamera, Animate, LinearRGB,
-  GeometryData, PBRMaterial, ImageCubeTexture,
+  Loop, Pass, LinearRGB,
+  GeometryData, ImageCubeTexture,
   OrbitCamera, OrbitControls,
-  Pick, Cursor,
-  PointLight, AmbientLight,
+  Cursor,
   AxisHelper,
   ShaderFlatMaterial,
 
@@ -22,6 +21,8 @@ import {
 import {
   Scene, Node, Mesh,
 } from '@use-gpu/scene';
+
+import { InfoBox } from '../../ui/info-box';
 
 const cubeMaterial = wgsl`
 @optional @link fn getCubeMap(uvw: vec3<f32>) -> vec4<f32> { return vec4<f32>(0.0); };
@@ -38,7 +39,8 @@ const cubeMaterial = wgsl`
 export const DebugAxesPage: LC = (props) => {
   const geometry = useOne(() => makeSphereGeometry({ width: 2, uvw: true }));
 
-  return (
+  return (<>
+    <InfoBox>Load a cube map using &lt;ImageCubeTexture&gt; and render it on a mesh as a &lt;ShaderFlatMaterial&gt;.</InfoBox>
     <Gather
       children={[
         <GeometryData {...geometry} />,
@@ -55,7 +57,7 @@ export const DebugAxesPage: LC = (props) => {
         mesh,
         texture,
       ]: [
-        Record<string, ShaderSource>,
+        GPUGeometry,
         TextureSource,
       ]) => {
         const fragment = useShader(cubeMaterial, [texture]);
@@ -65,15 +67,12 @@ export const DebugAxesPage: LC = (props) => {
             <LinearRGB tonemap="aces">
               <Cursor cursor='move' />
               <Camera>
-                <Pass lights>
-                  <AmbientLight intensity={0.2} />
-                  <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
-
+                <Pass>
                   <AxisHelper size={2} width={3} />
 
                   <Scene>
                     <ShaderFlatMaterial fragment={fragment}>
-                      <Mesh mesh={mesh} />
+                      <Mesh geometry={mesh} />
                     </ShaderFlatMaterial>
                   </Scene>
 
@@ -84,7 +83,7 @@ export const DebugAxesPage: LC = (props) => {
         );
       }}
     />
-  );
+  </>);
 };
 
 const Camera: LC = ({children}: PropsWithChildren<object>) => (

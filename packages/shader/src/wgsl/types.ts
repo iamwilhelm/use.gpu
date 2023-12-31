@@ -23,7 +23,6 @@ export type {
   LambdaSource,
   TextureSource,
   UniformAttribute,
-  UniformAttributeValue,
   VirtualRender,
 } from '../types';
 

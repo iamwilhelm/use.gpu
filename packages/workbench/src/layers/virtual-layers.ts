@@ -87,7 +87,7 @@ const Aggregate: LiveFunction<any> = (
   items: LayerAggregate[],
 ) => {
   const [item] = items;
-  const {flags} = item;
+  const {flags, sources: extra} = item;
   const {schema, component} = layerAggregator;
   const {quote} = QueueReconciler;
 
@@ -95,7 +95,7 @@ const Aggregate: LiveFunction<any> = (
 
   return useMemo(() => {
     const {matrices, normalMatrices, ...rest} = sources;
-    const props = {count, ...rest, ...flags};
+    const props = {count, ...rest, ...extra, ...flags};
 
     DEBUG && console.log(component.name, {props, items, sources});
 

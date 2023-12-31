@@ -265,7 +265,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           height: image.height,
         })}
       >
-        <Arrow end width={2} color={'#4080ff'} depth={0.01} detail={4} zBias={ZBIAS_DATA} />
+        <Arrow end width={2} color='#4080ff' depth={0.01} detail={4} zBias={ZBIAS_DATA} />
       </Sampler> : null}
 
       { image.xo && image.yo ? <Sampler
@@ -283,7 +283,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           height: image.height,
         })}
       >
-        <Arrow end width={2} color={'#40c0ff'} depth={0.01} detail={4} zBias={ZBIAS_DATA} />
+        <Arrow end width={2} color='#40c0ff' depth={0.01} detail={4} zBias={ZBIAS_DATA} />
       </Sampler> : null}
     </TextureFrame> : null
   );
@@ -294,10 +294,10 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
         <Pass>
           <UI>
             <Layout placement="center">
-              <Flex direction="y" anchor={"center"} align={"center"} height={'100%'}>
+              <Flex direction="y" anchor="center" align="center" height='100%'>
                 <Block width={1400}>
                   <Block margin={20}>
-                    <Inline align={"center"}>
+                    <Inline align="center">
                       <Text
                         size={32}
                         detail={64}
@@ -307,7 +307,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                       />
                     </Inline>
                   </Block>
-                  <Flex align={"center"} gap={10}>
+                  <Flex align="center" gap={10}>
                     <Block width={rgbaTexture.size[0]} height={rgbaTexture.size[1] * 2 + 32}>
                       <TextureFrame texture={rgbaTexture}>
                         {subpixel ? <>
@@ -321,7 +321,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={gridEmitter(outerField)}
                           >
-                            <Point size={0.5} depth={1} color={'#808080'} shape={'circleOutlined'} zBias={ZBIAS_DATA} />
+                            <Point size={0.5} depth={1} color='#808080' shape='circle' hollow="true" zBias={ZBIAS_DATA} />
                           </Sampler>
 
                           <Sampler
@@ -334,7 +334,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={pointEmitter(outerField)}
                           >
-                            <Point size={0.5} depth={1} color={preprocess ? '#80808080' : '#808080'} shape={'circle'} zBias={ZBIAS_DATA} />
+                            <Point size={0.5} depth={1} color={preprocess ? '#80808080' : '#808080'} shape='circle' zBias={ZBIAS_DATA} />
                           </Sampler>
 
                           {preprocess ? <Sampler
@@ -347,7 +347,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={pointEmitter(innerField)}
                           >
-                            <Point size={0.5} depth={1} color={'#808080'} shape={'circle'} zBias={ZBIAS_DATA + 1} />
+                            <Point size={0.5} depth={1} color='#808080' shape='circle' zBias={ZBIAS_DATA + 1} />
                           </Sampler> : null}
 
                           <Sampler
@@ -360,7 +360,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={arrowEmitter(preprocess ? innerField : outerField)}
                           >
-                            <Arrow end width={3} depth={0.05} color={'#40c0ff'} detail={4} zBias={ZBIAS_DATA} />
+                            <Arrow end width={3} depth={0.05} color='#40c0ff' detail={4} zBias={ZBIAS_DATA} />
                           </Sampler>
                         </> : null}
                       </TextureFrame>
@@ -377,7 +377,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={shiftedPointEmitter(outer2Field)}
                           >
-                            <Point size={0.5} depth={1} color={'#4080ff'} zBias={ZBIAS_DATA} />
+                            <Point size={0.5} depth={1} color='#4080ff' zBias={ZBIAS_DATA} />
                           </Sampler>
 
                           <Sampler
@@ -390,7 +390,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={shiftedPointEmitter(inner2Field)}
                           >
-                            <Point size={0.5} depth={1} color={'#40c0ff'} zBias={ZBIAS_DATA} />
+                            <Point size={0.5} depth={1} color='#40c0ff' zBias={ZBIAS_DATA} />
                           </Sampler>
 
                           <Sampler
@@ -403,7 +403,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={arrowEmitter(outer2Field)}
                           >
-                            <Arrow end width={3} depth={0.05} color={'#4080ff'} detail={4} zBias={ZBIAS_DATA} />
+                            <Arrow end width={3} depth={0.05} color='#4080ff' detail={4} zBias={ZBIAS_DATA} />
                           </Sampler>
 
                           <Sampler
@@ -416,7 +416,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={arrowEmitter(inner2Field)}
                           >
-                            <Arrow end width={3} depth={0.05} color={'#40c0ff'} detail={4} zBias={ZBIAS_DATA} />
+                            <Arrow end width={3} depth={0.05} color='#40c0ff' detail={4} zBias={ZBIAS_DATA} />
                           </Sampler>
                         </> : null}
                       </TextureFrame>
@@ -500,15 +500,15 @@ const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFra
       }}>
         <Embed width="100%" height="100%">
           <Embedded>
-            <Axis axis="x" width={5} color={'#808080'} end={false} />
-            <Axis axis="y" width={5} color={'#808080'} end={false} />
-            <Grid axes="xy" width={2} color={'#a0a0a0'} first={{divide: width / 10}} second={{divide: height / 10}} zBias={ZBIAS_GRID} />
+            <Axis axis="x" width={5} color='#808080' end={false} />
+            <Axis axis="y" width={5} color='#808080' end={false} />
+            <Grid axes="xy" width={2} color='#a0a0a0' first={{divide: width / 10}} second={{divide: height / 10}} zBias={ZBIAS_GRID} />
 
             <Scale axis="x" unit={1} divide={width}>
-              <Tick size={10} width={2.5} color={'#c0c0c0'} depth={0} zBias={ZBIAS_DATA} />
+              <Tick size={10} width={2.5} color='#c0c0c0' depth={0} zBias={ZBIAS_DATA} />
             </Scale>
             <Scale axis="y" unit={1} divide={height}>
-              <Tick size={10} width={2.5} color={'#c0c0c0'} depth={0} offset={[1, 0, 0]} zBias={ZBIAS_DATA} />
+              <Tick size={10} width={2.5} color='#c0c0c0' depth={0} offset={[1, 0, 0]} zBias={ZBIAS_DATA} />
             </Scale>
             {children}
           </Embedded>
@@ -524,7 +524,7 @@ type LabelProps = {
 
 const Label: LC<LabelProps> = (props: PropsWithChildren<LabelProps>) => (
   <Block margin={MARGIN_TOP}>
-    <Inline align={"center"}>
+    <Inline align="center">
       <Text
         size={10}
         snap={false}

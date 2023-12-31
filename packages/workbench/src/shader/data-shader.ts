@@ -7,10 +7,13 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useShaderRefs } from '../hooks/useShaderRef';
 import { getDerivedSource } from '../hooks/useDerivedSource';
+import { getLambdaSource } from '../hooks/useLambdaSource';
+import { useRawSource, useNoRawSource } from '../hooks/useRawSource';
 import { getShader } from '../hooks/useShader';
 import { useRenderProp } from '../hooks/useRenderProp';
 
 export type DataShaderProps = {
+  data?: TensorArray,
   source?: StorageSource,
   shader: ShaderModule,
 
@@ -29,11 +32,11 @@ Provides:
 - `@optional @link fn getDataSize() -> vec4<f32>`
 - `@optional @link fn getData(i: u32) -> T` where `T` is the source format.
 
-Unnamed arguments are linked in the order of: args, sources, source.
+Unnamed arguments are linked in the order of: args, sources, source | data.
 */
 export const DataShader: LiveComponent<DataShaderProps> = (props) => {
   const {
-    source,
+    data,
     shader,
     sources = NO_SOURCES,
     args = NO_SOURCES,
@@ -41,6 +44,8 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
   } = props;
 
   const argRefs = useShaderRefs(...args);
+
+  const source = data ? useRawSource(data.array, data.format) : (useNoRawSource(), props.source);
 
   const getData = useMemo(() => {
     const s = (source ? [source] : NO_SOURCES).map(s => ((s as any)?.buffer)
@@ -59,11 +64,11 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
       return links[k] ? links[k] : allArgs.shift();
     });
 
-    return getDerivedSource(
-      { shader: getShader(shader, values) } as any,
-      { size: () => (source as any)?.size ?? null, length: () => (source as any)?.length ?? null }
+    return getLambdaSource(
+      getShader(shader, values),
+      data ?? source
     );
-  }, [shader, args.length, source, sources]);
+  }, [shader, args.length, data, source, sources]);
 
   return useRenderProp(props, getData);
 };

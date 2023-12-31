@@ -52,7 +52,7 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
 
   const [resolved, fetchError] = useAwait(run, [run]);
   const [mapped, mapError] = resolved !== undefined && then
-    ? useAwait(() => then(resolved), [then, resolved])
+    ? useAwait(() => then(resolved), [resolved])
     : (useNoAwait(), [resolved]);
   const error = fetchError || mapError;
   useOne(() => error && console.warn(error), error);

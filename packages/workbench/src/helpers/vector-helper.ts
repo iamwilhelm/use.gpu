@@ -3,7 +3,7 @@ import type { StorageSource, TypedArray } from '@use-gpu/core';
 
 import { memo, use, useMemo } from '@use-gpu/live';
 import { useRawSource } from '../hooks/useRawSource';
-import { ArrowSegments } from '../layers/arrow-segments';
+import { useArrowSegmentsSource } from '../layers/arrow-segments';
 import { ArrowLayer } from '../layers/arrow-layer';
 
 type VectorHelperProps = {
@@ -43,7 +43,7 @@ export const VectorHelper: LC<VectorHelperProps> = memo((props: VectorHelperProp
   }, [position, tangent, length]);
 
   const positions = useRawSource(ps, 'vec4<f32>');
-  const {segments, anchors, trims} = useArrowSegmentsSource(CHUNKS, null, null, ENDS);
+  const {segments, anchors, trims} = useArrowSegmentsSource(CHUNKS, null, null, null, ENDS);
 
   return use(ArrowLayer, { positions, segments, anchors, trims, color, width });
 }, 'VectorHelper');

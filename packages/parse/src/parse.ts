@@ -306,21 +306,23 @@ export const parseBooleanArrayLike = (vec: VectorLike): Uint8Array =>
 typeof
   vec ? toScalarArray(vec, Uint8Array) as Uint8Array : new Uint8Array();
 
-export const parseColorArray = (colors?: ColorLikes): Float32Array => {
+export const parseColorArray = (colors: ColorLikes): Float32Array => {
   if (isTypedArray(colors)) return colors as Float32Array;
-  const parsed = (colors as any[]).map(parseColor);
+  if (isTypedArray(colors?.array)) return colors.array;
+  const parsed = colors ? (colors as any[]).map(parseColor) : [];
   return parseVec4Array(parsed);
 };
 
-export const parseColorArrayLike = (colors?: ColorLikes): Float32Array => {
+export const parseColorArrayLike = (colors: ColorLikes): Float32Array => {
   if (isTypedArray(colors)) return colors as Float32Array;
+  if (isTypedArray(colors?.array)) return colors.array;
   if (Array.isArray(colors) && typeof colors[0] !== 'number') {
     return parseVec4Array(colors.map(parseColor));
   }
   return parseColor(colors);
 };
 
-export const parseColorMultiArray = (colors?: ColorLikes | ColorLikes[]): Float32Array => {
+export const parseColorMultiArray = (colors: ColorLikes | ColorLikes[]): Float32Array => {
   if (isTypedArray(colors)) return colors as Float32Array;
   if (Array.isArray(colors[0]) && typeof colors[0][0] !== 'number') {
     return parseVec4MultiArray(colors.map(cs => cs.map(parseColor)));

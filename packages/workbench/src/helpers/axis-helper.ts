@@ -2,7 +2,7 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
 import { memo, use, useOne } from '@use-gpu/live';
 
-import { ArrowSegments } from '../layers/arrow-segments';
+import { useArrowSegmentsSource } from '../layers/arrow-segments';
 import { ArrowLayer } from '../layers/arrow-layer';
 
 import { useRawSource } from '../hooks/useRawSource';
@@ -45,7 +45,7 @@ export const AxisHelper: LiveComponent<AxisHelperProps> = memo((props: AxisHelpe
   const positions = useRawSource(vertices, 'vec4<f32>');
   const colors    = useRawSource(COLORS, 'vec4<f32>');
 
-  const {segments, anchors, trims} = useArrowSegmentsSource(CHUNKS, null, null, ENDS);
+  const {segments, anchors, trims} = useArrowSegmentsSource(CHUNKS, null, null, null, ENDS);
 
   return use(ArrowLayer, {positions, colors, width, depth, segments, anchors, trims});
 }, 'AxisHelper');

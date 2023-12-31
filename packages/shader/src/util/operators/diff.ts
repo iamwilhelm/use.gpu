@@ -62,8 +62,8 @@ export const makeDiffBy = (
   getSizes.forEach((getSize, i) => links[getSize] = sizes[i]);
 
   // Code generator
+  const f = formatFormat(format, type);
   const render = (namespace: string, rename: Map<string, string>) => {
-    const f = formatFormat(format, type);
     const format = rename.get(f) ?? f;
     const name = rename.get(entry) ?? 'entry';
     const accessor = rename.get('getValue') ?? 'getValue';

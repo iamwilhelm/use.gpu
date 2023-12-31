@@ -58,3 +58,17 @@ export const makeRefBinding = <T>(
   uniform: UniformAttribute | UniformAttributeValue,
   value?: {current: T} | T,
 ): DataBinding<T> => ({uniform, constant: value ?? (uniform as any).value});
+
+export const isShaderBinding = <T>(
+  source?: StorageSource | TextureSource | LambdaSource<T> | T | any,
+): DataBinding<T> => {
+  if (source != null) {
+    return !!(
+      (source.shader) ||
+      (source.module || source.table) ||
+      (source.buffer && (source.buffer instanceof GPUBuffer)) ||
+      (source.texture || source.view)
+    );
+  }
+  return false;
+}

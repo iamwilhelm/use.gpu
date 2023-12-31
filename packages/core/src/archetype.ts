@@ -1,5 +1,5 @@
 import type { AggregateBuffer, ArchetypeSchema, ArchetypeField, VectorEmitter, VectorRefEmitter, UniformType } from './types';
-import { toMurmur53, scrambleBits53, mixBits53 } from '@use-gpu/state';
+import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
 import { isTypedArray } from './buffer';
 import {
   makeAggregateBuffer,
@@ -41,7 +41,9 @@ export const formatToArchetype = (
   return toMurmur53(tokens);
 };
 
-export const normalizeSchema = <T>(schema: Record<string, string | T>) => {
+export const normalizeSchema = <T>(
+  schema: Record<string, string | T>,
+) => {
   const out = {};
   for (const k in schema) {
     const f = schema[k];
@@ -50,7 +52,10 @@ export const normalizeSchema = <T>(schema: Record<string, string | T>) => {
   return out;
 };
 
-export const adjustSchema = <T>(schema: Record<string, string | T>, formats?: Record<string, string>) => {
+export const adjustSchema = <T>(
+  schema: Record<string, string | T>,
+  formats?: Record<string, string>,
+) => {
   if (!formats) return schema;
 
   const out = {};
@@ -141,6 +146,7 @@ export const schemaToArchetype = (
   attributes: Record<string, TypedArray | VectorEmitter>,
   flags: Record<string, any>,
   refs?: Record<string, any>,
+  sources?: Record<string, any>,
 ) => {
   const tokens = [];
   for (const key in schema) {
@@ -157,6 +163,7 @@ export const schemaToArchetype = (
   }
   tokens.push(flags);
   if (refs) for (const key in refs) tokens.push(key);
+  if (sources) for (const key in sources) tokens.push(key, getObjectKey(sources[key]));
 
   return toMurmur53(tokens);
 };

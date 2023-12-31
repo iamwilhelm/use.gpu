@@ -20,7 +20,6 @@ export const Primitive: LiveComponent<PrimitiveProps> = memo((props: PropsWithCh
   const {children} = props;
 
   const [context] = useCombinedMatrixTransform();
-
   return (
     provide(TransformContext, context, children)
   );

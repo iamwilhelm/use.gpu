@@ -56,7 +56,7 @@ struct WithDepth {
 ) -> WithDepth {
 
   var normal = fragNormal;
-  if (!frontFacing) { normal = -normal; }
+  if (!frontFacing) { normal = vec4<f32>(-normal.xyz, normal.w); }
 
   var outColor = fragColor;
 

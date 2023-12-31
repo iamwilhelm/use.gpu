@@ -115,7 +115,8 @@ export type ShakeOp = [number, number[]];
 
 export type StorageSource = {
   buffer: GPUBuffer,
-  format: string | ShaderModule,
+  format: UniformFormat,
+  type?: ShaderModule,
   length: number,
   size: number[],
   version: number,
@@ -156,20 +157,17 @@ export type TextureSource = {
 
 export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | TextureSource | ShaderModule;
 
-export type UniformFormat = string | UniformAttribute[] | ShaderModule;
+export type UniformFormat = string | UniformAttribute[];
 
 export type UniformAttribute = {
   name: string,
   format: UniformFormat,
+  type?: ShaderModule,
   args?: any[] | null,
   members?: UniformAttribute[],
   attr?: UniformShaderAttribute[],
 };
 
 export type UniformShaderAttribute = string;
-
-export type UniformAttributeValue = UniformAttribute & {
-  value: any,
-};
 
 export type VirtualRender = (namespace: string, rename: Map<string, string>, virtualBase?: number, volatileBase?: number) => string;

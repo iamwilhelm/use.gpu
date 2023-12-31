@@ -72,7 +72,7 @@ export const Axis: LiveComponent<AxisProps> = memo((props) => {
   // Render as 1 arrow chunk
   const n = detail + 1;
   const [chunks, loops] = useMemo(() => [[n], loop], [n, loop]);
-  const {segments, anchors, trims} = useArrowSegmentsSource(chunks, loops, start, end);
+  const {segments, anchors, trims} = useArrowSegmentsSource(chunks, null, loops, start, end);
 
   return useMemo(() => (
     use(start || end ? ArrowLayer : LineLayer, {

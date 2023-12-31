@@ -4,15 +4,11 @@ import type { UniformAttribute } from '@use-gpu/core';
 
 import { patch, $set } from '@use-gpu/state';
 import { provide, useMemo } from '@use-gpu/live';
-import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { EnvironmentContext } from '../providers/environment-provider';
-import { useMaterialContext, MaterialContext } from '../providers/material-provider';
 
 import { getShader, useShader, useNoShader } from '../hooks/useShader';
-import { getSource } from '../hooks/useSource';
 
-import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
 import { getDefaultEnvironment } from '@use-gpu/wgsl/material/lights-default-env.wgsl';
 
 import {
@@ -42,6 +38,7 @@ const PRESETS = {
 export type EnvironmentProps = {
   map?: ShaderSource | null,
   preset?: (keyof typeof PRESETS) | 'none',
+  gain?: number,
 };
 
 const SAMPLE_ENVIRONMENT: UniformAttribute = {
@@ -51,31 +48,13 @@ const SAMPLE_ENVIRONMENT: UniformAttribute = {
 };
 
 export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<EnvironmentProps>) => {
-  const {map, preset, children} = props;
+  const {map, preset, gain, children} = props;
 
   const environment = map || !((preset as any) in PRESETS)
     ? (useNoShader(), map ?? null)
-    : useShader(getDefaultEnvironment, PRESETS[preset as any] ?? PRESETS.park);
-
-  const parent = useMaterialContext();
-  const material = useMemo(() => {
-    if (!environment) return parent;
-
-    const applyEnvironment = bindBundle(applyPBREnvironment, {
-      sampleEnvironment: getSource(SAMPLE_ENVIRONMENT, environment),
-    });
-
-    return patch(parent, {
-      shaded: {
-        applyEnvironment: $set(applyEnvironment),
-      }
-    });
-  }, [parent, environment]);
+    : useShader(getDefaultEnvironment, [...PRESETS[preset as any] ?? PRESETS.park]);
 
   return (
-    provide(EnvironmentContext, environment,
-      provide(MaterialContext, material, children)
-    )
+    provide(EnvironmentContext, environment, children)
   );
 };
-

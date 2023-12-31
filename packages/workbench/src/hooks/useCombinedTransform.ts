@@ -58,12 +58,17 @@ export const useCombinedEpsilonTransform = (
 export const useCombinedMatrixTransform = (
   matrix?: mat4 | null,
 ): [TransformContextProps, mat4] => {
+  const parent = useTransformContext();
   const combined = useCombinedMatrix(matrix);
+  if (!combined) {
+    useNoMatrixBounds();
+    useNoMatrixTransform();
+    useNoMemo();
+    return [parent, combined];
+  }
 
   const bounds = useMatrixBounds(combined);
   const [props, refs] = useMatrixTransform(combined, bounds);
-
-  const parent = useTransformContext();
 
   const context = useMemo(() => {
     const prev = parent.nonlinear ?? parent;
@@ -82,10 +87,10 @@ export const useNoCombinedTransform = () => {
 export const useNoCombinedEpsilonTransform = useNoCombinedTransform;
 
 export const useNoCombinedMatrixTransform = () => {
+  useNoTransformContext();
   useNoCombinedMatrix();
   useNoMatrixBounds();
   useNoMatrixTransform();
-  useNoTransformContext();
   useNoMemo();
 };
 

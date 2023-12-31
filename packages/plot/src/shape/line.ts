@@ -49,6 +49,7 @@ export const RawLine: LiveComponent<LineProps> = (props) => {
       slices,
       unwelds,
 
+      sources,
       ...flags
   } = parsed;
 
@@ -63,7 +64,7 @@ export const RawLine: LiveComponent<LineProps> = (props) => {
 
   const schema = useOne(() => adjustSchema(LINE_SCHEMA, formats), formats);
   const attributes = schemaToEmitters(schema, parsed);
-  const archetype = schemaToArchetype(schema, attributes, flags, refs);
+  const archetype = schemaToArchetype(schema, attributes, flags, refs, sources);
 
   if (Number.isNaN(count)) debugger;
   if (!count || !(position || positions)) return;
@@ -77,6 +78,7 @@ export const RawLine: LiveComponent<LineProps> = (props) => {
       refs,
       schema: formats ? schema : undefined,
       scissor,
+      sources,
       transform: nonlinear ?? context,
       zIndex,
     },

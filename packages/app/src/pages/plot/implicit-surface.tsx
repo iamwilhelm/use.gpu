@@ -10,12 +10,12 @@ import {
   OrbitCamera, OrbitControls,
   Animate, Keyframe,
   LinearRGB, DirectionalLight,
-  PointLayer, DataShader,
+  DataShader,
   Environment, PBRMaterial, PrefilteredEnvMap,
   useShaderRef,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Polar, Axis, Grid, Sampler, ImplicitSurface,
+  Plot, Cartesian, Polar, Axis, Grid, Sampler, ImplicitSurface, Point,
 } from '@use-gpu/plot';
 import { wgsl } from '@use-gpu/shader/wgsl';
 import { SurfaceControls } from '../../ui/surface-controls';
@@ -39,6 +39,8 @@ const f = (x: number, y: number, z: number, t: number) => {
   const grid = Math.cos(x) + Math.cos(y) + Math.cos(z);
   return lerp(swirl, grid, f);
 }
+
+const VOLUME_SIZE = [42, 28, 42];
 
 const EXPR_POSITION = (emit: Emit, x: number, y: number, z: number) => emit(x, y, z, 1);
 
@@ -67,7 +69,16 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) =>
 
 const BACKGROUND = [0, 0, 0.09, 1];
 
-const prefilteredEnvMap = ([texture]: TextureSource[]) => null;//<PrefilteredEnvMap texture={texture} />;
+const SHADOW_MAP_DIRECTIONAL = {
+  size: [2048, 2048],
+  span: [5, 5],
+  depth: [0, 10],
+  bias: [0, 0, 1/64],
+  blur: 4,
+};
+
+
+const prefilteredEnvMap = ([texture]: TextureSource[]) => <PrefilteredEnvMap texture={texture} />;
 
 export const PlotImplicitSurfacePage: LC = () => {
 
@@ -95,8 +106,8 @@ export const PlotImplicitSurfacePage: LC = () => {
               <LinearRGB backgroundColor={BACKGROUND} tonemap="aces" gain={2}>
                 <Cursor cursor="move" />
                 <Camera>
-                  <Pass lights>
-                    <DirectionalLight position={[10, 30, 20]} color={[1, 1, 1]} intensity={1} />
+                  <Pass lights shadows>
+                    <DirectionalLight position={[1, 3, 2]} color={[1, 1, 1]} intensity={1} shadowMap={SHADOW_MAP_DIRECTIONAL} />
                     <Plot>
                       <Animate prop='bend' keyframes={keyframes} pause={1} mirror>
                         <Polar
@@ -147,14 +158,14 @@ export const PlotImplicitSurfacePage: LC = () => {
                               <Sampler
                                 axes='xyz'
                                 format='vec3<f32>'
-                                size={[42, 28, 42]}
+                                size={VOLUME_SIZE}
                                 padding={1}
                                 expr={EXPR_POSITION}
                               />
                               <Sampler
                                 axes='xyz'
                                 format='vec3<f32>'
-                                size={[42, 28, 42]}
+                                size={VOLUME_SIZE}
                                 padding={1}
                                 expr={EXPR_NORMAL}
                                 time
@@ -163,7 +174,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                               <Sampler
                                 axes='xyz'
                                 format='f32'
-                                size={[42, 28, 42]}
+                                size={VOLUME_SIZE}
                                 padding={1}
                                 expr={EXPR_VALUE}
                                 time
@@ -172,8 +183,8 @@ export const PlotImplicitSurfacePage: LC = () => {
                             </>}
                             then={
                               ([positions, normals, values]: TensorArray[]) => (<>
-                                <Environment map={envMap} preset={env}>
-                                  <PBRMaterial roughness={roughness} metalness={metalness}>
+                                <Environment map={envMap} preset={env} gain={0.5}>
+                                  <PBRMaterial roughness={roughness} metalness={metalness}>{() => {}}
                                     <ImplicitSurface
                                       values={values}
                                       normals={normals}
@@ -188,10 +199,10 @@ export const PlotImplicitSurfacePage: LC = () => {
                                 {inspect ? (
                                   <DataShader
                                     shader={colorizeShader}
-                                    source={values}
+                                    data={values}
                                   >{
                                     (colorizedValues: ShaderModule) => (
-                                      <PointLayer
+                                      <Point
                                         positions={positions}
                                         colors={mode === 'normal' ? normals : colorizedValues}
                                         size={3}

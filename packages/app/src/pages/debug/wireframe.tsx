@@ -28,12 +28,9 @@ export const DebugWireframePage: LC = () => {
           <Node position={[-.5, 0, 0]}>
             <GeometryData
               {...boxGeometry}
-              render={(mesh: GPUGeometry) =>
-                <Mesh
-                  {...({...mesh, mode: 'debug'} as any)}
-                />
-              }
-            />
+            >{
+              (mesh: GPUGeometry) => <Mesh geometry={mesh} mode='debug' />
+            }</GeometryData>
           </Node>
           <Node position={[.5, 0, 0]}>
             <Primitive>

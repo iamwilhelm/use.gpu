@@ -23,6 +23,7 @@ export type BaseAggregate = {
   material?: MaterialContextProps,
   scissor?: ScissorContextProps,
   schema?: AggregateSchema,
+  sources?: Record<string, any>,
   zIndex?: number,
 };
 

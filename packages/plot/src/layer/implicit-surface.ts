@@ -30,10 +30,12 @@ export const ImplicitSurface: LiveComponent<ImplicitSurfaceProps> = memo((props:
 
     zBias,
     zIndex,
+
+    sources: extra,
     ...flags
   } = parsed;
 
-  if (zIndex && zBias == null) parsed.zBias = zIndex;
+  const z = (zIndex && zBias == null) ? zIndex : zBias;
 
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
@@ -48,9 +50,10 @@ export const ImplicitSurface: LiveComponent<ImplicitSurfaceProps> = memo((props:
     tensor: size ?? tensor,
     render: (sources: Record<string, ShaderSource>) => use(DualContourLayer, {
       range: r,
-      zBias: parsed.zBias,
-      ...flags,
+      zBias: z,
       ...sources,
+      ...extra,
+      ...flags,
     }),
   });
 }, shouldEqual({

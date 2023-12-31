@@ -58,6 +58,8 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       anchors,
       trims,
       unwelds,
+
+      sources,
       ...flags
   } = parsed;
 
@@ -70,7 +72,7 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
   const {transform, nonlinear, matrix: refs} = context;
 
   const attributes = schemaToEmitters(ARROW_SCHEMA, parsed);
-  const archetype = schemaToArchetype(ARROW_SCHEMA, attributes, flags, refs);
+  const archetype = schemaToArchetype(ARROW_SCHEMA, attributes, flags, refs, sources);
 
   if (Number.isNaN(count)) debugger;
   if (!count || !(position || positions)) return;
@@ -82,6 +84,7 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       attributes,
       flags,
       refs,
+      sources,
       transform: nonlinear ?? context,
       zIndex,
     },

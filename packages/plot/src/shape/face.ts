@@ -51,6 +51,7 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
       indices,
       slices,
 
+      sources,
       ...flags
   } = parsed;
 
@@ -63,7 +64,7 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
   const {transform, nonlinear, matrix: refs} = context;
 
   const attributes = schemaToEmitters(FACE_SCHEMA, parsed);
-  const archetype = schemaToArchetype(FACE_SCHEMA, attributes, flags, refs);
+  const archetype = schemaToArchetype(FACE_SCHEMA, attributes, flags, refs, sources);
 
   if (Number.isNaN(count)) debugger;
   if (!count || !(position || positions)) return;
@@ -76,6 +77,7 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
       attributes,
       flags,
       refs,
+      sources,
       transform: nonlinear ?? context,
       zIndex,
     },

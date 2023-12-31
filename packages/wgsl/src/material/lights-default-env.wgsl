@@ -1,8 +1,6 @@
 @link var SH_DIFFUSE: array<vec3<f32>>;
 @link var SH_SPECULAR: array<vec3<f32>>;
 
-const GAIN = 1.0;
-
 @export fn getDefaultEnvironment(
   uvw: vec3<f32>,
   sigma: f32,
@@ -10,9 +8,9 @@ const GAIN = 1.0;
   ddy: vec3<f32>,
 ) -> vec4<f32> {
   if (sigma < 0.0) {
-    return vec4<f32>(GAIN * sampleDiffuse(uvw), 1.0);
+    return vec4<f32>(sampleDiffuse(uvw), 1.0);
   }
-  return vec4<f32>(GAIN * sampleSpecular(uvw, sigma), 1.0);
+  return vec4<f32>(sampleSpecular(uvw, sigma), 1.0);
 }
 
 fn sqr(x: f32) -> f32 { return x * x; }

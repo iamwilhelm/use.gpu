@@ -1,5 +1,5 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { UniformAttributeValue, VectorLike } from '@use-gpu/core';
+import type { VectorLike } from '@use-gpu/core';
 import type { Swizzle } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 

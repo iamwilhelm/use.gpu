@@ -1,4 +1,4 @@
-import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, TypeLike, ParameterLike, BundleSummary, RefFlags as RF } from '../types';
+import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, TypeLike, FormatLike, ParameterLike, BundleSummary, RefFlags as RF } from '../types';
 
 const NO_LIBS: Record<string, any> = {};
 const NO_ARGS: any[] = [];
@@ -55,7 +55,7 @@ export const toModule = (bundle: ShaderModule) => {
 // Parse escaped C-style string
 export const parseString = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
 
-type ToTypeSymbol = (t: TypeLike) => FormatLike;
+type ToTypeSymbol = (t: TypeLike) => FormatLike<any>;
 type ToArgTypes = (t: ParameterLike[]) => string[];
 
 export const makeDeclarationToAttribute = (

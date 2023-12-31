@@ -15,26 +15,28 @@ export type SurfaceProps = TraitProps<typeof SurfaceTraits>;
 export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
   const parsed = useTraits(props);
   const {
-      position,
-      positions,
-      color,
-      colors,
-      zIndex,
-      zBias,
-      zBiases,
+    position,
+    positions,
+    color,
+    colors,
+    zIndex,
+    zBias,
+    zBiases,
 
-      id,
-      ids,
-      lookup,
-      lookups,
+    id,
+    ids,
+    lookup,
+    lookups,
 
-      size,
-      tensor = props.positions?.size,
-      formats,
-      ...flags
+    size,
+    tensor = props.positions?.size,
+    formats,
+
+    sources: extra,
+    ...flags
   } = parsed;
 
-  if (zIndex && zBias == null) parsed.zBias = zIndex;
+  const z = (zIndex && zBias == null) ? zIndex : zBias;
 
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
@@ -46,12 +48,13 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
     data: parsed,
     tensor: size ?? tensor,
     render: (sources: Record<string, ShaderSource>) => use(SurfaceLayer, {
-      ...flags,
-      ...sources,
       color,
-      zBias,
+      zBias: z,
       id,
       lookup,
+      ...sources,
+      ...extra,
+      ...flags,
     }),
   });
 }, shouldEqual({

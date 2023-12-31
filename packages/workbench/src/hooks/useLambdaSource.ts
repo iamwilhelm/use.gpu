@@ -5,27 +5,27 @@ import type { ArrowFunction } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 import { useMemo } from '@use-gpu/live';
 
-type GetProps = {
+export type SourceLike = {
   length?: Lazy<number>,
   size?: Lazy<number[]>,
 };
 
-export const useLambdaSource = (shader: ShaderModule, getProps: GetProps) =>
-  useMemo(() => getLambdaSource(shader, getProps), [shader, getProps]);
+export const useLambdaSource = (shader: ShaderModule, sourceProps: SourceLike) =>
+  useMemo(() => getLambdaSource(shader, sourceProps), [shader, sourceProps]);
 
-export const getLambdaSource = (shader: ShaderModule, getProps: GetProps) =>
+export const getLambdaSource = (shader: ShaderModule, sourceProps: SourceLike) =>
   new Proxy({
     shader,
   }, {
     get: (target, s) => {
       if (s === 'length') {
-        if (getProps.length) return resolve(getProps.length);
-        if (getProps.size) return resolve(getProps.size).reduce((a, b) => a * b, 1);
+        if (sourceProps.length != null) return resolve(sourceProps.length);
+        if (sourceProps.size != null) return resolve(sourceProps.size).reduce((a, b) => a * b, 1);
         return 0;
       }
       if (s === 'size') {
-        if (getProps.size) return resolve(getProps.size);
-        if (getProps.length) return [resolve(getProps.length)];
+        if (sourceProps.size != null) return resolve(sourceProps.size);
+        if (sourceProps.length != null) return [resolve(getProps.length)];
         return [0];
       }
       return (target as any)[s];

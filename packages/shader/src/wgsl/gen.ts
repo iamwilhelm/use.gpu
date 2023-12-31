@@ -1,7 +1,7 @@
 import { ShaderModule, LambdaSource, UniformAttribute, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
 import { formatMurmur53, toMurmur53, getObjectKey, mixBits, scrambleBits } from '../util/hash';
-import { getBundleHash, getBundleEntry, toBundle, toModule } from '../util/bundle';
+import { getBundleHash, getBundleEntry, getBundleName, toBundle, toModule } from '../util/bundle';
 import { getBindingArgument } from '../util/bind';
 import { loadVirtualModule, bundleToAttribute } from './shader';
 import { castTo, makeSwizzle } from './operators/cast';
@@ -185,7 +185,7 @@ export const makeBindingAccessors = (
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
       if (sampler && args !== null) volatile ? volatileBase++ : bindingBase++;
-      program.push(makeTextureAccessor(namespace, set, base, formatOut, formatIn, name, layout, variant, aspect, absolute, !!sampler, !!comparison, args));
+      program.push(makeTextureAccessor(namespace, set, base, formatOut as string, formatIn, name, layout, variant, aspect, absolute, !!sampler, !!comparison, args));
     }
 
     return program.join('\n');
@@ -214,7 +214,7 @@ export const makeBindingAccessors = (
   for (const {uniform, lambda} of lambdas)   {
     const needsCast = !checkLambdaType(uniform, lambda!);
     links[uniform.name] = needsCast
-      ? castTo(lambda!.shader, uniform.format)
+      ? castTo(lambda!.shader, uniform.format as string)
       : lambda!.shader;
   }
 

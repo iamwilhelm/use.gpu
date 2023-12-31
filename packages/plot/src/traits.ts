@@ -1,4 +1,5 @@
 import type { ColorLike, VectorLike, VectorLikes } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
 import { useMemo } from '@use-gpu/live';
 import { trait, combine, optional, useProp } from '@use-gpu/traits/live';
@@ -43,7 +44,7 @@ import {
   toChunkCounts,
   makeParseEnum,
 } from '@use-gpu/parse';
-import { seq } from '@use-gpu/core';
+import { seq, isShaderBinding, toCPUDims, getUniformDims } from '@use-gpu/core';
 import { getArrowSegments, getFaceSegments, getFaceSegmentsConcave, getLineSegments } from '@use-gpu/workbench';
 
 import { useDataContext } from './providers/data-provider';
@@ -52,6 +53,8 @@ import { vec4 } from 'gl-matrix';
 
 const EMPTY: any[] = [];
 const WHITE = [1, 1, 1, 1];
+
+const bindable = <A, B>(parse: (t: A) => B) => (t: A | ShaderSource) => isShaderBinding(t) ? undefined : parse(t);
 
 export const AnchorTrait = trait(
   {
@@ -262,7 +265,7 @@ export const ColorTrait = (
 
 export const ColorsTrait = ({composite}: {composite?: boolean} = {}) => {
   const parseColorProp = optional(composite ? parseColorArrayLike : parseColor);
-  const parseColorsProp = optional(composite ? parseColorMultiArray : parseColorArray);
+  const parseColorsProp = bindable(optional(composite ? parseColorMultiArray : parseColorArray));
 
   return (
     props: {
@@ -300,6 +303,7 @@ const applyOpacity = (colors?: TypedArray, opacity: number = 1) => {
 
 // Inject tensor arrays from data context if they match an existing undefined prop.
 // Record formats of tensor inputs.
+// Separate GPU sources from CPU-side data.
 
 export const DataTrait = (keys: string[], canonical: string = 'positions') => {
   const match = new Set(keys);
@@ -312,18 +316,21 @@ export const DataTrait = (keys: string[], canonical: string = 'positions') => {
   ) => {
     const dataContext = useDataContext();
 
-    const [data, formats] = useMemo(() => {
-      const formats = {};
+    const [data, formats, sources] = useMemo(() => {
       const data = {};
+      const formats = {};
+      const sources = {};
 
-      let n = 0;
+      let d = 0;
       let f = 0;
+      let s = 0;
       for (const k in dataContext) if (match.has(k)) {
         const {array, format, dims, size} = dataContext[k];
         if (!(props as any)[k]) {
           data[k] = array;
-          data.formats[k] = format;
-          n++;
+          formats[k] = format;
+          d++;
+          f++;
 
           if (k === canonical) data.tensor = size;
         }
@@ -335,13 +342,18 @@ export const DataTrait = (keys: string[], canonical: string = 'positions') => {
           formats[k] = value.format;
           f++;
         }
+        if (isShaderBinding(value)) {
+          sources[k] = value;
+          s++;
+        }
       }
 
-      return [n ? data : null, n + f ? formats : null];
+      return [d ? data : null, f ? formats : null, s ? sources : null];
     }, [dataContext]);
 
     if (data) for (const k in data) parsed[k] = data[k];
     parsed.formats = formats;
+    parsed.sources = sources;
   };
 };
 
@@ -409,6 +421,8 @@ export const SegmentsTrait = combine(
     parsed: {
       positions?: TypedArray,
       chunks?: TypedArray,
+      groups?: TypedArray,
+      formats: Record<string, string>,
     },
   ) => {
     const [chunks, groups] = useProp(
@@ -420,7 +434,8 @@ export const SegmentsTrait = combine(
           return [seq(count).map(_ => segment), null];
         }
         if (!pos || props.segments) return [];
-        return toChunkCounts(pos, 4);
+        const f = parsed.formats?.position ?? 'vec4<f32>';
+        return toChunkCounts(pos, toCPUDims(getUniformDims(f)));
       }
     );
     parsed.chunks = chunks;
@@ -444,6 +459,7 @@ export const FacetedTrait = combine(
       positions?: TypedArray,
       chunks?: TypedArray,
       groups?: TypedArray,
+      formats: Record<string, string>,
     },
   ) => {
     const [chunks, groups] = useProp(
@@ -463,7 +479,8 @@ export const FacetedTrait = combine(
           }
         }
         if (!pos || props.segments || props.indices) return [];
-        return toChunkCounts(pos, 4);
+        const f = parsed.formats?.position ?? 'vec4<f32>';
+        return toChunkCounts(pos, toCPUDims(getUniformDims(f)));
       }
     );
     parsed.chunks = chunks;
@@ -568,49 +585,49 @@ export const FaceSegmentsTrait = combine(
 
 export const VerticesTrait = trait({
   position: optional(parsePosition),
-  positions: optional(parsePositionArray),
+  positions: bindable(optional(parsePositionArray)),
   depth: optional(parseNumber),
-  depths: optional(parseScalarArray),
+  depths: bindable(optional(parseScalarArray)),
   zBias: optional(parseNumber),
-  zBiases: optional(parseScalarArray),
+  zBiases: bindable(optional(parseScalarArray)),
 
   id: optional(parseNumber),
-  ids: optional(parseScalarArray),
+  ids: bindable(optional(parseScalarArray)),
   lookup: optional(parseNumber),
-  lookups: optional(parseScalarArray),
+  lookups: bindable(optional(parseScalarArray)),
 });
 
 export const CompositeVerticesTrait = trait({
-  positions: optional(parsePositionMultiMultiArray),
+  positions: bindable(optional(parsePositionMultiMultiArray)),
   depth: optional(parseScalarArrayLike),
-  depths: optional(parseMultiScalarArray),
+  depths: bindable(optional(parseMultiScalarArray)),
   zBias: optional(parseScalarArrayLike),
-  zBiases: optional(parseMultiScalarArray),
+  zBiases: bindable(optional(parseMultiScalarArray)),
 
   id: optional(parseScalarArrayLike),
-  ids: optional(parseMultiScalarArray),
+  ids: bindable(optional(parseMultiScalarArray)),
   lookup: optional(parseScalarArrayLike),
-  lookups: optional(parseMultiScalarArray),
+  lookups: bindable(optional(parseMultiScalarArray)),
 });
 
 export const FacetedVerticesTrait = trait({
-  positions: optional(parsePositionMultiMultiArray),
+  positions: bindable(optional(parsePositionMultiMultiArray)),
   depth: optional(parseScalarArrayLike),
-  depths: optional(parseMultiScalarArray),
+  depths: bindable(optional(parseMultiScalarArray)),
   zBias: optional(parseScalarArrayLike),
-  zBiases: optional(parseMultiScalarArray),
+  zBiases: bindable(optional(parseMultiScalarArray)),
 
   id: optional(parseScalarArrayLike),
-  ids: optional(parseMultiScalarArray),
+  ids: bindable(optional(parseMultiScalarArray)),
   lookup: optional(parseScalarArrayLike),
-  lookups: optional(parseMultiScalarArray),
+  lookups: bindable(optional(parseMultiScalarArray)),
 });
 
 export const PointTraits = combine(
   ColorsTrait(),
   trait({
     size: optional(parseNumber),
-    sizes: optional(parseScalarArray),
+    sizes: bindable(optional(parseScalarArray)),
   }),
   VerticesTrait,
   DataTrait(['positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'sizes']),
@@ -625,7 +642,7 @@ export const LineTraits = combine(
   ColorsTrait({ composite: true }),
   trait({
     width: optional(parseScalarArrayLike),
-    widths: optional(parseMultiScalarArray),
+    widths: bindable(optional(parseMultiScalarArray)),
   }),
   CompositeVerticesTrait,
   DataTrait(['positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'widths']),
@@ -640,9 +657,9 @@ export const ArrowTraits = combine(
   ColorsTrait({ composite: true }),
   trait({
     width: optional(parseScalarArrayLike),
-    widths: optional(parseMultiScalarArray),
+    widths: bindable(optional(parseMultiScalarArray)),
     size: optional(parseScalarArrayLike),
-    sizes: optional(parseMultiScalarArray),
+    sizes: bindable(optional(parseMultiScalarArray)),
   }),
   CompositeVerticesTrait,
   DataTrait(['positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'widths', 'sizes']),

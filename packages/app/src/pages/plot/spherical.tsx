@@ -4,9 +4,9 @@ import React, { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, FlatCamera, ArrayData, Data, RawData,
+  Loop, Pass,
   OrbitCamera, OrbitControls,
-  Pick, Cursor,
+  Cursor,
   Animate,
   LinearRGB,
 } from '@use-gpu/workbench';

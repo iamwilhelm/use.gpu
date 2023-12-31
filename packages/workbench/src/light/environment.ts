@@ -6,10 +6,12 @@ import { patch, $set } from '@use-gpu/state';
 import { provide, useMemo } from '@use-gpu/live';
 
 import { EnvironmentContext } from '../providers/environment-provider';
+import { MaterialContext, useMaterialContext } from '../providers/material-provider';
 
 import { getShader, useShader, useNoShader } from '../hooks/useShader';
 
 import { getDefaultEnvironment } from '@use-gpu/wgsl/material/lights-default-env.wgsl';
+import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
 
 import {
   SH_DIFFUSE  as SH_DIFFUSE_PARK,
@@ -54,7 +56,18 @@ export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<Envir
     ? (useNoShader(), map ?? null)
     : useShader(getDefaultEnvironment, [...PRESETS[preset as any] ?? PRESETS.park]);
 
+  const parent = useMaterialContext();
+  const context = useMemo(() => {
+    return patch(parent, {
+      shaded: {
+        applyEnvironment: $set(getShader(applyPBREnvironment, [environment])),
+      },
+    });
+  }, [environment, parent])
+
   return (
-    provide(EnvironmentContext, environment, children)
+    provide(EnvironmentContext, environment, 
+      provide(MaterialContext, context, children)
+    )
   );
 };

@@ -71,12 +71,11 @@ const BACKGROUND = [0, 0, 0.09, 1];
 
 const SHADOW_MAP_DIRECTIONAL = {
   size: [2048, 2048],
-  span: [5, 5],
-  depth: [0, 10],
+  span: [6, 6],
+  depth: [0, 7],
   bias: [0, 0, 1/64],
   blur: 4,
 };
-
 
 const prefilteredEnvMap = ([texture]: TextureSource[]) => <PrefilteredEnvMap texture={texture} />;
 

@@ -9,7 +9,6 @@ import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
-import { getDefaultEnvironment } from '@use-gpu/wgsl/material/lights-default-env.wgsl';
 import { getDefaultPBRMaterial } from '@use-gpu/wgsl/material/pbr-default.wgsl';
 
 import { SH_DIFFUSE, SH_SPECULAR } from '@use-gpu/wgsl/material/env/park.wgsl';
@@ -29,9 +28,6 @@ export const DEFAULT_MATERIAL_CONTEXT = {
     getSurface,
     getLight: getLitFragment,
     applyLights: DEFAULT_LIGHT_CONTEXT.bindMaterial(applyPBRMaterial),
-    applyEnvironment: bindBundle(applyPBREnvironment, {
-      sampleEnvironment: bindBundle(getDefaultEnvironment, { SH_DIFFUSE, SH_SPECULAR }),
-    }),
   },
 };
 

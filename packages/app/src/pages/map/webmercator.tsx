@@ -4,16 +4,16 @@ import type { Tracks } from '@use-gpu/workbench';
 import React, { use, useContext } from '@use-gpu/live';
 
 import {
-  Loop, Pass, FlatCamera, RawData, PointLayer,
+  Loop, Pass,
   Cursor, OrbitCamera, OrbitControls,
   Animate,
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
-  Plot, Spherical, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
+  Plot, Spherical, Axis, Grid, Label, Line, Scale, Tick,
 } from '@use-gpu/plot';
 import {
-  WebMercator, MVTiles, MVTStyles, MapboxProvider, MapTileProvider,
+  WebMercator, MVTiles, MTStyles, MapboxProvider, MapTileProvider,
 } from '@use-gpu/map';
 import { parseColor } from '@use-gpu/parse';
 

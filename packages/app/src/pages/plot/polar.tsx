@@ -3,9 +3,8 @@ import type { LC } from '@use-gpu/live';
 import React, { use } from '@use-gpu/live';
 
 import {
-  Loop, Pass, FlatCamera, ArrayData, Data, RawData,
-  OrbitCamera, OrbitControls,
-  Pick, Cursor,
+  Loop, Pass, FlatCamera,
+  Cursor,
   Animate,
   LinearRGB,
 } from '@use-gpu/workbench';

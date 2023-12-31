@@ -8,6 +8,7 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useShaderRefs } from '../hooks/useShaderRef';
 import { getDerivedSource } from '../hooks/useDerivedSource';
 import { getShader } from '../hooks/useShader';
+import { useRenderProp } from '../hooks/useRenderProp';
 
 export type DataShaderProps = {
   source?: StorageSource,
@@ -17,6 +18,7 @@ export type DataShaderProps = {
   args?: Lazy<any>[],
 
   render?: (source: ShaderModule) => LiveElement,
+  children?: (source: ShaderModule) => LiveElement,
 };
 
 const NO_SOURCES: ShaderSource[] = [];
@@ -63,5 +65,5 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
     );
   }, [shader, args.length, source, sources]);
 
-  return useHooks(() => render ? render(getData) : yeet(getData), [render, getData]);
+  return useRenderProp(props, getData);
 };

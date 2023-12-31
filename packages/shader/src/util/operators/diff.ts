@@ -34,7 +34,7 @@ export const makeDiffBy = (
   size: null | ShaderModule | (null | ShaderModule)[],
 ): ParsedBundle => {
   const bundle = toBundle(source);
-  const {name, format, args} = bundleToAttribute(bundle);
+  const {name, format, type, args} = bundleToAttribute(bundle);
 
   const entry = 'diff';
 
@@ -63,10 +63,12 @@ export const makeDiffBy = (
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {
+    const f = formatFormat(format, type);
+    const format = rename.get(f) ?? f;
     const name = rename.get(entry) ?? 'entry';
     const accessor = rename.get('getValue') ?? 'getValue';
     const sizes = getSizes.map(getSize => rename.get(getSize) ?? getSize);
-    return makeDiffAccessor(name, accessor, sizes, args ?? [], formatFormat(format), offsets);
+    return makeDiffAccessor(name, accessor, sizes, args ?? [], format, offsets);
   }
 
   const diff = loadVirtualModule(

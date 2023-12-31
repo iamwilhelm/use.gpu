@@ -22,7 +22,8 @@ export type StructDataProps = {
   length?: number,
 
   /** Struct WGSL type */
-  format?: ShaderModule,
+  format?: 'T' | 'array<T>',
+  type?: ShaderModule,
 
   /** Input data */
   data?: Record<string, number | number[] | TypedArray>[],
@@ -49,16 +50,17 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
     expr,
     time,
 
-    format,
+    format = 'array<T>',
+    type,
     live,
   } = props;
 
-  if (!format || typeof (format as any) === 'string') throw new Error("<StructData> format must be a WGSL type shader module");
+  if (!type || typeof type === 'string') throw new Error("<StructData> type must be a WGSL shader type");
 
   // Make struct uniform layout
   const [bindings, layout] = useOne(() => {
     const bindings = bundleToAttribute(format);
-    if (!Array.isArray(bindings.format)) throw new Error("<StructData> format is not a shader struct type");
+    if (!Array.isArray(bindings.format)) throw new Error(`<StructData> type '${bindings.name}' is not a struct type`);
 
     const layout = makeUniformLayout(bindings.format);
     return [bindings, layout];
@@ -78,6 +80,7 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
     const source = {
       buffer,
       format,
+      type,
       length: 0,
       size: [0],
       version: 1,

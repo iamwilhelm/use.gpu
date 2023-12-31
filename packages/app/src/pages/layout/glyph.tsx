@@ -36,7 +36,8 @@ export const LayoutGlyphPage: LC = () => {
 
   const root = document.querySelector('#use-gpu .canvas');
 
-  return (
+  return (<>
+    <InfoBox>Extremely zoomable diagram with detail inside the pixels. Use &lt;Sampler&gt; to produce dense and sparse data sets and render them in a &lt;Flex&gt; layout.</InfoBox>
     <GlyphControls
       container={root}
       hasGlyph
@@ -89,7 +90,7 @@ export const LayoutGlyphPage: LC = () => {
         ]
       }
     />
-  );
+  </>);
 };
 
 type GlyphViewProps = {
@@ -289,7 +290,6 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
 
   return (
     <DebugProvider debug={{sdf2d: {subpixel, contours, preprocess, postprocess, solidify: true}}}>
-      <InfoBox>Extremely zoomable diagram with detail inside the pixels. Use &lt;Sampler&gt; to produce dense and sparse data sets and render them in a &lt;Flex&gt; layout.</InfoBox>
       <LinearRGB backgroundColor={BACKGROUND}>
         <Pass>
           <UI>
@@ -502,7 +502,7 @@ const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFra
           <Embedded>
             <Axis axis="x" width={5} color={'#808080'} end={false} />
             <Axis axis="y" width={5} color={'#808080'} end={false} />
-            <Grid axes="xy" width={2} color={'#cccccc'} first={{divide: width / 10}} second={{divide: height / 10}} zBias={ZBIAS_GRID} />
+            <Grid axes="xy" width={2} color={'#a0a0a0'} first={{divide: width / 10}} second={{divide: height / 10}} zBias={ZBIAS_GRID} />
 
             <Scale axis="x" unit={1} divide={width}>
               <Tick size={10} width={2.5} color={'#c0c0c0'} depth={0} zBias={ZBIAS_DATA} />

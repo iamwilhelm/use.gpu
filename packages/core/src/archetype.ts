@@ -181,7 +181,7 @@ export const schemaToAggregate = (
   const refBuffers: Record<string, any> = {};
 
   for (const key in schema) {
-    const {format, name, unwelded, index, ref} = schema[key];
+    const {format, name, unwelded, index, ref, separate} = schema[key];
 
     const hasValues = attributes[key] != null;
     const hasRef = ref && refs && refs[key] != null;
@@ -198,15 +198,15 @@ export const schemaToAggregate = (
       const attr = [key, alloc];
 
       // Separate emulated types like u8/u16
-      const align = getUniformAlign(format);
-      const separate = !hasRef && (align === 0);
+      const isEmulated = getUniformAlign(format) === 0;
+      const isSeparate = separate || isEmulated;
 
       if (hasRef) {
-        if (separate) throw new Error(`Cannot use emulated type '${format}' as ref attribute`);
+        if (isEmulated) throw new Error(`Cannot use emulated type '${format}' as ref attribute`);
         refBuffers[key] = [];
       }
 
-      if (separate) bySelf.push([key, alloc]);
+      if (isSeparate) bySelf.push([key, alloc]);
       else {
         const list = (
           // Uniform with lazy ref

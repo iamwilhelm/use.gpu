@@ -16,6 +16,7 @@ import {
 } from '@use-gpu/plot';
 
 import { PlotControls } from '../../ui/plot-controls';
+import { InfoBox } from '../../ui/info-box';
 
 const π = Math.PI;
 const τ = π*2;
@@ -39,7 +40,8 @@ export const PlotStereographicPage: LC = () => {
     [11, 1],
   ] as Keyframe[];
 
-  const view = (normalize: number) => (
+  const view = (normalize: number) => (<>
+    <InfoBox>Plot curves and grids in an animated &lt;Stereographic&gt; viewport.</InfoBox>
     <Loop>
       <LinearRGB>
       <Camera>
@@ -167,7 +169,7 @@ export const PlotStereographicPage: LC = () => {
       </Camera>
       </LinearRGB>
     </Loop>
-  );
+  </>);
 
   const root = document.querySelector('#use-gpu .canvas');
 

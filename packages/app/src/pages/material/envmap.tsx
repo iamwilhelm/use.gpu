@@ -10,7 +10,7 @@ import { vec3 } from 'gl-matrix';
 import {
   Loop, Pass, FlatCamera, Animate, LinearRGB, Environment,
   GeometryData, PBRMaterial, ImageCubeTexture, PrefilteredEnvMap, ShaderLitMaterial,
-  OrbitCamera, OrbitControls, PanControls, Suspense,
+  OrbitCamera, OrbitControls, PanControls,
   Pick, Cursor, PointLayer, LineLayer,
   AxisHelper, KeyboardContext,
 
@@ -55,7 +55,7 @@ export const MaterialEnvMapPage: LC = (props) => {
       <Gather
         children={[
           <GeometryData {...geometry} />,
-          <Suspense>{envMap}</Suspense>,
+          {envMap},
         ]}
         then={([
           mesh,

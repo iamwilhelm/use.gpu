@@ -6,6 +6,7 @@ import { MouseContext, WheelContext, KeyboardContext } from '../providers/event-
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { LayoutContext } from '../providers/layout-provider';
+import { getRenderFunc } from '../hooks/useRenderProp';
 
 const π = Math.PI;
 const SOFT_LERP = 0.35;
@@ -34,7 +35,8 @@ export type PanControlsProps = {
   maxZoom?: number,
   snapZoom?: number,
 
-  render: (x: number, y: number, zoom: number) => LiveElement,
+  render?: (x: number, y: number, zoom: number) => LiveElement,
+  children?: (x: number, y: number, zoom: number) => LiveElement,
 };
 
 const DEFAULT_ANCHOR = [0.5, 0.5];
@@ -63,7 +65,6 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     active = true,
     anchor = DEFAULT_ANCHOR,
     version,
-    render,
   } = props;
 
   let [x, setX]       = useState<number>(initialX);
@@ -255,6 +256,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const panX = centered ? x - originX * (zoom - 1) / zoom + offsetX : x;
   const panY = centered ? y - originY * (zoom - 1) / zoom + offsetY : y;
 
+  const render = getRenderFunc(props);
   return useMemo(() => render ? use(Inner, panX, panY, zoom, x, y, render) : null, [render, panX, panY, zoom]);
 };
 

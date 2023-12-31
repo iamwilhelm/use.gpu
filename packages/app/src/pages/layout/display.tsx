@@ -11,6 +11,8 @@ import {
   UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
 } from '@use-gpu/layout';
 
+import { InfoBox } from '../../ui/info-box';
+
 const BLACK_SHADE = [0, 0, 0, .9];
 const GRAY_TRANSPARENT = [0.5, 0.5, 0.5, 0.5];
 const WHITE_TRANSPARENT = [1, 1, 1, .5];
@@ -21,7 +23,8 @@ const MARGIN_TOP = [0, 24, 0, 0];
 
 export const LayoutDisplayPage: LC = () => {
 
-  const view = (
+  const view = (<>
+    <InfoBox>Create flex, block and inline layouts using the layout package. Fully scalable, rendered using distance fields.</InfoBox>
     <LinearRGB>
       <Pass>
         <UI>
@@ -142,7 +145,7 @@ export const LayoutDisplayPage: LC = () => {
         </UI>
       </Pass>
     </LinearRGB>
-  );
+  </>);
 
   const root = document.querySelector('#use-gpu .canvas');
 

@@ -1,5 +1,5 @@
 import type {
-  ArrowFunction, TypedArray, TypedArrayConstructor,
+  ArrowFunction, TypedArray, TensorArray, TypedArrayConstructor,
   Blending, VectorLike, ArrayLike, ColorLike, ColorLikes, Side, VectorLikes,
 } from '@use-gpu/core';
 import type { Parser, Join, Placement, PointShape, Domain } from './types';
@@ -113,7 +113,7 @@ export const makeParseMat4 = (defaults: mat4 = NO_MAT4) => (matrix?: VectorLike)
 export const makeParseScalarArray = <T extends TypedArrayConstructor>(
   constructor: T,
 ) => (
-  vec: VectorLike
+  vec: VectorLike | TensorArray
 ): InstanceType<T> => {
   return (toScalarArray(vec, constructor) ?? new constructor(0)) as T;
 };
@@ -121,7 +121,7 @@ export const makeParseScalarArray = <T extends TypedArrayConstructor>(
 export const makeParseScalarArrayLike = <T extends TypedArrayConstructor>(
   constructor: T,
 ) => (
-  vec: number | VectorLike,
+  vec: number | VectorLike | TensorArray,
 ): number | InstanceType<T> => {
   if (typeof vec === 'number') return vec;
   return (toScalarArray(vec, constructor) ?? new constructor(0)) as T;
@@ -130,7 +130,7 @@ export const makeParseScalarArrayLike = <T extends TypedArrayConstructor>(
 export const makeParseMultiScalarArray = <T extends TypedArrayConstructor>(
   constructor: T,
 ) => (
-  vecs: VectorLikes
+  vecs: VectorLikes | TensorArray
 ): InstanceType<T> => {
   return (toMultiScalarArray(vecs, constructor) ?? new constructor(0)) as T;
 };
@@ -140,7 +140,7 @@ export const makeParseVectorArray = <T extends TypedArrayConstructor>(
   w: number = 0,
   constructor: T,
 ) => (
-  vecs: VectorLikes
+  vecs: VectorLikes | TensorArray
 ): InstanceType<T> => {
   return (toVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as T;
 };
@@ -150,7 +150,7 @@ export const makeParseMultiVectorArray = <T extends TypedArrayConstructor>(
   w: number = 0,
   constructor: T,
 ) => (
-  vecs: VectorLikes
+  vecs: VectorLikes | TensorArray
 ): InstanceType<T> => {
   return (toMultiVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as T;
 };
@@ -160,7 +160,7 @@ export const makeParseMultiMultiVectorArray = <T extends TypedArrayConstructor>(
   w: number = 0,
   constructor: T,
 ) => (
-  vecs: VectorLikes
+  vecs: VectorLikes | TensorArray
 ): InstanceType<T> => {
   return (toMultiMultiVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as T;
 };

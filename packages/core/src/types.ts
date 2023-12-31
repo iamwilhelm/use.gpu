@@ -98,7 +98,8 @@ export type GPUGeometry = {
   unwelded?: Record<string, boolean>,
 };
 
-// Classic vertex attributes
+// Classic vertex attributes.
+// Unused because the types differ from uniforms.
 export type VertexData = {
   count: number,
   vertices: TypedArray[],
@@ -113,11 +114,13 @@ export type VertexAttribute = {
 };
 
 // Uniform buffers
-export type UniformFormat = UniformType | UniformAttribute[] | ShaderModule;
+export type UniformNamedType = 'T' | 'array<T>';
+export type UniformFormat = UniformType | UniformAttribute[] | UniformNamedType;
 
 export type UniformAttribute = {
   name: string,
   format: UniformFormat,
+  type?: ShaderStructType, 
   args?: UniformFormat[] | null,
   attr?: UniformShaderAttribute[],
 };
@@ -144,10 +147,6 @@ export type InterleavedLayout = {
   uniforms: UniformAttribute[],
   offsets: number[],
   groups: number[],
-};
-
-export type ShaderStructType = {
-  module: {entry: string}
 };
 
 // Uniform bindings
@@ -191,6 +190,14 @@ export type UniformValueSetter = (index: number, field: number, value: any) => v
 export type UniformByteSetter = (view: DataView, offset: number, data: any) => void;
 
 // Shaders
+export type ShaderStructType = ShaderModule & {entry: 'string'};
+
+export type ShaderModule = {
+  module?: Record<string, any>, // ParsedBundle
+  table?: Record<string, any>,  // ParsedModule
+  entry?: string,
+};
+
 export type ShaderModuleDescriptor = {
   code: TypedArray | string,
   label?: string,
@@ -220,9 +227,11 @@ export type DataBounds = {
   max: number[],
 };
 
-export type StorageSource = {
+export type StorageSource<T extends ShaderModule = ShaderModule> = {
   buffer: GPUBuffer,
-  format: any,
+  format: UniformType | UniformNamedType,
+  type?: T,
+
   length: number,
   size: number[],
   version: number,
@@ -235,7 +244,7 @@ export type StorageSource = {
   colorSpace?: ColorSpace,
 };
 
-export type LambdaSource<T = any> = {
+export type LambdaSource<T extends ShaderModule = ShaderModule> = {
   shader: T,
   length: number,
   size: number[],
@@ -373,6 +382,8 @@ export type DataField = {
   unwelded?: boolean,
   /** Spread a singular to a plural attribute */
   spread?: string,
+  /** Don't aggregate */
+  separate?: boolean,
 };
 
 export type ArchetypeSchema = Record<string, ArchetypeField>;
@@ -389,6 +400,8 @@ export type ArchetypeField = {
   spread?: string,
   /** Instance attribute passed by ref just-in-time */
   ref?: boolean,
+  /** Don't aggregate */
+  separate?: boolean,
 };
 
 export type Aggregate = {

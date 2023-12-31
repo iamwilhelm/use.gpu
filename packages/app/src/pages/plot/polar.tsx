@@ -12,6 +12,9 @@ import {
 import {
   Plot, Polar, Axis, Grid, Label, Line, Sampler, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
+
+import { InfoBox } from '../../ui/info-box';
+
 const π = Math.PI;
 const EPS = 1e-3;
 
@@ -26,7 +29,8 @@ const thetaFormatter = (θ: number) => {
 
 export const PlotPolarPage: LC = () => {
 
-  return (
+  return (<>
+    <InfoBox>Plot curves and grids in an animated &lt;Polar&gt; viewport.</InfoBox>
     <Loop>
       <LinearRGB>
         <FlatCamera relative>
@@ -131,5 +135,5 @@ export const PlotPolarPage: LC = () => {
         </FlatCamera>
       </LinearRGB>
     </Loop>
-  );
+  </>);
 };

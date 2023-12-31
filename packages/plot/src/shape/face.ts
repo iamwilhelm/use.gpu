@@ -1,33 +1,20 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/traits';
 
-import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
+import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
 import { getFaceSegments, useInspectHoverable, useTransformContext, FACE_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
-import {
-  FacesTrait,
-
-  FaceTrait,
-  ROPTrait,
-  ZIndexTrait,
-} from '../traits';
+import { FaceTraits } from '../traits';
 
 const {quote} = LayerReconciler;
 
-const Traits = combine(
-  FacesTrait,
+const useTraits = makeUseTrait(FaceTraits);
 
-  FaceTrait,
-  ROPTrait,
-  ZIndexTrait,
-);
-const useTraits = makeUseTrait(Traits);
-
-export type FaceProps = TraitProps<typeof Traits>;
+export type FaceProps = TraitProps<typeof FaceTraits>;
 
 export const RawFace: LiveComponent<FaceProps> = (props) => {
 
@@ -67,7 +54,7 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
       ...flags
   } = parsed;
 
-  if (zIndex && !zBias) parsed.zBias = zIndex;
+  if (zIndex && zBias == null) parsed.zBias = zIndex;
 
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";

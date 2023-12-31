@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { TraitProps } from '@use-gpu/traits/live';
 
-import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
+import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { adjustSchema, schemaToArchetype, schemaToAttributes } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
@@ -13,26 +13,11 @@ const {quote} = LayerReconciler;
 //import { PointLayer } from '@use-gpu/workbench';
 //import { DataContext } from '../providers/data-provider';
 
-import {
-  PointsTrait,
+import { PointTraits } from '../traits';
 
-  MarkerTrait,
-  PointTrait,
-  ROPTrait,
-  ZIndexTrait,
-} from '../traits';
+const useTraits = makeUseTrait(PointTraits);
 
-const Traits = combine(
-  PointsTrait,
-
-  MarkerTrait,
-  PointTrait,
-  ROPTrait,
-  ZIndexTrait,
-);
-const useTraits = makeUseTrait(Traits);
-
-export type PointProps = TraitProps<typeof Traits>;
+export type PointProps = TraitProps<typeof PointTraits>;
 
 export const Point: LiveComponent<PointProps> = memo((props) => {
   const parsed = useTraits(props);
@@ -60,7 +45,7 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
       ...flags
   } = parsed;
 
-  if (zIndex && !zBias) parsed.zBias = zIndex;
+  if (zIndex && zBias == null) parsed.zBias = zIndex;
 
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";

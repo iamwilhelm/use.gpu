@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { XY, ColorSpace, TextureSource } from '@use-gpu/core';
 
-import { use, yeet, gather, keyed, wrap, suspend, useMemo, useHooks } from '@use-gpu/live';
+import { use, yeet, gather, keyed, wrap, suspend, useMemo } from '@use-gpu/live';
 import { Suspense } from '@use-gpu/workbench';
 import { makeDynamicTexture, uploadDataTexture, uploadExternalTexture, updateMipArrayTextureChain } from '@use-gpu/core';
 
@@ -47,7 +47,10 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
   } = props;
 
   const suspense = useSuspenseContext();
-  const fetch = wrap(Suspense, urls.map((url: string) => keyed(ImageLoader, url, {url, format, colorSpace})));
+  const fetch = useMemo(
+    () => wrap(Suspense, urls.map((url: string) => keyed(ImageLoader, url, {url, format, colorSpace}))),
+    [...urls, format, colorSpace]
+  );
 
   return gather(fetch, (resources: any[]) => {
     if (resources.filter(x => !!x).length !== 6) return suspense ? suspend() : render ? render(null) : yeet(null);

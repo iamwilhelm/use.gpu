@@ -1,35 +1,20 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/traits';
 
-import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
+import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
 import { getArrowSegments, useInspectHoverable, useTransformContext, ARROW_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
-import {
-  ArrowsTrait,
-
-  ArrowTrait,
-  ROPTrait,
-  StrokeTrait,
-  ZIndexTrait,
-} from '../traits';
+import { ArrowTraits } from '../traits';
 
 const {quote} = LayerReconciler;
 
-const Traits = combine(
-  ArrowsTrait,
+const useTraits = makeUseTrait(ArrowTraits);
 
-  ArrowTrait,
-  ROPTrait,
-  StrokeTrait,
-  ZIndexTrait,
-);
-const useTraits = makeUseTrait(Traits);
-
-export type ArrowProps = TraitProps<typeof Traits>;
+export type ArrowProps = TraitProps<typeof ArrowTraits>;
 
 export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
 
@@ -76,7 +61,7 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       ...flags
   } = parsed;
 
-  if (zIndex && !zBias) parsed.zBias = zIndex;
+  if (zIndex && zBias == null) parsed.zBias = zIndex;
 
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";

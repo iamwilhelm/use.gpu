@@ -23,6 +23,11 @@ export type ParameterLike = string | {
   type: TypeLike,
 };
 
+export type FormatLike<T> = {
+  format: string,
+  type?: T,
+};
+
 export type ParsedModuleCache<T extends SymbolTableT = any> = LRU<number, ParsedModule<T>>;
 
 export type ShaderModule<T extends SymbolTableT = any> = ParsedBundle<T> | ParsedModule<T>;

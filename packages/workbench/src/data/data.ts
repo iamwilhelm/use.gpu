@@ -24,7 +24,7 @@ import {
   schemaToEmitters,
   getAggregateSummary,
 } from '@use-gpu/core';
-import { sizeToMultiCompositeChunks, toMultiChunkCounts, toChunkCount, toVertexCount } from '@use-gpu/parse';
+import { sizeToChunkCounts, toChunkCounts, toVertexCount } from '@use-gpu/parse';
 
 const {signal} = QueueReconciler;
 
@@ -131,7 +131,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
 
     if (isArray) {
       if (tensor) {
-        [chunks, groups] = sizeToMultiCompositeChunks(tensor);
+        [chunks, groups] = sizeToChunkCounts(tensor);
         indexCount = vertexCount = tensor.reduce((a, b) => a * b, 1);
       }
       else if (segments) {
@@ -247,15 +247,18 @@ export const Data: LiveComponent<DataProps> = (props) => {
   // Aggregate into struct buffers by access policy
   const {sources} = useAggregator(mergedSchema, items);
 
-  // Tag positions with bounds
   useMemo(() => {
+    // Tag output with tensor size
+    if (tensor) for (const k in sources) sources[k].size = tensor;
+
+    // Tag positions with bounds
     if (!fields.positions) return NO_BOUNDS;
 
     const {array, dims} = fields.positions;
     const bounds = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
 
     if (sources.positions && bounds) sources.positions.bounds = bounds;
-  }, [fields, items, sources]);
+  }, [fields, items, sources, tensor]);
 
   if (live) useAnimationFrame();
   else useNoAnimationFrame();
@@ -304,7 +307,7 @@ const getMultiChunkCount = (
   const groups = [];
 
   for (let i = 0; i < itemCount; ++i) {
-    const [c, g] = toMultiChunkCounts(get(i + skip), dims);
+    const [c, g] = toChunkCounts(get(i + skip), dims);
     chunks.push(...c);
     if (g) groups.push(...g)
     else groups.push(c.length);

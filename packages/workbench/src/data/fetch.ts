@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import { yeet, suspend, useAwait, useMemo, useOne } from '@use-gpu/live';
+import { yeet, suspend, useAwait, useNoAwait, useMemo, useOne } from '@use-gpu/live';
 import { useSuspenseContext } from '../providers/suspense-provider';
 import { getRenderFunc } from '../hooks/useRenderProp';
 
@@ -46,14 +46,18 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
       return response;
     };
 
-    let go = (url ?? request) ? (slow ? () => delay(f(), slow) : f) : async () => null;
-    return then ? async () => go().then(then) : go;
+    const go = (url ?? request) ? (slow ? () => delay(f(), slow) : f) : async () => null;
+    return go;
   }, [url, request, JSON.stringify(options), type, then, version]);
 
-  const [resolved, error] = useAwait(run, [run]);
+  const [resolved, fetchError] = useAwait(run, [run]);
+  const [mapped, mapError] = resolved !== undefined && then
+    ? useAwait(() => then(resolved), [then, resolved])
+    : (useNoAwait(), [resolved]);
+  const error = fetchError || mapError;
   useOne(() => error && console.warn(error), error);
 
-  const result = resolved !== undefined ? resolved : (error !== undefined ? fallback ?? loading : loading);
+  const result = resolved !== undefined ? mapped : (error !== undefined ? fallback ?? loading : loading);
 
   const render = getRenderFunc(props);
   return result !== undefined ? (render ? render(result) : yeet(result)) : (suspense ? suspend() : null);

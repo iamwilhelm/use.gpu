@@ -41,7 +41,7 @@ import {
   parseDomain,
   parsePointShape,
   toChunkCounts,
-  toMultiChunkCounts,
+  makeParseEnum,
 } from '@use-gpu/parse';
 import { seq } from '@use-gpu/core';
 import { getArrowSegments, getFaceSegments, getFaceSegmentsConcave, getLineSegments } from '@use-gpu/workbench';
@@ -298,9 +298,10 @@ const applyOpacity = (colors?: TypedArray, opacity: number = 1) => {
   return copy;
 }
 
-// Inject tensor arrays from data context if they match an existing undefined prop
+// Inject tensor arrays from data context if they match an existing undefined prop.
+// Record formats of tensor inputs.
 
-export const DataContextTrait = (...keys: string[]) => {
+export const DataTrait = (keys: string[], canonical: string = 'positions') => {
   const match = new Set(keys);
   return (
     props: {},
@@ -311,9 +312,12 @@ export const DataContextTrait = (...keys: string[]) => {
   ) => {
     const dataContext = useDataContext();
 
-    const data = useMemo(() => {
-      const data = {formats: {}};
+    const [data, formats] = useMemo(() => {
+      const formats = {};
+      const data = {};
+
       let n = 0;
+      let f = 0;
       for (const k in dataContext) if (match.has(k)) {
         const {array, format, dims, size} = dataContext[k];
         if (!(props as any)[k]) {
@@ -321,17 +325,76 @@ export const DataContextTrait = (...keys: string[]) => {
           data.formats[k] = format;
           n++;
 
-          if (k === 'positions') data.tensor = size;
+          if (k === canonical) data.tensor = size;
         }
       }
-      return n ? data : {};
+
+      for (const k in props) if (match.has(k)) {
+        const value = (props as any)[k];
+        if (value?.array) {
+          formats[k] = value.format;
+          f++;
+        }
+      }
+
+      return [n ? data : null, n + f ? formats : null];
     }, [dataContext]);
 
-    for (const k in data) parsed[k] = data[k];
+    if (data) for (const k in data) parsed[k] = data[k];
+    parsed.formats = formats;
   };
 };
 
 // Chunking
+
+export const ConcaveTrait = trait({
+  concave: optional(parseBoolean),
+});
+
+export const LoopTrait = trait({
+  loop: optional(parseBoolean),
+});
+
+export const Loop2DTrait = trait(
+  {
+    loopX: optional(parseBoolean),
+    loopY: optional(parseBoolean),
+  },
+  {
+    loopX: false,
+    loopY: false,
+  },
+);
+
+export const Loop3DTrait = trait(
+  {
+    loopX: optional(parseBoolean),
+    loopY: optional(parseBoolean),
+    loopZ: optional(parseBoolean),
+  },
+  {
+    loopX: false,
+    loopY: false,
+    loopZ: false,
+  },
+);
+
+export const LoopsTrait = trait({
+  loop: optional(parseBoolean),
+  loops: optional(parseBooleanArray),
+});
+
+export const DirectedTrait = trait({
+  start: optional(parseBoolean),
+  end: optional(parseBoolean),
+});
+
+export const DirectedsTrait = trait({
+  start: optional(parseBoolean),
+  starts: optional(parseBooleanArray),
+  end: optional(parseBoolean),
+  ends: optional(parseBooleanArray),
+});
 
 export const SegmentsTrait = combine(
   trait({
@@ -353,9 +416,10 @@ export const SegmentsTrait = combine(
       (pos) => {
         if (parsed.tensor) {
           const [segment, ...rest] = parsed.tensor;
-          return seq(rest.reduce((a, b) => a * b, 1)).map(_ => segment);
+          const count = rest.reduce((a, b) => a * b, 1);
+          return [seq(count).map(_ => segment), null];
         }
-        if (!pos || props.segments) return;
+        if (!pos || props.segments) return [];
         return toChunkCounts(pos, 4);
       }
     );
@@ -398,63 +462,14 @@ export const FacetedTrait = combine(
             return [chunks, groups];
           }
         }
-        if (!pos || props.segments || props.indices) return;
-        return toMultiChunkCounts(pos, 4);
+        if (!pos || props.segments || props.indices) return [];
+        return toChunkCounts(pos, 4);
       }
     );
     parsed.chunks = chunks;
     parsed.groups = groups;
   },
 );
-
-export const ConcaveTrait = trait({
-  concave: optional(parseBoolean),
-});
-
-export const LoopTrait = trait({
-  loop: optional(parseBoolean),
-});
-
-export const Loop2DTrait = trait(
-  {
-    loopX: optional(parseBoolean),
-    loopY: optional(parseBoolean),
-  },
-  {
-    loopX: false,
-    loopY: false,
-  },
-);
-
-export const Looped3DTrait = trait(
-  {
-    loopX: optional(parseBoolean),
-    loopY: optional(parseBoolean),
-    loopZ: optional(parseBoolean),
-  },
-  {
-    loopX: false,
-    loopY: false,
-    loopZ: false,
-  },
-);
-
-export const LoopsTrait = trait({
-  loop: optional(parseBoolean),
-  loops: optional(parseBooleanArray),
-});
-
-export const DirectedTrait = trait({
-  start: optional(parseBoolean),
-  end: optional(parseBoolean),
-});
-
-export const DirectedsTrait = trait({
-  start: optional(parseBoolean),
-  end: optional(parseBoolean),
-  starts: optional(parseBooleanArray),
-  ends: optional(parseBooleanArray),
-});
 
 export const LineSegmentsTrait = combine(
   SegmentsTrait,
@@ -591,28 +606,37 @@ export const FacetedVerticesTrait = trait({
   lookups: optional(parseMultiScalarArray),
 });
 
-export const PointsTrait = combine(
+export const PointTraits = combine(
   ColorsTrait(),
   trait({
     size: optional(parseNumber),
     sizes: optional(parseScalarArray),
   }),
   VerticesTrait,
-  DataContextTrait('positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'sizes'),
+  DataTrait(['positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'sizes']),
+
+  MarkerTrait,
+  PointTrait,
+  ROPTrait,
+  ZIndexTrait,
 );
 
-export const LinesTrait = combine(
+export const LineTraits = combine(
   ColorsTrait({ composite: true }),
   trait({
     width: optional(parseScalarArrayLike),
     widths: optional(parseMultiScalarArray),
   }),
   CompositeVerticesTrait,
-  DataContextTrait('positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'widths'),
+  DataTrait(['positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'widths']),
   LineSegmentsTrait,
+
+  ROPTrait,
+  StrokeTrait,
+  ZIndexTrait,
 );
 
-export const ArrowsTrait = combine(
+export const ArrowTraits = combine(
   ColorsTrait({ composite: true }),
   trait({
     width: optional(parseScalarArrayLike),
@@ -621,23 +645,58 @@ export const ArrowsTrait = combine(
     sizes: optional(parseMultiScalarArray),
   }),
   CompositeVerticesTrait,
-  DataContextTrait('positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'widths', 'sizes'),
+  DataTrait(['positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'widths', 'sizes']),
   ArrowSegmentsTrait,
+
+  ArrowTrait,
+  ROPTrait,
+  StrokeTrait,
+  ZIndexTrait,
 );
 
-export const FacesTrait = combine(
+export const FaceTraits = combine(
   ColorsTrait({ composite: true }),
   FacetedVerticesTrait,
-  DataContextTrait,
+  DataTrait(['positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups']),
   FaceSegmentsTrait,
+
+  FaceTrait,
+  ROPTrait,
+  ZIndexTrait,
 );
 
-export const SurfaceTrait = combine(
+export const SurfaceTraits = combine(
   ColorsTrait({ composite: true }),
   Loop2DTrait,
   CompositeVerticesTrait,
-  DataContextTrait('positions', 'colors', 'zBiases', 'ids', 'lookups'),
+  DataTrait(['positions', 'colors', 'zBiases', 'ids', 'lookups']),
   trait({
     size: optional(parseScalarArray),
   }),
+
+  ColorTrait,
+  FaceTrait,
+  ROPTrait,
+  StrokeTrait,
+  ZIndexTrait,
+);
+
+export const ImplicitSurfaceTraits = combine(
+  ColorTrait,
+  DataTrait(['values', 'normals'], 'values'),
+  FaceTrait,
+  Loop3DTrait,
+  ROPTrait,
+  ZIndexTrait,
+  trait({
+    range: optional(parseRanges),
+    values: optional(parseScalarArray),
+    normals: optional(parseVec4Array),
+    size: optional(parseScalarArray),
+    method: makeParseEnum(['linear', 'quadratic']),
+    level: parseNumber,
+    padding: parseNumber,
+    id: parseNumber,
+    zBias: parseNumber,
+  })
 );

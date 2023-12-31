@@ -1,17 +1,17 @@
-import type { UniformFormat } from '../types';
+import type { ParsedBundle, UniformFormat } from '../types';
 import { formatMurmur53 } from './hash';
 import { getBundleEntry, getBundleKey } from './bundle';
 
-export const flattenFormat = (format: UniformFormat): string => {
+export const flattenFormat = (format: UniformFormat, type?: ParsedBundle): string => {
+  if (type) return formatMurmur53(getBundleKey(format));
   if (typeof format === 'string') return format;
-  if (Array.isArray(format)) return `[${format.map(f => flattenFormat(f.format)).join(' ')}]`;
-  if (typeof format === 'object') return formatMurmur53(getBundleKey(format));
+  if (Array.isArray(format)) return `[${format.map(f => flattenFormat(f.format, f.type)).join(' ')}]`;
   return 'unknown';
 };
 
-export const formatFormat = (format: UniformFormat): string => {
+export const formatFormat = (format: UniformFormat, type?: ParsedBundle): string => {
+  if (type) return `${format}: ${getBundleEntry(type)}`;
   if (typeof format === 'string') return format;
-  if (Array.isArray(format)) return `[${format.map(f => formatFormat(f.format)).join(' ')}]`;
-  if (typeof format === 'object') return getBundleEntry(format) ?? 'unknown';
+  if (Array.isArray(format)) return `[${format.map(f => formatFormat(f.format, f.type)).join(' ')}]`;
   return 'unknown';
 };

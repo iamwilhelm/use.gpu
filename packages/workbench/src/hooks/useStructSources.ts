@@ -25,7 +25,7 @@ export const getStructSources = (
   name = name ?? 'get' + uniforms.map(u => toTitleCase(u.name)).join('');
 
   const type = structType(uniforms, name);
-  const bound = getSource({name: name ?? 'storage', format: type, args: null}, source);
+  const bound = getSource({name: name ?? 'storage', format: 'array<T>', type, args: null}, source);
   const exploded = explode(type, bound);
 
   const sources = {};

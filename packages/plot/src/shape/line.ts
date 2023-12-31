@@ -1,33 +1,18 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { TraitProps } from '@use-gpu/traits/live';
 
-import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
+import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { schemaToArchetype, schemaToEmitters, adjustSchema } from '@use-gpu/core';
 import { yeet, memo, keyed, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
 import { getLineSegments, useInspectHoverable, useTransformContext, useScissorContext, LineLayer, LINE_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
-import {
-  LinesTrait,
-
-  DataContextTrait,
-  ROPTrait,
-  StrokeTrait,
-  ZIndexTrait,
-} from '../traits';
+import { LineTraits } from '../traits';
 
 const {quote} = LayerReconciler;
 
-const Traits = combine(
-  LinesTrait,
-
-  DataContextTrait,
-  ROPTrait,
-  StrokeTrait,
-  ZIndexTrait,
-);
-const useTraits = makeUseTrait(Traits);
+const useTraits = makeUseTrait(LineTraits);
 
 export type LineProps = TraitProps<typeof Traits>;
 
@@ -67,7 +52,7 @@ export const RawLine: LiveComponent<LineProps> = (props) => {
       ...flags
   } = parsed;
 
-  if (zIndex && !zBias) parsed.zBias = zIndex;
+  if (zIndex && zBias == null) parsed.zBias = zIndex;
 
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";

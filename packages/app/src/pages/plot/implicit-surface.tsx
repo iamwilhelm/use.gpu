@@ -6,18 +6,16 @@ import React, { Gather, Provide } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, FlatCamera, ArrayData, Data, RawData,
+  Loop, Pass, Cursor,
   OrbitCamera, OrbitControls,
-  Pick, Cursor,
   Animate, Keyframe,
   LinearRGB, DirectionalLight,
   PointLayer, DataShader,
   Environment, PBRMaterial, PrefilteredEnvMap,
-  Suspense,
   useShaderRef,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Polar, Axis, Grid, Sampled, ImplicitSurface, DataContext,
+  Plot, Cartesian, Polar, Axis, Grid, Sampler, ImplicitSurface,
 } from '@use-gpu/plot';
 import { wgsl } from '@use-gpu/shader/wgsl';
 import { SurfaceControls } from '../../ui/surface-controls';
@@ -42,10 +40,7 @@ const f = (x: number, y: number, z: number, t: number) => {
   return lerp(swirl, grid, f);
 }
 
-const EXPR_POSITION = (emit: Emit, x: number, y: number, z: number, time: Time) => {
-  const t = time.elapsed / 1000;
-  emit(x, y, z, t);
-}
+const EXPR_POSITION = (emit: Emit, x: number, y: number, z: number) => emit(x, y, z, 1);
 
 const EXPR_VALUE = (emit: Emit, x: number, y: number, z: number, time: Time) => {
   const t = time.elapsed / 1000;
@@ -72,6 +67,8 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) =>
 
 const BACKGROUND = [0, 0, 0.09, 1];
 
+const prefilteredEnvMap = ([texture]: TextureSource[]) => null;//<PrefilteredEnvMap texture={texture} />;
+
 export const PlotImplicitSurfacePage: LC = () => {
 
   const colorizeShader = wgsl`
@@ -90,12 +87,9 @@ export const PlotImplicitSurfacePage: LC = () => {
     <SurfaceControls
       container={root}
       hasInspect
-      render={({inspect, mode, level, env, roughness, metalness, envMap}) => {
-        const r = useShaderRef(roughness);
-        const m = useShaderRef(metalness);
-        return (
+      render={({inspect, mode, level, env, roughness, metalness, envMap}) => (
           <Gather children={
-            <Gather children={<Suspense>{envMap}</Suspense>} then={([texture]: TextureSource[]) => <PrefilteredEnvMap texture={texture} />} />
+            <Gather children={envMap} then={prefilteredEnvMap} />
           } then={([envMap]: ShaderSource[]) => (
             <Loop>
               <LinearRGB backgroundColor={BACKGROUND} tonemap="aces" gain={2}>
@@ -150,16 +144,14 @@ export const PlotImplicitSurfacePage: LC = () => {
                           />
                           <Gather
                             children={<>
-                              <Sampled
+                              <Sampler
                                 axes='xyz'
                                 format='vec3<f32>'
                                 size={[42, 28, 42]}
                                 padding={1}
                                 expr={EXPR_POSITION}
-                                time
-                                live
                               />
-                              <Sampled
+                              <Sampler
                                 axes='xyz'
                                 format='vec3<f32>'
                                 size={[42, 28, 42]}
@@ -168,7 +160,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                                 time
                                 live
                               />
-                              <Sampled
+                              <Sampler
                                 axes='xyz'
                                 format='f32'
                                 size={[42, 28, 42]}
@@ -179,35 +171,36 @@ export const PlotImplicitSurfacePage: LC = () => {
                               />
                             </>}
                             then={
-                              ([positions, normals, values]: StorageSource[]) => <>
-                                <Provide context={DataContext} value={values}>
-                                  <Environment map={envMap} preset={env}>
-                                    <PBRMaterial roughness={r} metalness={m}>
-                                      <ImplicitSurface
-                                        normals={normals}
-                                        level={level}
-                                        method="linear"
-                                        padding={1}
-                                        color={[0.8, 0.8, 1.0, 1.0]}
-                                      />
-                                    </PBRMaterial>
-                                  </Environment>
-                                </Provide>
+                              ([positions, normals, values]: TensorArray[]) => (<>
+                                <Environment map={envMap} preset={env}>
+                                  <PBRMaterial roughness={roughness} metalness={metalness}>
+                                    <ImplicitSurface
+                                      values={values}
+                                      normals={normals}
+                                      level={level}
+                                      method="linear"
+                                      padding={1}
+                                      shaded
+                                      color={[0.8, 0.8, 1.0, 1.0]}
+                                    />
+                                  </PBRMaterial>
+                                </Environment>
                                 {inspect ? (
                                   <DataShader
                                     shader={colorizeShader}
                                     source={values}
-                                    render={(colorizedValues: ShaderModule) => (
+                                  >{
+                                    (colorizedValues: ShaderModule) => (
                                       <PointLayer
                                         positions={positions}
                                         colors={mode === 'normal' ? normals : colorizedValues}
                                         size={3}
                                         depth={1}
                                       />
-                                    )}
-                                  />
+                                    )
+                                  }</DataShader>
                                 ) : null}
-                              </>
+                              </>)
                             }
                           />
                         </Polar>
@@ -218,8 +211,7 @@ export const PlotImplicitSurfacePage: LC = () => {
               </LinearRGB>
             </Loop>
           )} />
-        );
-      }}
+      )}
     />
   );
 };

@@ -23,7 +23,7 @@ const BACKGROUND = [0, 0, 0.09, 1];
 export const PlotCartesianPage: LC = () => {
 
   return (<>
-    <InfoBox>Plot a sampled surface in an animated viewport.</InfoBox>
+    <InfoBox>Plot a sampled surface with &lt;Sampler&gt; in an animated &lt;Cartesian&gt; viewport.</InfoBox>
     <Loop>
       <LinearRGB backgroundColor={BACKGROUND} tonemap="aces" gain={2}>
         <Cursor cursor="move" />

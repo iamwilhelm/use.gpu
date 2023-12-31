@@ -78,7 +78,7 @@ export const makeBindingLayoutEntry = (
   binding: number,
 ): GPUBindGroupLayoutEntry | GPUBindGroupLayoutEntry[] => {
   if (b.storage) {
-    const minBindingSize = getMinBindingSize(b.storage.format);
+    const minBindingSize = getMinBindingSize(b.storage.format, b.storage.type);
     if (b.storage!.readWrite) return {binding, visibility, buffer: {type: 'storage', minBindingSize}};
     return {binding, visibility, buffer: {type: 'read-only-storage', minBindingSize}};
   }
@@ -131,7 +131,25 @@ export const makeBindGroup = (
   });
 }
 
-export const getMinBindingSize = (format: UniformType | UniformAttribute[] | ShaderStructType) => {
+export const getMinBindingSize = (
+  format: UniformFormat | UniformAttribute[],
+  type?: ShaderStructType,
+) => {
+  if (type) {
+    console.warn('getMinBindingSize module', {format, type});
+
+    const {module} = type;
+    const {entry, table: {declarations}} = module;
+    const {struct} = declarations.find((d: any) => d.struct?.name === entry);
+    if (!struct) return 0;
+
+    const members = struct.members.map((m: any) => ({name: m.name, format: toTypeString(m.type)}));
+    const layout = makeUniformLayout(members);
+
+    console.warn({members, layout});
+    return layout.length;
+  }
+  
   if (typeof format === 'string') {
     format = format.replace(/^array<([^>]+)>$/, '$1');
     format = format.replace(/^vec3to4</, 'vec4<');
@@ -146,15 +164,5 @@ export const getMinBindingSize = (format: UniformType | UniformAttribute[] | Sha
     return layout.length;
   }
 
-  if (!format) return 0;
-
-  const {module} = format;
-  const {entry, table: {declarations}} = module;
-  const {struct} = declarations.find((d: any) => d.struct?.name === entry);
-  if (!struct) return 0;
-
-  const members = struct.members.map((m: any) => ({name: m.name, format: toTypeString(m.type)}));
-  const layout = makeUniformLayout(members);
-  return layout.length;
+  return 0;
 };
-

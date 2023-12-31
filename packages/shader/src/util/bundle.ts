@@ -55,74 +55,78 @@ export const toModule = (bundle: ShaderModule) => {
 // Parse escaped C-style string
 export const parseString = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
 
-type ToTypeString = (t: TypeLike) => string;
+type ToTypeSymbol = (t: TypeLike) => FormatLike;
 type ToArgTypes = (t: ParameterLike[]) => string[];
 
 export const makeDeclarationToAttribute = (
-  toTypeString: ToTypeString,
+  toTypeSymbol: ToTypeSymbol,
   toArgTypes: ToArgTypes,
 ) => (
+  bundle: ParsedBundle,
   d: any,
 ) => {
   if (d.format) return d;
   if (d.func) {
     const {type, name, parameters, attr} = d.func;
-    return {name, format: toTypeString(type), args: toArgTypes(parameters), attr};
+    const resolved = resolveTypeSymbol(bundle, toTypeSymbol(type));
+    return {name, ...resolved, args: toArgTypes(parameters), attr};
   }
   if (d.variable || d.constant) {
     const {type, name, parameters, attr} = d.variable ?? d.constant;
-    return {name, format: toTypeString(type), args: null, attr};
+    const resolved = resolveTypeSymbol(bundle, toTypeSymbol(type));
+    return {name, ...resolved, args: null, attr};
   }
   if (d.struct) {
     const {name, members, attr} = d.struct;
     const ms = members?.map(({name, type}: any) => ({
       name,
-      format: toTypeString(type),
+      ...resolveTypeSymbol(bundle, toTypeSymbol(type)),
     }));
     return {name, format: ms, args: null, attr};
   }
   throw new Error(`Cannot convert declaration to attribute: ${JSON.stringify(d)}`);
 }
 
-// Replace custom types with a reference to the bundle
-const resolveBundleType = (bundle: ShaderModule, attribute: UniformAttribute) => {
-  const {format} = attribute;
-  if (typeof format !== 'string') return attribute;
-  if (!format.match(/[A-Z]/)) return attribute;
+// Convert custom type names to their originating bundle (if foreign)
+const resolveTypeSymbol = (bundle: ParsedBundle, f: FormatLike<string>): FormatLike<ShaderModule> => {
+  const {libs, module} = bundle;
+  const {format, type: typeName} = f;
 
-  const {libs, module} = bundle as any as ParsedBundle;
-  if (!libs || !module) return attribute;
-
-  const {table: {modules}} = module;
-  if (modules) for (const {name: lib, imports} of modules) {
-    for (const {name, imported} of imports) {
-      if (name === format) {
-        const m = libs[lib];
-        if (m) return {...attribute, format: {...m, entry: imported}};
+  if (typeName != null && libs) {
+    const {table: {modules}} = module;
+    if (modules) for (const {name: lib, imports} of modules) {
+      for (const {name, imported} of imports) {
+        if (name === typeName) {
+          const m = libs[lib];
+          if (m) return {format, type: {...m, entry: imported}};
+        }
       }
     }
-  }
 
-  return attribute;
+    // Must be local
+    return {format: typeName};
+  }
+  
+  return {format};
 }
 
 // Convert bundle to attributes for its external declarations
 export const makeBundleToAttributes = (
-  toTypeString: ToTypeString,
+  toTypeSymbol: ToTypeSymbol,
   toArgTypes: ToArgTypes,
 ) => {
-  const toAttribute = makeDeclarationToAttribute(toTypeString, toArgTypes);
+  const toAttribute = makeDeclarationToAttribute(toTypeSymbol, toArgTypes);
 
   return (
-    bundle: ShaderModule,
+    shader: ShaderModule,
   ): UniformAttribute[] => {
-    const module = toModule(bundle);
-    const {table: {externals}} = module;
+    const bundle = toBundle(shader);
+    const {module: {table: {externals}}} = bundle;
 
     const out: UniformAttribute[] = [];
     for (const d of externals) if (d.func ?? d.variable ?? d.constant) {
-      const attr = toAttribute(d);
-      if (!(bundle as any).links?.[attr.name]) out.push(resolveBundleType(bundle, attr));
+      const attr = toAttribute(bundle, d);
+      if (!bundle.links?.[attr.name]) out.push(attr);
     }
 
     return out;
@@ -131,39 +135,41 @@ export const makeBundleToAttributes = (
 
 // Convert bundle to attribute for entry point (or named declaration)
 export const makeBundleToAttribute = (
-  toTypeString: ToTypeString,
+  toTypeSymbol: ToTypeSymbol,
   toArgTypes: ToArgTypes,
 ) => {
-  const toAttribute = makeDeclarationToAttribute(toTypeString, toArgTypes);
+  const toAttribute = makeDeclarationToAttribute(toTypeSymbol, toArgTypes);
 
   return (
-    bundle: ShaderModule,
+    shader: ShaderModule,
     name?: string,
   ): UniformAttribute => {
-    const module = toModule(bundle);
-    const {table: {exports, externals}} = module;
+    const bundle = toBundle(shader);
+    const {module: {table: {externals, exports}}} = bundle;
 
-    const entry = name ?? bundle.entry ?? module.entry;
+    const entry = name ?? getBundleEntry(bundle);
 
+    // Externals must be looked up by name
     if (name != null) for (const d of externals) {
       if (
         d.func?.name === entry ||
         d.variable?.name === entry ||
-        d.constant?.name === entry
-      ) return resolveBundleType(bundle, toAttribute(d));
-      if (d.struct?.name === entry) {
-        return toAttribute(d);
+        d.constant?.name === entry ||
+        d.struct?.name === entry
+      ) {
+        return toAttribute(bundle, d);
       }
     }
 
+    // Exports are looked up by entry point
     for (const d of exports) {
       if (
         d.func?.name === entry ||
         d.variable?.name === entry ||
-        d.constant?.name === entry
-      ) return resolveBundleType(bundle, toAttribute(d));
-      if (d.struct?.name === entry) {
-        return toAttribute(d);
+        d.constant?.name === entry ||
+        d.struct?.name === entry
+      ) {
+        return toAttribute(bundle, d);
       }
     }
 

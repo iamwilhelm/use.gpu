@@ -64,7 +64,7 @@ export const makeInstanceWith = (
     const vBundle = toBundle(value);
     const v = bundleToAttribute(vBundle);
 
-    const f = formatFormat(i.format);
+    const f = formatFormat(i.format, i.type);
     if (v.args?.[0] !== f) {
       throw new Error(`Type Error: ${i.name} -> ${v.name}.\nCannot chain output ${f} to args (${v.args?.join(', ')}).`);
     }

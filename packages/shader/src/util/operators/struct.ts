@@ -25,7 +25,7 @@ export const makeStructType = (
   const symbols = [entry];
 
   const readable = fields.map(({name}) => name).join(' ');
-  const types = fields.map(({format}) => flattenFormat(format)).join(' ');
+  const types = fields.map(({format, type}) => flattenFormat(format, type)).join(' ');
 
   const unique = `@struct [${name ?? ''}] [${readable}] [${types}]`;
   const code   = `@struct ${name ?? ''}`;

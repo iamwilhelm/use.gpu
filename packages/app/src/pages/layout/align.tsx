@@ -12,6 +12,8 @@ import {
   UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
 } from '@use-gpu/layout';
 
+import { InfoBox } from '../../ui/info-box';
+
 const TRANSPARENT = [1, 1, 1, 0.1] as XYZW;
 const BACKGROUND = [0.0, 0.0, 0.09, 1.0] as XYZW;
 const FILL = [0.4, 0.7, 1, 0.5] as XYZW;
@@ -27,7 +29,8 @@ export const LayoutAlignPage: LC = () => {
     <Element width={140} height={60} fill={FILL} />
   </>)
 
-  const view = (
+  const view = (<>
+    <InfoBox>&lt;Flex&gt; box alignment test cases, plus hybrid row/column layouts.</InfoBox>
     <LinearRGB backgroundColor={BACKGROUND}>
       <Pass>
         <UI>
@@ -36,7 +39,7 @@ export const LayoutAlignPage: LC = () => {
             <Absolute left={0} right={0} top={0} bottom={0}>
               <Overflow y="scroll">
 
-                <Block margin={[10, 0, 10, 50]}>
+                <Block margin={[10, 50, 10, 50]}>
 
                   <Label>Flex Start</Label>
                   <Flex margin={10} gap={[10, 5]} align="start"   anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
@@ -166,7 +169,7 @@ export const LayoutAlignPage: LC = () => {
         </UI>
       </Pass>
     </LinearRGB>
-  );
+  </>);
 
   const root = document.querySelector('#use-gpu .canvas');
 

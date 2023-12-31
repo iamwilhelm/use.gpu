@@ -1,21 +1,22 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataBounds, TensorArray, TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
+import type { DataBounds, TensorArray, Emitter } from '@use-gpu/core';
 
-import { provide, yeet, signal, useOne, useMemo, useNoMemo } from '@use-gpu/live';
+import { provide, yeet, memo, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   seq,
-  makeTensorArray, copyNumberArray, emitIntoMultiNumberArray,
+  makeTensorArray, emitIntoMultiNumberArray,
   makeNumberReader, makeNumberWriter, makeNumberSplitter,
   emitArray, emitMultiArray,
   toCPUDims,
   updateTensor,
 } from '@use-gpu/core';
-
+import { shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import {
   useTimeContext, useNoTimeContext,
   useAnimationFrame, useNoAnimationFrame,
   useBufferedSize, getRenderFunc,
 } from '@use-gpu/workbench';
+
 import { useRangeContext, useNoRangeContext } from '../providers/range-provider';
 import { useDataContext, DataContext } from '../providers/data-provider';
 import zipObject from 'lodash/zipObject';
@@ -53,7 +54,7 @@ export type TensorProps = {
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Sample up-to-4D array of a WGSL type. Reads input `data` or samples a given `expr`. */
-export const Tensor: LiveComponent<TensorProps> = (props) => {
+export const Tensor: LiveComponent<TensorProps> = memo((props) => {
   const {
     format,
     length: l = 0,
@@ -75,7 +76,12 @@ export const Tensor: LiveComponent<TensorProps> = (props) => {
   const split = Array.isArray(as) ? as.length : 0;
 
   // Make tensor array
-  const tensors = useMemo(() => seq(items).map(i => makeTensorArray(format, alloc)), [format, alloc]);
+  const tensors = useMemo(
+    () => split
+      ? seq(items).map(i => makeTensorArray(format, alloc))
+      : [makeTensorArray(format, items * alloc)],
+    [format, alloc, items]
+  );
   const arrays = useOne(() => tensors.map(({array}) => array), tensors);
 
   // Provide time for expr
@@ -88,7 +94,7 @@ export const Tensor: LiveComponent<TensorProps> = (props) => {
     const d = toCPUDims(dims);
 
     let emitted = 0;
-    const emit = split ? makeNumberSplitter(arrays, dims) : makeNumberWriter(arrays[0], dims);
+    const emit = split ? makeNumberSplitter(arrays, dims) : makeNumberWriter(array, dims);
     if (data) {
       const expr = makeNumberReader(data, dims);
       emitted = emitArray(expr, emit, count);
@@ -100,7 +106,7 @@ export const Tensor: LiveComponent<TensorProps> = (props) => {
     const l = !sparse ? length : emitted;
     const s = !sparse ? size : [emitted / items];
 
-    if (tensors) {
+    if (split) {
       for (const t of tensors) updateTensor(t, l, s);
       return zipObject(as, tensors);
     }
@@ -114,7 +120,7 @@ export const Tensor: LiveComponent<TensorProps> = (props) => {
   let value;
   if (!live) {
     useNoAnimationFrame();
-    value = useMemo(refresh, [tensor, expr, items]);
+    value = useMemo(refresh, [tensors, data, expr, items, ...size]);
   }
   else {
     useAnimationFrame();
@@ -133,4 +139,8 @@ export const Tensor: LiveComponent<TensorProps> = (props) => {
     [dataContext, value, as]) : useNoMemo();
 
   return render ? render(value) : children ? provide(DataContext, context, children) : yeet(value);
-};
+}, shouldEqual({
+  size: sameShallow(),
+  range: sameShallow(sameShallow()),
+  origin: sameShallow(),
+}), 'Tensor');

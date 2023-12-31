@@ -2,33 +2,15 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { memo, use, useOne } from '@use-gpu/live';
-import { makeUseTrait, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
+import { makeUseTrait, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { adjustSchema } from '@use-gpu/core';
 import { useInspectHoverable, Data, SurfaceLayer, SURFACE_SCHEMA } from '@use-gpu/workbench';
 
-import {
-  SurfaceTrait,
+import { SurfaceTraits } from '../traits';
 
-  ColorTrait,
-  FaceTrait,
-  ROPTrait,
-  StrokeTrait,
-  ZIndexTrait,
-} from '../traits';
+const useTraits = makeUseTrait(SurfaceTraits);
 
-const Traits = combine(
-  SurfaceTrait,
-
-  ColorTrait,
-  FaceTrait,
-  ROPTrait,
-  StrokeTrait,
-  ZIndexTrait,
-);
-
-const useTraits = makeUseTrait(Traits);
-
-export type SurfaceProps = TraitProps<typeof Traits>;
+export type SurfaceProps = TraitProps<typeof SurfaceTraits>;
 
 export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
   const parsed = useTraits(props);
@@ -47,12 +29,12 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
       lookups,
 
       size,
-      tensor,
+      tensor = props.positions?.size,
       formats,
       ...flags
   } = parsed;
 
-  if (zIndex && !zBias) parsed.zBias = zIndex;
+  if (zIndex && zBias == null) parsed.zBias = zIndex;
 
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
@@ -66,7 +48,6 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
     render: (sources: Record<string, ShaderSource>) => use(SurfaceLayer, {
       ...flags,
       ...sources,
-      size: size ?? tensor,
       color,
       zBias,
       id,

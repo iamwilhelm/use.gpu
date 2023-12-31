@@ -6,7 +6,7 @@ import { makeBundleToAttribute, makeBundleToAttributes } from '../util/bundle';
 import { makeTranspile } from '../util/transpile';
 
 import { makeASTParser, compressAST, decompressAST } from './ast';
-import { toTypeString, toTypeArgs } from './type';
+import { toTypeSymbol, toTypeArgs } from './type';
 import { removeComments, removeWhiteSpace, renameLocals } from './minify';
 import { parser } from './grammar/wgsl';
 
@@ -43,10 +43,10 @@ export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
 export const defineEnables = (enabled: string[]) => enabled.length ? `enable ${enabled.join(', ')};` : '';
 
 /** Convert a bundle with a defined entry point to a definition for that attribute or type. */
-export const bundleToAttribute = makeBundleToAttribute(toTypeString, toTypeArgs);
+export const bundleToAttribute = makeBundleToAttribute(toTypeSymbol, toTypeArgs);
 
 /** Convert a bundle to a definition for all its attributes. */
-export const bundleToAttributes = makeBundleToAttributes(toTypeString, toTypeArgs);
+export const bundleToAttributes = makeBundleToAttributes(toTypeSymbol, toTypeArgs);
 
 // Simple whitespace / comment removal
 const minifyCode = (code: string) => {

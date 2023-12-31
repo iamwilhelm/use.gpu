@@ -5,6 +5,7 @@ export * from './providers/range-provider';
 export * from './layer/axis';
 export * from './layer/grid';
 export * from './layer/surface';
+export * from './layer/implicit-surface';
 
 export * from './shape/arrow';
 export * from './shape/face';
@@ -20,7 +21,6 @@ export * from './source/transpose';
 export * from './shape/label';
 
 export * from './layer/tick';
-export * from './layer/implicit-surface';
 */
 
 export * from './view/cartesian';

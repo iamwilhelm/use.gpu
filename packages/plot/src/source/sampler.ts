@@ -1,21 +1,23 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataBounds, TypedArray, StorageSource, VectorLike, UniformType, Emit, Emitter } from '@use-gpu/core';
+import type { DataBounds, TensorArray, VectorLike, Emit, Emitter } from '@use-gpu/core';
 
-import { provide, yeet, signal, useOne, useMemo, useNoMemo } from '@use-gpu/live';
+import { provide, yeet, deprecated, memo, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   makeTensorArray, emitMultiArray, makeNumberWriter, updateTensor,
   getBoundingBox, toDataBounds,
   toCPUDims, toGPUDims,
 } from '@use-gpu/core';
 import { parseAxis, parseVec4 } from '@use-gpu/parse';
-import { optional, useProp } from '@use-gpu/traits/live';
+import { optional, useProp, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import {
   useTimeContext, useNoTimeContext,
   useAnimationFrame, useNoAnimationFrame,
   useBufferedSize, getRenderFunc,
 } from '@use-gpu/workbench';
+
 import { useRangeContext, useNoRangeContext } from '../providers/range-provider';
 import { useDataContext, DataContext } from '../providers/data-provider';
+import zipObject from 'lodash/zipObject';
 
 export type SamplerProps = {
   /** Sample count up to [width, height, depth, layers] */
@@ -56,14 +58,14 @@ export type SamplerProps = {
   as?: string | string[],
 
   /** Leave empty to yeet source instead. */
-  render?: (source: StorageSource) => LiveElement,
-  children?: (source: StorageSource) => LiveElement,
+  render?: (source: TensorArray) => LiveElement,
+  children?: (source: TensorArray) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Up-to-4D array of a WGSL type. Samples a given `expr` on the given `range`. */
-export const Sampler: LiveComponent<SamplerProps> = (props) => {
+export const Sampler: LiveComponent<SamplerProps> = memo((props) => {
   const {
     axis,
     axes = 'xyzw',
@@ -97,16 +99,22 @@ export const Sampler: LiveComponent<SamplerProps> = (props) => {
   const count = padded.reduce((a, b) => a * b, 1);
   const alloc = useBufferedSize(count);
   const length = items * count;
+  const split = Array.isArray(as) ? as.length : 0;
 
   // Make tensor array
-  const tensor = useMemo(() => makeTensorArray(format, items * alloc, size), [format, items, alloc]);
-  tensor.size = size;
-  tensor.length = length;
+  const tensors = useMemo(
+    () => split
+      ? seq(items).map(i => makeTensorArray(format, alloc))
+      : [makeTensorArray(format, items * alloc)],
+    [format, alloc, items]
+  );
+  const arrays = useOne(() => tensors.map(({array}) => array), tensors);
 
   const clock = time ? useTimeContext() : useNoTimeContext();
 
   // Refresh and upload data
   const refresh = () => {
+    const [tensor] = tensors;
     const {array, dims} = tensor;
     let emitted = 0;
 
@@ -263,14 +271,21 @@ export const Sampler: LiveComponent<SamplerProps> = (props) => {
       }
 
       if (sampled) {
-        const emit = makeNumberWriter(array, dims);
+        const emit = split ? makeNumberSplitter(arrays, dims) : makeNumberWriter(array, dims);
         emitted = emitMultiArray(sampled, emit, count, padded, clock!);
       }
     }
 
     const l = !sparse ? length : emitted;
-    const s = !sparse ? (items > 1 ? [items, ...padded] : padded) : (items > 1  ? [items, emitted / items] : [emitted / items]);
-    updateTensor(tensor, l, s);
+    const s = !sparse ? padded : [emitted / items];
+
+    if (split) {
+      for (const t of tensors) updateTensor(t, l, s);
+      return zipObject(as, tensors);
+    }
+
+    if (items > 1) updateTensor(tensor, l * items, [items, ...s]);
+    else updateTensor(tensor, l, s);
 
     return {...tensor};
   };
@@ -278,7 +293,7 @@ export const Sampler: LiveComponent<SamplerProps> = (props) => {
   let value;
   if (!live) {
     useNoAnimationFrame();
-    value = useMemo(refresh, [tensor, expr, items, range]);
+    value = useMemo(refresh, [tensors, expr, centered, border, origin, range, items, ...size]);
   }
   else {
     useAnimationFrame();
@@ -289,7 +304,17 @@ export const Sampler: LiveComponent<SamplerProps> = (props) => {
   const render = getRenderFunc(props);
 
   const dataContext = useDataContext();
-  const context = !render && children ? useMemo(() => ({...dataContext, [as]: value}), [dataContext, value, as]) : useNoMemo();
+  const context = !render && children ? useMemo(
+    () => split
+      ? ({...dataContext, ...value})
+      : ({...dataContext, [as]: value}),
+    [dataContext, value, as]) : useNoMemo();
 
-  return render ? render(tensor) : children ? provide(DataContext, context, children) : yeet(tensor);
-};
+  return render ? render(value) : children ? provide(DataContext, context, children) : yeet(value);
+}, shouldEqual({
+  size: sameShallow(),
+  range: sameShallow(sameShallow()),
+  origin: sameShallow(),
+}), 'Sampler');
+
+export const Sampled = deprecated(Sampler, 'Sampled');

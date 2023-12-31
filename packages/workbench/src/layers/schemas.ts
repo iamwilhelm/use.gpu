@@ -119,6 +119,11 @@ export const SURFACE_SCHEMA = {
   }),
 };
 
+export const DUAL_CONTOUR_SCHEMA = {
+  values: {format: 'array<f32>', separate: true},
+  normals: {format: 'array<vec4<f32>>', separate: true},
+};
+
 export const UI_SCHEMA = expandArrays({
   rectangles: {format: 'vec4<f32>', single: 'rectangle'},
   radii:      {format: 'vec4<f32>', single: 'radius'},

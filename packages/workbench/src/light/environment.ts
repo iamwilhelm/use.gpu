@@ -72,8 +72,6 @@ export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<Envir
     });
   }, [parent, environment]);
 
-  console.log({material, map})
-
   return (
     provide(EnvironmentContext, environment,
       provide(MaterialContext, material, children)

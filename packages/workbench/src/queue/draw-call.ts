@@ -211,6 +211,7 @@ export const drawCall = (props: DrawCallProps) => {
       instances: 0,
       triangles: 0,
     },
+    indirect,
   });
 
   const isStrip = topology === 'triangle-strip';

@@ -8,6 +8,7 @@ import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { KeyboardContext, MouseContext, WheelContext } from '../providers/event-provider';
 import { LayoutContext } from '../providers/layout-provider';
 import { useDerivedState } from '../hooks/useDerivedState';
+import { getRenderFunc } from '../hooks/useRenderProp';
 import { mat4, vec3 } from 'gl-matrix';
 
 const CAPTURE_EVENT = {capture: true};
@@ -40,6 +41,7 @@ export type OrbitControlsProps = {
 
   active?: boolean,
   render: (radius: number, bearing: number, pitch: number, target: vec3) => LiveElement,
+  children: (radius: number, bearing: number, pitch: number, target: vec3) => LiveElement,
 };
 
 export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
@@ -62,7 +64,6 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     maxPitch,
 
     active = true,
-    render,
   } = props;
 
   const initialTarget = useProp(props.target, parsePosition);
@@ -132,6 +133,6 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     if (active) stop();
   }, wheel);
 
+  const render = getRenderFunc(props);
   return useHooks(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);
 };
-

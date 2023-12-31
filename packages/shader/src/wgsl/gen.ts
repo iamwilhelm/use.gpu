@@ -71,28 +71,23 @@ export const makeBindingAccessors = (
     flags: RF.Exported,
   })) as any[];
 
-  // Handle struct types for storage
+  // Inject import for storage struct types
   const libs: Record<string, ShaderModule> = {};
   const modules = storages.map(({uniform, storage}) => {
-    const {format} = uniform;
-    const {format: type} = storage!;
+    const {type: typeOut} = uniform;
+    const {type: typeIn} = storage!;
 
-    const object = (
-      typeof type === 'object' && !Array.isArray(type) ? type :
-      typeof format === 'object' && !Array.isArray(format) ? format :
-      null
-    );
-
-    if (object) {
-      const entry = getBundleEntry(object);
+    const type = typeOut ?? typeIn;
+    if (type) {
+      const entry = getBundleEntry(type);
       if (entry != null) {
-        const module = toModule(object);
+        const module = toModule(type);
         libs[module.name] = module;
         return {
           at: 0,
           name: module.name,
           imports: [{name: entry, imported: entry}],
-          symbols: [format],
+          symbols: [entry],
         } as ModuleRef;
       }
     }
@@ -128,72 +123,69 @@ export const makeBindingAccessors = (
       program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, type, name, args as any));
     }
 
-    for (const {uniform: {name, format: type, args}, storage} of storages) {
-      const {volatile, format, readWrite} = storage!;
+    for (const {uniform: {name, format: formatOut, type: typeOut, args}, storage} of storages) {
+      const {volatile, format: formatIn, type: typeIn, readWrite} = storage!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
 
-      const object = (
-        typeof type === 'object' && !Array.isArray(type) ? type :
-        typeof format === 'object' && !Array.isArray(format) ? format :
-        null
-      );
+      const type = typeOut ?? typeIn;
+      if (type) {
+        const format = type === typeOut ? formatOut : formatIn;
+        const entry = getBundleEntry(type);
+        let t = (entry ? rename.get(entry) : null) ?? entry ?? 'unknown';
+        if (t === 'unknown') throw new Error(`Invalid type '${getBundleName(type)}'. Module has no entry point.`);
 
-      if (object) {
-        const entry = getBundleEntry(object);
-        const t = (entry ? rename.get(entry) : null) ?? entry ?? 'unknown';
-        if (t === 'unknown') debugger;
-
+        if (format === 'array<T>') t = `array<${t}>`;
         program.push(makeStorageAccessor(namespace, set, base, t, t, name, readWrite, args));
+        continue;        
+      }
+      
+      if (Array.isArray(formatIn) || Array.isArray(formatOut)) throw new Error(`Cannot bind data to a type`);
+
+      if (formatIn === 'T' || formatOut === 'T') debugger;
+
+      if (is3to4(formatIn)) {
+        const accessor = name + '3to4';
+        program.push(makeStorageAccessor(namespace, set, base, to4(formatIn), to4(formatIn), accessor, readWrite));
+        program.push(makeVec3to4Accessor(namespace, formatOut, to3(formatIn), name, accessor));
+        continue;
+      }
+      else if (is8to32(formatIn)) {
+        const accessor = name + '8to32';
+        program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
+        program.push(make8to32Accessor(namespace, formatOut, to32(formatIn), name, accessor));
+        continue;
+      }
+      else if (is16to32(formatIn)) {
+        const accessor = name + '16to32';
+        program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
+        program.push(make16to32Accessor(namespace, formatOut, to32(formatIn), name, accessor));
+        continue;
+      }
+      else if (isVec8to32(formatIn)) {
+        const accessor = name + 'Vec8to32';
+        const wide = to32(formatIn).replace('i32', 'u32');
+        program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
+        program.push(makeVec8to32Accessor(namespace, formatOut, wide, name, accessor));
+        continue;
+      }
+      else if (isVec16to32(formatIn)) {
+        const accessor = name + 'Vec16to32';
+        const wide = to32(formatIn).replace('i32', 'u32');
+        program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
+        program.push(makeVec16to32Accessor(namespace, formatOut, wide, name, accessor));
         continue;
       }
 
-      if (typeof format === 'string' && typeof type === 'string') {
-        if (is3to4(format)) {
-          const accessor = name + '3to4';
-          program.push(makeStorageAccessor(namespace, set, base, to4(format), to4(format), accessor, readWrite));
-          program.push(makeVec3to4Accessor(namespace, type, to3(format), name, accessor));
-          continue;
-        }
-        else if (is8to32(format)) {
-          const accessor = name + '8to32';
-          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
-          program.push(make8to32Accessor(namespace, type, to32(format), name, accessor));
-          continue;
-        }
-        else if (is16to32(format)) {
-          const accessor = name + '16to32';
-          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
-          program.push(make16to32Accessor(namespace, type, to32(format), name, accessor));
-          continue;
-        }
-        else if (isVec8to32(format)) {
-          const accessor = name + 'Vec8to32';
-          const wide = to32(format).replace('i32', 'u32');
-          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
-          program.push(makeVec8to32Accessor(namespace, type, wide, name, accessor));
-          continue;
-        }
-        else if (isVec16to32(format)) {
-          const accessor = name + 'Vec16to32';
-          const wide = to32(format).replace('i32', 'u32');
-          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
-          program.push(makeVec16to32Accessor(namespace, type, wide, name, accessor));
-          continue;
-        }
-      }
-
-      program.push(makeStorageAccessor(namespace, set, base, type as string, format as string, name, readWrite, args));
+      program.push(makeStorageAccessor(namespace, set, base, formatOut, formatIn, name, readWrite, args));
     }
 
-    for (const {uniform: {name, format: type, args}, texture} of textures) {
-      const {volatile, layout, variant, absolute, sampler, comparison, format, aspect} = texture!;
+    for (const {uniform: {name, format: formatOut, args}, texture} of textures) {
+      const {volatile, layout, variant, absolute, sampler, comparison, format: formatIn, aspect} = texture!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
       if (sampler && args !== null) volatile ? volatileBase++ : bindingBase++;
-      if (typeof type !== 'string') throw new Error(`Texture format cannot be a struct ${type}`);
-      if (typeof format !== 'string') throw new Error(`Texture format cannot be a struct ${type}`);
-      program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, aspect, absolute, !!sampler, !!comparison, args));
+      program.push(makeTextureAccessor(namespace, set, base, formatOut, formatIn, name, layout, variant, aspect, absolute, !!sampler, !!comparison, args));
     }
 
     return program.join('\n');
@@ -222,7 +214,7 @@ export const makeBindingAccessors = (
   for (const {uniform, lambda} of lambdas)   {
     const needsCast = !checkLambdaType(uniform, lambda!);
     links[uniform.name] = needsCast
-      ? castTo(lambda!.shader, toTypeString(uniform.format))
+      ? castTo(lambda!.shader, uniform.format)
       : lambda!.shader;
   }
 
@@ -240,11 +232,8 @@ export const checkLambdaType = (
 
   if (Array.isArray(from) || Array.isArray(to)) return true;
 
-  const fromName = toTypeString(from);
-  const toName = toTypeString(to);
-
-  let f = fromName;
-  let t = toName;
+  let f = from;
+  let t = to;
 
   if (f === t) return true;
   if (t === 'auto') return true;
@@ -270,23 +259,13 @@ export const checkLambdaType = (
 
     if (fromScalar !== toScalar) {
       // uppercase = struct type, allow any
-      if (fromName.match(/[A-Z]/) && toName) return true;
+      if (from.match(/[A-Z]/) && to) return true;
 
       throw new Error(`Invalid format ${to} bound for ${from} "${name}" (${fromScalar} != ${toScalar})`);
     }
   }
 
   return false;
-};
-
-export const toTypeString = (t: string | any): string => {
-  if (typeof t === 'string') return t;
-  if (t.entry != null) return t.entry;
-  if (t.module?.entry != null) return t.module.entry;
-  if (t.name != null) return t.name;
-  if (t.type != null) return toTypeString(t.type);
-  if (Array.isArray(t)) return `[${t.map(toTypeString).join(',')}]`;
-  return 'void';
 };
 
 export const makeUniformBlock = (
@@ -339,7 +318,6 @@ export const makeStorageAccessor = (
   const access = readWrite ? 'storage, read_write' : 'storage';
 
   if (args === null) {
-    if (!type.match(/^array</)) type = `array<${type}>`;
     return `@group(${set}) @binding(${binding}) var<${access}> ${ns}${name}: ${type};\n`;
   }
 

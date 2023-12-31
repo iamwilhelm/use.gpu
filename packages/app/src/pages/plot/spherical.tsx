@@ -14,6 +14,8 @@ import {
   Plot, Spherical, Axis, Grid, Label, Line, Sampler, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 
+import { InfoBox } from '../../ui/info-box';
+
 const π = Math.PI;
 const τ = π * 2;
 const EPS = 1e-3;
@@ -29,7 +31,8 @@ const thetaFormatter = (θ: number) => {
 
 export const PlotSphericalPage: LC = () => {
 
-  return (
+  return (<>
+    <InfoBox>Plot curves and grids in an animated &lt;Spherical&gt; viewport.</InfoBox>
     <Loop>
       <LinearRGB>
         <Cursor cursor="move" />
@@ -137,7 +140,7 @@ export const PlotSphericalPage: LC = () => {
         </Camera>
       </LinearRGB>
     </Loop>
-  );
+  </>);
 }
 
 const Camera = ({children}: PropsWithChildren<object>) => (

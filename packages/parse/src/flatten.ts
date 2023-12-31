@@ -1,31 +1,31 @@
-import type { ArchetypeSchema, Emit, TypedArrayConstructor, VectorLike, VectorLikes } from '@use-gpu/core';
+import type { ArchetypeSchema, Emit, TypedArrayConstructor, TensorArray, VectorLike, VectorLikes } from '@use-gpu/core';
 import { seq, isTypedArray, copyNumberArray, copyNestedNumberArray } from '@use-gpu/core';
 
 const NO_CHUNKS = [new Uint32Array(0), null];
 
 const maybeTypedArray = (
-  xs: VectorLike | VectorLikes | VectorLikes[]
-) => isTypedArray(xs) ? xs : null;
+  xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray
+) => isTypedArray(xs) ? xs : isTypedArray(xs.array) ? xs.array : null;
 
 const maybeEmptyArray = <T extends TypedArrayConstructor>(
-  xs: VectorLike | VectorLikes | VectorLikes[],
+  xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray,
   ctor: T,
 ) => Array.isArray(xs) && !xs.length ? new ctor(0) : null;
 
 const maybeTensorArray = <T extends TypedArrayConstructor>(
-  xs: VectorLike | VectorLikes | VectorLikes[],
+  xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray,
   ctor: T,
 ) => Array.isArray(xs) && !xs.length ? new ctor(0) : null;
 
 // Array of scalars
 const maybeScalarArray = <T extends TypedArrayConstructor>(
-  xs: VectorLike | VectorLikes | VectorLikes[],
+  xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray,
   ctor: T,
 ) => typeof xs[0] === 'number' ? new ctor(xs) : null
 
 // Array of vectors
 const maybeVectorArray = <T extends TypedArrayConstructor>(
-  xs: VectorLike | VectorLikes | VectorLikes[],
+  xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray,
   dims: number,
   w: number,
   ctor: T,
@@ -45,7 +45,7 @@ const maybeVectorArray = <T extends TypedArrayConstructor>(
 
 // Array of ragged scalar arrays
 const maybeMultiScalarArray = <T extends TypedArrayConstructor>(
-  xs: VectorLike | VectorLikes | VectorLikes[],
+  xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray,
   ctor: T,
 ) => {
   const d = (xs[0] as any)?.length;
@@ -71,7 +71,7 @@ const maybeMultiScalarArray = <T extends TypedArrayConstructor>(
 
 // Array of ragged vector arrays
 const maybeMultiVectorArray = <T extends TypedArrayConstructor>(
-  xs: VectorLike | VectorLikes | VectorLikes[],
+  xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray,
   dims: number,
   w: number,
   ctor: T,
@@ -100,7 +100,7 @@ const maybeMultiVectorArray = <T extends TypedArrayConstructor>(
 }
 // Array of ragged arrays of ragged vector arrays
 const maybeMultiMultiVectorArray = <T extends TypedArrayConstructor>(
-  xs: VectorLike | VectorLikes | VectorLikes[],
+  xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray,
   dims: number,
   w: number,
   ctor: T,
@@ -141,7 +141,7 @@ const maybeMultiMultiVectorArray = <T extends TypedArrayConstructor>(
 }
 
 export const toScalarArray = <T extends TypedArrayConstructor>(
-  xs: VectorLike,
+  xs: VectorLike | TensorArray,
   ctor?: T = Float32Array
 ): T | null => (
   maybeTypedArray(xs) ??
@@ -150,7 +150,7 @@ export const toScalarArray = <T extends TypedArrayConstructor>(
 );
 
 export const toVectorArray = <T extends TypedArrayConstructor>(
-  xs: VectorLikes,
+  xs: VectorLikes | TensorArray,
   dims: number,
   w: number = 0,
   ctor: T = Float32Array,
@@ -160,7 +160,7 @@ export const toVectorArray = <T extends TypedArrayConstructor>(
 );
 
 export const toMultiScalarArray = <T extends TypedArrayConstructor>(
-  xs: VectorLike,
+  xs: VectorLikes | TensorArray,
   ctor: T = Float32Array
 ): T | null => (
   toScalarArray(xs, ctor) ??
@@ -168,7 +168,7 @@ export const toMultiScalarArray = <T extends TypedArrayConstructor>(
 );
 
 export const toMultiVectorArray = <T extends TypedArrayConstructor>(
-  xs: VectorLikes | VectorLikes[],
+  xs: VectorLikes | VectorLikes[] | TensorArray,
   dims: number,
   w: number = 0,
   ctor: T = Float32Array
@@ -178,7 +178,7 @@ export const toMultiVectorArray = <T extends TypedArrayConstructor>(
 );
 
 export const toMultiMultiVectorArray = <T extends TypedArrayConstructor>(
-  xs: VectorLikes | VectorLikes[],
+  xs: VectorLikes | VectorLikes[] | TensorArray,
   dims: number,
   w: number = 0,
   ctor: T = Float32Array
@@ -189,9 +189,11 @@ export const toMultiMultiVectorArray = <T extends TypedArrayConstructor>(
 
 // Get 1 chunk length
 export const toVertexCount = (
-  xs: number | VectorLike | VectorLikes | VectorLikes[] | null | undefined,
+  xs: number | VectorLike | VectorLikes | VectorLikes[] | TensorArray | null | undefined,
   dims: number,
 ): number => {
+  if (isTypedArray(xs?.array)) return xs.length;
+  
   const n = xs?.length;
   if (!n) return 0;
 
@@ -206,11 +208,13 @@ export const toVertexCount = (
   return 0;
 };
 
-// Get list of ragged chunk lengths
+// Get list of inner ragged chunk lengths plus outer ragged groupings
 export const toChunkCounts = (
-  xs: VectorLike | VectorLikes | VectorLikes[] | null | undefined,
+  xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray | null | undefined,
   dims: number,
 ): VectorLike => {
+  if (isTypedArray(xs?.array)) return sizeToChunkCounts(xs.size);
+
   const n = xs?.length;
   if (!n) return NO_CHUNKS;
 
@@ -220,24 +224,6 @@ export const toChunkCounts = (
     for (let i = 0; i < n; ++i) to[i] = xs[i].length;
     return [to, null];
   }
-  if (typeof x?.[0]?.[0]?.[0] === 'number') {
-    return toMultiChunkCounts(xs);
-  }
-
-  const count = toVertexCount(xs, dims);
-  return count ? [[count], null] : NO_CHUNKS;
-};
-
-// Get list of inner ragged chunk lengths plus outer ragged groupings
-export const toMultiChunkCounts = (
-  xs: VectorLike | VectorLikes | VectorLikes[] | null | undefined,
-  dims: number,
-): VectorLike[] => {
-  const n = xs?.length;
-  if (!n) return NO_CHUNKS;
-
-  const x = xs[0];
-
   if (typeof x?.[0]?.[0]?.[0] === 'number') {
     const groups = new Uint32Array(n);
 
@@ -262,15 +248,18 @@ export const toMultiChunkCounts = (
     return [to, groups];
   }
 
-  return toChunkCounts(xs, dims);
+  const count = toVertexCount(xs, dims);
+  return count ? [[count], null] : NO_CHUNKS;
 };
 
-export const sizeToMultiCompositeChunks = (size: number[]) => {
+export const sizeToChunkCounts = (size: number[]) => {
   const [segment, group, ...rest] = size;
+
+  if (group == null) return [[segment], null];
 
   if (rest.length === 0) {
     const chunks = seq(group).map(_ => segment);
-    return [chunks, [1]];
+    return [chunks, null];
   }
 
   const planes = rest.reduce((a, b) => a * b, 1);

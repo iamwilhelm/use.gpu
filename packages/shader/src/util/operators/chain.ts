@@ -48,19 +48,19 @@ export const makeChainTo = (
   const fBundle = toBundle(from);
   const tBundle = toBundle(to);
 
-  const {name: fromName, format: fromFormat, args: fromArgs} = bundleToAttribute(from);
-  const {name: toName, format: toFormat, args: toArgs} = bundleToAttribute(to);
+  const {name: fromName, format: fromFormat, type: fromType, args: fromArgs} = bundleToAttribute(from);
+  const {name: toName, format: toFormat, type: toType, args: toArgs} = bundleToAttribute(to);
 
   const entry = 'chain';
   const args = fromArgs;
 
-  const fromType = formatFormat(fromFormat);
-  const isVoid = fromType === 'void';
+  const fromT = formatFormat(fromFormat, fromType);
+  const isVoid = fromT === 'void';
   const restIndex = isVoid ? 0 : 1;
 
   // Return value of `from` must match 1st argument of `to`
-  if (!isVoid && toArgs?.[0] !== fromType) {
-    throw new Error(`Type Error: ${fromName} -> ${toName}.\nCannot chain output ${fromType} to args (${toArgs?.join(', ')}).`);
+  if (!isVoid && toArgs?.[0] !== fromT) {
+    throw new Error(`Type Error: ${fromName} -> ${toName}.\nCannot chain output ${fromT} to args (${toArgs?.join(', ')}).`);
   }
 
   // Other arguments of `from` and `to` must match
@@ -82,10 +82,12 @@ export const makeChainTo = (
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {
+    const f = formatFormat(toFormat, toType);
+    const format = rename.get(f) ?? f;
     const name = rename.get(entry) ?? entry;
     const from = rename.get('from') ?? 'from';
     const to = rename.get('to') ?? 'to';
-    return makeChainAccessor(formatFormat(toFormat), name, args ?? [], from, to, restIndex);
+    return makeChainAccessor(format, name, args ?? [], from, to, restIndex);
   }
 
   const exports = makeDeclarations(toFormat, fromArgs);

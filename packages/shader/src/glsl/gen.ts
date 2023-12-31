@@ -62,12 +62,12 @@ export const makeBindingAccessors = (
   ) => {
     const program: string[] = [];
 
-    for (const {uniform: {name, format: type, args}} of constants) {
-      program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, type, name, args));
+    for (const {uniform: {name, format: formatOut, args}} of constants) {
+      program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, formatOut, name, args));
     }
 
-    for (const {uniform: {name, format: type, args}, storage} of storages) {
-      const {volatile, format} = storage!;
+    for (const {uniform: {name, format: formatOut, args}, storage} of storages) {
+      const {volatile, format: formatIn} = storage!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
 
@@ -76,15 +76,15 @@ export const makeBindingAccessors = (
         continue;
       }
 
-      program.push(makeStorageAccessor(namespace, set, base, type, format, name));
+      program.push(makeStorageAccessor(namespace, set, base, formatOut, format, name));
     }
 
-    for (const {uniform: {name, format: type, args}, texture} of textures) {
-      const {volatile, layout, variant, absolute, format} = texture!;
+    for (const {uniform: {name, format: formatOut, args}, texture} of textures) {
+      const {volatile, layout, variant, absolute, format: formatIn} = texture!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
       volatile ? volatileBase++ : bindingBase++;
-      program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, absolute));
+      program.push(makeTextureAccessor(namespace, set, base, formatOut, formatIn, name, layout, variant, absolute));
     }
 
     return program.join('\n');

@@ -23,7 +23,7 @@ export const useAggregator = (
 ) => {
   const device = useDeviceContext();
   const {archetype, count, indexed, instanced, offsets} = useOne(() => getAggregateSummary(items), items);
-  console.log(items)
+
   const allocInstances = useBufferedSize(instanced);
   const allocVertices = useBufferedSize(count);
   const allocIndices = useBufferedSize(indexed);

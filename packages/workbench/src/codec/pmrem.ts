@@ -2,7 +2,7 @@ import type { LC, LiveElement } from '@use-gpu/live';
 import type { TextureSource, TextureTarget } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { gather, yeet, use, useMemo, useOne } from '@use-gpu/live';
+import { memo, gather, yeet, use, useMemo, useOne } from '@use-gpu/live';
 import { makeAtlas, makeDataBuffer, clamp, seq, lerp } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
 import { DebugAtlas } from '../text/debug-atlas';
@@ -74,7 +74,7 @@ const DIFFUSE_MIP = 127;
 const hasWebGPU = typeof GPUBufferUsage !== 'undefined';
 const READ_WRITE_SOURCE = hasWebGPU ? { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC } : {};
 
-export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: PrefilteredEnvMapProps) => {
+export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: PrefilteredEnvMapProps) => {
   const {
     levels = 8,
     size = 1024,
@@ -126,7 +126,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
       radii.push(radius);
     }
 
-    // Lambertian diffuse
+    // Lambertian diffuse (for debug/viz)
     sizes.push(DIFFUSE_MIP);
 
     // Allocate in atlas
@@ -173,13 +173,8 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
       const [diffuseSHBuffer, allocate] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
       allocate(16);
 
-      const textureRead = useDerivedSource(textureDump, {
-        readWrite: false,
-      });
-
-      const shCoefficients = useDerivedSource(diffuseSHBuffer, {
-        readWrite: false,
-      });
+      const textureRead = useDerivedSource(textureDump, {readWrite: false});
+      const shCoefficients = useDerivedSource(diffuseSHBuffer, {readWrite: false});
 
       const targetIn = useDerivedSource(target, {
         variant: 'textureSampleLevel',
@@ -325,4 +320,4 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
       ], [debug, atlas, dispatches, render, target, boundCubeMap]);
     })
   );
-};
+}, 'PrefilteredEnvMap');

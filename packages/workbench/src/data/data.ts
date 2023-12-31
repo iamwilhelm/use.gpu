@@ -224,7 +224,8 @@ export const Data: LiveComponent<DataProps> = (props) => {
       let b = 0;
       let o = 0;
       for (let i = 0; i < itemCount; ++i) {
-        o += copyRecursiveNumberArray(accessor ? accessor(i + skip) : data?.[i + skip][prop], array, dimsIn, dimsIn, depth, o, 1);
+        const from = accessor ? accessor(i + skip) : data?.[i + skip][prop];
+        o += copyRecursiveNumberArray(from, array, dimsIn, dimsIn, depth, o, 1);
         if (slice) slices.push((o - b) / dimsIn + ((loops === true || loops?.[i]) ? 3 : 0));
         b = o;
       }

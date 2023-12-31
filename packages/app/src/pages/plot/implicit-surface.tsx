@@ -20,6 +20,8 @@ import {
 import { wgsl } from '@use-gpu/shader/wgsl';
 import { SurfaceControls } from '../../ui/surface-controls';
 
+import { InfoBox } from '../../ui/info-box';
+
 let t = 0;
 let π = Math.PI;
 
@@ -35,8 +37,15 @@ const f = (x: number, y: number, z: number, t: number) => {
 
   const f = Math.cos(t * .5) * .5 + .5;
 
-  const swirl = Math.sin(x)*Math.cos(y) + Math.sin(y)*Math.cos(z) + Math.sin(z)*Math.cos(x);
-  const grid = Math.cos(x) + Math.cos(y) + Math.cos(z);
+  const cx = Math.cos(x);
+  const sx = Math.sin(x);
+  const cy = Math.cos(y);
+  const sy = Math.sin(y);
+  const cz = Math.cos(z);
+  const sz = Math.sin(z);
+
+  const swirl = sx * cy + sy * cz + sz * cx;
+  const grid = cx + cy + cz;
   return lerp(swirl, grid, f);
 }
 
@@ -93,7 +102,8 @@ export const PlotImplicitSurfacePage: LC = () => {
   const root = document.querySelector('#use-gpu .canvas');
   const keyframes = [[0, 0], [23, 1.0]] as Keyframe[];
 
-  return (
+  return (<>
+    <InfoBox>Plot an implicit function with &lt;ImplicitSurface&gt; in an animated &lt;Polar&gt; viewport. Control lighting and environment.</InfoBox>
     <SurfaceControls
       container={root}
       hasInspect
@@ -106,84 +116,84 @@ export const PlotImplicitSurfacePage: LC = () => {
                 <Cursor cursor="move" />
                 <Camera>
                   <Pass lights shadows>
-                    <DirectionalLight position={[1, 3, 2]} color={[1, 1, 1]} intensity={1} shadowMap={SHADOW_MAP_DIRECTIONAL} />
-                    <Plot>
-                      <Animate prop='bend' keyframes={keyframes} pause={1} mirror>
-                        <Polar
-                          bend={0}
-                          range={[[-π, π], [1, 5], [-π, π]]}
-                          scale={[π/2, 1, π/2]}
-                        >
-                          <Grid
-                            axes='xy'
-                            width={2}
-                            first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
-                            second={{ detail: 64, divide: 5, end: true }}
-                            depth={0.5}
-                            zBias={-1}
-                          />
-                          <Grid
-                            axes='xz'
-                            width={2}
-                            first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
-                            second={{ unit: π, base: 2, detail: 64, divide: 5, end: true }}
-                            depth={0.5}
-                            zBias={-1}
-                          />
+                    <Environment map={envMap} preset={env} gain={0.5}>
+                      <DirectionalLight position={[1, 3, 2]} color={[1, 1, 1]} intensity={1} shadowMap={SHADOW_MAP_DIRECTIONAL} />
+                      <Plot>
+                        <Animate prop='bend' keyframes={keyframes} pause={1} mirror>
+                          <Polar
+                            bend={0}
+                            range={[[-π, π], [1, 5], [-π, π]]}
+                            scale={[π/2, 1, π/2]}
+                          >
+                            <Grid
+                              axes='xy'
+                              width={2}
+                              first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
+                              second={{ detail: 64, divide: 5, end: true }}
+                              depth={0.5}
+                              zBias={-1}
+                            />
+                            <Grid
+                              axes='xz'
+                              width={2}
+                              first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
+                              second={{ unit: π, base: 2, detail: 64, divide: 5, end: true }}
+                              depth={0.5}
+                              zBias={-1}
+                            />
 
-                          <Axis
-                            axis='x'
-                            detail={64}
-                            width={5}
-                            color={[0.75, 0.75, 0.75, 1]}
-                            depth={0.5}
-                          />
-                          <Axis
-                            axis='y'
-                            width={5}
-                            color={[0.75, 0.75, 0.75, 1]}
-                            detail={8}
-                            depth={0.5}
-                          />
-                          <Axis
-                            axis='z'
-                            width={5}
-                            color={[0.75, 0.75, 0.75, 1]}
-                            detail={8}
-                            depth={0.5}
-                          />
-                          <Gather
-                            children={<>
-                              <Sampler
-                                axes='xyz'
-                                format='vec3<f32>'
-                                size={VOLUME_SIZE}
-                                padding={1}
-                                expr={EXPR_POSITION}
-                              />
-                              <Sampler
-                                axes='xyz'
-                                format='vec3<f32>'
-                                size={VOLUME_SIZE}
-                                padding={1}
-                                expr={EXPR_NORMAL}
-                                time
-                                live
-                              />
-                              <Sampler
-                                axes='xyz'
-                                format='f32'
-                                size={VOLUME_SIZE}
-                                padding={1}
-                                expr={EXPR_VALUE}
-                                time
-                                live
-                              />
-                            </>}
-                            then={
-                              ([positions, normals, values]: TensorArray[]) => (<>
-                                <Environment map={envMap} preset={env} gain={0.5}>
-                                  <PBRMaterial roughness={roughness} metalness={metalness}>{() => {}}
+                            <Axis
+                              axis='x'
+                              detail={64}
+                              width={5}
+                              color={[0.75, 0.75, 0.75, 1]}
+                              depth={0.5}
+                            />
+                            <Axis
+                              axis='y'
+                              width={5}
+                              color={[0.75, 0.75, 0.75, 1]}
+                              detail={8}
+                              depth={0.5}
+                            />
+                            <Axis
+                              axis='z'
+                              width={5}
+                              color={[0.75, 0.75, 0.75, 1]}
+                              detail={8}
+                              depth={0.5}
+                            />
+                            <Gather
+                              children={<>
+                                <Sampler
+                                  axes='xyz'
+                                  format='vec3<f32>'
+                                  size={VOLUME_SIZE}
+                                  padding={1}
+                                  expr={EXPR_POSITION}
+                                />
+                                <Sampler
+                                  axes='xyz'
+                                  format='vec3<f32>'
+                                  size={VOLUME_SIZE}
+                                  padding={1}
+                                  expr={EXPR_NORMAL}
+                                  time
+                                  live
+                                />
+                                <Sampler
+                                  axes='xyz'
+                                  format='f32'
+                                  size={VOLUME_SIZE}
+                                  padding={1}
+                                  expr={EXPR_VALUE}
+                                  time
+                                  live
+                                />
+                              </>}
+                              then={
+                                ([positions, normals, values]: TensorArray[]) => (<>
+                                  <PBRMaterial roughness={roughness} metalness={metalness}>
                                     <ImplicitSurface
                                       values={values}
                                       normals={normals}
@@ -194,28 +204,28 @@ export const PlotImplicitSurfacePage: LC = () => {
                                       color={[0.8, 0.8, 1.0, 1.0]}
                                     />
                                   </PBRMaterial>
-                                </Environment>
-                                {inspect ? (
-                                  <DataShader
-                                    shader={colorizeShader}
-                                    data={values}
-                                  >{
-                                    (colorizedValues: ShaderModule) => (
-                                      <Point
-                                        positions={positions}
-                                        colors={mode === 'normal' ? normals : colorizedValues}
-                                        size={3}
-                                        depth={1}
-                                      />
-                                    )
-                                  }</DataShader>
-                                ) : null}
-                              </>)
-                            }
-                          />
-                        </Polar>
-                      </Animate>
-                    </Plot>
+                                  {inspect ? (
+                                    <DataShader
+                                      shader={colorizeShader}
+                                      data={values}
+                                    >{
+                                      (colorizedValues: ShaderModule) => (
+                                        <Point
+                                          positions={positions}
+                                          colors={mode === 'normal' ? normals : colorizedValues}
+                                          size={3}
+                                          depth={1}
+                                        />
+                                      )
+                                    }</DataShader>
+                                  ) : null}
+                                </>)
+                              }
+                            />
+                          </Polar>
+                        </Animate>
+                      </Plot>
+                    </Environment>
                   </Pass>
                 </Camera>
               </LinearRGB>
@@ -223,7 +233,7 @@ export const PlotImplicitSurfacePage: LC = () => {
           )} />
       )}
     />
-  );
+  </>);
 };
 
 const Camera = ({children}: PropsWithChildren<object>) => (

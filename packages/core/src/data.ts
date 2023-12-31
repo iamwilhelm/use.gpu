@@ -321,7 +321,7 @@ export const spreadNumberArray = (
 
 // Copy from any-nested 1d/2d/3d/4d number[] with array depth known ahead of time
 export const copyRecursiveNumberArray = (
-  from: number | any[],
+  from: VectorLike | number,
   to: TypedArray,
   fromDims: number = 1,
   toDims: number = fromDims,
@@ -329,6 +329,8 @@ export const copyRecursiveNumberArray = (
   toIndex: number = 0,
   w: number = 0,
 ) => {
+  if (isTypedArray(from)) fromDepth = 0;
+
   if (fromDepth === 0) {
     if (typeof from === 'number') {
       // Scalar

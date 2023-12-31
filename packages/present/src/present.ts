@@ -10,7 +10,7 @@ import {
   Pass, RawFullScreen, RenderTarget,
 } from '@use-gpu/workbench';
 import { UI, UILayers } from '@use-gpu/layout';
-import { makeParseColor, parseColor, useProp } from '@use-gpu/traits/live';
+import { makeParseColor, parseColor, parseBackground, useProp } from '@use-gpu/traits/live';
 import { clamp } from '@use-gpu/core';
 
 import { resolveSlides } from './lib/slides';

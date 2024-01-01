@@ -2,7 +2,7 @@ import type { LC, LiveElement } from '@use-gpu/live';
 import type { TextureSource, TextureTarget } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { memo, gather, yeet, use, useMemo, useOne } from '@use-gpu/live';
+import { memo, gather, yeet, use, useMemo, useOne, useHooks, useNoHooks } from '@use-gpu/live';
 import { makeAtlas, makeDataBuffer, clamp, seq, lerp } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
 import { DebugAtlas } from '../text/debug-atlas';
@@ -89,7 +89,8 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
   } = props;
 
   const render = getRenderFunc(props);
-  if (!texture) return render ? render(null, null) : yeet(null);
+  if (!texture) return useHooks(() => render ? render(null, null) : yeet(null), [render]);
+  useNoHooks();
 
   const device = useDeviceContext();
   const inspect = useInspectable();

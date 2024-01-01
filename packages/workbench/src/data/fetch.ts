@@ -50,7 +50,7 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
     return go;
   }, [url, request, JSON.stringify(options), type, then, version]);
 
-  const [resolved, fetchError] = useAwait(run, [run]);
+  const [resolved, fetchError, isLoading] = useAwait(run, [run]);
   const [mapped, mapError] = resolved !== undefined && then
     ? useAwait(() => then(resolved), [resolved])
     : (useNoAwait(), [resolved]);
@@ -60,7 +60,7 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
   const result = resolved !== undefined ? mapped : (error !== undefined ? fallback ?? loading : loading);
 
   const render = getRenderFunc(props);
-  return result !== undefined ? (render ? render(result) : yeet(result)) : (suspense ? suspend() : null);
+  return result !== undefined && (!suspense || !isLoading) ? (render ? render(result) : yeet(result)) : (suspense ? suspend() : null);
 };
 
 const delay = <T>(promise: Promise<T>, time: number = 0) =>

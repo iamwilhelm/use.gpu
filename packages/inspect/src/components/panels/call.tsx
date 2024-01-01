@@ -85,8 +85,8 @@ const hookToObject = (
   if (type === Hook.VERSION) {
     return {version: b, value: a};
   }
-  if (type === Hook.YOLO) {
-    return a ? {skip: a} : {scope: b};
+  if (type === Hook.HOOKS) {
+    return {scope: a?.map(hookToObject)};
   }
   return null;
 }

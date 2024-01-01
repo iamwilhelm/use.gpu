@@ -41,6 +41,10 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
       default:
         useNoHook(type)();
         break;
+      case Hook.HOOKS:
+        if (state[i + 1]) useNoHooks();
+        else fiber.pointer += 3;
+        break;
       case Hook.RESOURCE:
         useNoResource();
         break;
@@ -503,46 +507,53 @@ export const useHooks = <T>(
   dependencies: any[] = NO_DEPS,
 ): T => {
   const fiber = useFiber();
-  const {pointer} = fiber;
 
   const i = pushState(fiber, Hook.HOOKS);
-  let {state} = fiber;
+  const {state} = fiber;
 
-  let value;
-  if (pointer === 0) {
-    let skip = true;
-    value = useMemo(() => {
-      skip = false;
+  const scope = state![i];
+
+  const {pointer} = fiber;
+  const value = useMemo(() => {
+    try {
+      fiber.pointer = 0;
+      fiber.state = scope;
       return initialState();
-    }, dependencies);
+    }
+    finally {
+      state![i] = fiber.state;
+      fiber.pointer = pointer + STATE_SLOTS;
+      fiber.state = state;
+    }
+  }, dependencies);
 
-    if (skip) fiber.pointer = state![i];
-    else state![i] = fiber.pointer;
-  }
-  else {
-    let scope = state![i + 1];
-
-    let {pointer} = fiber;
-    value = useMemo(() => {
-      try {
-        fiber.pointer = 0;
-        fiber.state = scope;
-        return initialState();
-      }
-      finally {
-        state![i + 1] = fiber.state;
-        fiber.pointer = pointer + STATE_SLOTS;
-        fiber.state = state;
-      }
-    }, dependencies);
-  }
+  state![i + 1] = undefined;
 
   return value as unknown as T;
 }
 
 export const useNoHooks = () => {
-  useNoHook(Hook.HOOKS);
-  useNoHook(Hook.MEMO);
+  const fiber = useFiber();
+
+  const i = pushState(fiber, Hook.HOOKS);
+  const {state} = fiber;
+  const scope = state?.[i];
+
+  if (scope) {
+    const {pointer} = fiber;
+    try {
+      fiber.pointer = 0;
+      fiber.state = scope;
+      discardState(fiber);
+    }
+    finally {
+      state![i] = undefined;
+      fiber.pointer = pointer;
+      fiber.state = state;
+    }
+  }
+
+  pushState(fiber, Hook.MEMO);
 };
 
 // Togglable hooks
@@ -566,22 +577,25 @@ export const useAwait = <T, E = Error>(
   deps: any[] = NO_DEPS,
 ): [T | undefined, E | undefined] => {
   const [value, setValue] = useState<[T | undefined, E | undefined]>([f ? undefined : null, undefined]);
+  const loadingRef = useRef(false);
 
   const ref = useResource((dispose) => {
     if (!f) return;
 
+    loadingRef.current = true;
     let cancelled = false;
     f(() => cancelled)
-    .then(value => !cancelled && setValue([value, undefined]))
-    .catch(error => !cancelled && setValue([undefined, error]));
+    .then(value => { loadingRef.current = false; if (!cancelled) setValue([value, undefined]); })
+    .catch(error => { loadingRef.current = false; if (!cancelled) setValue([undefined, error]); });
     dispose(() => { cancelled = true; });
   }, deps);
 
-  return value;
+  return [...value, loadingRef.current];
 };
 
 export const useNoAwait = () => {
   useNoState();
+  useNoRef();
   useNoResource();
 };
 

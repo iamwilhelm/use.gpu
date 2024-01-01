@@ -8,12 +8,11 @@ import { bindBundle, wgsl } from '@use-gpu/shader/wgsl';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, FlatCamera, Animate, LinearRGB, Environment,
-  GeometryData, PBRMaterial, ImageCubeTexture, PrefilteredEnvMap, ShaderLitMaterial,
+  Loop, Pass, FlatCamera, LinearRGB, Environment,
+  GeometryData, PBRMaterial, PrefilteredEnvMap,
   OrbitCamera, OrbitControls, PanControls,
-  Pick, Cursor, PointLayer, LineLayer,
-  AxisHelper, KeyboardContext,
-
+  Cursor, Suspense,
+  KeyboardContext,
   makeSphereGeometry,
   useShader, useShaderRef,
 } from '@use-gpu/workbench';
@@ -27,6 +26,8 @@ import {
 import {
   UI, Layout, Absolute, Block, Embed,
 } from '@use-gpu/layout';
+
+import { InfoBox } from '../../ui/info-box';
 
 import { EnvMapControls } from '../../ui/envmap-controls';
 
@@ -50,12 +51,13 @@ export const MaterialEnvMapPage: LC = (props) => {
 
   const root = document.querySelector('#use-gpu .canvas');
 
-  return (
+  return (<>
+    <InfoBox>PBR material spheres of varying roughness and metalness. Octahedral PMREM environment map is generated using compute shaders.</InfoBox>
     <EnvMapControls container={root} hasDebug render={(envPreset, envMap, seamFix, debugGrid) => (
       <Gather
         children={[
           <GeometryData {...geometry} />,
-          envMap,
+          <Suspense>{envMap}</Suspense>
         ]}
         then={([
           mesh,
@@ -77,14 +79,12 @@ export const MaterialEnvMapPage: LC = (props) => {
                     <Cursor cursor='move' />
                     <Pass lights>
 
-                      {/*<AxisHelper size={2} width={3} />*/}
-
                       <Environment map={cubeMap} preset={envPreset}>
                         <Scene>
                           {
                             seq(8).flatMap(i =>
                               seq(8).map(j => (
-                                <Node position={[i - 3.5, 0, j - 3.5]} scale={[0.35, 0.35, 0.35]}>
+                                <Node key={`${i}-${j}`} position={[i - 3.5, 0, j - 3.5]} scale={[0.35, 0.35, 0.35]}>
                                   <PBRMaterial
                                     albedo={[0.6, 0.85, 1.0, 1.0]}
                                     metalness={i / 7}
@@ -135,7 +135,7 @@ export const MaterialEnvMapPage: LC = (props) => {
         )}
       />
     )} />
-  );
+  </>);
 };
 
 type CameraProps = {

@@ -64,8 +64,10 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
 }
 
 const hookToObject = (
-  state: any[],
+  state?: any[],
 ) => {
+  if (!state) return null;
+
   const [type, a, b] = state;
   if (type === Hook.STATE) {
     return {state: a, setter: b};
@@ -86,7 +88,7 @@ const hookToObject = (
     return {version: b, value: a};
   }
   if (type === Hook.HOOKS) {
-    return {scope: a?.map(hookToObject)};
+    return {scope: a ? chunk(a, STATE_SLOTS).map(hookToObject) : null};
   }
   return null;
 }

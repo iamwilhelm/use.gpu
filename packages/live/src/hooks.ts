@@ -564,10 +564,11 @@ export const useNoCallback = useNoHook(Hook.CALLBACK);
 export const useNoVersion = useNoHook(Hook.VERSION);
 
 /**
- * On-change logger
+ * On-change logger for debug purposes.
  */
-export const useLog = (value: any, name?: string) => useOne(() => console.log(value, name), value);
-export const useNoLog = useNoOne;
+export const useLog = (values: Record<string, any>) => {
+  for (const k in values) useOne(() => console.log(k, '=', value), value);
+};
 
 /**
  * Async wrapper

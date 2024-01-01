@@ -150,6 +150,8 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       sdf: [radius, scale, size, 0],
       fill,
     };
+    
+    console.log('glyphs')
 
     return yeet({
       count,

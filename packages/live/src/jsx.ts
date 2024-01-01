@@ -69,13 +69,13 @@ export const createElement = (type: ArrowFunction | string, props: any, ...child
         return yeet(toChildren(props?.children ?? children), props?.key);
 
       case SIGNAL:
-        return signalTo(props?.reconciler, props?.key);
+        return signalTo(props?.to, props?.key);
 
       case SUSPEND:
         return suspend(props?.key);
 
       case QUOTE:
-        return quoteTo(props?.reconciler, toChildren(props?.children ?? children), props?.key);
+        return quoteTo(props?.to, toChildren(props?.children ?? children), props?.key);
 
       case UNQUOTE:
         return unquote(toChildren(props?.children ?? children), props?.key);

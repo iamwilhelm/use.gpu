@@ -4,7 +4,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { FontMetrics, GlyphMetrics } from '@use-gpu/glyph';
 import type { Alignment } from '../types';
 
-import { fence, provide, memo, yeet, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
+import { fence, provide, memo, yeet, useContext, useNoContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/glyph';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping, updateMipTextureChain } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
@@ -19,6 +19,7 @@ import { getLODBiasedTexture } from '@use-gpu/wgsl/fragment/lod-bias.wgsl';
 
 export const SDFFontContext = makeContext<SDFFontContextProps>(undefined, 'SDFFontContext');
 export const useSDFFontContext = () => useContext(SDFFontContext);
+export const useNoSDFFontContext = () => useNoContext(SDFFontContext);
 
 export type SDFFontContextProps = {
   __debug: {

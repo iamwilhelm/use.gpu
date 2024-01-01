@@ -506,6 +506,7 @@ export const reconcileFiberCalls = (() => {
 
     // Get new key set and order
     let i = 0, j = 0;
+    let keyed = false;
     let rekeyed = false;
     for (let call of calls) {
       if (call == null || (call as any) === false) {
@@ -516,6 +517,7 @@ export const reconcileFiberCalls = (() => {
 
       let key;
       if (callKey != null) {
+        keyed = true;
         rekeyed = rekeyed || (order[i] !== callKey);
         key = callKey;
       }
@@ -569,7 +571,7 @@ export const reconcileFiberCalls = (() => {
       if (Array.isArray(call)) call = {f: FRAGMENT, args: call} as any;
 
       const mount = mounts.get(key);
-      const nextMount = updateMount(fiber, mount, call as any, key, callKey != null);
+      const nextMount = updateMount(fiber, mount, call as any, key, keyed);
       if (nextMount !== false) {
         if (nextMount) mounts.set(key, nextMount);
         else mounts.delete(key);

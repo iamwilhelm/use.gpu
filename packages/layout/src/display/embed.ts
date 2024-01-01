@@ -86,7 +86,7 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: PropsWithChildren<E
               id,
             )
           );
-        return quote(yeet(view));
+        return quote(view);
       }),
     };
   };

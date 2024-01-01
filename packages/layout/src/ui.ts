@@ -60,7 +60,6 @@ export const UILayers: LC<UILayersProps> = ({
   }
   const layers = partitioner.resolve();
 
-  console.log('-------')
   const els = layers.flatMap((layer, i): LiveElement => {
     if ((layer.items[0] as any)?.f) return (layer.items as any);
     return keyed(Layer, layer.key, layer.items);

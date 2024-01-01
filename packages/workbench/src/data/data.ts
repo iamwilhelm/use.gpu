@@ -7,7 +7,7 @@ import { QueueReconciler } from '../reconcilers';
 import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
-import { yeet, useLog, useOne, useMemo, useNoMemo } from '@use-gpu/live';
+import { yeet, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   seq,
   toCPUDims,

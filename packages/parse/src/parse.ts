@@ -340,7 +340,7 @@ export const parseVec2Array = makeParseVectorArray(2, 0, Float32Array);
 export const parseVec3Array = makeParseVectorArray(3, 0, Float32Array);
 export const parseVec4Array = makeParseVectorArray(4, 0, Float32Array);
 
-export const parseVec4MultiArray = makeParseVectorArray(4, 0, Float32Array);
+export const parseVec4MultiArray = makeParseMultiVectorArray(4, 0, Float32Array);
 
 //////////////////
 

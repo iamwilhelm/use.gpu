@@ -35,7 +35,7 @@ const isEnd   = (i: number) => arrowData[i].end;
 
 export const GeometryLinesPage: LC = () => {
   return (<>
-    <InfoBox>Drive &lt;LineLayer&gt; and &lt;ArrowLayer&gt; directly using &lt;Data&gt;.</InfoBox>
+    <InfoBox>Drive &lt;LineLayer&gt; and &lt;ArrowLayer&gt; directly using &lt;Data&gt;, skipping the plot API entirely.</InfoBox>
     <Camera>
       <Cursor cursor='move' />
       <Pass>

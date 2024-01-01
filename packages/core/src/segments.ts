@@ -194,7 +194,7 @@ export const generateConcaveIndices = (
   positions: VectorLike,
   dims: number,
 ) => {
-  const gs = groups ?? [chunks.length];
+  const gs = groups ?? chunks.map(_ => 1);
   let g = gs.length;
 
   // Convert XYZ to dominant 2D plane

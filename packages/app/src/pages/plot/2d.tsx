@@ -32,6 +32,7 @@ export const Plot2DPage: LC = () => {
       <Camera>
         <Pass>
           <Plot>
+            {/* Transforms */}
             <Transform position={[100, 100]}>
 
               {/* Single point */}
@@ -77,6 +78,7 @@ export const Plot2DPage: LC = () => {
                 color={'#40c000'}
               />
 
+              {/* Per line color */}
               <Line
                 positions={[
                   [[300, 250], [350, 350], [400, 250], [450, 350]],
@@ -87,19 +89,23 @@ export const Plot2DPage: LC = () => {
                 join="miter"
               />
 
-              {/* Transforms */}
+              {/* Per vertex color/width */}
               <Transform position={[0, 400]}>
                 <Line
                   positions={[
                     [[300, 50], [350, 150], [400, 50], [450, 150]],
                     [[300, 150], [350, 250], [400, 150], [450, 250]],
                   ]}
-                  width={12}
-                  color={['#ffa040', '#7f40a0']}
+                  widths={[[0, 12, 12, 0], [0, 12, 12, 0]]}
+                  colors={[['#ffa040', '#fff0f0', '#ffa040', '#fff0f0'], ['#7f20a0', '#af60ff', '#7f20a0', '#af60ff']]}
                   join="round"
+
+                  /* Scale line width with view */
+                  depth={1}
                 />
               </Transform>
 
+              {/* Looped polylines */}
               <Transform position={[10, 0]}>
                 <Line
                   positions={[
@@ -224,7 +230,7 @@ export const Plot2DPage: LC = () => {
                   />
                 </Transform>
 
-                {/* Polygons with holes */}
+                {/* Polygons with holes [[boundary, hole, hole, ...]] */}
                 <Transform position={[-25, 240]}>
                   <Polygon
                     positions={[[

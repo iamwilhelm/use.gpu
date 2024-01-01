@@ -1,39 +1,30 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { DataField } from '@use-gpu/core';
+import type { DataSchema } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
 import { seq } from '@use-gpu/core';
 
 import { PickingOverlay } from '../../ui/picking-overlay';
-import earcut from 'earcut';
 
 import {
-  Pass, FlatCamera, Cursor, Pick,
-  Data, LineSegments, FaceSegments,
+  Pass, Cursor, Pick, FlatCamera,
+  Data, getFaceSegments, getFaceSegmentsConcave,
   OrbitCamera, OrbitControls,
-  LineLayer, FaceLayer,
+  FaceLayer,
 } from '@use-gpu/workbench';
 
 // Convex and concave polygon data
 
-const convexDataFields = [
-  // Accessor syntax
-  ['array<vec3<f32>>', (o: any) => o.positions],
-  // Shorthand => o.color
-  ['vec3<f32>', 'color'],
-] as DataField[];
+const convexDataSchema: DataSchema = {
+  positions: {format: 'array<vec3<f32>>'},
+  color: {format: 'vec3<f32>'},
+};
 
-const concaveDataFields = [
-  ['array<vec3<f32>>', (o: any) => o.positions],
-  ['vec3<f32>', 'color'],
-  // Indexed attribute - must be adjusted when aggregated.
-  ['array<u32>', (o: any) => o.indices, 'index'],
-  ['u32', 'lookup'],
-] as DataField[];
-
-const lineDataFields = [
-  ['array<vec4<f32>>', (o: any) => o],
-] as DataField[];
+const concaveDataSchema: DataSchema = {
+  positions: {format: 'array<vec3<f32>>'},
+  color: {format: 'vec3<f32>'},
+  lookup: {format: 'u32'},
+};
 
 // Generate some random polygons
 
@@ -46,7 +37,7 @@ const circleY = (a: number, r: number) => Math.sin(a * Math.PI * 2) * r;
 
 const N = 32;
 
-let convexFaceData = seq(20).map(i => {
+const convexFaceData = seq(20).map(i => {
   const n = Math.max(3, randomInt(5, 16) - randomInt(0, 5));
   const r = randomFloat(0.15, 0.5);
   const o = [randomFloat(-2, 2), randomFloat(-1, 1), randomFloat(-2, -0.5)];
@@ -60,7 +51,7 @@ let convexFaceData = seq(20).map(i => {
   };
 });
 
-let concaveFaceData = seq(20).map(i => {
+const concaveFaceData = seq(20).map(i => {
   const n = Math.max(3, randomInt(5, 24) - randomInt(0, 5));
   const r = randomFloat(0.15, 0.5);
   const o = [randomFloat(-2, 2), randomFloat(-1, 1), randomFloat(0.5, 2)];
@@ -75,21 +66,12 @@ let concaveFaceData = seq(20).map(i => {
     ];
   });
 
-  const flatPos3D = positions.flatMap(p => p.slice(0, 3));
-  const indices = earcut(flatPos3D, [], 3);
-
   return {
     positions,
-    indices,
     color: randomColor(),
     lookup: i,
   };
 });
-
-let lineData = seq(22).map((i) => (
-  // path: [[x, y, z, w], ...]
-  i < 11 ? seq(2).map(j => [i / 2.5 - 2, -1, j * 4 - 2, 1]) : seq(2).map(j => [j * 4 - 2, -1, (i - 11) / 2.5 - 2, 1])
-));
 
 export const GeometryFacesPage: LC = () => {
 
@@ -99,28 +81,28 @@ export const GeometryFacesPage: LC = () => {
       <Pass picking>
 
         <Data
-          fields={convexDataFields}
+          schema={convexDataSchema}
           data={convexFaceData}
-          on={<FaceSegments />}
-          render={(positions, colors, segments, lookups) =>
+          segments={getFaceSegments}
+        >{
+          (sources) =>
             <Pick
               onMouseOver={(mouse, index) => console.log('round', {mouse, index})}
-              render={({id, hovered, index}) => [
+            >{
+              ({id, hovered, index}) => [
                 hovered ? <Cursor cursor='default' /> : null,
                 <FaceLayer
                   id={id}
-                  positions={positions}
-                  segments={segments}
-                  colors={colors}
-                  lookups={lookups}
                   side="both"
+                  {...sources}
                 />,
                 hovered ? (
                   <Data
-                    fields={convexDataFields}
-                    data={convexFaceData.slice(index, index + 1)}
-                    on={<FaceSegments />}
-                    render={(positions, colors, segments) =>
+                    schema={convexDataSchema}
+                    data={convexFaceData}
+                    segments={getFaceSegments}
+                  >{
+                    (positions, colors, segments) =>
                       <FaceLayer
                         positions={positions}
                         segments={segments}
@@ -128,65 +110,50 @@ export const GeometryFacesPage: LC = () => {
                         side="both"
                         zBias={1}
                       />
-                    }
-                  />
+                  }</Data>
                 ) : null
-              ]}
-            />
-          }
-        />
+              ]
+            }</Pick>
+        }</Data>
 
         <Data
-          fields={concaveDataFields}
+          schema={concaveDataSchema}
           data={concaveFaceData}
-          render={(positions, colors, indices, lookups) =>
+          segments={getFaceSegmentsConcave}
+        >{
+          (sources) =>
             <Pick
               onMouseOver={(mouse, index) => console.log('spiky', {mouse, index})}
-              render={({id, hovered, index}) => [
+            >{
+              ({id, hovered, index}) => [
                 hovered ? <Cursor cursor='default' /> : null,
                 <FaceLayer
                   id={id}
-                  positions={positions}
-                  indices={indices}
-                  colors={colors}
-                  lookups={lookups}
+                  {...sources}
                   side="both"
                 />,
                 hovered ? (
                   <Data
-                    fields={concaveDataFields}
-                    data={concaveFaceData.slice(index, index + 1)}
-                    render={(positions, colors, indices) =>
+                    schema={concaveDataSchema}
+                    data={concaveFaceData}
+                    segments={getFaceSegmentsConcave}
+                    count={1}
+                    skip={index}
+                  >{
+                    ({positions, indices}) =>
                       <FaceLayer
-                        positions={positions}
-                        indices={indices}
+                        {...{positions, indices}}
                         color={[1, 1, 1, 1]}
                         side="both"
                         zBias={1}
                       />
                     }
-                  />
+                  }</Data>
                 ) : null
-              ]}
-            />
-          }
-        />
+              ]
+            }</Pick>
+        }</Data>
 
-        <Data
-          fields={lineDataFields}
-          data={lineData}
-          on={<LineSegments />}
-          render={(positions, segments) =>
-            <LineLayer
-              positions={positions}
-              color={[1, 1, 1, .2]}
-              width={3}
-              segments={segments}
-              depth={0.5}
-              mode="transparent"
-            />
-          }
-        />
       </Pass>
     </Camera>
 

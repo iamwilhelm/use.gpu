@@ -72,6 +72,7 @@ export const makeAggregator = (
     itemCount = items.length;
 
     updateAggregateFromSchema(device, schema, aggregate, items, count, indexed, instanced, offsets);
+    if (schema.indices) console.log(aggregateBuffers.positions.array.slice());
 
     return {count: indexed, sources, uploadRefs};
   };

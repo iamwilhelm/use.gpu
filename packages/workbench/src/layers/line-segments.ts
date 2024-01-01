@@ -30,7 +30,6 @@ export const getLineSegments = ({
   const unwelds = loops ? new Uint32Array(count) : undefined;
 
   generateChunkSegments(segments, slices, unwelds, chunks, groups, loops);
-  console.log({chunks, groups, slices})
 
   return {count, segments, slices, unwelds, schema: LINE_SEGMENTS_SCHEMA};
 };

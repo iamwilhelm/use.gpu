@@ -144,7 +144,7 @@ export const updateAggregateBuffer = (
     i++;
   }
 
-  if (buffer) uploadStorage(device, source, array.buffer, b);
+  if (buffer) uploadStorage(device, source, array.buffer, b / dimsOut);
 }
 
 export const updateAggregateInstances = (

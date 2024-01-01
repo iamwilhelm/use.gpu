@@ -36,7 +36,7 @@ export const GeometryGLTFPage: LC = () => {
       <Gather
         children={[
           <Gather
-            children={envMap}
+            children={<Suspense>{envMap}</Suspense>}
             then={([texture]: TextureSource[]) => (
               <PrefilteredEnvMap
                 texture={texture}
@@ -44,7 +44,7 @@ export const GeometryGLTFPage: LC = () => {
             )}
           />
         ]}
-        then={([cubeMap]: TextureSource[]) => (console.log({cubeMap}),
+        then={([cubeMap]: TextureSource[]) => (
           <Loop>
             <LinearRGB>
               <Cursor cursor='move' />

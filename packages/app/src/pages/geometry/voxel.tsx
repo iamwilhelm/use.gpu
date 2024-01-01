@@ -117,7 +117,7 @@ export const GeometryVoxelPage: LC = () => {
                         (planeMesh: GPUGeometry) =>
                           <PBRMaterial albedo={'#808080'} roughness={0.7}>
                             <Mesh
-                              geometry={planeMesh}
+                              mesh={planeMesh}
                               side="both"
                               shaded
                             />

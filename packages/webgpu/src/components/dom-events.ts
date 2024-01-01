@@ -36,7 +36,6 @@ const makeMouseState = () => ({
   y: 0,
   moveX: 0,
   moveY: 0,
-  stopped: false,
 } as MouseState);
 
 const makeWheelState = () => ({
@@ -46,7 +45,6 @@ const makeWheelState = () => ({
   moveY: 0,
   spinX: 0,
   spinY: 0,
-  stopped: false,
 } as WheelState);
 
 const makeKeyboardState = () => ({
@@ -58,7 +56,6 @@ const makeKeyboardState = () => ({
   },
   keys: {},
   key: null,
-  stopped: false,
 } as KeyboardState);
 
 export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithChildren<DOMEventsProps>) => {
@@ -85,9 +82,9 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
   const [keyboard, setKeyboard] = useState<KeyboardState>(makeKeyboardState);
 
   const pointerLock = useMemo(() => ({
-    hasLock: document.pointerLockElement === element,
-    beginLock: () => element.requestPointerLock(),
-    endLock: () => document.exitPointerLock(),
+    locked: document.pointerLockElement === element,
+    lock: () => element.requestPointerLock(),
+    unlock: () => document.exitPointerLock(),
   }), [element, document.pointerLockElement]);
 
   useResource((dispose) => {
@@ -112,7 +109,6 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
             shift: e.shiftKey,
             meta:  e.metaKey,
           },
-          stopped: false,
         };
       });
     };
@@ -128,7 +124,6 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
             [k]: true,
           },
           key: k,
-          stopped: false,
         };
       });
     };
@@ -144,7 +139,6 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
             [k]: false,
           },
           key: k,
-          stopped: false,
         };
       });
     };
@@ -203,7 +197,6 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
         moveY,
         spinX,
         spinY,
-        stopped: false,
       }));
 
       onMove(clientX, clientY);
@@ -223,7 +216,6 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
         y,
         moveX: moveX ?? x - state.x,
         moveY: moveY ?? y - state.y,
-        stopped: false,
       }));
     };
 
@@ -269,6 +261,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
       onMove(clientX, clientY, 0, 0);
       onModifiers(e);
 
+      // Iframe + pointercapture bug
       // https://bugs.chromium.org/p/chromium/issues/detail?id=1300622
       if (!iframe) e.preventDefault();
       e.stopPropagation();
@@ -314,7 +307,6 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
           ...state,
           keys: {},
           key: null,
-          stopped: true,
         };
       });
     };

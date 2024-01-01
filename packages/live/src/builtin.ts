@@ -96,8 +96,8 @@ export const extend = (
   calls: LiveNode<any>,
   props: Record<string, any>,
 ): LiveElement => {
-  if (typeof calls === 'string') return null;
-  if (typeof calls === 'function') return null;
+  if (typeof calls === 'string') throw new Error(`Cannot extend props of string child '${calls}'`);
+  if (typeof calls === 'function') throw new Error(`Cannot extend props of function child '${calls}'`);
   if (!calls) return calls;
 
   if (Array.isArray(calls)) return calls.map(call => extend(call, props)) as any;

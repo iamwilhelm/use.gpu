@@ -349,7 +349,7 @@ export const DataTrait = (keys: string[], canonical: string = 'positions') => {
       }
 
       return [d ? data : null, f ? formats : null, s ? sources : null];
-    }, [dataContext]);
+    }, [dataContext, props]);
 
     if (data) for (const k in data) parsed[k] = data[k];
     parsed.formats = formats;

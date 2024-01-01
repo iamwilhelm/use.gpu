@@ -30,8 +30,8 @@ fn varianceForRoughness(roughness: f32) -> f32 {
   let Fs = ibl.specular;
   let dotNV = ibl.dotNV;
 
-  let dfx = dpdx(N);
-  let dfy = dpdy(N);
+  let dfx = dpdx(R);
+  let dfy = dpdy(R);
 
   let brdf = environmentBRDF(roughness, dotNV);
   let diffuse = Fd * sampleEnvironment(N, -1.0, dfx, dfy).xyz;

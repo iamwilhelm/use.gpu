@@ -7,7 +7,9 @@ import {
   DEPTH_STENCIL_FORMAT,
 } from '../constants';
 
-import { DeviceContext, RenderContext, PickingContext } from '../providers';
+import { DeviceContext } from '../providers/device-provider';
+import { RenderContext } from '../providers/render-provider';
+import { PickingContext } from '../providers/picking-provider';
 import {
   memo, use, provide, yeet, makeContext,
   useMemo, useOne, useNoOne, useResource,
@@ -39,6 +41,7 @@ export type PickingProps = {
   resolution?: number,
 }
 
+const DEBUG = false;
 const NOP = () => {};
 
 /** Global picking provider. Provides a screen-sized render target that contains object ID + item index. */
@@ -64,7 +67,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
     depthStencilFormat
   );
 
-  const pickingContext = useMemo(() => {
+  const [pickingContext, pickingSource] = useMemo(() => {
     const {width: w, height: h, pixelRatio: dpi} = renderContext;
     const width = Math.round(w * resolution / dpi);
     const height = Math.round(h * resolution / dpi);
@@ -81,6 +84,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
     let waiting = false;
     let captured = null as TypedArray | null;
     const captureTexture = async () => {
+      DEBUG && console.log('captureTexture', {waiting, updated})
       if (waiting) return;
       if (!updated) {
         if (captured) captured = null;
@@ -102,6 +106,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
       if (ArrayType) {
         const array = new ArrayType(pickingBuffer.getMappedRange());
         captured = array.slice();
+        DEBUG && console.log('captured texture', captured);
       }
 
       pickingBuffer.unmap();
@@ -153,7 +158,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
       sampleTexture,
     };
 
-    return context;
+    return [context, pickingSource];
   }, [device, renderContext, colorStates, depthStencilState, resolution]);
 
   return [

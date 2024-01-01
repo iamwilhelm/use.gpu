@@ -51,9 +51,9 @@ export type EventProviderProps = {
 };
 
 export type PointerLockAPI = {
-  isLocked: () => boolean,
-  beginLock: () => void,
-  endLock: () => void,
+  locked: () => boolean,
+  lock: () => void,
+  unlock: () => void,
 };
 
 export type MouseState = {
@@ -63,7 +63,6 @@ export type MouseState = {
   y: number,
   moveX: number,
   moveY: number,
-  stopped: boolean,
 };
 
 export type WheelState = {
@@ -73,7 +72,6 @@ export type WheelState = {
   moveY: number,
   spinX: number,
   spinY: number,
-  stopped: boolean,
 };
 
 export type KeyboardState = {
@@ -85,7 +83,8 @@ export type KeyboardState = {
   },
   keys: Record<string, boolean>,
   key: string | null,
-  stopped: boolean,
+  char: string | null,
+  soft: boolean,
 };
 
 export type MouseEventState = {
@@ -178,9 +177,11 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((props: Eve
 
   const mouseContext = useMemo(() => ({
     mouse,
-    captureId,
-    targetId,
-    targetIndex,
+    target: {
+      captureId,
+      targetId,
+      targetIndex,
+    },
     ...pointerLock,
     beginCapture: (id: number) => setCaptureId(id),
     endCapture: () => setCaptureId(null),

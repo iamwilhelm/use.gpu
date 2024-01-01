@@ -2,9 +2,9 @@ use '@use-gpu/wgsl/codec/octahedral'::{ decodeOctahedral };
 
 const MAX_HEIGHT = 64;
 
-const CONV_COS0 = 3.1415926536; // π     //0.8862269255;//0.2499987930059433/0.2820947918;
-const CONV_COS1 = 2.09439510239;// π*2/3 //1.02332670795;//0.2888830900192261/0.2820947918;
-const CONV_COS2 = 0.7853981634; // π/4   //0.4954159122;//0.1400941610336303/0.2820947918;
+const CONV_COS0 = 3.1415926536; // π
+const CONV_COS1 = 2.09439510239;// π*2/3
+const CONV_COS2 = 0.7853981634; // π/4
 
 @link fn getSourceMapping() -> vec4<i32> {};
 

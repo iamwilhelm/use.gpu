@@ -29,7 +29,7 @@ export const DebugWireframePage: LC = () => {
             <GeometryData
               {...boxGeometry}
             >{
-              (mesh: GPUGeometry) => <Mesh geometry={mesh} mode='debug' />
+              (mesh: GPUGeometry) => <Mesh mesh={mesh} mode='debug' />
             }</GeometryData>
           </Node>
           <Node position={[.5, 0, 0]}>

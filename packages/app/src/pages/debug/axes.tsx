@@ -72,7 +72,7 @@ export const DebugAxesPage: LC = (props) => {
 
                   <Scene>
                     <ShaderFlatMaterial fragment={fragment}>
-                      <Mesh geometry={mesh} />
+                      <Mesh mesh={mesh} />
                     </ShaderFlatMaterial>
                   </Scene>
 

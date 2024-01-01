@@ -99,11 +99,11 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     if (swap) for (const t of targets) if (t.swap) t.swap();
   };
 
-  return dispatch({
+  return yeet(dispatch({
     shader: dispatchKernel,
     size: dataSize,
     group: workgroupSize,
     shouldDispatch,
     onDispatch,
-  });
+  }));
 };

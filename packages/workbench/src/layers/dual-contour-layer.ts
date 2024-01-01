@@ -40,7 +40,7 @@ const {quote} = PassReconciler;
 
 const hasWebGPU = typeof GPUBufferUsage !== 'undefined';
 
-const READ_WRITE_SOURCE = hasWebGPU ? { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC } : {};
+const READ_WRITE_SOURCE_VOLATILE = hasWebGPU ? { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC, volatile: true } : {};
 const INDIRECT_SOURCE   = hasWebGPU ? { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC } : {};
 
 const INDIRECT_OFFSET_1 = { byteOffset: 16 };
@@ -139,12 +139,12 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const indirectDraw    = useOne(() => new Uint32Array(12));
   const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
 
-  const [edgeStorage,   allocateEdges]    = useScratchSource('u32', READ_WRITE_SOURCE);
-  const [cellStorage,   allocateCells]    = useScratchSource('u32', READ_WRITE_SOURCE);
-  const [markStorage,   allocateMarks]    = useScratchSource('u32', READ_WRITE_SOURCE);
-  const [indexStorage,  allocateIndices]  = useScratchSource('u32', READ_WRITE_SOURCE);
-  const [vertexStorage, allocateVertices] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
-  const [normalStorage, allocateNormals]  = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
+  const [edgeStorage,   allocateEdges]    = useScratchSource('u32', READ_WRITE_SOURCE_VOLATILE);
+  const [cellStorage,   allocateCells]    = useScratchSource('u32', READ_WRITE_SOURCE_VOLATILE);
+  const [markStorage,   allocateMarks]    = useScratchSource('u32', READ_WRITE_SOURCE_VOLATILE);
+  const [indexStorage,  allocateIndices]  = useScratchSource('u32', READ_WRITE_SOURCE_VOLATILE);
+  const [vertexStorage, allocateVertices] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE_VOLATILE);
+  const [normalStorage, allocateNormals]  = useScratchSource('vec4<f32>', READ_WRITE_SOURCE_VOLATILE);
 
   const indirectReadout1 = useDerivedSource(indirectStorage, READ_ONLY_SOURCE);
   const indirectReadout2 = useDerivedSource(indirectStorage, INDIRECT_OFFSET_1);

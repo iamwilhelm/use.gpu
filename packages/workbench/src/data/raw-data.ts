@@ -45,10 +45,21 @@ export type RawDataProps = {
   /** Add current `TimeContext` to the `expr` arguments. */
   time?: boolean,
 
+  /** Split multiple emits into multiple source */
+  interleaved?: boolean,
+} & {
+  interleaved?: true
+
+  /** Leave empty to yeet source(s) instead. */
+  render?: (sources: ShaderSource[]) => LiveElement,
+  children?: (sources: ShaderSource[]) => LiveElement,
+} & {
+  interleaved?: false
+
   /** Leave empty to yeet source(s) instead. */
   render?: (source: ShaderSource) => LiveElement,
   children?: (source: ShaderSource) => LiveElement,
-};
+}
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
@@ -95,14 +106,14 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     const binding = useOne(() => ({name: 'getData', format: format as any as UniformType}), format);
     const getData = useSource(binding, source);
     sources = useMemo(() => (
-      seq(t).map(i => ({
-        shader: chainTo(getShader(getInterleaveIndex, [i, t]), getData),
+      seq(items).map(i => ({
+        shader: chainTo(getShader(getInterleaveIndex, [i, items]), getData),
         length: 0,
         size: [0],
         version: 0,
         bounds: source.bounds,
       }))
-    ), [t, getData]);
+    ), [items, getData]);
   }
   else {
     useNoOne();

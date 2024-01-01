@@ -640,6 +640,13 @@ declare module "@use-gpu/wgsl/pmrem/pmrem-copy.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/pmrem/pmrem-debug.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const pmremGridOverlay: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/pmrem/pmrem-diffuse-render.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;

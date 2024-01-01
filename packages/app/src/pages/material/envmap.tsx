@@ -51,11 +51,11 @@ export const MaterialEnvMapPage: LC = (props) => {
   const root = document.querySelector('#use-gpu .canvas');
 
   return (
-    <EnvMapControls container={root} render={(envPreset, envMap) => (
+    <EnvMapControls container={root} hasDebug render={(envPreset, envMap, seamFix, debugGrid) => (
       <Gather
         children={[
           <GeometryData {...geometry} />,
-          {envMap},
+          envMap,
         ]}
         then={([
           mesh,
@@ -64,14 +64,17 @@ export const MaterialEnvMapPage: LC = (props) => {
           Record<string, ShaderSource>,
           TextureSource,
         ]) => (
-          <PrefilteredEnvMap
-            texture={texture}
-            gain={1}
-            render={(cubeMap, texture) =>
-              <Loop>
-                <LinearRGB tonemap="aces" gain={3}>
-                  <Cursor cursor='move' />
-                  <Camera active={!zooming && !panning}>
+          <Camera active={!zooming && !panning}>
+            <PrefilteredEnvMap
+              texture={texture}
+              gain={1}
+              seamFix={seamFix}
+              debugGrid={debugGrid}
+            >{
+              (cubeMap, texture) =>
+                <Loop>
+                  <LinearRGB tonemap="aces" gain={3}>
+                    <Cursor cursor='move' />
                     <Pass lights>
 
                       {/*<AxisHelper size={2} width={3} />*/}
@@ -97,37 +100,38 @@ export const MaterialEnvMapPage: LC = (props) => {
                       </Environment>
 
                     </Pass>
-                  </Camera>
-                  <PanControls
-                    x={-window.innerWidth/2} y={-window.innerHeight/2} zoom={1/2}
-                    active={panning || zooming}
-                    scroll={zooming}
-                    render={(x, y, zoom) =>
-                      texture ? (
-                        <FlatCamera x={x} y={y} zoom={zoom}>
-                          <Pass overlay>
-                            <UI>
-                              <Layout>
-                                <Block margin={[0, 0, 0, 0]}>
-                                  <Absolute left={0} top={0}>
-                                    <Block
-                                      width={512}
-                                      height={texture.size[1] / texture.size[0] * 512}
-                                      fill={[0, 0, 0, .25]}
-                                      image={{texture, fit: 'scale'}}
-                                    />
-                                  </Absolute>
-                                </Block>
-                              </Layout>
-                            </UI>
-                          </Pass>
-                        </FlatCamera>
-                      ) : null
-                    }
-                  />
-              </LinearRGB>
-            </Loop>
-          } />
+                    <PanControls
+                      x={-window.innerWidth/2} y={-window.innerHeight/2} zoom={1/2}
+                      active={panning || zooming}
+                      scroll={zooming}
+                    >{
+                      (x, y, zoom) =>
+                        texture ? (
+                          <FlatCamera x={x} y={y} zoom={zoom}>
+                            <Pass overlay>
+                              <UI>
+                                <Layout>
+                                  <Block margin={[0, 0, 0, 0]}>
+                                    <Absolute left={0} top={0}>
+                                      <Block
+                                        width={512}
+                                        height={texture.size[1] / texture.size[0] * 512}
+                                        fill={[0, 0, 0, .25]}
+                                        image={{texture, fit: 'scale'}}
+                                      />
+                                    </Absolute>
+                                  </Block>
+                                </Layout>
+                              </UI>
+                            </Pass>
+                          </FlatCamera>
+                        ) : null
+                      }
+                    }</PanControls>
+                </LinearRGB>
+              </Loop>
+            }</PrefilteredEnvMap>
+          </Camera>
         )}
       />
     )} />

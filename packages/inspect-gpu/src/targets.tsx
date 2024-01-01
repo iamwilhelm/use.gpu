@@ -8,8 +8,6 @@ import { Pass, FlatCamera, FontLoader, Queue, DeviceContext, getShader, getLambd
 import { AutoCanvas } from '@use-gpu/webgpu';
 import { UI, Layout, Flex, Block, Inline, Text, Overflow, Absolute } from '@use-gpu/layout';
 
-import { styled as _styled } from '@stitches/react';
-
 import React, { Fragment } from 'react';
 
 import { UseInspect } from '@use-gpu/inspect';
@@ -23,10 +21,6 @@ const NO_OPS: any[] = [];
 const toArray = <T,>(x?: T | T[]): T[] => Array.isArray(x) ? x : x ? [x] : NO_OPS;
 
 const backgroundColor = [0, 0, 0, 0.1];
-const styled: any = _styled;
-
-//const StyledShader = styled('div', {
-//});
 
 const arrayShader = wgsl`
   @link fn getIndex() -> u32;
@@ -235,7 +229,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
           }),
           use(Inline, {
             children: use(Text, {
-              color: 0xffffff,
+              color: '#ffffff',
               lineHeight: 24,
               size: 16,
               children: `${(texture as any).layout} – ${(texture as any).format}`,
@@ -357,6 +351,8 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
 
       let texture = getShader(pickingShader, [() => size, t]) as any;
       texture = getLambdaSource(texture, t);
+      texture.format = t.format;
+      texture.layout = t.layout;
 
       out.push(makeView(texture));
     }

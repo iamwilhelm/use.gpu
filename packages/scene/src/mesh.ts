@@ -10,7 +10,7 @@ import { Primitive } from './primitive';
 
 export type MeshProps = {
   id?: number,
-  geometry: GPUGeometry,
+  mesh: GPUGeometry,
   shaded?: boolean,
   side?: 'front' | 'back' | 'both',
 };

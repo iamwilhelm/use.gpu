@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, LiveNode, LiveFiber, Task, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
-import { use, detach, provide, unquote, yeet, gather, useCallback, useOne, useResource, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
+import { use, detach, provide, unquote, yeet, gather, useCallback, useOne, useResource, useState, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
 
 import { useRenderContext } from '../providers/render-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
@@ -47,6 +47,8 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
     version: {
       frame: 0,
       rendered: 0,
+      pending: false,
+      queued: false,
     },
     loop: {
       request: () => ref.time,
@@ -62,15 +64,15 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
   // for looped component re-rendering.
   const request = useResource((dispose) => {
     const {time, version, loop} = ref;
-    let running = live;
-    let pending = false;
+    let mounted = true;
     let fibers: LiveFiber<any>[] = [];
 
     const render = (timestamp: number) => {
       requestSyncRender();
-      pending = false;
+      ref.version.pending = false;
 
-      if (running) request();
+      if (live && mounted) request();
+      if (!mounted) return;
 
       if (time.timestamp === -Infinity) time.start = timestamp;
       else time.delta = timestamp - time.timestamp;
@@ -84,17 +86,18 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       const {run} = ref;
       if (run) run();
 
-      if (!pending) time.timestamp = -Infinity;
+      // If stopped, reset start time
+      if (!ref.version.pending) time.timestamp = -Infinity;
     };
 
     const request = (fiber?: LiveFiber<any>) => {
-      if (!pending) requestAnimationFrame(render);
+      if (!ref.version.pending) requestAnimationFrame(render);
       if (fiber && fibers.indexOf(fiber) < 0) fibers.push(fiber);
-      pending = true;
+      ref.version.pending = true;
 
       return ref.time;
     };
-    dispose(() => running = false);
+    dispose(() => mounted = false);
 
     return loop.request = request;
   }, [live]);
@@ -102,7 +105,6 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
   useRenderContext();
   usePerFrame();
   request!();
-  requestSyncRender();
 
   const Run = useCallback(tagFunction(() => {
     const {time, version, loop, children} = ref;
@@ -124,6 +126,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
   // and ensure steady rendering
   // when children change.
   const Resume = (ts: ArrowFunction[]) => {
+    const [dispatches, setDispatches] = useState(0);
     const {version} = ref;
 
     const dispatch = () => {
@@ -137,27 +140,28 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       return render;
     };
 
-    let pending = false;
-    return useOne(() => [
-      signal(),
-      quote(yeet(() => {
-        // In animation frame or after self-render - sync
-        if (version.frame > version.rendered) {
-          version.rendered = version.frame;
-          return dispatch();
-        }
-        // Outside animation frame - async
-        else if (!pending) {
-          pending = true;
-          const {rendered} = version;
-          requestAnimationFrame(() => {
-            pending = false;
-            // If no loop frame requested since, dispatch
-            if (rendered === version.rendered) dispatch();
-          });
-        }
-      })),
-    ], ts);
+    // In animation frame or after self-render - sync
+    if (version.frame != version.rendered) {
+      version.rendered = version.frame;
+    }
+    // Outside animation frame - async
+    else if (!version.pending && !version.queued) {
+      ref.version.queued = true;
+
+      const {rendered} = version;
+      requestAnimationFrame(() => {
+        // If no loop frame requested since, dispatch
+        if (rendered === version.rendered) setDispatches(d => d + 1);
+      });
+    }
+
+    return useOne(() => {
+      ref.version.queued = false;
+      return [
+        signal(), // extra signal so that yeet can be memoized
+        quote(yeet(ts)),
+      ];
+    }, version.rendered + dispatches);
   };
 
   return (

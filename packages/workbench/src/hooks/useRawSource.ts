@@ -19,6 +19,7 @@ export const useRawSource = (
   array: TypedArray,
   format: UniformType,
   options: RawSourceOptions = NO_OPTIONS,
+  version: number = 0,
 ) => {
   const {
     live,
@@ -31,7 +32,7 @@ export const useRawSource = (
   const alloc = useBufferedSize(array.byteLength);
   const buffer = useOne(() => makeDataBuffer(device, alloc, flags), alloc);
 
-  const version = useVersion(buffer) + useVersion(readWrite);
+  const memoKey = useVersion(buffer) + useVersion(readWrite);
   const source = useOne(() => ({
     buffer,
     format,
@@ -39,7 +40,7 @@ export const useRawSource = (
     size: [],
     version: 0,
     readWrite,
-  } as StorageSource), version);
+  } as StorageSource), memoKey);
 
   if (live) {
     useNoMemo();
@@ -56,7 +57,7 @@ export const useRawSource = (
       source.length = array.length / Math.floor(UNIFORM_ARRAY_DIMS[format]);
       source.size = [source.length];
       source.version = incrementVersion(source.version);
-    }, [array, buffer]);
+    }, [array, buffer, version]);
   }
 
   return source;
@@ -71,3 +72,8 @@ export const useNoRawSource = () => {
   useNoOne();
   useNoMemo();
 };
+
+export const useTensorSource = (data: TensorArray, options: RawSourceOptions = NO_OPTIONS) =>
+  useRawSource(data.array, data.format, options, data.version);
+  
+export const useNoTensorSource = useNoRawSource;

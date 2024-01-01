@@ -2,6 +2,7 @@ import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ColorLike, Rectangle, XYZW } from '@use-gpu/core';
 import type { ParsedEffect, SlideInfo, SlideEase, ResolvedSlide } from './types';
 
+import { clamp } from '@use-gpu/core';
 import { gather, provide, use, keyed, useMemo, useOne, useRef, useState } from '@use-gpu/live';
 import {
   useTimeContext,
@@ -10,8 +11,8 @@ import {
   Pass, RawFullScreen, RenderTarget,
 } from '@use-gpu/workbench';
 import { UI, UILayers } from '@use-gpu/layout';
-import { makeParseColor, parseColor, parseBackground, useProp } from '@use-gpu/traits/live';
-import { clamp } from '@use-gpu/core';
+import { makeParseColor, parseColor } from '@use-gpu/parse';
+import { useProp } from '@use-gpu/traits/live';
 
 import { resolveSlides } from './lib/slides';
 import { PresentContext, PresentAPI } from './providers/present-provider';
@@ -43,7 +44,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
     children,
   } = props;
 
-  const backgroundColor = useProp(props.backgroundColor, parseBackground, '#000000');
+  const backgroundColor = useProp(props.backgroundColor, parseColor, '#000000');
 
   // Presentation state starts out empty
   const [state, setState] = useState(() => ({

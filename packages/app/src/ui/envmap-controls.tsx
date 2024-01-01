@@ -20,6 +20,7 @@ const STYLE = {
 };
 
 type EnvMapControlsProps = {
+  hasDebug?: boolean,
   container?: Element | null,
   render?: (mode: string, map: any) => LiveElement,
 };
@@ -69,12 +70,14 @@ export const ENVIRONMENTS = {
 } as Record<string, any>;
 
 export const EnvMapControls: LC<EnvMapControlsProps> = (props: EnvMapControlsProps) => {
-  const {container, render} = props;
+  const {hasDebug, container, render} = props;
   const [mode, setMode] = useState('park');
   const [approximate, setApproximate] = useState(false);
+  const [seamFix, setSeamFix] = useState(true);
+  const [debugGrid, setDebugGrid] = useState(false);
 
   return fragment([
-    render ? render(mode, approximate ? null : ENVIRONMENTS[mode]) : null,
+    render ? render(mode, approximate ? null : ENVIRONMENTS[mode], seamFix, debugGrid) : null,
     use(HTML, {
       container,
       style: STYLE,
@@ -91,6 +94,14 @@ export const EnvMapControls: LC<EnvMapControlsProps> = (props: EnvMapControlsPro
         <div>
           <label><input type="checkbox" checked={approximate} onChange={(e) => setApproximate(e.target.checked)} /> Approximate SH</label>
         </div>
+        {hasDebug ? (<>
+          <div>
+            <label><input type="checkbox" checked={seamFix} onChange={(e) => setSeamFix(e.target.checked)} /> Octahedral Seam Fix</label>
+          </div>
+          <div>
+            <label><input type="checkbox" checked={debugGrid} onChange={(e) => setDebugGrid(e.target.checked)} /> Octahedral Grid</label>
+          </div>
+        </>) : null}
       </>)
     }),
   ]);

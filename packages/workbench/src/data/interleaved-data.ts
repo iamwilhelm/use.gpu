@@ -11,7 +11,9 @@ import { yeet, extend, gather, useOne, useMemo, useNoMemo, incrementVersion } fr
 import {
   makePackedLayout,
   normalizeSchema,
-  makeStorageBuffer, uploadStorage, UNIFORM_ARRAY_DIMS,
+  makeMultiAggregateBuffer,
+  makeMultiAggregateFields,
+  uploadStorage,
   getBoundingBox, toDataBounds,
   isUniformArrayType,
 } from '@use-gpu/core';
@@ -49,7 +51,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
 
   const uniforms = useMemo(
     () => {
-      const out = {};
+      const out = [];
       for (const k in schema) {
         const {name = k, format, index, unwelded, ref} = schema[k];
         if (ref) throw new Error(`Ref '${k}' not supported in <Data>`);
@@ -73,26 +75,29 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
     const bytesPerElement = BYTES_PER_ELEMENT;
 
     return [layout, dataCount, dataStride, bytesPerElement];
-  }, [typedArray, fs]);
+  }, [typedArray, uniforms]);
 
   const bufferLength = useBufferedSize(dataCount);
 
   // Make aggregate buffer
-  const [aggregateBuffer, fields, source] = useMemo(() => {
+  const [aggregateBuffer, fields] = useMemo(() => {
     const aggregateBuffer = makeMultiAggregateBuffer(device, uniforms, bufferLength);
     const fields = makeMultiAggregateFields(aggregateBuffer);
 
-    return [aggregrateBuffer, fields, source];
+    return [aggregateBuffer, fields];
   }, [device, uniforms, bufferLength]);
 
   // Refresh and upload data
   const refresh = () => {
     if (!typedArray) return;
     const {buffer, raw, source, layout, keys} = aggregateBuffer;
+    const {attributes} = packedLayout;
 
     let f = 0;
-    for (const {array, base, stride, dims} of fields) {
-      let src = packedLayout[f].offset;
+    for (const k in fields) {
+      const {array, base, stride, dims} = fields[k];
+
+      let src = attributes[f].offset / bytesPerElement;
       let dst = base;
       for (let i = 0; i < dataCount; ++i) {
         let p = src;
@@ -116,6 +121,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
     refresh()
   }
 
+  const {source} = aggregateBuffer;
   const sources = useStructSources(uniforms, source, 'interleavedData');
 
   const trigger = useOne(() => signal(), source.version);

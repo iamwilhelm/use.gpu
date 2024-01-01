@@ -399,9 +399,10 @@ export const makeMultiUniformLayout = (
 export const makeLayoutData = (
   layout: UniformLayout,
   count: number = 1,
+  extra: number = 0,
 ): ArrayBuffer => {
   const {length} = layout;
-  const data = new ArrayBuffer(length * count);
+  const data = new ArrayBuffer(length * count + extra);
   return data;
 }
 

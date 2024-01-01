@@ -137,7 +137,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
     // Make light storage buffer
     const [storage, data, filler] = useMemo(() => {
-      const data = makeLayoutData(LIGHT_LAYOUT, size);
+      const data = makeLayoutData(LIGHT_LAYOUT, size, LIGHT_BYTE_OFFSET);
       const buffer = makeStorageBuffer(device, data);
 
       const {current: prevData} = prevDataRef;
@@ -321,7 +321,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       order,
       subranges,
     }), [storage, texture, order, subranges]);
-
+    
     return [
       signal(),
       then ? then(env) : yeet(env),

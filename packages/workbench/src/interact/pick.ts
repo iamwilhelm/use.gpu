@@ -1,6 +1,7 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import { extend, useContext, useMemo, useNoMemo, useOne, useResource, useNoResource, useHooks } from '@use-gpu/live';
 import { EventContext, MouseContext, MouseEventState } from '../providers/event-provider';
+import { getRenderFunc } from '../hooks/useRenderProp';
 
 export type PickState = {
   id: number,
@@ -31,32 +32,35 @@ export type PickProps = {
   all?: boolean,
   move?: boolean,
   capture?: boolean,
-  render?: (state: PickState) => LiveElement,
   onMouseOver?: (m: MouseEventState, index: number) => void,
   onMouseOut?:  (m: MouseEventState, index: number) => void,
   onMouseDown?: (m: MouseEventState, index: number) => void,
   onMouseUp?:   (m: MouseEventState, index: number) => void,
   onMouseMove?: (m: MouseEventState, index: number) => void,
+
+  render?: (state: PickState) => LiveElement,
+  children?: LiveElement | ((state: PickState) => LiveElement),
 }
 
-export const Pick: LiveComponent<PickProps> = ({
-  all,
-  move,
-  capture,
-  render,
-  children,
-  onMouseOver,
-  onMouseOut,
-  onMouseDown,
-  onMouseUp,
-  onMouseMove,
-}: PropsWithChildren<PickProps>) => {
-  const { useId } = useContext(EventContext);
-  const { useMouse, beginCapture, endCapture } = useContext(MouseContext);
+export const Pick: LiveComponent<PickProps> = (props: PropsWithChildren<PickProps>) => {
+  const {
+    all,
+    move,
+    capture,
+    children,
+    onMouseOver,
+    onMouseOut,
+    onMouseDown,
+    onMouseUp,
+    onMouseMove,
+  } = props;
+
+  const {useId} = useContext(EventContext);
+  const {useMouse, beginCapture, endCapture} = useContext(MouseContext);
 
   const id = useId();
   const mouse = useMouse(all ? undefined : id);
-  const { mouse: {x, y, moveX, moveY}, hovered, captured, pressed, presses, clicks, index } = mouse;
+  const {mouse: {x, y, moveX, moveY}, hovered, captured, pressed, presses, clicks, index} = mouse;
 
   const mouseRef = useOne(() => ({current: mouse}));
   mouseRef.current = mouse;
@@ -88,7 +92,7 @@ export const Pick: LiveComponent<PickProps> = ({
   }
 
   if (onMouseDown || onMouseUp || capture) {
-    const { left, middle, right } = pressed;
+    const {left, middle, right} = pressed;
     useResource((dispose) => {
       if (left) {
         if (onMouseDown) onMouseDown(mouse, index);
@@ -136,9 +140,15 @@ export const Pick: LiveComponent<PickProps> = ({
 
   if (move && countRef.current === 1) return null;
 
+  const value = useMemo(
+    () => ({id, index, hovered, pressed, presses, clicks, x: px, y: py, moveX: dx, moveY: dy}),
+    [id, index, hovered, pressed, count, px, py, dx, dy]
+  );
+
+  const render = getRenderFunc(props);
+
   return useHooks(() =>
-    render ? render({id, index, hovered, pressed, presses, clicks, x: px, y: py, moveX: dx, moveY: dy}) : (children ? extend(children, {id}) : null),
-    [render, children, id, index, hovered, pressed, count, px, py, dx, dy]
+    render ? render(value) : (children ? extend(children as LiveElement, {id}) : null),
+    [render, children, value]
   );
 };
-

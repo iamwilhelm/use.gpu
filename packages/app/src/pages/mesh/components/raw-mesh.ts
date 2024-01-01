@@ -8,8 +8,8 @@ import {
   makeRenderPipeline, makeShaderModuleDescriptor, makeShaderBinding, makeSampler, makeTextureBinding,
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
-import { linkBundle } from '@use-gpu/shader/wgsl';
-import { useInspectable, useNativeColor } from '@use-gpu/workbench';
+import { linkBundle, getBundleLabel } from '@use-gpu/shader/wgsl';
+import { useInspectable, useNativeColor, PassReconciler } from '@use-gpu/workbench';
 
 import instanceDrawMesh from '@use-gpu/wgsl/app/vertex/mesh.wgsl';
 import instanceDrawMeshPick from '@use-gpu/wgsl/app/vertex/mesh-pick.wgsl';
@@ -17,10 +17,12 @@ import instanceDrawMeshPick from '@use-gpu/wgsl/app/vertex/mesh-pick.wgsl';
 import instanceFragmentMesh from '@use-gpu/wgsl/app/fragment/mesh.wgsl';
 import instanceFragmentPickGeometry from '@use-gpu/wgsl/render/fragment/pick.wgsl';
 
+const {quote} = PassReconciler;
+
 //
 // This component shows how to do "raw" rendering with Use.GPU,
 // without using any of the built-in components or binding gen,
-// but while still fully supporting GPU Picking and color spaces.
+// but while still fully supporting GPU mouse picking and color spaces.
 //
 // It is mainly intended as an anti-example.
 //
@@ -173,8 +175,8 @@ export const RawMesh: LiveComponent<RawMeshProps> = memo((props: RawMeshProps) =
     unbind(passEncoder);
   };
 
-  return yeet({
+  return quote(yeet({
     // Optionally pass `bounds` of type Lazy<DataBounds> to enable culling
     [mode]: {draw}
-  });
+  }));
 }, 'Mesh');

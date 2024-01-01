@@ -65,7 +65,7 @@ export type RawFacesProps = {
     lookups?: boolean,
   },
 
-  geometry?: GPUGeometry,
+  mesh?: GPUGeometry,
   count?: Lazy<number>,
 
   shouldDispatch?: (u: Record<string, any>) => boolean | number | null,
@@ -93,14 +93,14 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     instance,
     instances,
 
-    geometry,
-    unwelded = geometry?.unwelded,
+    mesh,
+    unwelded = mesh?.unwelded,
 
     shouldDispatch,
     onDispatch,
   } = props;
 
-  const attr = geometry ? {...props, ...geometry.attributes} : props;
+  const attr = mesh ? {...props, ...mesh.attributes} : props;
 
   // Set up draw as:
   // - individual tris (none)

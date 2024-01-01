@@ -460,6 +460,11 @@
       "import": "./src/pmrem/pmrem-copy.wgsl",
       "require": "./src/pmrem/pmrem-copy.wgsl"
     },
+    "./pmrem/pmrem-debug.wgsl": {
+      "types": "./src/pmrem/pmrem-debug.wgsl.d.ts",
+      "import": "./src/pmrem/pmrem-debug.wgsl",
+      "require": "./src/pmrem/pmrem-debug.wgsl"
+    },
     "./pmrem/pmrem-diffuse-render.wgsl": {
       "types": "./src/pmrem/pmrem-diffuse-render.wgsl.d.ts",
       "import": "./src/pmrem/pmrem-diffuse-render.wgsl",

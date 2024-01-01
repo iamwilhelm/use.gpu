@@ -10,16 +10,27 @@ import { Canvas } from './canvas';
 import { DOMEvents } from './dom-events';
 
 export type AutoCanvasProps = {
+  /** Adopt HTML canvas */
   canvas?: HTMLCanvasElement,
+  /** Adopt from, or create HTML canvas in CSS selector */
   selector?: string,
 
+  /** Color format */
   format?: GPUTextureFormat,
+  /** Depth stencil format */
   depthStencil?: GPUTextureFormat,
+  /** Canvas background */
   backgroundColor?: GPUColor,
+  /** Multisampling / Anti-aliasing */
   samples?: number,
 
+  /** Autofocus keyboard on canvas */
   autofocus?: boolean,
+  /** Enable DOM events */
+  events?: boolean,
+  /** Enable GPU picking */
   picking?: boolean,
+  /** If running in an iframe, avoid preventing default on scroll. */
   iframe?: boolean,
   children: LiveElement,
 }
@@ -28,6 +39,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   const {
     selector,
     children,
+    events = true,
     autofocus = false,
     picking = true,
     iframe = false,
@@ -47,7 +59,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   }
   if (!canvas) throw new Error(`Cannot find canvas '${props.selector ?? props.canvas}'`);
 
-  const view = (
+  const view = events ? (
     use(DOMEvents, {
       autofocus,
       iframe,
@@ -58,7 +70,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
           children,
         })
     })
-  );
+  ) : children;
 
   return (
     use(AutoSize, {

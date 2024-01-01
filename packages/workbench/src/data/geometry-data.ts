@@ -30,7 +30,6 @@ export const GeometryData: LiveComponent<GeometryDataProps> = (props: GeometryDa
     })),
     [attributes, formats],
   );
-  console.log(attributes, schema)
 
   return (
     use(Data, {
@@ -43,7 +42,6 @@ export const GeometryData: LiveComponent<GeometryDataProps> = (props: GeometryDa
           attributes: sources,
           unwelded,
         };
-        console.log('useRenderProp <GeometryData>', out, props)
         return useRenderProp(props, out);
       },
     })

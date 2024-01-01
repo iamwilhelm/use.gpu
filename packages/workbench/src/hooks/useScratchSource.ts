@@ -11,9 +11,14 @@ import { useDeviceContext } from '../providers/device-provider';
 const NO_OPTIONS: ScratchSourceOptions = {};
 
 type ScratchSourceOptions = {
+  /** WebGPU buffer flags */
   flags?: GPUFlagsConstant,
+  /** Read write access (exclusive) */
   readWrite?: boolean,
+  /** Initial allocation size */
   reserve?: number,
+  /** Resizable binding */
+  volatile?: boolean,
 };
 
 export const useScratchSource = (
@@ -24,6 +29,7 @@ export const useScratchSource = (
     readWrite = false,
     reserve = 16,
     flags = GPUBufferUsage.STORAGE,
+    volatile = false,
   } = options;
 
   const device = useDeviceContext();
@@ -55,11 +61,11 @@ export const useScratchSource = (
       size: [0],
       version: 0,
       readWrite,
-      volatile: 1,
+      volatile: +volatile,
     } as StorageSource;
 
     allocate(reserve);
 
     return [source, allocate] as [StorageSource, (x: number) => void];
-  }, [device, format, readWrite, flags]);
+  }, [device, format, readWrite, flags, volatile]);
 };

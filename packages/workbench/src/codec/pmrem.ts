@@ -22,6 +22,7 @@ import { pmremInit } from '@use-gpu/wgsl/pmrem/pmrem-init.wgsl';
 import { pmremCopy } from '@use-gpu/wgsl/pmrem/pmrem-copy.wgsl';
 import { pmremBlur } from '@use-gpu/wgsl/pmrem/pmrem-blur.wgsl';
 import { pmremDiffuseSH } from '@use-gpu/wgsl/pmrem/pmrem-diffuse-sh.wgsl';
+import { pmremGridOverlay } from '@use-gpu/wgsl/pmrem/pmrem-debug.wgsl';
 //import { pmremDiffuseRender } from '@use-gpu/wgsl/pmrem/pmrem-diffuse-render.wgsl';
 
 import { sampleEnvMap } from '@use-gpu/wgsl/pmrem/pmrem-read.wgsl';
@@ -42,7 +43,11 @@ export type PrefilteredEnvMapProps = {
   size?: number,
   levels?: number,
   gain?: number,
-  debug?: boolean,
+
+  seamFix?: boolean,
+  debugGrid?: boolean,
+  debugAtlas?: boolean,
+
   render?: (cubeMap: ShaderSource | null, textureMap: TextureSource | null) => LiveElement,
   children?: (cubeMap: ShaderSource | null, textureMap: TextureSource | null) => LiveElement,
 };
@@ -64,8 +69,6 @@ const PIXEL_PER_SIGMA = 5;
 const WEIGHT_CUTOFF = 0.0125;
 const SIGMA_CUTOFF = Math.sqrt(-Math.log(WEIGHT_CUTOFF));
 
-const FIX_BILINEAR_SEAM = true;
-
 const CRISP_SIGMA = 0.3989422804; // 1/sqrt(2π) - normalizes to p(0) == 1
 
 const FIRST_MIP = Math.ceil(PIXEL_PER_SIGMA * (π / 2) / MIN_SIGMA) + 2;
@@ -80,7 +83,9 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
     size = 1024,
     gain = 1,
     texture,
-    debug,
+    seamFix = true,
+    debugGrid = false,
+    debugAtlas = false,
   } = props;
 
   const render = getRenderFunc(props);
@@ -305,7 +310,8 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
         boundVariances,
         targetIn,
         shCoefficients,
-      ], {FIX_BILINEAR_SEAM});
+        debugGrid ? pmremGridOverlay : null,
+      ], {FIX_BILINEAR_SEAM: seamFix, OCTAHEDRAL_OVERLAY: debugGrid});
 
       inspect({
         output: {
@@ -314,10 +320,10 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
       });
 
       return useMemo(() => [
-        debug ? use(DebugAtlas, {atlas}) : null,
+        debugAtlas ? use(DebugAtlas, {atlas}) : null,
         use(Queue, {nested: true, children: use(Compute, {children: dispatches}) }),
         render ? render(boundCubeMap, target) : yeet(boundCubeMap),
-      ], [debug, atlas, dispatches, render, target, boundCubeMap]);
+      ], [debugAtlas, debugGrid, seamFix, atlas, dispatches, render, target, boundCubeMap]);
     })
   );
 }, 'PrefilteredEnvMap');

@@ -9,7 +9,7 @@ import { useScratchSource } from '../hooks/useScratchSource';
 
 const hasWebGPU = typeof GPUBufferUsage !== 'undefined';
 
-const READBACK_SOURCE = hasWebGPU ? { flags: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ } : {};
+const READBACK_SOURCE = hasWebGPU ? { flags: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ, volatile: true } : {};
 
 export type ReadbackProps = {
   source: StorageSource,

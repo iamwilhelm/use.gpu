@@ -7,8 +7,8 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useShaderRefs } from '../hooks/useShaderRef';
 import { getDerivedSource } from '../hooks/useDerivedSource';
-import { getLambdaSource } from '../hooks/useLambdaSource';
-import { useRawSource, useNoRawSource } from '../hooks/useRawSource';
+import { useLambdaSource } from '../hooks/useLambdaSource';
+import { useTensorSource, useNoTensorSource } from '../hooks/useRawSource';
 import { getShader } from '../hooks/useShader';
 import { useRenderProp } from '../hooks/useRenderProp';
 
@@ -45,7 +45,7 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
 
   const argRefs = useShaderRefs(...args);
 
-  const source = data ? useRawSource(data.array, data.format) : (useNoRawSource(), props.source);
+  const source = data ? useTensorSource(data) : (useNoTensorSource(), props.source);
 
   const getData = useMemo(() => {
     const s = (source ? [source] : NO_SOURCES).map(s => ((s as any)?.buffer)
@@ -64,11 +64,10 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
       return links[k] ? links[k] : allArgs.shift();
     });
 
-    return getLambdaSource(
-      getShader(shader, values),
-      data ?? source
-    );
-  }, [shader, args.length, data, source, sources]);
+    return getShader(shader, values);
+  }, [shader, args.length, source, sources]);
+
+  const output = useLambdaSource(getData, data ?? source);
 
   return useRenderProp(props, getData);
 };

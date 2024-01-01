@@ -15,6 +15,7 @@ export const RTTFeedbackPage: LC = () => {
       <LinearRGB history={1} sampler={{minFilter: 'linear', magFilter: 'linear'}}>
         <OrbitCamera scale={1080}>
           <Pass>
+
             <FullScreen shader={
               wgsl`
                 @link fn getTexture(uv: vec2<f32>) -> vec4<f32> {}
@@ -47,17 +48,18 @@ export const RTTFeedbackPage: LC = () => {
                 emit(x, y, z, 1);
                 emit(r, g, b, 0.5);
               }}
-              render={(positions, colors) => (
+            >{
+              ([positions, colors]: StorageSource[]) => (
                 <PointLayer
                   positions={positions}
                   colors={colors}
                   shape='circle'
                   size={20}
                   depth={1}
-                  mode={'transparent'}
+                  mode='transparent'
                 />
-              )}
-            />
+              )
+            }</RawData>
 
           </Pass>
         </OrbitCamera>

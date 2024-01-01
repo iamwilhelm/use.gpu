@@ -11,6 +11,8 @@ const MAX_LAYERS_LOG = 8;
 
 @link var<storage> shCoefficients: array<vec4<f32>>;
 
+@optional @link fn getOverlay(xy: vec2<f32>, size1: vec2<f32>, sigma: f32) -> vec4<f32> { return vec4<f32>(0.0); };
+
 @export fn sampleEnvMap(
   uvw: vec3<f32>,
   sigma: f32,
@@ -22,23 +24,27 @@ const MAX_LAYERS_LOG = 8;
     return vec4<f32>(gain * sampleDiffuse(uvw), 1.0);
   }
 
+  // Convert UVW d/dx d/dy into arc size
   let df = abs(ddx) + abs(ddy);
   let dr = dot(uvw, normalize(uvw + df / 1.414));
-  var s = max(sigma, sqrt(2.0 * (1.0 - dr)) * 2.0);
-  //var s = max(sigma, acos(dr) * 2.0);
+
+  // approx: let scale = acos(dr);
+  let scale = sqrt(2.0 * (1.0 - dr));
+  let clamped = max(sigma, scale);
 
   let uv = encodeOctahedral(uvw) * .5 + .5;
-  if (s == 0) {
-    return vec4<f32>(gain * sampleCubeMapLevel(uv, 0u), 1.0);
+  if (clamped < getSigma(0)) {
+    return vec4<f32>(gain * sampleCubeMapLevel(uv, 0u, scale), 1.0);
   }
 
+  // Binary search for right levels
   let count = getLayerCount();
   var start = 0u;
   var length = count;
   for (var i = 0u; i < MAX_LAYERS_LOG; i++) {
     var mid = start + length / 2u;
     var v = getSigma(mid);
-    if (s > v) {
+    if (clamped > v) {
       length -= mid - start;
       start = mid;
     }
@@ -54,10 +60,10 @@ const MAX_LAYERS_LOG = 8;
 
   let a = max(getSigma(level), 1e-5);
   let b = getSigma(level + 1);
-  let f = max(0.0, (s - a) / (b - a));
+  let f = max(0.0, (clamped - a) / (b - a));
 
-  let s1 = sampleCubeMapLevel(uv, level);
-  let s2 = sampleCubeMapLevel(uv, level + 1);
+  let s1 = sampleCubeMapLevel(uv, level, scale);
+  let s2 = sampleCubeMapLevel(uv, level + 1, scale);
 
   return vec4<f32>(gain * mix(s1, s2, f), 1.0);
 }
@@ -84,6 +90,7 @@ fn sampleDiffuse(
 fn sampleCubeMapLevel(
   uv: vec2<f32>,
   level: u32,
+  scale: f32,
 ) -> vec3<f32> {
   let mapping = vec4<f32>(getMapping(level));
   let size = mapping.zw - mapping.xy;
@@ -91,17 +98,26 @@ fn sampleCubeMapLevel(
   let s = size - 1.0;
   let xy = uv * s + 0.5;
 
+  // Debug overlay
+  var o: vec4<f32>;
+  if (OCTAHEDRAL_OVERLAY) {
+    o = getOverlay(xy, s, scale);
+  }
+
   if (FIX_BILINEAR_SEAM) {
     // Seam in diamond-shaped great circle where bilinear patches are not parallelograms
     let fxy = floor(xy - .5) + .5;
     let axy = abs(fxy * 2.0 - s);
     let diag = abs(s.x - axy.x - axy.y);
 
-    if (diag < 1.0) {
-      let uvb = fxy + mapping.xy;
-      let uvd = xy - fxy;
+    let uvb = fxy + mapping.xy;
+    let uvd = xy - fxy;
 
-      let signs = sign(uv);
+    if (diag < 1.0) {
+      //let uvb = fxy + mapping.xy;
+      //let uvd = xy - fxy;
+
+      let signs = sign(uv - .5);
       let inv = max(vec2<f32>(0.0), -signs);
       let xy = uvd * signs + inv;
 
@@ -117,16 +133,25 @@ fn sampleCubeMapLevel(
       let diff2 = 1.0 - (1.0 - x) / (2.0 - x - y);
       let af = min(sum, 2 - sum);
       let bf = select(diff1, diff2, sum > 1.0);
-      let corner = select(tl, br, sum > 1.0);
-      let top = bl;
-      let bottom = tr;
 
-      return mix(corner, mix(top, bottom, bf), af);
+      if (OCTAHEDRAL_OVERLAY) {
+        let t = mix(vec3<f32>(1.0, 0.0, 0.0), mix(vec3<f32>(0.0, 1.0, 0.0), vec3<f32>(0.0, 0.0, 1.0), bf), af);
+        return t * (1.0 - o.a) + o.rgb;
+      }
+      else {
+        let corner = select(tl, br, sum > 1.0);
+        let top = bl;
+        let bottom = tr;
+        return mix(corner, mix(top, bottom, bf), af);
+      }
     }
   }
 
   let uvt = xy + mapping.xy;
-  return getTexture(uvt, 0.0).xyz;
+  let t = getTexture(uvt, 0.0).xyz;
+
+  if (OCTAHEDRAL_OVERLAY) { return t * (1.0 - o.a) + o.rgb; }
+  else { return t; }
 }
 
 fn sqr(x: f32) -> f32 { return x * x; }

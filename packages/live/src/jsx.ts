@@ -34,8 +34,10 @@ export const Reconcile = RECONCILE as AnyF;
 export const Quote = QUOTE as AnyF;
 export const Unquote = UNQUOTE as AnyF;
 
-export const createElement = (type: ArrowFunction, props: any, ...children: any[]) => {
+export const createElement = (type: ArrowFunction | string, props: any, ...children: any[]) => {
   const by = getCurrentFiberBy();
+
+  if (typeof type === 'string') throw new Error(`Can't use Live-flavored JSX to render HTML.'`);
 
   if ((type as any)?.isLiveBuiltin) {
     switch (type) {

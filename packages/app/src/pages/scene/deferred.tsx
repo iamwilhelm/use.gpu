@@ -98,7 +98,7 @@ export const SceneDeferredPage: LC = (props) => {
                   <Scene>
 
                     <Node position={[0, -4, 0]}>
-                      <PBRMaterial albedo={0x808080} roughness={0.7}>
+                      <PBRMaterial albedo={'#808080'} roughness={0.7}>
                         <Mesh
                           mesh={planeMesh}
                           side="both"

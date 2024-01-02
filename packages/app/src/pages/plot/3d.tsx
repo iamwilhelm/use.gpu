@@ -60,7 +60,7 @@ const zBias = width.map(w => w / 100);
 export const Plot3DPage: LC = () => {
 
   return (<>
-    <InfoBox>Draw 3D shapes using the plot API. Feed them live data via expressions.</InfoBox>
+    <InfoBox>Draw 3D shapes using the plot API. Feed them live data via expressions. Control depth scaling smoothly.</InfoBox>
     <Loop>
       <Cursor cursor="move" />
       <Camera>

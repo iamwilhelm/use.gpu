@@ -36,16 +36,14 @@ export type PolygonProps = TraitProps<typeof Traits> &
     fills?: ColorLikes,
     stroke?: ColorLike | ColorLikes,
     strokes?: ColorLikes,
+    zBiasShift?: number,
   };
 
 export const Polygon: LiveComponent<PolygonProps> = memo((props) => {
-  const {fill, fills, stroke, strokes} = props;
+  const {fill, fills, stroke, strokes, zBiasShift = 1} = props;
+  const zBias = (props.zBias || 0) + zBiasShift;
   return [
     fill ?? fills ? use(RawFace, {...props, color: fill, colors: fills, concave: true}) : null,
-    stroke ?? strokes ? use(RawLine, {...props, color: stroke, colors: strokes, loop: true}) : null,
+    stroke ?? strokes ? use(RawLine, {...props, color: stroke, colors: strokes, loop: true, zBias}) : null,
   ];
-}, shouldEqual({
-  position: sameShallow(sameShallow()),
-  fill: sameShallow(),
-  stroke: sameShallow(),
-}), 'Polygon');
+}, 'Polygon');

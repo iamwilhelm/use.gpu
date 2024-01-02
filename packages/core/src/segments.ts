@@ -207,9 +207,9 @@ export const generateConcaveIndices = (
     const p2 = vec3.fromValues(positions[d],   positions[d+1],   positions[d+2]);
     const p3 = vec3.fromValues(positions[d*2], positions[d*2+1], positions[d*2+2]);
 
-    vec3.sub(p1, p2, p1);
-    vec3.sub(p2, p3, p1);
-    vec3.cross(p3, p1, p2);
+    vec3.sub(p2, p2, p1);
+    vec3.sub(p3, p3, p1);
+    vec3.cross(p3, p2, p3);
 
     const nx = Math.abs(p3[0]);
     const ny = Math.abs(p3[1]);

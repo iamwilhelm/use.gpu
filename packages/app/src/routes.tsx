@@ -1,6 +1,5 @@
 import React from '@use-gpu/live';
 
-import { GeometryFacesPage } from './pages/geometry/faces';
 import { GeometryGLTFPage } from './pages/geometry/gltf';
 import { GeometryLinesPage } from './pages/geometry/lines';
 import { GeometryBinaryPage } from './pages/geometry/binary';
@@ -21,6 +20,7 @@ import { SceneShadowPage } from './pages/scene/shadow';
 import { SceneDeferredPage } from './pages/scene/deferred';
 import { Plot2DPage } from './pages/plot/2d';
 import { Plot3DPage } from './pages/plot/3d';
+import { PlotPickingPage } from './pages/plot/picking';
 import { PlotCartesianPage } from './pages/plot/cartesian';
 import { PlotImplicitSurfacePage } from './pages/plot/implicit-surface';
 import { PlotPolarPage } from './pages/plot/polar';
@@ -39,8 +39,8 @@ import { EmptyPage } from './pages/empty';
 export const makePages = () => [
   {path: "/plot/2d",               title: "Plot - 2D",                         element: <Plot2DPage />},
   {path: "/plot/3d",               title: "Plot - 3D",                         element: <Plot3DPage />},
+  {path: "/plot/picking",          title: "Plot - GPU Picking",                element: <PlotPickingPage />},
   {path: "/geometry/lines",        title: "Geometry - 3D Lines and Arrows",    element: <GeometryLinesPage />},
-  {path: "/geometry/faces",        title: "Geometry - 3D Polygons",            element: <GeometryFacesPage />},
   {path: "/geometry/gltf",         title: "Geometry - GLTF",                   element: <GeometryGLTFPage />},
   {path: "/geometry/voxel",        title: "Geometry - Voxels",                 element: <GeometryVoxelPage />},
   {path: "/geometry/binary",       title: "Geometry - Byte Histogram",         element: <GeometryBinaryPage />},

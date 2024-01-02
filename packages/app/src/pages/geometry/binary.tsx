@@ -6,7 +6,7 @@ import { wgsl } from '@use-gpu/shader/wgsl';
 import { clamp } from '@use-gpu/core';
 
 import {
-  Loop, Pass, Data, DataShader,
+  Pass, Data, DataShader,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
   PointLayer,
@@ -263,12 +263,10 @@ export const GeometryBinaryPage: LC = () => {
         ), [viz, gridColor]);
 
         return (
-          <Loop>
-            <LinearRGB tonemap="aces" colorInput="linear" gain={gamma}>
-              <Cursor cursor="move" />
-              {view}
-            </LinearRGB>
-          </Loop>
+          <LinearRGB tonemap="aces" colorInput="linear" gain={gamma}>
+            <Cursor cursor="move" />
+            {view}
+          </LinearRGB>
         );
       }}
     />

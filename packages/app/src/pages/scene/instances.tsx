@@ -7,7 +7,7 @@ import { vec3 } from 'gl-matrix';
 import { seq } from '@use-gpu/core';
 
 import {
-  Loop, Pass, FlatCamera, Animate, LinearRGB,
+  Loop, Pass, Animate, LinearRGB,
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Cursor,

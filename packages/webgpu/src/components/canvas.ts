@@ -2,7 +2,7 @@ import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { UseGPURenderContext, ColorSpace } from '@use-gpu/core';
 
 import { EventProvider, RenderContext, LayoutContext, DeviceContext, QueueReconciler } from '@use-gpu/workbench';
-import { provide, use, imperative, useCallback, useContext, useMemo, useOne, useFiber } from '@use-gpu/live';
+import { provide, use, useCallback, useContext, useMemo, useOne, useFiber } from '@use-gpu/live';
 import {
   makeColorState,
   makeColorAttachment,
@@ -14,10 +14,12 @@ import {
   BLEND_PREMULTIPLY,
 } from '@use-gpu/core';
 
+import { Loop } from '@use-gpu/workbench';
+
 import { DEPTH_STENCIL_FORMAT, COLOR_SPACE, BACKGROUND_COLOR } from '../constants';
 import { makePresentationContext } from '../web';
 
-const {signal} = QueueReconciler;
+//const {signal} = QueueReconciler;
 
 export type CanvasProps = {
   canvas: HTMLCanvasElement,
@@ -28,43 +30,48 @@ export type CanvasProps = {
   colorSpace?: ColorSpace,
   colorInput?: ColorSpace,
   samples?: number,
+
+  width: number,
+  height: number,
   pixelRatio?: number,
-}
+};
 
-const getPixelRatio = () => typeof window !== 'undefined' ? window.devicePixelRatio : 1;
-
-export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithChildren<CanvasProps>) => {
+export const Canvas: LiveComponent<CanvasProps> = (props: PropsWithChildren<CanvasProps>) => {
   const {
+    width,
+    height,
+    pixelRatio = 1,
     canvas,
     children,
-    pixelRatio = getPixelRatio(),
     format = navigator.gpu.getPreferredCanvasFormat(),
     depthStencil = DEPTH_STENCIL_FORMAT,
     backgroundColor = BACKGROUND_COLOR,
     colorSpace = COLOR_SPACE,
     colorInput = COLOR_SPACE,
-    samples = 1
+    samples = 1,
   } = props;
 
   const device = useContext(DeviceContext);
 
-  const {width, height} = canvas;
   if (width * height === 0) return;
 
   const layout = useMemo(() => [0, height / pixelRatio, width / pixelRatio, 0], [width, height, pixelRatio]);
 
-  const renderTexture = useMemo(() =>
-    samples > 1
-    ? makeTargetTexture(
-        device,
-        width,
-        height,
-        format,
-        samples,
-      )
-    : null,
-    [device, width, height, format, samples]
-  );
+  const renderTexture = useMemo(() => {
+    const texture = (
+      samples > 1
+      ? makeTargetTexture(
+          device,
+          width,
+          height,
+          format,
+          samples,
+        )
+      : null
+    );
+    texture.label = '<Canvas> RenderTarget';
+    return texture;
+  }, [device, width, height, format, samples]);
 
   const colorStates      = useOne(() => [makeColorState(format, BLEND_PREMULTIPLY)], format);
   const colorAttachments = useMemo(() =>
@@ -78,6 +85,8 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithCh
     depthStencilAttachment,
   ] = useMemo(() => {
       const texture = makeDepthTexture(device, width, height, depthStencil, samples);
+      texture.label = '<Canvas> DepthTarget';
+
       const attachment = makeDepthStencilAttachment(texture, depthStencil);
       return [texture, attachment];
     },
@@ -90,12 +99,13 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithCh
   );
 
   const swap = useCallback((view?: GPUTextureView) => {
-    view = view ?? gpuContext
+    const v = view ?? gpuContext
       .getCurrentTexture()
       .createView();
+    if (!view) v.label = '<Canvas> GPUPresentationContext View';
 
-    if (samples > 1) colorAttachments[0].resolveTarget = view;
-    else colorAttachments[0].view = view;
+    if (samples > 1) colorAttachments[0].resolveTarget = v;
+    else colorAttachments[0].view = v;
   }, [gpuContext, samples, colorAttachments])
 
   const renderContext = useOne(() => ({
@@ -144,9 +154,13 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithCh
   };
 
   return [
-    signal(),
     provide(RenderContext, renderContext,
-      provide(LayoutContext, layout, children)
+      provide(LayoutContext, layout,
+        // Wrap everything in a paint-flushing loop so that canvas resize is processed in one pass
+        use(Loop, {
+          children
+        })
+      )
     )
   ];
-}, 'Canvas')
+};

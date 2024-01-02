@@ -5,7 +5,7 @@ import React, { Gather } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, FlatCamera, InterleavedData, PBRMaterial, RawTexture,
+  Pass, FlatCamera, InterleavedData, PBRMaterial, RawTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor, FaceLayer,
   PointLight,

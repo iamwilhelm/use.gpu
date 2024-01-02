@@ -1,7 +1,7 @@
 import type { ColorLike, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
-import { useMemo } from '@use-gpu/live';
+import { useMemo, useOne } from '@use-gpu/live';
 import { trait, combine, optional, useProp } from '@use-gpu/traits/live';
 import {
   parseNumber,
@@ -44,7 +44,7 @@ import {
   toChunkCounts,
   makeParseEnum,
 } from '@use-gpu/parse';
-import { seq, isShaderBinding, toCPUDims, getUniformDims } from '@use-gpu/core';
+import { seq, isShaderBinding, toCPUDims, getUniformDims, formatToArchetype } from '@use-gpu/core';
 import { getArrowSegments, getFaceSegments, getFaceSegmentsConcave, getLineSegments } from '@use-gpu/workbench';
 
 import { useDataContext } from './providers/data-provider';
@@ -316,7 +316,7 @@ export const DataTrait = (keys: string[], canonical: string = 'positions') => {
   ) => {
     const dataContext = useDataContext();
 
-    const [data, formats, sources] = useMemo(() => {
+    const [data, formats, sources, version] = useMemo(() => {
       const data = {};
       const formats = {};
       const sources = {};
@@ -324,8 +324,9 @@ export const DataTrait = (keys: string[], canonical: string = 'positions') => {
       let d = 0;
       let f = 0;
       let s = 0;
+
       for (const k in dataContext) if (match.has(k)) {
-        const {array, format, dims, size} = dataContext[k];
+        const {array, format, dims, size, version = 0} = dataContext[k];
         if (!(props as any)[k]) {
           data[k] = array;
           formats[k] = format;
@@ -352,7 +353,7 @@ export const DataTrait = (keys: string[], canonical: string = 'positions') => {
     }, [dataContext, props]);
 
     if (data) for (const k in data) parsed[k] = data[k];
-    parsed.formats = formats;
+    parsed.formats = useOne(() => formats, formats && formatToArchetype(formats));
     parsed.sources = sources;
   };
 };

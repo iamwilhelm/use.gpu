@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, LiveNode, LiveFiber, Task, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
-import { use, detach, provide, unquote, yeet, gather, useCallback, useOne, useResource, useState, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
+import { use, detach, provide, unquote, yeet, gather, useCallback, useContext, useOne, useResource, useState, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
 
 import { useRenderContext } from '../providers/render-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
@@ -8,6 +8,8 @@ import { LoopContext } from '../providers/loop-provider';
 import { QueueReconciler } from '../reconcilers';
 
 const {reconcile, quote, signal} = QueueReconciler;
+
+const DEBUG = false;
 
 export type LoopProps = {
   live?: boolean,
@@ -36,6 +38,10 @@ export type LoopRef = {
 /** Provides `useAnimationFrame` and clock to allow for controlled looping and animation. */
 export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProps>) => {
   const {live, children} = props;
+  const parent = useContext(LoopContext);
+
+  // Don't nest requestAnimationFrame when <Loop> is nested.
+  const isSync = !!parent.buffered;
 
   const ref: LoopRef = useOne(() => ({
     time: {
@@ -51,6 +57,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       queued: false,
     },
     loop: {
+      buffered: true,
       request: () => ref.time,
     },
     children,
@@ -67,22 +74,41 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
     let mounted = true;
     let fibers: LiveFiber<any>[] = [];
 
+    const request = (fiber?: LiveFiber<any>) => {
+      DEBUG && console.log('Request animation frame');
+      
+      // Enqueue animated fiber for next frame
+      if (!ref.version.pending) queueMicrotask(() => requestAnimationFrame(render));
+      if (fiber && fibers.indexOf(fiber) < 0) fibers.push(fiber);
+      ref.version.pending = true;
+
+      // Ensure parent is also a sync animation frame
+      parent.request();
+
+      return ref.time;
+    };
+
     const render = (timestamp: number) => {
+      DEBUG && console.log('Request sync render');
       requestSyncRender();
       ref.version.pending = false;
 
+      // Loop continuously if live but abort on unmount
       if (live && mounted) request();
       if (!mounted) return;
 
+      // Start elapsed timer
       if (time.timestamp === -Infinity) time.start = timestamp;
       else time.delta = timestamp - time.timestamp;
 
       time.elapsed = timestamp - time.start;
       time.timestamp = timestamp;
 
+      // Schedule enqueued fibers from last frame
       for (const fiber of fibers) fiber.host?.schedule(fiber);
       fibers.length = 0;
 
+      // Render detached children
       const {run} = ref;
       if (run) run();
 
@@ -90,13 +116,6 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       if (!ref.version.pending) time.timestamp = -Infinity;
     };
 
-    const request = (fiber?: LiveFiber<any>) => {
-      if (!ref.version.pending) requestAnimationFrame(render);
-      if (fiber && fibers.indexOf(fiber) < 0) fibers.push(fiber);
-      ref.version.pending = true;
-
-      return ref.time;
-    };
     dispose(() => mounted = false);
 
     return loop.request = request;
@@ -104,22 +123,22 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
 
   useRenderContext();
   usePerFrame();
-  request!();
+  (isSync && !live) || request!();
 
   const Run = useCallback(tagFunction(() => {
     const {time, version, loop, children} = ref;
 
-    const view = useOne(() => [
-      signal(),
-      provide(LoopContext, ref.loop, children),
-    ], children);
+    let view = useOne(() => provide(LoopContext, ref.loop, children), children);
 
     const t = {...time};
-    return (
+    view = [
+      signal(),
       provide(FrameContext, ref.version.frame,
         provide(TimeContext, t, view)
       )
-    );
+    ];
+    
+    return view;
   }, 'Run'));
 
   // Intercept unscheduled renders
@@ -128,6 +147,13 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
   const Resume = (ts: ArrowFunction[]) => {
     const [dispatches, setDispatches] = useState(0);
     const {version} = ref;
+
+    if (isSync) {
+      return [
+        signal(), // Extra signal so that yeet(ts) can be memoized and doesn't invalidate the next queue
+        quote(yeet(ts)),
+      ];
+    }
 
     const dispatch = () => {
       const children: LiveElement = [];
@@ -143,19 +169,23 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
     // In animation frame or after self-render - sync
     if (version.frame != version.rendered) {
       version.rendered = version.frame;
+      DEBUG && console.log('Dispatch sync render');
     }
     // Outside animation frame - async
     else if (!version.pending && !version.queued) {
       ref.version.queued = true;
 
       const {rendered} = version;
+      DEBUG && console.log('Schedule async render');
       requestAnimationFrame(() => {
-        // If no loop frame requested since, dispatch
+        // If no new calls rendered since last frame, dispatch existing queue
         if (rendered === version.rendered) setDispatches(d => d + 1);
+        DEBUG && console.log('Dispatch async render');
       });
     }
 
     return useOne(() => {
+      DEBUG && console.log('Dispatch to queue');
       ref.version.queued = false;
       return [
         signal(), // extra signal so that yeet can be memoized
@@ -169,7 +199,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       quote(
         gather(
           unquote(
-            detach(use(Run), (render: Task) => ref.run = render)
+            detach(use(Run), (render: Task) => { ref.run = render; if (isSync) render(); })
           ),
           Resume,
         )

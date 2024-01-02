@@ -27,6 +27,7 @@ import {
 import { sizeToChunkCounts, toChunkCounts, toVertexCount } from '@use-gpu/parse';
 
 const {signal} = QueueReconciler;
+const NO_TENSOR: number[] = [];
 
 type BooleanList = boolean | boolean[] | (<T>(i: number) => boolean);
 
@@ -147,7 +148,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
     }
 
     return [chunks, groups, vertexCount, indexedKey ? indexCount : vertexCount];
-  }, [isArray, segments, itemCount, countKey, indexedKey, data, virtual, skip]);
+  }, [isArray, segments, itemCount, countKey, indexedKey, data, virtual, skip, ...(tensor ?? NO_TENSOR)]);
 
   const allocItems = useBufferedSize(itemCount);
   const allocVertices = useBufferedSize(vertexCount);
@@ -212,6 +213,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
 
     return slices;
   }, [
+    fields,
     live ? NaN : virtual ? (version ?? NaN) : null, propData,
     itemCount, skip,
     countKey, indexedKey,
@@ -266,7 +268,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
     const bounds = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
 
     if (sources.positions && bounds) sources.positions.bounds = bounds;
-  }, [fields, items, sources, tensor]);
+  }, [fields, items, sources, ...(tensor ?? NO_TENSOR)]);
 
   if (live) useAnimationFrame();
   else useNoAnimationFrame();

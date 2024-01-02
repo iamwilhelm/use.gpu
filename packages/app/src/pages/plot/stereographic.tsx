@@ -42,133 +42,131 @@ export const PlotStereographicPage: LC = () => {
 
   const view = (normalize: number) => (<>
     <InfoBox>Plot curves and grids in an animated &lt;Stereographic&gt; viewport.</InfoBox>
-    <Loop>
-      <LinearRGB>
-      <Camera>
-        <Pass>
-          <Plot>
-            <Animate
-              loop
-              mirror
-              delay={0}
-              keyframes={frames}
-              prop='bend'
+    <LinearRGB>
+    <Camera>
+      <Pass>
+        <Plot>
+          <Animate
+            loop
+            mirror
+            delay={0}
+            keyframes={frames}
+            prop='bend'
+          >
+            <Stereographic
+              bend={0}
+              normalize={normalize}
+              range={[[-1, 1], [-1, 1], [-1, 1]]}
+              scale={[1, 1, 1]}
             >
-              <Stereographic
-                bend={0}
-                normalize={normalize}
-                range={[[-1, 1], [-1, 1], [-1, 1]]}
-                scale={[1, 1, 1]}
+              <Spherical
+                rotation={[45, 22.5, 0]}
+                range={[[-π, π], [-τ/4, τ/4], [-1, 1]]}
               >
-                <Spherical
-                  rotation={[45, 22.5, 0]}
-                  range={[[-π, π], [-τ/4, τ/4], [-1, 1]]}
+
+                <Grid
+                  axes='xy'
+                  origin={[0, 0, 1]}
+                  width={2}
+                  first={{ unit: π, base: 2, detail: 64, divide: 8, end: true }}
+                  second={{ detail: 64, divide: 5 }}
+                  depth={0.5}
+                  zBias={-1}
+                />
+
+                <Axis
+                  axis='x'
+                  origin={[0, 0, 1]}
+                  width={5}
+                  color={[0.75, 0.75, 0.75, 1]}
+                  depth={0.5}
+                  detail={64}
+                />
+                <Scale
+                  origin={[0, 0, 1]}
+                  unit={π}
+                  base={2}
+                  divide={4}
+                  axis='x'
                 >
-
-                  <Grid
-                    axes='xy'
-                    origin={[0, 0, 1]}
-                    width={2}
-                    first={{ unit: π, base: 2, detail: 64, divide: 8, end: true }}
-                    second={{ detail: 64, divide: 5 }}
-                    depth={0.5}
-                    zBias={-1}
-                  />
-
-                  <Axis
-                    axis='x'
-                    origin={[0, 0, 1]}
+                  <Tick
+                    size={20}
                     width={5}
+                    offset={[0, 1, 0]}
                     color={[0.75, 0.75, 0.75, 1]}
                     depth={0.5}
-                    detail={64}
                   />
-                  <Scale
-                    origin={[0, 0, 1]}
-                    unit={π}
-                    base={2}
-                    divide={4}
-                    axis='x'
-                  >
-                    <Tick
-                      size={20}
-                      width={5}
-                      offset={[0, 1, 0]}
-                      color={[0.75, 0.75, 0.75, 1]}
-                      depth={0.5}
-                    />
-                    <Label
-                      placement='bottom'
-                      color='#80808080'
-                      size={24}
-                      offset={16}
-                      expand={5}
-                      depth={0.5}
-                      format={thetaFormatter}
-                    />
-                    <Label
-                      placement='bottom'
-                      color='#ffffff'
-                      size={24}
-                      offset={16}
-                      expand={0}
-                      depth={0.5}
-                      format={thetaFormatter}
-                    />
-                  </Scale>
-
-                  <Axis
-                    axis='y'
-                    origin={[0, 0, 1]}
-                    width={5}
-                    color={[0.75, 0.75, 0.75, 1]}
-                    detail={32}
+                  <Label
+                    placement='bottom'
+                    color='#80808080'
+                    size={24}
+                    offset={16}
+                    expand={5}
                     depth={0.5}
+                    format={thetaFormatter}
                   />
+                  <Label
+                    placement='bottom'
+                    color='#ffffff'
+                    size={24}
+                    offset={16}
+                    expand={0}
+                    depth={0.5}
+                    format={thetaFormatter}
+                  />
+                </Scale>
 
-                  <Sampler
-                    axes='x'
-                    format='vec3<f32>'
-                    size={[1024]}
-                    expr={(emit, θ) => {
-                      const r = Math.cos(θ * 4 + Math.sin(θ * 3) * .5) * .4 - Math.sin(θ * 5) * .5;
-                      emit(θ, r, 1);
-                    }}
-                  >
-                    <Line
-                      width={4}
-                      color={'#3090FF'}
-                      depth={0.5}
-                      zBias={1}
-                    />
-                  </Sampler>
-                </Spherical>
+                <Axis
+                  axis='y'
+                  origin={[0, 0, 1]}
+                  width={5}
+                  color={[0.75, 0.75, 0.75, 1]}
+                  detail={32}
+                  depth={0.5}
+                />
 
-                <Spherical
-                  rotation={[45, 22.5, 0]}
-                  scale={[0.25, 0.25, 0.25]}
-                  range={[[-π, π], [-τ/4, τ/4], [-1, 1]]}
+                <Sampler
+                  axes='x'
+                  format='vec3<f32>'
+                  size={[1024]}
+                  expr={(emit, θ) => {
+                    const r = Math.cos(θ * 4 + Math.sin(θ * 3) * .5) * .4 - Math.sin(θ * 5) * .5;
+                    emit(θ, r, 1);
+                  }}
                 >
-
-                  <Grid
-                    axes='xy'
-                    origin={[0, 0, 1]}
-                    width={2}
-                    first={{ unit: π, base: 2, detail: 64, divide: 8, end: true }}
-                    second={{ detail: 64, divide: 5 }}
-                    color={[0.25, 0.25, 0.25, 1]}
+                  <Line
+                    width={4}
+                    color={'#3090FF'}
                     depth={0.5}
-                    zBias={-1}
+                    zBias={1}
                   />
+                </Sampler>
+              </Spherical>
 
-                </Spherical>
-              </Stereographic>
-            </Animate>
-          </Plot>
-        </Pass>
-      </Camera>
-      </LinearRGB>
-    </Loop>
+              <Spherical
+                rotation={[45, 22.5, 0]}
+                scale={[0.25, 0.25, 0.25]}
+                range={[[-π, π], [-τ/4, τ/4], [-1, 1]]}
+              >
+
+                <Grid
+                  axes='xy'
+                  origin={[0, 0, 1]}
+                  width={2}
+                  first={{ unit: π, base: 2, detail: 64, divide: 8, end: true }}
+                  second={{ detail: 64, divide: 5 }}
+                  color={[0.25, 0.25, 0.25, 1]}
+                  depth={0.5}
+                  zBias={-1}
+                />
+
+              </Spherical>
+            </Stereographic>
+          </Animate>
+        </Plot>
+      </Pass>
+    </Camera>
+    </LinearRGB>
   </>);
 
   const root = document.querySelector('#use-gpu .canvas');

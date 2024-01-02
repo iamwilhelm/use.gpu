@@ -12,6 +12,7 @@ import { resolve, uploadBuffer, toDataBounds } from '@use-gpu/core';
 import { shouldEqual, sameShallow } from '@use-gpu/traits/live';
 
 import { useShader, useNoShader } from '../hooks/useShader';
+import { useCombinedTransform, useNoCombinedTransform } from '../hooks/useCombinedTransform';
 import { useComputePipeline } from '../hooks/useComputePipeline';
 import { useDataSize } from '../hooks/useDataBinding';
 import { useDerivedSource } from '../hooks/useDerivedSource';

@@ -45,7 +45,7 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
 
   return use(Data, {
     schema,
-    data: parsed,
+    data: {...parsed},
     tensor: size ?? tensor,
     render: (sources: Record<string, ShaderSource>) => use(SurfaceLayer, {
       color,

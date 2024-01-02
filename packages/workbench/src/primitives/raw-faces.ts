@@ -113,7 +113,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const instanceCount = useCallback(() => {
     if (count != null) {
       const c = (resolve(count) || 0);
-      return (attr.segments != null) ? Math.max(0, c - 2) : c / 3;
+      return (attr.segments != null) ? Math.max(0, c - 2) : (c / 3) | 0;
     }
 
     const segments = (attr.segments as any)?.length;

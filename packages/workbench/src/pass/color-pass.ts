@@ -103,5 +103,4 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
 
     return null;
   }));
-
 }, 'ColorPass');

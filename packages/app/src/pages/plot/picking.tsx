@@ -70,10 +70,10 @@ export const PlotPickingPage: LC = () => {
     <InfoBox>Use &lt;Pick&gt; for GPU-driven mouse picking on any shape or layer. Attach any u32 lookup index per shape or vertex.</InfoBox>
     <Camera>
       <Pass picking>
-        
+      
         <Plot>
           <Grid axes="zx" width={2} color="#ffffff40" range={[[-5, 5], [0, 1], [-5, 5]]} />
-        
+      
           <Pick
             onMouseOver={(mouse, index) => console.log('Round shape #' + index, mouse)}
           >{
@@ -88,6 +88,7 @@ export const PlotPickingPage: LC = () => {
                   stroke="#ffffff"
                   width={3}
                   depth={0.5}
+                  zBiasStroke={1}
                 />
               )),
             ]
@@ -107,6 +108,7 @@ export const PlotPickingPage: LC = () => {
                   stroke="#ffffff"
                   width={3}
                   depth={0.5}
+                  zBiasStroke={1}
                 />
               )),
             ]
@@ -131,7 +133,7 @@ export const PlotPickingPage: LC = () => {
 
 const Camera = ({children}: PropsWithChildren<object>) => (
   <OrbitControls
-    radius={3}
+    radius={6}
     bearing={0.5}
     pitch={0.3}
   >{

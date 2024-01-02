@@ -1,6 +1,7 @@
 import type { StorageSource, TypedArrayConstructor, TypedArray } from './types';
 import { TYPED_ARRAYS, TEXTURE_FORMAT_SIZES, TEXTURE_FORMAT_DIMS } from './constants';
 import { incrementVersion } from './id';
+import { LOGGING, decodeUsageFlags } from './debug';
 
 type BufferArray = TypedArray | number[] | ArrayBuffer | number;
 
@@ -30,6 +31,8 @@ export const makeTypedBuffer = (
     usage,
     mappedAtCreation: !!data,
   });
+  
+  LOGGING.buffer && console.warn('Allocate typed buffer', {size, ...decodeUsageFlags(usage)});
 
   if (data) {
     const ArrayType = getTypedArrayConstructor(data);
@@ -76,6 +79,8 @@ export const makeTextureReadbackBuffer = (
   const dimsPerItem = d;
 
   if (itemsPerRow !== Math.round(itemsPerRow)) throw new Error("Readback size not a multiple of item size");
+
+  LOGGING.buffer && console.warn('Allocate readback buffer', {width, height, format});
 
   const n = bytesPerRow * height;
   const buffer = device.createBuffer({

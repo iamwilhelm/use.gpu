@@ -4,7 +4,7 @@ import React from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass,
+  Pass,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
 } from '@use-gpu/workbench';
@@ -20,25 +20,23 @@ export const MeshRawPage: LC = (props) => {
 
   return (<>
     <InfoBox>Render a clickable cube mesh using a fully hand-rolled draw call and shaders (if you really want to).</InfoBox>
-    <Loop>
-      <Cursor cursor='move' />
-      <Camera>
-        <Pass picking>
-          <Pick>{
-            ({id, hovered, presses}) => [
-              // <RawMesh> is a fully hand-coded component, intended as an anti-example
-              // of how to integrate fully custom rendering code with classic GL-style vertex attributes.
-              <RawMesh texture={texture} mesh={mesh} blink={presses.left} />,
+    <Cursor cursor='move' />
+    <Camera>
+      <Pass picking>
+        <Pick>{
+          ({id, hovered, presses}) => [
+            // <RawMesh> is a fully hand-coded component, intended as an anti-example
+            // of how to integrate fully custom rendering code with classic GL-style vertex attributes.
+            <RawMesh texture={texture} mesh={mesh} blink={presses.left} />,
 
-              // For mouse picking, we render a copy to the picking buffer with the given ID
-              <RawMesh id={id} texture={texture} mesh={mesh} mode='picking' />,
+            // For mouse picking, we render a copy to the picking buffer with the given ID
+            <RawMesh id={id} texture={texture} mesh={mesh} mode='picking' />,
 
-              hovered ? <Cursor cursor='pointer' /> : null,
-            ]
-          }</Pick>
-        </Pass>
-      </Camera>
-    </Loop>
+            hovered ? <Cursor cursor='pointer' /> : null,
+          ]
+        }</Pick>
+      </Pass>
+    </Camera>
   </>);
 };
 

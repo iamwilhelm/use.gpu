@@ -1,5 +1,6 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import { useOne, useResource, useState } from '@use-gpu/live';
+import { getRenderFunc } from '@use-gpu/workbench';
 
 export type AutoSizeProps = {
   canvas: HTMLCanvasElement,
@@ -11,13 +12,13 @@ const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, numb
   const {parentElement} = canvas;
   if (parentElement) {
     const {offsetWidth, offsetHeight} = parentElement;
-    return [offsetWidth, offsetHeight, pixelRatio];
+    return [pixelRatio * offsetWidth, pixelRatio * offsetHeight, pixelRatio];
   }
   return [pixelRatio * window.innerWidth, pixelRatio * window.innerHeight, pixelRatio];
 }
 
 export const AutoSize: LiveComponent<AutoSizeProps> = (props: PropsWithChildren<AutoSizeProps>) => {
-  const {canvas, render, children} = props;
+  const {canvas, children} = props;
 
   useResource(() => {
     canvas.style.position = 'absolute';
@@ -57,5 +58,6 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (props: PropsWithChildren<
     });
   }, [canvas]);
 
+  const render = getRenderFunc(props);
   return render ? render(width, height, pixelRatio) : (children ?? null);
 };

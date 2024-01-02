@@ -3,7 +3,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React, { use } from '@use-gpu/live';
 
 import {
-  Loop, Pass,
+  Pass,
   OrbitControls, OrbitCamera,
   Cursor, Animate,
 } from '@use-gpu/workbench';
@@ -61,55 +61,53 @@ export const Plot3DPage: LC = () => {
 
   return (<>
     <InfoBox>Draw 3D shapes using the plot API. Feed them live data via expressions. Control depth scaling smoothly.</InfoBox>
-    <Loop>
-      <Cursor cursor="move" />
-      <Camera>
-        <Pass>
-          <Plot>
+    <Cursor cursor="move" />
+    <Camera>
+      <Pass>
+        <Plot>
 
-            <Line
-              positions={paths}
-              color={color}
-              width={width}
-              zBias={zBias}
-              depth={0.75}
-            />
+          <Line
+            positions={paths}
+            color={color}
+            width={width}
+            zBias={zBias}
+            depth={0.75}
+          />
 
-          </Plot>
+        </Plot>
 
-          <Plot>
-            <Transform scale={4}>
-              <Tensor
-                format='vec3<f32>'
-                length={500}
-                live
-                time
-                items={2}
-                as={['positions', 'colors']}
-                expr={(emit: Emit, i: number, time: Time) => {
-                  const s = ((i*i + i) % 13133.371) % 1000;
-                  const t = time.elapsed / 8000;
+        <Plot>
+          <Transform scale={4}>
+            <Tensor
+              format='vec3<f32>'
+              length={500}
+              live
+              time
+              items={2}
+              as={['positions', 'colors']}
+              expr={(emit: Emit, i: number, time: Time) => {
+                const s = ((i*i + i) % 13133.371) % 1000;
+                const t = time.elapsed / 8000;
 
-                  const x = Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2;
-                  const y = Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2;
-                  const z = Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2;
-                
-                  const r = 1;
-                  const g = (1 - x - y) / 2;
-                  const b = (1 - z) / 2;
-                
-                  emit(x, y, z);
-                  emit(r, g, b);
-                }}
-              >
-                <Point shape='diamond' hollow size={50} depth={1} mode={'transparent'} />
-              </Tensor>
-            </Transform>
-          </Plot>
+                const x = Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2;
+                const y = Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2;
+                const z = Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2;
+              
+                const r = 1;
+                const g = (1 - x - y) / 2;
+                const b = (1 - z) / 2;
+              
+                emit(x, y, z);
+                emit(r, g, b);
+              }}
+            >
+              <Point shape='diamond' hollow size={50} depth={1} mode={'transparent'} />
+            </Tensor>
+          </Transform>
+        </Plot>
 
-        </Pass>
-      </Camera>
-    </Loop>
+      </Pass>
+    </Camera>
   </>);
 }
 

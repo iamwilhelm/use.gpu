@@ -234,7 +234,7 @@ export const unquote = <T>(
 /** Signal = quote yeet an empty value */
 export const signalTo = (reconciler: LiveReconciler, key?: Key) => {
   if (!reconciler?.reconciler) throw new Error("Missing reconciler for signal");
-  return ({f: SIGNAL, args: reconciler, key, by: getCurrentFiberID()} as any);
+  return ({f: SIGNAL, args: [reconciler], key, by: getCurrentFiberID()} as any);
 };
 
 /** Yeet a suspend symbol. */

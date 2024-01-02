@@ -7,7 +7,7 @@ import { wgsl } from '@use-gpu/shader/wgsl';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, LinearRGB,
+  Pass, LinearRGB,
   GeometryData, ImageCubeTexture,
   OrbitCamera, OrbitControls,
   Cursor,
@@ -63,23 +63,21 @@ export const DebugAxesPage: LC = (props) => {
         const fragment = useShader(cubeMaterial, [texture]);
 
         return (
-          <Loop>
-            <LinearRGB tonemap="aces">
-              <Cursor cursor='move' />
-              <Camera>
-                <Pass>
-                  <AxisHelper size={2} width={3} />
+          <LinearRGB tonemap="aces">
+            <Cursor cursor='move' />
+            <Camera>
+              <Pass>
+                <AxisHelper size={2} width={3} />
 
-                  <Scene>
-                    <ShaderFlatMaterial fragment={fragment}>
-                      <Mesh mesh={mesh} />
-                    </ShaderFlatMaterial>
-                  </Scene>
+                <Scene>
+                  <ShaderFlatMaterial fragment={fragment}>
+                    <Mesh mesh={mesh} />
+                  </ShaderFlatMaterial>
+                </Scene>
 
-                </Pass>
-              </Camera>
-            </LinearRGB>
-          </Loop>
+              </Pass>
+            </Camera>
+          </LinearRGB>
         );
       }}
     />

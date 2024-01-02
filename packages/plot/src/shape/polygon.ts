@@ -40,8 +40,8 @@ export type PolygonProps = TraitProps<typeof Traits> &
   };
 
 export const Polygon: LiveComponent<PolygonProps> = memo((props) => {
-  const {fill, fills, stroke, strokes, zBiasShift = 1} = props;
-  const zBias = (props.zBias || 0) + zBiasShift;
+  const {fill, fills, stroke, strokes, zBiasStroke = 0} = props;
+  const zBias = (props.zBias || 0) + zBiasStroke;
   return [
     fill ?? fills ? use(RawFace, {...props, color: fill, colors: fills, concave: true}) : null,
     stroke ?? strokes ? use(RawLine, {...props, color: stroke, colors: strokes, loop: true, zBias}) : null,

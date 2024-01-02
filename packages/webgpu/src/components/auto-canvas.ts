@@ -32,6 +32,7 @@ export type AutoCanvasProps = {
   picking?: boolean,
   /** If running in an iframe, avoid preventing default on scroll. */
   iframe?: boolean,
+
   children: LiveElement,
 }
 
@@ -59,7 +60,8 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   }
   if (!canvas) throw new Error(`Cannot find canvas '${props.selector ?? props.canvas}'`);
 
-  const view = events ? (
+  let view = children;
+  if (events) view = (
     use(DOMEvents, {
       autofocus,
       iframe,
@@ -67,24 +69,26 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
       children:
         use(CursorProvider, {
           element: canvas,
-          children,
+          children: view,
         })
     })
-  ) : children;
+  );
+
+  if (picking) view = use(PickingTarget, {
+    children: view,
+  });
 
   return (
     use(AutoSize, {
       canvas,
-      children:
+      children: (width, height, pixelRatio) => 
         use(Canvas, {
           ...rest,
+          width,
+          height,
+          pixelRatio,
           canvas,
-          children:
-            picking
-            ? use(PickingTarget, {
-                children: view,
-              })
-            : view
+          children: view
         })
     })
   );

@@ -567,7 +567,7 @@ export const useNoVersion = useNoHook(Hook.VERSION);
  * On-change logger for debug purposes.
  */
 export const useLog = (values: Record<string, any>) => {
-  for (const k in values) useOne(() => console.log(k, '=', value), value);
+  for (const k in values) useOne(() => console.log(k, '=', values[k]), values[k]);
 };
 
 /**

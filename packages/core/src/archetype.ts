@@ -296,7 +296,6 @@ export const schemaToAggregate = (
   }
 
   const aggregate = {aggregateBuffers, refBuffers, bySelfs, byRefs, byInstances, byVertices, byIndices};
-  console.warn('aggregate', aggregate);
 
   return aggregate;
 };

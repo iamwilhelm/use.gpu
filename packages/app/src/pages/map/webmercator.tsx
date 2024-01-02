@@ -125,120 +125,118 @@ export const MapWebMercatorPage: LC = () => {
     ],
   } as Tracks;
 
-  return (
-    <Loop>
-      <Cursor cursor='move' />
-      <LinearRGB>
-        <Camera>
-          <Pass>
-            <Plot>
-              <Animate
-                paused
-                loop
-                delay={1}
-                speed={2}
-                tracks={tracks}
-                duration={75}
+  return (<>
+    <Cursor cursor='move' />
+    <LinearRGB>
+      <Camera>
+        <Pass>
+          <Plot>
+            <Animate
+              paused
+              loop
+              delay={1}
+              speed={2}
+              tracks={tracks}
+              duration={75}
+            >
+              <WebMercator
+                bend={0}
+                range={[[-1.5, 1.5], [-.5 - 2/3, .5 + 2/3]]}
+                long={90}
+                lat={20}
+                zoom={1}
+                scale={[3, 3, 3]}
+                centered
+                scissor
+                native
               >
-                <WebMercator
-                  bend={0}
-                  range={[[-1.5, 1.5], [-.5 - 2/3, .5 + 2/3]]}
-                  long={90}
-                  lat={20}
-                  zoom={1}
-                  scale={[3, 3, 3]}
-                  centered
-                  scissor
-                  native
-                >
-                  <MVTStyles styles={styleSheet}>
-                    {USE_MAPBOX ? (
-                      <MapboxProvider accessToken={accessToken}>
-                        <MVTiles detail={2} />
-                      </MapboxProvider>
-                    ) : (
-                      <MapTileProvider url={url}>
-                        <MVTiles detail={2} maxLevel={3} />
-                      </MapTileProvider>
-                    )}
-                  </MVTStyles>
-                </WebMercator>
-                <WebMercator
-                  bend={0}
-                  range={[[-1, 1], [-2/3, 2/3]]}
-                  long={90}
-                  lat={20}
-                  zoom={1}
-                  scale={[3, 3, 3]}
-                  centered
-                >
-                  <Grid
-                    axes='xy'
-                    origin={[0, 0, 0]}
-                    width={2}
-                    first={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
-                    second={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
-                    color={[0.75, 0.75, 0.75, 0.125]}
-                    depth={0.5}
-                    zBias={10}
-                  />
+                <MVTStyles styles={styleSheet}>
+                  {USE_MAPBOX ? (
+                    <MapboxProvider accessToken={accessToken}>
+                      <MVTiles detail={2} />
+                    </MapboxProvider>
+                  ) : (
+                    <MapTileProvider url={url}>
+                      <MVTiles detail={2} maxLevel={3} />
+                    </MapTileProvider>
+                  )}
+                </MVTStyles>
+              </WebMercator>
+              <WebMercator
+                bend={0}
+                range={[[-1, 1], [-2/3, 2/3]]}
+                long={90}
+                lat={20}
+                zoom={1}
+                scale={[3, 3, 3]}
+                centered
+              >
+                <Grid
+                  axes='xy'
+                  origin={[0, 0, 0]}
+                  width={2}
+                  first={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
+                  second={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
+                  color={[0.75, 0.75, 0.75, 0.125]}
+                  depth={0.5}
+                  zBias={10}
+                />
 
-                  <Axis
-                    axis='x'
+                <Axis
+                  axis='x'
+                  width={5}
+                  color={[0.75, 0.75, 0.75, 1]}
+                  depth={0.5}
+                  detail={64}
+                  zBias={20}
+                />
+                <Scale
+                  unit={360}
+                  base={2}
+                  divide={8}
+                  axis='x'
+                >
+                  <Tick
+                    size={20}
                     width={5}
+                    offset={[0, 1, 0]}
                     color={[0.75, 0.75, 0.75, 1]}
                     depth={0.5}
-                    detail={64}
-                    zBias={20}
                   />
-                  <Scale
-                    unit={360}
-                    base={2}
-                    divide={8}
-                    axis='x'
-                  >
-                    <Tick
-                      size={20}
-                      width={5}
-                      offset={[0, 1, 0]}
-                      color={[0.75, 0.75, 0.75, 1]}
-                      depth={0.5}
-                    />
-                  </Scale>
+                </Scale>
 
-                  <Axis
-                    axis='y'
+                <Axis
+                  axis='y'
+                  width={5}
+                  origin={[45, 0, 0]}
+                  color={[0.75, 0.75, 0.75, 1]}
+                  detail={32}
+                  depth={0.5}
+                  zBias={20}
+                />
+                <Scale
+                  origin={[45, 0, 0]}
+                  unit={360}
+                  base={2}
+                  divide={8}
+                  axis='y'
+                >
+                  <Tick
+                    size={20}
                     width={5}
-                    origin={[45, 0, 0]}
+                    offset={[1, 0, 0]}
                     color={[0.75, 0.75, 0.75, 1]}
-                    detail={32}
                     depth={0.5}
-                    zBias={20}
                   />
-                  <Scale
-                    origin={[45, 0, 0]}
-                    unit={360}
-                    base={2}
-                    divide={8}
-                    axis='y'
-                  >
-                    <Tick
-                      size={20}
-                      width={5}
-                      offset={[1, 0, 0]}
-                      color={[0.75, 0.75, 0.75, 1]}
-                      depth={0.5}
-                    />
-                  </Scale>
+                </Scale>
 
-                </WebMercator>
-              </Animate>
-            </Plot>
-          </Pass>
-        </Camera>
-      </LinearRGB>
-    </Loop>
-  );
+              </WebMercator>
+            </Animate>
+          </Plot>
+        </Pass>
+      </Camera>
+    </LinearRGB>
+  </>);
 };
 
 const Camera = ({children}: PropsWithChildren<object>) => (

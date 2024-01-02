@@ -84,7 +84,7 @@ export const useMatrixTransformSources = (
 ): [
   TransformContextProps,
 ] => {
-  return useOne(() => {
+  return useMemo(() => {
     const m = getSource(MATRIX_BINDING, matrix);
     const transform = getShader(getCartesianPosition, [m]);
     const differential = getShader(getMatrixDifferential, [m, normalMatrix]);

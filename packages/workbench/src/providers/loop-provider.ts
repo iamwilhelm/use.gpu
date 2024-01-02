@@ -3,10 +3,12 @@ import { makeContext, useContext, useFiber, useNoContext } from '@use-gpu/live';
 import { TimeContext, TimeContextProps } from './time-provider';
 
 type LoopContextProps = {
+  buffered: boolean,
   request: (fiber: LiveFiber<any>) => TimeContextProps,
 };
 
 export const LoopContext = makeContext<LoopContextProps>({
+  buffered: false,
   request: () => TimeContext.initialValue!,
 }, 'LoopContext');
 

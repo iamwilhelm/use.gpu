@@ -5,6 +5,7 @@ import type {
 import type { Update } from '@use-gpu/state';
 
 import { patch, $delete } from '@use-gpu/state';
+import { LOGGING } from './debug';
 
 export const makeShaderModuleDescriptor = (
   code: TypedArray | string,
@@ -46,6 +47,7 @@ export const makeRenderPipeline = (
 
   if (!depthStencilState) delete pipelineDescriptor.depthStencil;
 
+  LOGGING.pipeline && console.warn('Created render pipeline', pipelineDescriptor);
   return device.createRenderPipeline(pipelineDescriptor);
 }
 
@@ -71,6 +73,8 @@ export const makeRenderPipelineAsync = (
   } as any, descriptor) as any as GPURenderPipelineDescriptor;
 
   if (!depthStencilState) delete pipelineDescriptor.depthStencil;
+
+  LOGGING.pipeline && console.warn('Created render pipeline async', pipelineDescriptor);
   return device.createRenderPipelineAsync(pipelineDescriptor);
 }
 
@@ -84,6 +88,7 @@ export const makeComputePipeline = (
     layout: layout ?? 'auto',
     compute: makeShaderStage(device, shader),
   };
+  LOGGING.pipeline && console.warn('Created compute pipeline', pipelineDescriptor);
   return device.createComputePipeline(pipelineDescriptor);
 }
 
@@ -97,6 +102,7 @@ export const makeComputePipelineAsync = (
     layout: layout ?? 'auto',
     compute: makeShaderStage(device, shader),
   };
+  LOGGING.pipeline && console.warn('Created compute pipeline async', pipelineDescriptor);
   return device.createComputePipelineAsync(pipelineDescriptor);
 }
 

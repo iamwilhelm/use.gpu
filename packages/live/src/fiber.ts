@@ -242,15 +242,11 @@ export const renderFiber = <F extends ArrowFunction>(
   if (fiber.version != null) {
     if (fiber.version !== fiber.memo) {
       fiber.memo = fiber.version;
-      bustFiberDeps(fiber);
-      pingFiber(fiber);
     }
     else return;
   }
-  else {
-    bustFiberDeps(fiber);
-    pingFiber(fiber);
-  }
+
+  bustFiberDeps(fiber);
 
   // Apply rendered result
   return element ?? null;
@@ -328,6 +324,7 @@ export const updateFiber = <F extends ArrowFunction>(
     if (isArray) reconcileFiberCalls(fiber, cs.map(call => morph(call as any)));
     else morphFiberCall(fiber, c);
 
+    pingFiber(fiber);
     return fiber;
   }
 
@@ -369,7 +366,7 @@ export const updateFiber = <F extends ArrowFunction>(
   }
   // Signal quoted reduction directly
   else if (fiberType === SIGNAL) {
-    const reconciler = callArgs;
+    const [reconciler] = callArgs;
     const quote = fiber.quotes.get(reconciler);
     if (!quote) throw new Error(`Signal to reconciler ${reconciler.displayName} without being provided in ${formatNode(fiber)}`);
     if (!fiber.quote) fiber.quote = quote;
@@ -397,11 +394,14 @@ export const updateFiber = <F extends ArrowFunction>(
       if (value !== undefined) yeeted.emit(fiber, value);
       else fiber.yeeted!.value = undefined;
     }
+    else return;
   }
   // Mount normal node (may still be built-in)
   else {
     mountFiberCall(fiber, call);
   }
+
+  pingFiber(fiber);
 
   return fiber;
 }
@@ -1274,7 +1274,7 @@ export const updateMount = <P extends ArrowFunction>(
     const aa = newMount?.arg;
     const args = aas !== undefined ? aas : (aa !== undefined ? [aa] : undefined);
 
-    if (mount!.args === args && !to?.isImperativeFunction && !(to === YEET && !args) && !(to === SIGNAL)) {
+    if (mount!.args === args && !to?.isImperativeFunction && !(to === YEET && !args)) {
       LOG && console.log('Skipping', key, formatNode(newMount!));
       return false;
     }

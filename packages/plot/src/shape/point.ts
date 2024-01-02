@@ -3,7 +3,7 @@ import type { TraitProps } from '@use-gpu/traits/live';
 
 import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { adjustSchema, schemaToArchetype, schemaToAttributes, toCPUDims, getUniformDims } from '@use-gpu/core';
-import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
+import { useLog, yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
 import { useInspectHoverable, useTransformContext, POINT_SCHEMA, LayerReconciler } from '@use-gpu/workbench';

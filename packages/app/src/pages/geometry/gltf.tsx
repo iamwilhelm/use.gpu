@@ -11,7 +11,7 @@ import {
   Cursor, PointLayer, LineLayer,
   ImageCubeTexture, PrefilteredEnvMap, Environment,
   DirectionalLight, PointLight, DomeLight,
-  Loop, Animate, Suspense,
+  Animate, Suspense,
 } from '@use-gpu/workbench';
 
 import { GLTFData, GLTFModel } from '@use-gpu/gltf';
@@ -45,55 +45,53 @@ export const GeometryGLTFPage: LC = () => {
           />
         ]}
         then={([cubeMap]: TextureSource[]) => (
-          <Loop>
-            <LinearRGB>
-              <Cursor cursor='move' />
-              <Camera>
-                <Pass lights>
-                  <Animate
-                    loop
-                    delay={0}
-                    keyframes={[
-                      [0, [30, 20, 10]],
-                      [4, [20, 10, 40]],
-                      [8, [-5, 20, 20]],
-                      [12, [30, 20, 10]],
-                    ]}
-                    prop='position'
-                  >
-                    <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} intensity={40*40} />
-                  </Animate>
+          <LinearRGB>
+            <Cursor cursor='move' />
+            <Camera>
+              <Pass lights>
+                <Animate
+                  loop
+                  delay={0}
+                  keyframes={[
+                    [0, [30, 20, 10]],
+                    [4, [20, 10, 40]],
+                    [8, [-5, 20, 20]],
+                    [12, [30, 20, 10]],
+                  ]}
+                  prop='position'
+                >
+                  <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} intensity={40*40} />
+                </Animate>
 
-                  <Animate
-                    loop
-                    delay={0}
-                    keyframes={[
-                      [0, [10, 20, 30]],
-                      [3, [20, 30, 10]],
-                      [6, [40, 10, 20]],
-                      [9, [10, 20, 40]],
-                    ]}
-                    prop='position'
-                  >
-                    <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
-                  </Animate>
+                <Animate
+                  loop
+                  delay={0}
+                  keyframes={[
+                    [0, [10, 20, 30]],
+                    [3, [20, 30, 10]],
+                    [6, [40, 10, 20]],
+                    [9, [10, 20, 40]],
+                  ]}
+                  prop='position'
+                >
+                  <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
+                </Animate>
 
-                  <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
-                  <DomeLight intensity={0.15} />
+                <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
+                <DomeLight intensity={0.15} />
 
-                  <Environment map={cubeMap} preset={envPreset}>
-                    <Scene>
-                      <Node position={[0, -0.1, 0]}>
-                        <GLTFData url={url}>{
-                          (gltf: GLTF) => <GLTFModel gltf={gltf} />
-                        }</GLTFData>
-                      </Node>
-                    </Scene>
-                  </Environment>
-                </Pass>
-              </Camera>
-            </LinearRGB>
-          </Loop>
+                <Environment map={cubeMap} preset={envPreset}>
+                  <Scene>
+                    <Node position={[0, -0.1, 0]}>
+                      <GLTFData url={url}>{
+                        (gltf: GLTF) => <GLTFModel gltf={gltf} />
+                      }</GLTFData>
+                    </Node>
+                  </Scene>
+                </Environment>
+              </Pass>
+            </Camera>
+          </LinearRGB>
         )}
       />
     )}/>

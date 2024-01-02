@@ -81,7 +81,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, api}) => {
       props = {reconciler: reconciler.displayName};
     }
     else if (f.name === 'SIGNAL') {
-      const reconciler = args;
+      const [reconciler] = args;
       props = {reconciler: reconciler.displayName};
     }
     else {

@@ -48,7 +48,7 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
     const {matrices, normalMatrices, ...rest} = sources;
     return use(IndexedTransform, {
       ...sources,
-      children: use(FaceLayer, {...mesh, ...rest, shaded, side}),
+      children: use(FaceLayer, {...rest, mesh, shaded, side}),
     });
   }, [mesh]);
 

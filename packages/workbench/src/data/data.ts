@@ -138,7 +138,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
       }
       else if (segments) {
         [vertexCount, chunks, groups] = getMultiChunkCount(schema, countKey, itemCount, data, virtual, skip);
-        if (indexedKey) [indexCount] = getMultiChunkCount(schema, indexedKey, itemCount, data, virtual, skip);
+        if (indexedKey) [indexCount, chunks, groups] = getMultiChunkCount(schema, indexedKey, itemCount, data, virtual, skip);
       }
       else {
         vertexCount = getVertexCount(schema, countKey, itemCount, data, virtual, skip);
@@ -213,13 +213,14 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
   // Blit all data into merged arrays
   const items = useMemo(() => {
     const slices = [];
+    const sliceKey = indexedKey ?? countKey;
 
     for (const k in fields) {
       const accessor = virtual?.[k];
       if (!accessor && !data) continue;
 
       const {array, dims, depth, prop} = fields[k];
-      const slice = k === countKey;
+      const slice = k === sliceKey;
 
       // Keep CPU-only layout, as useAggregator will widen for us
       const dimsIn = toCPUDims(dims);
@@ -245,7 +246,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
   }, [
     live ? NaN : virtual ? (version ?? NaN) : null, propData,
     itemCount, skip, total, indexed,
-    archetype, emitters,
+    archetype, emitters, countKey, indexedKey,
   ]);
 
   // Aggregate into struct buffers by access policy

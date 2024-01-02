@@ -269,6 +269,7 @@ export const generateConcaveIndices = (
 
     // Triangulate and add to index buffer
     const indices = earcut(scratch, holes);
+    console.log(indices, indices.length)
     offsetNumberArray(indices, to, baseVertex, 1, 1, 0, baseIndex, indices.length);
 
     scratch.length = 0;

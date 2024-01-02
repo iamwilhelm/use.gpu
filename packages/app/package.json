@@ -6,7 +6,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@types/earcut": "^2.1.1",
     "@use-gpu/core": "*",
     "@use-gpu/layout": "*",
     "@use-gpu/live": "*",
@@ -19,8 +18,7 @@
     "@use-gpu/state": "*",
     "@use-gpu/webgpu": "*",
     "@use-gpu/workbench": "*",
-    "@use-gpu/wgsl": "*",
-    "earcut": "^2.2.3"
+    "@use-gpu/wgsl": "*"
   },
   "scripts": {
     "build": "NPM_PACKAGE=app ../../scripts/build-mjs-cjs.sh",

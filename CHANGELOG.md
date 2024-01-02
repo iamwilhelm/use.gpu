@@ -1,3 +1,25 @@
+0.11.0
+- `@use-gpu/core`: refactor data ingestion pipe
+- `@use-gpu/core`: add per-spread struct data aggregator
+- `@use-gpu/inspect`: improved tree view and value formatting
+- `@use-gpu/live`: change `reconcile` and `quote` to be targeted to a context
+- `@use-gpu/live`: `useYolo` is now `useHooks`
+- `@use-gpu/plot`: new "declarative mode" drawing primitives
+- `@use-gpu/plot`: aggregated matrix transforms
+- `@use-gpu/plot`: make DataContext a CPU-side concept
+- `@use-gpu/traits`: split off value parsers into `@use-gpu/parse`
+- `@use-gpu/traits`: make hooks React/Live-polymorphic
+- `@use-gpu/shader`: add struct types and instancing operators
+- `@use-gpu/shader`: add automatic vec# casts between lambdas
+- `@use-gpu/workbench`: add explicit `LayerReconciler`, `PassReconciler`, `QueueReconciler`
+- `@use-gpu/workbench`: refactor `<VirtualLayers>`
+- `@use-gpu/workbench`: refactor attribute instancing
+- `@use-gpu/workbench`: add instancing to Line/Arrow/Point layers
+- `@use-gpu/workbench`: use new aggregator schema in data components
+- `@use-gpu/workbench`: move `expr` based samplers to plot package
+- `@use-gpu/workbench`: merge `<CompositeData>` into `<Data>`
+- `@use-gpu/*`: support `render` prop as `children`
+
 0.10.2
 - `@use-gpu/live`: allow `detach()` to work on fragments, allow immediate render
 - `@use-gpu/live`: ensure steady render clock in `<Loop>` without double renders

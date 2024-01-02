@@ -2,7 +2,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { DataSchema } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
-import { seq } from '@use-gpu/core';
+import { seq, lerp } from '@use-gpu/core';
 
 import { PickingOverlay } from '../../ui/picking-overlay';
 
@@ -55,7 +55,7 @@ const convexFaceData = seq(20).map(i => {
   };
 });
 
-const concaveFaceData = seq(20).map(i => {
+const concaveFaceData2 = seq(20).map(i => {
   const n = Math.max(3, randomInt(5, 24) - randomInt(0, 5));
   const r = randomFloat(0.15, 0.5);
   const o = [randomFloat(-2, 2), randomFloat(-1, 1), randomFloat(0.5, 2)];
@@ -76,6 +76,24 @@ const concaveFaceData = seq(20).map(i => {
     lookup: i,
   };
 });
+
+const n = 24;
+const r = .25;
+const o = [0, 0, 0];
+const concaveFaceData = [{
+  positions: seq(n).map(j => {
+    const m1 = 1 + 1.5 * ((j*1.316) % 2);
+    const m2 = circleX(j / n * 12, 1) * .5 + 1;
+    const modulate = lerp(m1, m2, .8);
+    return [
+      o[0] + circleX(j / n, r * modulate),
+      o[1] + circleY(j / n, r * modulate),
+      o[2],
+    ];
+  }),
+  color: [0.5, 0.75, 1],
+  lookup: 0,
+}];
 
 export const GeometryFacesPage: LC = () => {
 
@@ -118,7 +136,7 @@ export const GeometryFacesPage: LC = () => {
                       />
                   }</Data>
                 ) : null
-              ]
+              ], () => {}
             }</Pick>
         }</Data>
 

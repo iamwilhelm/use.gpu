@@ -226,11 +226,11 @@ export const Inspect: React.FC<InspectProps> = ({
               : {display: 'flex', height: '100%'}}>
             <RowPanel style={fullSize
                 ? {position: 'relative', flexGrow: 1, minHeight: 0}
-                : {position: 'relative', width: splitLeft + '%'}}>
+                : {position: 'relative', width: splitLeft + '%', borderRight: '1px solid var(--LiveInspect-borderThin'}}>
               <PanelAbsolute>
                 {tree}
               </PanelAbsolute>
-              {resize ? <Resizer side="right" value={splitLeft} onChange={setSplitLeft} /> : null}
+              {resize && !fullSize ? <Resizer side="right" value={splitLeft} onChange={setSplitLeft} /> : null}
             </RowPanel>
             {selectedFiber ? (
               <RowPanel style={fullSize
@@ -240,7 +240,7 @@ export const Inspect: React.FC<InspectProps> = ({
                 <PanelScrollable>
                   <Panels fiber={selectedFiber} api={api} fullSize={fullSize} tab={tab} onTab={updateTab} />
                 </PanelScrollable>
-                {resize ? <Resizer side="top" value={splitBottom} onChange={setSplitBottom} /> : null}
+                {resize && fullSize ? <Resizer side="top" value={splitBottom} onChange={setSplitBottom} /> : null}
               </RowPanel>
             ) : null}
           </div>

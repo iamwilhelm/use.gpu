@@ -82,8 +82,8 @@ export const Resizer: FC<ResizerProps> = (props: ResizerProps) => {
     const {left, right, top, bottom} = e.target.getBoundingClientRect();
     const {left: ll, right: rr, top: tt, bottom: bb} = outer.getBoundingClientRect();
 
-    const cx = (left + right) / 2;
-    const cy = (top + bottom) / 2;
+    const cx = side === 'left' ? (left + right) / 2 : right;
+    const cy = side === 'top' ? (top + bottom) / 2 : bottom;
 
     if (side === 'left') {
       const offset = clientX - cx;

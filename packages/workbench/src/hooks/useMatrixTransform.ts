@@ -85,8 +85,9 @@ export const useMatrixTransformSources = (
   TransformContextProps,
 ] => {
   return useOne(() => {
-    const transform = getShader(getCartesianPosition, [matrix]);
-    const differential = getShader(getMatrixDifferential, [matrix, normalMatrix]);
+    const m = getSource(MATRIX_BINDING, matrix);
+    const transform = getShader(getCartesianPosition, [m]);
+    const differential = getShader(getMatrixDifferential, [m, normalMatrix]);
 
     const key = getBundleKey(transform) ^ getBundleKey(differential);
     return {key, transform, differential};

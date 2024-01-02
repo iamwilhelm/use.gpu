@@ -7,12 +7,15 @@ import { useDraw } from '../hooks/useDraw';
 import { use, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
 import { resolve, BLEND_ALPHA } from '@use-gpu/core';
+
+import { PickingSource, usePickingShader } from '../providers/picking-provider';
+import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
+import { TransformContextProps } from '../providers/transform-provider';
+
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useShader } from '../hooks/useShader';
 import { useDataLength } from '../hooks/useDataBinding';
-import { PickingSource, usePickingShader } from '../providers/picking-provider';
-import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getLabelVertex } from '@use-gpu/wgsl/instance/vertex/label.wgsl';
 import { getSDFRectangleFragment } from '@use-gpu/wgsl/instance/fragment/sdf-rectangle.wgsl';
@@ -51,6 +54,7 @@ export type RawLabelsProps = {
   colors?: ShaderSource,
   expands?: ShaderSource,
 
+  transform?: TransformContextProps | ShaderModule,
   texture?: TextureSource | LambdaSource | ShaderModule,
   flip?: [number, number],
 
@@ -66,6 +70,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     blend,
     id = 0,
     count = null,
+    transform,
   } = props;
 
   const vertexCount = 4;
@@ -88,7 +93,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
 
   const q  = useShaderRef(props.flip);
 
-  const {positions, bounds: getBounds} = useApplyTransform(p);
+  const {positions, bounds: getBounds} = useApplyTransform(p, transform);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {

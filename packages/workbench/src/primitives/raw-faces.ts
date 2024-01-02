@@ -14,10 +14,11 @@ import { resolve } from '@use-gpu/core';
 import { useMaterialContext } from '../providers/material-provider';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { useScissorContext } from '../providers/scissor-provider';
+import { TransformContextProps } from '../providers/transform-provider';
 
 import { useShader, useNoShader } from '../hooks/useShader';
 import { useSource, useNoSource } from '../hooks/useSource';
-import { useCombinedTransform } from '../hooks/useCombinedTransform';
+import { useCombinedTransform, useNoCombinedTransform } from '../hooks/useCombinedTransform';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -53,9 +54,9 @@ export type RawFacesProps = {
   zBiases?: ShaderSource,
 
   indices?: ShaderSource,
-
   instance?: number,
   instances?: ShaderSource,
+  transform?: TransformContextProps,
 
   unwelded?: {
     colors?: boolean,
@@ -92,6 +93,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
     instance,
     instances,
+    transform,
 
     mesh,
     unwelded = mesh?.unwelded,
@@ -136,7 +138,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
   const i = useShaderRef(null, attr.indices);
 
-  const {transform: xf, differential: xd, bounds: getBounds} = useCombinedTransform();
+  const {transform: xf, differential: xd, bounds: getBounds} = transform ? (useNoCombinedTransform(), transform) : useCombinedTransform();
   const scissor = useScissorContext();
 
   let bounds: Lazy<DataBounds> | null = null;

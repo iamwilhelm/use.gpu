@@ -95,10 +95,9 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
   const device = useDeviceContext();
   const inspect = useInspectable();
 
-  const {atlas, mappings, mips, sigmas, sigmas2, dsigmas, sizes, radii} = useMemo(() => {
+  const {atlas, mappings, mips, sigmas, dsigmas, sizes, radii} = useMemo(() => {
 
     const sigmas = [];
-    const sigmas2 = [];
     const dsigmas = [];
     const sizes = [];
     const radii = [];
@@ -108,7 +107,6 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
     for (let i = 0; i < mips; ++i) {
       const sigma = CRISP_SIGMA * (τ / 4) / (size >> i);
       sigmas.push(sigma);
-      sigmas2.push(sigma * sigma);
       dsigmas.push(0);
       sizes.push(size >> i);
       radii.push(0);
@@ -126,7 +124,6 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
       if (radius > MAX_SAMPLES) console.warn(`PMREM radius too big: ${radius} > MAX_SAMPLES ${MAX_SAMPLES}`);
 
       sigmas.push(sigma);
-      sigmas2.push(sigma * sigma);
       dsigmas.push(dsigma);
       sizes.push(size);
       radii.push(radius);
@@ -147,7 +144,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
     }
     atlas.snug();
 
-    return {atlas, mappings, mips, sigmas, sigmas2, dsigmas, sizes, radii};
+    return {atlas, mappings, mips, sigmas, dsigmas, sizes, radii};
   }, [size, levels]);
 
   const {width, height} = atlas;
@@ -305,7 +302,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
       const boundMappings = useRawSource(mappingData, 'vec4<u16>');
       const boundVariances = useRawSource(varianceData, 'f32');
       const boundCubeMap = useShader(sampleEnvMap, [
-        () => sigmas2.length,
+        () => sigmas.length,
         () => gain,
         boundMappings,
         boundVariances,

@@ -80,6 +80,7 @@ export const SceneInstancesPage: LC = (props) => {
                                 <Instance
                                   rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
                                   scale={[0.2, 0.2, 0.2]}
+                                  color={[Math.random(), Math.random(), Math.random()*Math.random()]}
                                 />
                               </Animate>
                             ))}
@@ -94,6 +95,7 @@ export const SceneInstancesPage: LC = (props) => {
                                   <Instance
                                     rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
                                     scale={[0.2, 0.2, 0.2]}
+                                    color={[Math.random(), Math.random(), Math.random()*Math.random()]}
                                   />
                                 </Animate>
                               ))}

@@ -14,6 +14,7 @@ import { resolve } from '@use-gpu/core';
 
 import { useMaterialContext } from '../providers/material-provider';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
+import { TransformContextProps } from '../providers/transform-provider';
 
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -49,6 +50,7 @@ export type RawQuadsProps = {
 
   instance?: number,
   instances?: ShaderSource,
+  transform?: TransformContextProps,
 
   count?: Lazy<number>,
 } & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
@@ -65,6 +67,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
     instance,
     instances,
+    transform,
 
     id = 0,
     count = null,
@@ -83,7 +86,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
 
-  const {positions, scissor, bounds: getBounds} = useApplyTransform(p);
+  const {positions, scissor, bounds: getBounds} = useApplyTransform(p, transform);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {

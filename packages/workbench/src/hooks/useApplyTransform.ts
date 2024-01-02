@@ -6,7 +6,7 @@ import type { Ref } from '@use-gpu/live';
 import { useOne, useVersion, useNoOne, useNoVersion } from '@use-gpu/live';
 import { chainTo } from '@use-gpu/shader/wgsl';
 import { getSource } from '../hooks/useSource';
-import { useTransformContext, useNoTransformContext } from '../providers/transform-provider';
+import { useTransformContext, useNoTransformContext, TransformContextProps } from '../providers/transform-provider';
 import { useScissorContext, useNoScissorContext } from '../providers/scissor-provider';
 
 import { chainTransform } from './useCombinedTransform';
@@ -18,15 +18,16 @@ const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u3
 
 export const useApplyTransform = (
   positions?: StorageSource | LambdaSource | TextureSource | ShaderModule | Ref<TypedArray | number[]> | (() => TypedArray | number[]) | null,
+  replace?: TransformContextProps | ShaderModule,
 ): {
   positions: ShaderSource | null,
   scissor: ShaderSource | null,
   bounds: TransformBounds | null,
 } => {
-  const context = useTransformContext();
+  const context = replace ? (useNoTransformContext(), replace) : useTransformContext();
   const scissor = useScissorContext();
 
-  const {transform, bounds} = context;
+  const {transform, bounds} = 'transform' in context ? context : {transform: context};
   const version = useVersion(positions) + useVersion(transform) + useVersion(scissor) + useVersion(bounds);
 
   return useOne(() => {
@@ -43,9 +44,12 @@ export const useApplyTransform = (
       bounds,
     };
 
-    let xform = context;
+    let transformed = getPosition;
+    if (transform) transformed = chainTo(transformed, transform);
+
     return {
-      positions: transform ? chainTo(getPosition, transform) : getPosition,
+      positions: transformed,
+      // Apply scissor to untransformed coordinates
       scissor: scissor ? chainTo(getPosition, scissor) : null,
       bounds,
     };

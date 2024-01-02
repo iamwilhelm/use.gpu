@@ -8,7 +8,10 @@ import { getStructAggregate } from './useStructSources';
 import { getLambdaSource } from './useLambdaSource';
 
 const NO_AGGREGATE: Record<string, StorageSource> = {};
-const INDEX = {name: 'instances', format: 'u32'};
+const INDEX = {
+  u16: {name: 'instances', format: 'u16'},
+  u32: {name: 'instances', format: 'u32'},
+};
 
 export const useInstancedSources = (
   uniforms: UniformAttribute[],
@@ -41,19 +44,21 @@ export const getInstancedSources = (
 export const useInstancedAggregate = (
   aggregateBuffer: MultiAggregateBuffer,
   instances?: StorageSource,
+  format?: 'u16' | 'u32',
 ) => {
-  return useMemo(() => getInstancedAggregate(aggregateBuffer, instances), [aggregateBuffer, instances]);
+  return useMemo(() => getInstancedAggregate(aggregateBuffer, instances, format), [aggregateBuffer, instances, format]);
 };
 
 export const getInstancedAggregate = (
   aggregateBuffer: MultiAggregateBuffer,
   instances?: StorageSource,
+  format: 'u16' | 'u32' = 'u32',
 ) => {
   const sources = getStructAggregate(aggregateBuffer);
   if (!instances) return sources;
 
   const {layout: {attributes}} = aggregateBuffer;
-  const [instanced, loadInstance] = getInstancedSources(attributes, INDEX, sources, instances.source);
+  const [instanced, loadInstance] = getInstancedSources(attributes, INDEX[format], sources, instances.source);
   instanced.instances = loadInstance;
 
   return instanced;

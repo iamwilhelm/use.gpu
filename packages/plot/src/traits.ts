@@ -251,7 +251,7 @@ export const ZIndexTrait = trait(
 
 export const ColorTrait = (
   props: {
-    color?: number,
+    color?: VectorLike | string,
     opacity?: number,
   },
   parsed: {

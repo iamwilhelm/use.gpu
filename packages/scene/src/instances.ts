@@ -1,44 +1,39 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { StorageSource } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader';
-import type { ObjectTrait } from './types';
+import type { GPUGeometry, StorageSource } from '@use-gpu/core';
 
-import { use, memo, provide, yeet, useCallback, useMemo, useOne, tagFunction } from '@use-gpu/live';
-import { bindEntryPoint } from '@use-gpu/shader/wgsl';
+import { use, useCallback, useOne, tagFunction } from '@use-gpu/live';
+import { makeUseTrait, combine, TraitProps } from '@use-gpu/traits/live';
 
 import {
   FaceLayer,
   InstanceData,
-  TransformContext,
-  MatrixContext,
+  IndexedTransform,
   useMatrixContext,
-  useCombinedTransform,
-  getShader,
 } from '@use-gpu/workbench';
 
-import { useObjectTrait } from './traits';
+import { ColorTrait, ObjectTrait } from './traits';
 import { composeTransform } from './lib/compose';
-
-import { loadInstance } from '@use-gpu/wgsl/transform/instance.wgsl';
-import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
-import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
 
 import { mat3, mat4 } from 'gl-matrix';
 
+const Traits = combine(ColorTrait, ObjectTrait);
+const useTraits = makeUseTrait(Traits);
+
 export type InstancesProps = {
-  mesh: Record<string, ShaderSource>,
+  mesh: GPUGeometry,
   shaded?: boolean,
   side?: 'front' | 'back' | 'both',
   format?: 'u16' | 'u32',
   render?: (Instance: LiveComponent<InstanceProps>) => LiveElement,
 };
 
-export type InstanceProps = Partial<ObjectTrait>;
+export type InstanceProps = TraitProps<typeof Traits>;
 
-const INSTANCE_FIELDS = [
-  ['mat4x4<f32>', 'matrix'],
-  ['mat3x3<f32>', 'normalMatrix'],
-];
+const INSTANCE_SCHEMA = {
+   matrices:       {format: 'mat4x4<f32>', prop: 'matrix'},
+   normalMatrices: {format: 'mat3x3<f32>', prop: 'normalMatrix'},
+   colors:         {format: 'vec4<f32>',   prop: 'color'},
+};
 
 export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildren<InstancesProps>) => {
   const {
@@ -49,17 +44,17 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
     render,
   } = props;
 
-  const Resume = useCallback((instances: StorageSource, fieldSources: StorageSource[]) => {
+  const Resume = useCallback((sources: Record<string, StorageSource>) => {
+    const {matrices, normalMatrices, ...rest} = sources;
     return use(IndexedTransform, {
-      matrices,
-      normalMatrices,
-      children: use(FaceLayer, {...mesh, instances, shaded, side}),
+      ...sources,
+      children: use(FaceLayer, {...mesh, ...rest, shaded, side}),
     });
   }, [mesh]);
 
   return use(InstanceData, {
     format,
-    fields: INSTANCE_FIELDS,
+    schema: INSTANCE_SCHEMA,
     render: (useInstance: () => (data: Record<string, any>) => void) => {
       const Instance = useOne(() => makeInstancer(useInstance), useInstance);
       return render ? render(Instance as any) : null;
@@ -70,11 +65,11 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
 
 const makeInstancer = (
   useInstance: () => (data: Record<string, any>) => void,
-) => tagFunction((props: Partial<ObjectTrait>) => {
+) => tagFunction((props: Partial<ObjectTrait> & Partial) => {
   const parent = useMatrixContext();
   const updateInstance = useInstance();
 
-  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {color, position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useTraits(props);
   const [matrix, normalMatrix] = useOne(() => [
     mat4.create(),
     mat3.create(),
@@ -96,7 +91,7 @@ const makeInstancer = (
     if (parent) mat4.multiply(matrix, parent, matrix);
     mat3.normalFromMat4(normalMatrix, matrix);
 
-    updateInstance({matrix, normalMatrix});
+    updateInstance({matrix, normalMatrix, color});
   }, props);
 
   return null;

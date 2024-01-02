@@ -67,6 +67,8 @@ export type DualContourLayerProps = {
   flat?: boolean,
   live?: boolean,
 
+  transform?: TransformContextProps,
+
   size?: Lazy<[number, number] | [number, number, number] | [number, number, number, number]>,
   id?: number,
 } & DualContourLayerFlags;
@@ -97,6 +99,8 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     mode = 'opaque',
     id = 0,
     blend,
+
+    transform,
   } = props;
 
   const size = useDataSize(props.size, props.values);
@@ -117,7 +121,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const min = useShaderRef(rangeMin);
   const max = useShaderRef(rangeMax);
 
-  const {transform: xf, differential: xd, bounds: getBounds} = useTransformContext();
+  const {transform: xf, differential: xd, bounds: getBounds} = transform ? (useNoCombinedTransform(), transform) : useCombinedTransform();
   const {shaded: material} = useMaterialContext();
 
   const rangeBounds = useOne(() => {

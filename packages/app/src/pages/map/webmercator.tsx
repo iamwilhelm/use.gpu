@@ -13,7 +13,7 @@ import {
   Plot, Spherical, Axis, Grid, Label, Line, Scale, Tick,
 } from '@use-gpu/plot';
 import {
-  WebMercator, MVTiles, MTStyles, MapboxProvider, MapTileProvider,
+  WebMercator, MVTiles, MVTStyles, MapboxProvider, MapTileProvider,
 } from '@use-gpu/map';
 import { parseColor } from '@use-gpu/parse';
 

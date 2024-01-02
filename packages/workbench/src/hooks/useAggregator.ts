@@ -27,7 +27,8 @@ export const useAggregator = (
   const allocInstances = useBufferedSize(instanced);
   const allocVertices = useBufferedSize(count);
   const allocIndices = useBufferedSize(indexed);
-  console.log({items})
+
+  //console.log({items})
   const aggregate = useMemo(() => (
     makeAggregator(schema)(device, items, allocInstances, allocVertices, allocIndices)),
     [archetype, allocInstances, allocVertices, allocIndices]

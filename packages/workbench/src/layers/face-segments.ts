@@ -54,7 +54,7 @@ export const useFaceSegmentsSource = (
   const {count, segments} = useOne(() => getFaceSegments({chunks}), chunks);
 
   // Bind as shader storage
-  const s = useRawSource(segments, 'i8');
+  const s = useRawSource(segments, 'i16');
 
   return {count, segments};
 };
@@ -68,11 +68,11 @@ export const useFaceSegmentsConcaveSource = (
   const {count, indexed, indices} = useMemo(() => getFaceSegmentsConcave({chunks, groups, positions, dims}));
 
   // Bind as shader storage
-  const i = useRawSource(indices, 'i8');
+  const i = useRawSource(indices, 'u32');
   i.length = indexed;
   i.size[0] = indexed;
 
-  return {count, indexed, segments, schema: FACE_SEGMENTS_SCHEMA};
+  return {count, indexed, segments};
 };
 
 export const useNoFaceSegments = useNoOne;

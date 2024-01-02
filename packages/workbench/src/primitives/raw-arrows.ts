@@ -4,7 +4,7 @@ import type {
   UniformPipe, UniformAttribute, UniformType,
   VertexData, DataBounds,
 } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader';
+import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
 
@@ -13,6 +13,7 @@ import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl'
 import { resolve } from '@use-gpu/core';
 
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
+import { TransformContextProps } from '../providers/transform-provider';
 
 import { RawData } from '../data/raw-data';
 import { useRawSource } from '../hooks/useRawSource';
@@ -61,6 +62,7 @@ export type RawArrowsProps = {
 
   instance?: number,
   instances?: ShaderSource,
+  transform?: TransformContextProps | ShaderModule,
 
   count?: number,
 } & PickingSource & RawArrowsProps;
@@ -77,6 +79,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
 
     instance,
     instances,
+    transform,
 
     flat = false,
     detail = 12,
@@ -105,7 +108,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const g = useRawSource(geometry.attributes.positions, 'vec4<f32>');
   const l = useShaderRef(null, props.instances);
 
-  const {positions, scissor, bounds: getBounds} = useApplyTransform(p);
+  const {positions, scissor, bounds: getBounds} = useApplyTransform(p, transform);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {

@@ -14,6 +14,7 @@ import { resolve } from '@use-gpu/core';
 
 import { useMaterialContext } from '../providers/material-provider';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
+import { TransformContextProps } from '../providers/transform-provider';
 
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { getShader, useShader, useNoShader } from '../hooks/useShader';
@@ -58,6 +59,7 @@ export type RawLinesProps = {
 
   instance?: number,
   instances?: ShaderSource,
+  transform?: TransformContextProps | ShaderModule,
 
   count?: Lazy<number>,
 } & PickingSource & RawLinesFlags;
@@ -87,6 +89,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
     instance,
     instances,
+    transform,
 
     count = null,
     depth = 0,
@@ -120,7 +123,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const auto = useOne(() => props.segment != null ? getShader(getLineSegment, [props.segment]) : null, props.segment);
 
-  const {positions, scissor, bounds: getBounds} = useApplyTransform(p);
+  const {positions, scissor, bounds: getBounds} = useApplyTransform(p, transform);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {

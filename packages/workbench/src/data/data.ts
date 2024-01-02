@@ -185,33 +185,8 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
     return [fields, attributes, archetype];
   }, [schema, allocItems, allocVertices, allocIndices]);
 
-  // Get emitters for data + segment data
-  const [mergedSchema, emitters, total, indexed, sparse] = useMemo(() => {
-    if (!isArray || !segments) return [schema, schemaToEmitters(schema, attributes), vertexCount, indexCount, 0];
-
-    const {array, dims} = fields[countKey];
-
-    const segmentData = segments({
-        chunks: chunks!,
-        groups: groups!,
-        positions: array,
-        dims,
-        loops,
-        starts,
-        ends,
-    });
-
-    const {count: total, indexed, sparse, schema: segmentSchema, ...rest} = segmentData;
-    for (const k in rest) if (attributes[k]) throw new Error(`Attribute name '${k}' reserved for segment data.`);
-
-    const mergedSchema = {...schema, ...segmentSchema};
-    const emitters = schemaToEmitters(mergedSchema, {...attributes, ...rest});
-
-    return [mergedSchema, emitters, total, indexed, sparse];
-  }, [schema, fields, countKey, attributes, segments, chunks, groups, loops, starts, ends]);
-
-  // Blit all data into merged arrays
-  const items = useMemo(() => {
+  // Blit all data into merged arrays if stale
+  const slices = useMemo(() => {
     const slices = [];
     const sliceKey = indexedKey ?? countKey;
 
@@ -235,19 +210,47 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
       }
     }
 
-    return [{
-      count: total,
-      indexed,
-      instanced: itemCount,
-      slices,
-      archetype,
-      attributes: emitters,
-    }];
+    return slices;
   }, [
     live ? NaN : virtual ? (version ?? NaN) : null, propData,
-    itemCount, skip, total, indexed,
-    archetype, emitters, countKey, indexedKey,
+    itemCount, skip,
+    countKey, indexedKey,
   ]);
+
+  // Get emitters for data + segment data
+  const [mergedSchema, emitters, total, indexed, sparse] = useMemo(() => {
+    if (!isArray || !segments) return [schema, schemaToEmitters(schema, attributes), vertexCount, indexCount, 0];
+
+    const {array, dims} = fields[countKey];
+
+    const segmentData = segments({
+        chunks: chunks!,
+        groups: groups!,
+        positions: array,
+        dims: toCPUDims(dims),
+        loops,
+        starts,
+        ends,
+    });
+
+    const {count: total, indexed, sparse, schema: segmentSchema, ...rest} = segmentData;
+    for (const k in rest) if (attributes[k]) throw new Error(`Attribute name '${k}' reserved for segment data.`);
+
+    const mergedSchema = {...schema, ...segmentSchema};
+    const emitters = schemaToEmitters(mergedSchema, {...attributes, ...rest});
+
+    return [mergedSchema, emitters, total, indexed, sparse];
+  }, [schema, fields, countKey, attributes, segments, chunks, groups, loops, starts, ends]);
+
+  // Make aggregate chunk
+  const items = useMemo(() => [{
+    count: total,
+    indexed,
+    instanced: itemCount,
+    slices,
+    archetype,
+    attributes: emitters,
+  }], [total, indexed, itemCount, slices, archetype, emitters]);
 
   // Aggregate into struct buffers by access policy
   const {sources} = useAggregator(mergedSchema, items);

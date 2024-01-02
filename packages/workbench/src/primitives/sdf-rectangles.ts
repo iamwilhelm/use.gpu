@@ -41,7 +41,7 @@ export type SDFRectanglesProps = {
   sdfs?: ShaderSource,
 
   texture?: TextureSource | LambdaSource | ShaderModule,
-  transform?: ShaderModule,
+  transform?: TransformContextProps | ShaderModule,
   clip?: ShaderModule,
   mask?: ShaderSource,
 

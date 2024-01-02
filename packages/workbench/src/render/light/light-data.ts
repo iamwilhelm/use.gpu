@@ -46,7 +46,7 @@ export const LightCapture = makeCapture<null>('LightCapture');
 export type UseLight = (l: Light) => void;
 
 export type LightDataProps = {
-  alloc?: number,
+  reserve?: number,
   deferred?: boolean,
   shadows?: boolean,
   render?: (
@@ -59,7 +59,7 @@ export type LightDataProps = {
 
 export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) => {
   const {
-    alloc = 1,
+    reserve = 1,
     deferred = false,
     shadows = false,
     render,
@@ -130,7 +130,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     }
 
     const lightCount = lights.size;
-    const size = useBufferedSize(Math.max(alloc, lightCount + 1));
+    const size = useBufferedSize(Math.max(reserve, lightCount + 1));
     const device = useDeviceContext();
 
     const prevDataRef = useRef<ArrayBuffer | null>(null);

@@ -123,7 +123,7 @@ const provideContext = (
 
   let view = element;
   if (hasRefTransform) {
-    view = use(IndexedTransform, {...refSources, children: view});
+    view = use(IndexedTransform, {...refSources, immediate: true, children: view});
   }
   if (hasTransform) {
     view = provide(TransformContext, transform, view, element.key);

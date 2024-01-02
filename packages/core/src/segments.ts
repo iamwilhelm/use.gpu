@@ -202,9 +202,10 @@ export const generateConcaveIndices = (
 
   let axis = 0;
   if (dims >= 3) {
-    const p1 = vec3.fromValues(positions[0], positions[1], positions[2]);
-    const p2 = vec3.fromValues(positions[4], positions[5], positions[6]);
-    const p3 = vec3.fromValues(positions[8], positions[9], positions[10]);
+    const d = dims;
+    const p1 = vec3.fromValues(positions[0],   positions[1],     positions[2]);
+    const p2 = vec3.fromValues(positions[d],   positions[d+1],   positions[d+2]);
+    const p3 = vec3.fromValues(positions[d*2], positions[d*2+1], positions[d*2+2]);
 
     vec3.sub(p1, p2, p1);
     vec3.sub(p2, p3, p1);
@@ -269,7 +270,6 @@ export const generateConcaveIndices = (
 
     // Triangulate and add to index buffer
     const indices = earcut(scratch, holes);
-    console.log(indices, indices.length)
     offsetNumberArray(indices, to, baseVertex, 1, 1, 0, baseIndex, indices.length);
 
     scratch.length = 0;

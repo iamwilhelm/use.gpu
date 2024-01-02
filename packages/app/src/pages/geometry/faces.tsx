@@ -8,11 +8,12 @@ import { PickingOverlay } from '../../ui/picking-overlay';
 
 import {
   Pass, Cursor, Pick, FlatCamera,
-  Data, getFaceSegments, getFaceSegmentsConcave,
+  Data, getLineSegments, getFaceSegments, getFaceSegmentsConcave,
   OrbitCamera, OrbitControls,
-  FaceLayer,
+  FaceLayer, LineLayer,
 } from '@use-gpu/workbench';
 
+import { Plot, Polygon, Transform } from '@use-gpu/plot';
 import { InfoBox } from '../../ui/info-box';
 
 // Convex and concave polygon data
@@ -78,16 +79,30 @@ const concaveFaceData2 = seq(20).map(i => {
 });
 
 const n = 24;
+const n2 = 30;
 const r = .25;
 const o = [0, 0, 0];
 const concaveFaceData = [{
   positions: seq(n).map(j => {
     const m1 = 1 + 1.5 * ((j*1.316) % 2);
     const m2 = circleX(j / n * 12, 1) * .5 + 1;
-    const modulate = lerp(m1, m2, .8);
+    const modulate = lerp(m1, m2, .5);
     return [
       o[0] + circleX(j / n, r * modulate),
       o[1] + circleY(j / n, r * modulate),
+      o[2],
+    ];
+  }),
+  color: [0.5, 0.75, 1],
+  lookup: 0,
+}, {
+  positions: seq(n2).map(j => {
+    const m1 = 1 + 1.5 * ((j*1.316) % 2);
+    const m2 = circleX(j / n2 * 12, 1) * .5 + 1;
+    const modulate = lerp(m1, m2, .5);
+    return [
+      1 + o[0] + circleX(j / n2, r * modulate),
+      o[1] + circleY(j / n2, r * modulate),
       o[2],
     ];
   }),
@@ -102,7 +117,7 @@ export const GeometryFacesPage: LC = () => {
     <InfoBox>Use &lt;Data&gt; for convex segmentation and concave triangulation with &lt;FaceLayer&gt;. Uses &lt;Pick&gt; for mouse picking.</InfoBox>
     <Camera>
       <Pass picking>
-
+      
         <Data
           schema={convexDataSchema}
           data={convexFaceData}
@@ -136,7 +151,7 @@ export const GeometryFacesPage: LC = () => {
                       />
                   }</Data>
                 ) : null
-              ], () => {}
+              ]
             }</Pick>
         }</Data>
 
@@ -176,6 +191,23 @@ export const GeometryFacesPage: LC = () => {
               ]
             }</Pick>
         }</Data>
+
+        <Data
+          schema={concaveDataSchema}
+          data={concaveFaceData}
+          segments={getLineSegments}
+          loop
+        >{
+          ({colors, ...sources}) =>
+            <LineLayer
+              width={10}
+              color={[1, 1, 1, 1]}
+              {...sources}
+              zBias={5}
+            />
+        }</Data>
+        
+        <Plot><Transform position={[0, 0, 1]}><Polygon {...concaveFaceData[0]} width={10} stroke={[1, 1, 1, 1]} fill={[0.5, 0.5, 0.5, 1]} /></Transform></Plot>
 
       </Pass>
     </Camera>

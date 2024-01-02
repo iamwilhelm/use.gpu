@@ -50,41 +50,25 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
   } = props;
 
   const Resume = useCallback((instances: StorageSource, fieldSources: StorageSource[]) => {
-
-    const [view, boundPosition, boundDifferential] = useMemo(() => {
-
-      const [matrices, normalMatrices] = fieldSources;
-
-      const load = getShader(loadInstance, [matrices, normalMatrices]);
-      const matrix = bindEntryPoint(load, 'getTransformMatrix');
-      const normalMatrix = bindEntryPoint(load, 'getNormalMatrix');
-
-      const boundPosition = getShader(getCartesianPosition, [matrix]);
-      const boundDifferential = getShader(getMatrixDifferential, [matrix, normalMatrix]);
-
-      const view = use(FaceLayer, {...mesh, instances, load, shaded, side});
-      return [view, boundPosition, boundDifferential];
-    }, [instances, fieldSources]);
-
-    const context = useCombinedTransform(boundPosition, boundDifferential);
-
-    return (
-      provide(TransformContext, context, view)
-    );
+    return use(IndexedTransform, {
+      matrices,
+      normalMatrices,
+      children: use(FaceLayer, {...mesh, instances, shaded, side}),
+    });
   }, [mesh]);
 
   return use(InstanceData, {
     format,
     fields: INSTANCE_FIELDS,
     render: (useInstance: () => (data: Record<string, any>) => void) => {
-      const Instance = useOne(() => makeInstance(useInstance), useInstance);
+      const Instance = useOne(() => makeInstancer(useInstance), useInstance);
       return render ? render(Instance as any) : null;
     },
     then: Resume,
   })
 };
 
-const makeInstance = (
+const makeInstancer = (
   useInstance: () => (data: Record<string, any>) => void,
 ) => tagFunction((props: Partial<ObjectTrait>) => {
   const parent = useMatrixContext();

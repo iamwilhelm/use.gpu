@@ -7,10 +7,7 @@ type NumberMapper = (x: number) => number;
 
 const IDENTITY = (x: number) => x;
 
-export const alignSizeTo = (n: number, s: number) => {
-  let f = n % s;
-  return f === 0 ? n : n + (s - f);
-};
+export const alignSizeTo = (n: number, align: number) => Math.ceil(n / align) * align;
 
 export const makeRawArray = (byteSize: number) => new ArrayBuffer(byteSize);
 

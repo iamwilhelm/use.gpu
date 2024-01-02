@@ -360,10 +360,10 @@ export const makeUniformLayout = (
   for (const {name, format} of uniforms) {
     if (typeof format === 'object') throw new Error(`Struct cannot be used as uniform member types`);
 
-    const s = getUniformSize(format);
     const a = getUniformAlign(format);
     if (a === 0) throw new Error(`Type ${format} is not host-shareable or unimplemented`);
 
+    const s = getUniformSize(format);
     const o = alignSizeTo(offset, a);
     out.push({name, offset: o, format});
     max = Math.max(max, a);
@@ -371,8 +371,8 @@ export const makeUniformLayout = (
     offset = o + s;
   }
 
-  const s = alignSizeTo(offset, max);
-  return {length: s - base, attributes: out, offsets: [base]};
+  const a = alignSizeTo(offset, max);
+  return {length: a - base, attributes: out, offsets: [base]};
 };
 
 export const makeMultiUniformLayout = (

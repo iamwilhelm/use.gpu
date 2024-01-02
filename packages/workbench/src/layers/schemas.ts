@@ -95,7 +95,7 @@ export const ARROW_SCHEMA = {
 };
 
 export const FACE_SEGMENTS_SCHEMA = expandArrays({
-  segments:  {format: 'i8', unwelded: true},
+  segments:  {format: 'i16', unwelded: true},
   indices:   {format: 'u32', index: true},
 });
 

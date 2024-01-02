@@ -19,7 +19,7 @@ import { useRangeContext, useNoRangeContext } from '../providers/range-provider'
 import { useDataContext, DataContext } from '../providers/data-provider';
 import zipObject from 'lodash/zipObject';
 
-export type SamplerProps = {
+export type SamplerProps<S extends string> = {
   /** Sample count up to [width, height, depth, layers] */
   size?: number[],
   /** Shorthand for size=[length] */
@@ -55,17 +55,24 @@ export type SamplerProps = {
   live?: boolean,
 
   /** Inject into DataContext under this key(s) */
-  as?: string | string[],
+  as?: string | S[],
+} & {
+  as?: string,
 
-  /** Leave empty to yeet source instead. */
-  render?: (source: TensorArray) => LiveElement,
-  children?: (source: TensorArray) => LiveElement,
+  /** Omit to provide data context instead. */
+  render?: (data: TensorArray) => LiveElement,
+  children?: (data: TensorArray) => LiveElement,
+} & {
+  as: S,
+  /** Omit to provide data context instead. */
+  render?: (data: Record<keyof S, TensorArray>) => LiveElement,
+  children?: (data: Record<keyof S, TensorArray>) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Up-to-4D array of a WGSL type. Samples a given `expr` on the given `range`. */
-export const Sampler: LiveComponent<SamplerProps> = memo((props) => {
+export const Sampler: LiveComponent<SamplerProps<unknown>> = memo(<S extends string>(props: SamplerProps<S>) => {
   const {
     axis,
     axes = 'xyzw',

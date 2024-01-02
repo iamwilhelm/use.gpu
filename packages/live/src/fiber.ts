@@ -617,7 +617,9 @@ export const makeResolveFiber = <F extends ArrowFunction, R>(
   if (!lookup) fiber.lookup = new Map();
   if (!order)  fiber.order  = [];
 
-  const Resume = () => reconcileFiberOrder(fiber);
+  const Resume = () => {
+    reconcileFiberOrder(fiber);
+  };
   Resume.isLiveReconcile = true;
 
   return makeNextFiber(fiber, Resume, name);

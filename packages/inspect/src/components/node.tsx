@@ -98,7 +98,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   }, [onClick]);
 
   const name = formatNodeName(fiber);
-  const label = runCount && (name !== ' ') ? <>{name} <Muted>({fiber.runs})</Muted></> : name;
+  const label = runCount && (name !== ' ') && fiber.runs !== 0 ? <>{name} <Muted>({fiber.runs})</Muted></> : name;
 
   return (
     <div

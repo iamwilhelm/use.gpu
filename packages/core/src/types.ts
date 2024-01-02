@@ -370,6 +370,8 @@ export type Time = {
   delta: number,
 };
 
+export type FromSchema<S extends DataSchema | ArchetypeSchema, T> = Record<keyof S, T>;
+
 export type DataSchema = Record<string, string | DataField>;
 export type DataField = {
   /** UniformType or array<…> or array<array<…>> */

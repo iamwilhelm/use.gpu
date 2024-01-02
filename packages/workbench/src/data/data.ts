@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ArrowFunction, TypedArray, StorageSource, DataSchema, DataBounds } from '@use-gpu/core';
+import type { ArrowFunction, FromSchema, TypedArray, StorageSource, DataSchema, DataBounds } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
@@ -39,15 +39,17 @@ export type SegmentsInfo = {
   ends: boolean[] | boolean,
 };
 
-export type DataProps = {
+export type DataProps<S extends DataSchema> = {
   /** WGSL schema of input data + accessors */
-  schema: DataSchema,
+  schema: S,
   /** Input data, array of structs of values/arrays, or 1 struct, if data is not virtualized */
   data?: Record<string, any> | (Record<string, any>)[],
   /** Input data accessors, if data is virtualized */
   virtual?: Record<string, (i: number) => any>,
   /** Input length, if data is virtualized */
   count?: number,
+  /** Input items to skip */
+  skip?: number,
   /** Input version, if data is virtualized. Controls re-upload if set. */
   version?: number,
   /** Resample data on every animation frame. */
@@ -66,14 +68,14 @@ export type DataProps = {
   tensor?: number[],
 
   /** Receive 1 source per field, in virtual struct-of-array format. Leave empty to yeet sources instead. */
-  render?: (sources: Record<string, StorageSource>) => LiveElement,
-  children?: (sources: Record<string, StorageSource>) => LiveElement,
+  render?: (sources: FromSchema<S, StorageSource>) => LiveElement,
+  children?: (sources: FromSchema<S, StorageSource>) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Aggregate array-of-structs with fields `T | T[] | T[][]` into grouped storage sources. */
-export const Data: LiveComponent<DataProps> = (props) => {
+export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(props: DataProps<S>) => {
   const {
     skip = 0,
     count,
@@ -91,7 +93,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
 
   const schema = useOne(() => normalizeSchema(propSchema), propSchema);
   const data = propData ? Array.isArray(propData) ? propData : [propData] : null;
-  const itemCount = Math.max(0, (count ?? data?.length) - skip);
+  const itemCount = Math.max(0, count ?? (data?.length - skip));
 
   if (itemCount === 0) return null;
 
@@ -187,12 +189,13 @@ export const Data: LiveComponent<DataProps> = (props) => {
   const [mergedSchema, emitters, total, indexed, sparse] = useMemo(() => {
     if (!isArray || !segments) return [schema, schemaToEmitters(schema, attributes), vertexCount, indexCount, 0];
 
-    const positions = fields[countKey].array;
+    const {array, dims} = fields[countKey];
 
     const segmentData = segments({
         chunks: chunks!,
         groups: groups!,
-        positions,
+        positions: array,
+        dims,
         loops,
         starts,
         ends,
@@ -278,7 +281,7 @@ const resolveSegmentFlag = (count: number, flag?: Boolean, skip: number = 0) => 
     return flags;
   }
   if (Array.isArray(flag)) {
-    if (skip) return flag(skip, skip + count);
+    if (skip) return flag.slice(skip, skip + count);
     else if (flag.length > count) return flag.slice(0, count);
     return flag;
   }
@@ -294,7 +297,7 @@ const getMultiChunkCount = (
   virtual?: Record<string, (i: number) => any>,
   skip: number = 0
 ) => {
-  const {format, prop} = schema[key];
+  const {format, prop = key} = schema[key];
   const accessor = virtual?.[key];
   const dims = getUniformDims(format);
 

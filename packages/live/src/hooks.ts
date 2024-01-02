@@ -195,7 +195,7 @@ export const useState = <T>(
   let setValue = state![i + 1];
 
   if (setValue === undefined) {
-    value = (initialState instanceof Function) ? initialState() : initialState;
+    value = (initialState instanceof Function) ? initialState() : initialState;  // <- Step through here
     setValue = host
       ? (value: Reducer<T>) => {
           if (state![i - 1] !== Hook.STATE) return;
@@ -249,7 +249,7 @@ export const useMemo = <T>(
   const deps = state![i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
-    value = initialState();
+    value = initialState(); // <- Step through here
 
     state![i] = value;
     state![i + 1] = dependencies;
@@ -274,7 +274,7 @@ export const useOne = <T>(
   const dep = state![i + 1];
 
   if (dep !== dependency) {
-    value = initialState();
+    value = initialState();  // <- Step through here
 
     state![i] = value;
     state![i + 1] = dependency;
@@ -356,7 +356,7 @@ export const useResource = <R>(
 
     state![i + 1] = dependencies;
 
-    const value = callback(tag);
+    const value = callback(tag); // <- Step through here
     state![i].value = value;
     return value;
   }
@@ -518,7 +518,7 @@ export const useHooks = <T>(
     try {
       fiber.pointer = 0;
       fiber.state = scope;
-      return initialState();
+      return initialState();  // <- Step through here
     }
     finally {
       state![i] = fiber.state;

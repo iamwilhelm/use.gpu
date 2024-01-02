@@ -23,7 +23,6 @@ export {
   useNoContext,
   useNoCapture,
   useNoHooks,
-  useNoLog,
   useNoMemo,
   useNoOne,
   useNoResource,

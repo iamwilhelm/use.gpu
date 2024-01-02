@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataBounds, TensorArray, Emitter } from '@use-gpu/core';
+import type { DataBounds, TensorArray, VectorLike, Emitter } from '@use-gpu/core';
 
 import { provide, yeet, memo, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
@@ -21,7 +21,7 @@ import { useRangeContext, useNoRangeContext } from '../providers/range-provider'
 import { useDataContext, DataContext } from '../providers/data-provider';
 import zipObject from 'lodash/zipObject';
 
-export type TensorProps = {
+export type TensorProps<S extends string> = {
   /** Input size up to [width, height, depth, layers] */
   size?: number[],
   /** Shorthand for size=[length] */
@@ -44,17 +44,24 @@ export type TensorProps = {
   live?: boolean,
 
   /** Inject into DataContext under this key(s) */
-  as?: string | string[],
+  as?: string | S[],
+} & {
+  as?: string,
 
   /** Omit to provide data context instead. */
   render?: (data: TensorArray) => LiveElement,
   children?: (data: TensorArray) => LiveElement,
+} & {
+  as: S[],
+  /** Omit to provide data context instead. */
+  render?: (data: Record<S, TensorArray>) => LiveElement,
+  children?: (data: Record<S, TensorArray>) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Sample up-to-4D array of a WGSL type. Reads input `data` or samples a given `expr`. */
-export const Tensor: LiveComponent<TensorProps> = memo((props) => {
+export const Tensor: LiveComponent<TensorProps<unknown>> = memo(<S extends string>(props: TensorProps<S>) => {
   const {
     format,
     length: l = 0,

@@ -13,22 +13,25 @@ import {
   FaceLayer,
 } from '@use-gpu/workbench';
 
+import { InfoBox } from '../../ui/info-box';
+
 // Convex and concave polygon data
 
 const convexDataSchema: DataSchema = {
   positions: {format: 'array<vec3<f32>>'},
-  color: {format: 'vec3<f32>'},
+  colors: {format: 'vec3<f32>', prop: 'color'},
+  lookups: {format: 'u32', prop: 'lookup'},
 };
 
 const concaveDataSchema: DataSchema = {
   positions: {format: 'array<vec3<f32>>'},
-  color: {format: 'vec3<f32>'},
-  lookup: {format: 'u32'},
+  colors: {format: 'vec3<f32>', prop: 'color'},
+  lookups: {format: 'u32', prop: 'lookup'},
 };
 
 // Generate some random polygons
 
-const randomColor = () => [Math.random(), Math.random(), Math.random()];
+const randomColor = () => [Math.random(), Math.random(), Math.random()*Math.random()];
 const randomInt = (min: number, max: number) => min + Math.round(Math.random() * (max - min));
 const randomFloat = (min: number, max: number) => min + Math.random() * (max - min);
 
@@ -48,6 +51,7 @@ const convexFaceData = seq(20).map(i => {
       o[2] + circleX(j / n, r) * circleY(i / 20, 1),
     ]),
     color: randomColor(),
+    lookup: i,
   };
 });
 
@@ -75,8 +79,9 @@ const concaveFaceData = seq(20).map(i => {
 
 export const GeometryFacesPage: LC = () => {
 
-  // Render polygons
+  // Render polygons using FaceLayer directly.
   const view = (<>
+    <InfoBox>Use &lt;Data&gt; for convex segmentation and concave triangulation with &lt;FaceLayer&gt;. Uses &lt;Pick&gt; for mouse picking.</InfoBox>
     <Camera>
       <Pass picking>
 
@@ -87,7 +92,7 @@ export const GeometryFacesPage: LC = () => {
         >{
           (sources) =>
             <Pick
-              onMouseOver={(mouse, index) => console.log('round', {mouse, index})}
+              onMouseOver={(mouse, index) => console.log('Round shape', {mouse, index})}
             >{
               ({id, hovered, index}) => [
                 hovered ? <Cursor cursor='default' /> : null,
@@ -101,11 +106,12 @@ export const GeometryFacesPage: LC = () => {
                     schema={convexDataSchema}
                     data={convexFaceData}
                     segments={getFaceSegments}
+                    count={1}
+                    skip={index}
                   >{
-                    (positions, colors, segments) =>
+                    ({positions, segments}) =>
                       <FaceLayer
-                        positions={positions}
-                        segments={segments}
+                        {...{positions, segments}}
                         color={[1, 1, 1, 1]}
                         side="both"
                         zBias={1}
@@ -123,7 +129,7 @@ export const GeometryFacesPage: LC = () => {
         >{
           (sources) =>
             <Pick
-              onMouseOver={(mouse, index) => console.log('spiky', {mouse, index})}
+              onMouseOver={(mouse, index) => console.log('Spiky shape', {mouse, index})}
             >{
               ({id, hovered, index}) => [
                 hovered ? <Cursor cursor='default' /> : null,
@@ -132,7 +138,7 @@ export const GeometryFacesPage: LC = () => {
                   {...sources}
                   side="both"
                 />,
-                hovered ? (
+                hovered && false ? (
                   <Data
                     schema={concaveDataSchema}
                     data={concaveFaceData}
@@ -147,7 +153,6 @@ export const GeometryFacesPage: LC = () => {
                         side="both"
                         zBias={1}
                       />
-                    }
                   }</Data>
                 ) : null
               ]
@@ -157,10 +162,11 @@ export const GeometryFacesPage: LC = () => {
       </Pass>
     </Camera>
 
-    <FlatCamera>
+    <FlatCamera>{/*
       <Pass overlay>
         <PickingOverlay />
       </Pass>
+    */}
     </FlatCamera>
   </>);
 
@@ -175,14 +181,15 @@ const Camera = ({children}: PropsWithChildren<object>) => (
     radius={3}
     bearing={0.5}
     pitch={0.3}
-    render={(radius: number, phi: number, theta: number) =>
+  >{
+    (radius: number, phi: number, theta: number, target: vec3) =>
       <OrbitCamera
         radius={radius}
         phi={phi}
         theta={theta}
+        target={target}
       >
         {children}
       </OrbitCamera>
-    }
-  />
+  }</OrbitControls>
 );

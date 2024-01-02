@@ -154,7 +154,13 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     p, n, t, u, s, g, c, z,
     i,
   ]);
-  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, attr.instance, attr.instances, instanceCount, getInstancedFaceIndex);
+  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(
+    boundVertex,
+    attr.instance,
+    attr.instances,
+    instanceCount,
+    !props.segments ? getInstancedFaceIndex : null,
+  );
   const getPicking = usePickingShader(attr);
 
   const links = useMemo(() => {

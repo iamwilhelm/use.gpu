@@ -95,6 +95,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
   const device = useDeviceContext();
   const inspect = useInspectable();
 
+  // Calculate parameters and atlas mappings
   const {atlas, mappings, mips, sigmas, dsigmas, sizes, radii} = useMemo(() => {
 
     const sigmas = [];
@@ -149,6 +150,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
 
   const {width, height} = atlas;
   return (
+    // Allocate target and scratch texture buffers
     gather([
       use(TextureBuffer, {
         width,

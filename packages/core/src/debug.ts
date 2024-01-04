@@ -1,7 +1,7 @@
 /** @hidden */
 export const LOGGING = {
-  buffer: true,
-  pipeline: true,
+  buffer: false,
+  pipeline: false,
 } as Record<string, boolean>;
 
 export const decodeUsageFlags = (flags: GPUBufferUsageFlags) => {

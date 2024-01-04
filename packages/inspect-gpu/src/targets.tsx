@@ -17,6 +17,9 @@ import { decodeOctahedral } from '@use-gpu/wgsl/codec/octahedral.wgsl';
 
 const {signal} = QueueReconciler;
 
+const SIZE = 512;
+const HEIGHT = SIZE + 24 * 2;
+
 const NO_OPS: any[] = [];
 const toArray = <T,>(x?: T | T[]): T[] => Array.isArray(x) ? x : x ? [x] : NO_OPS;
 
@@ -164,7 +167,7 @@ export const Targets: React.FC<TargetsProps> = ({fiber}) => {
   const device = fiber.context.values.get(DeviceContext)?.current;
 
   return (
-    <div style={{height: 546, position: 'relative'}}>
+    <div style={{height: HEIGHT, position: 'relative'}}>
       <LiveCanvas>
         {(canvas: HTMLCanvasElement) => use(View, {canvas, device, color, picking, depth})}
       </LiveCanvas>
@@ -214,8 +217,15 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
 
   const makeView = (texture: TextureSource | LambdaSource) => {
     const {size: [w, h]} = texture;
-    const width = w > h ? 512 : Math.round(w/h * 512);
-    const height = w > h ? Math.round(h/w * 512) : 512;
+    const width = w > h ? SIZE : Math.round(w/h * SIZE);
+    const height = w > h ? Math.round(h/w * SIZE) : SIZE;
+
+    const t = texture as any;
+    const parts: string[] = [];
+    if (t.layout) parts.push(t.layout);
+    if (t.format) parts.push(t.format);
+    const type = parts.join(' – ');
+    const label = t.label ?? '';
 
     return (
       use(Block, {
@@ -232,9 +242,18 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
               color: '#ffffff',
               lineHeight: 24,
               size: 16,
-              children: `${(texture as any).layout} – ${(texture as any).format}`,
+              children: type,
             })
-          })
+          }),
+          use(Inline, {
+            children: use(Text, {
+              color: '#ffffff',
+              weight: 'bold',
+              lineHeight: 24,
+              size: 14,
+              children: label,
+            })
+          }),
         ]
       })
     )
@@ -337,6 +356,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
         texture = getLambdaSource(texture, t);
         texture.format = t.format;
         texture.layout = t.layout;
+        texture.label  = t.texture?.label ?? t.view?.label;
         out.push(makeView(texture));
       }
     }
@@ -353,6 +373,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
       texture = getLambdaSource(texture, t);
       texture.format = t.format;
       texture.layout = t.layout;
+      texture.label  = t.texture?.label ?? t.view?.label;
 
       out.push(makeView(texture));
     }

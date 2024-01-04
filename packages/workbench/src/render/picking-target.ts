@@ -77,6 +77,9 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
     const pickingTexture = makeReadbackTexture(device, width, height, pickingFormat);
     const depthTexture = makeDepthTexture(device, width, height, depthStencilFormat);
 
+    pickingTexture.label = '<PickingTarget> Readback';
+    depthTexture.label = '<PickingTarget> DepthTexture';
+
     const colorAttachments = [makeColorAttachment(pickingTexture, null, pickingColor)];
     const depthStencilAttachment = makeDepthStencilAttachment(depthTexture, depthStencilFormat);
 

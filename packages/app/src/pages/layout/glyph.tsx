@@ -265,7 +265,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           height: image.height,
         })}
       >
-        <Arrow end width={2} color='#4080ff' depth={0.01} detail={4} zBias={ZBIAS_DATA} />
+        <Arrow flat end width={2} color='#4080ff' depth={0.01} detail={4} zBias={ZBIAS_DATA} />
       </Sampler> : null}
 
       { image.xo && image.yo ? <Sampler
@@ -283,7 +283,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           height: image.height,
         })}
       >
-        <Arrow end width={2} color='#40c0ff' depth={0.01} detail={4} zBias={ZBIAS_DATA} />
+        <Arrow flat end width={2} color='#40c0ff' depth={0.01} detail={4} zBias={ZBIAS_DATA} />
       </Sampler> : null}
     </TextureFrame> : null
   );
@@ -360,7 +360,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={arrowEmitter(preprocess ? innerField : outerField)}
                           >
-                            <Arrow end width={3} depth={0.05} color='#40c0ff' detail={4} zBias={ZBIAS_DATA} />
+                            <Arrow flat end width={3} depth={0.05} color='#40c0ff' detail={4} zBias={ZBIAS_DATA} />
                           </Sampler>
                         </> : null}
                       </TextureFrame>
@@ -403,7 +403,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={arrowEmitter(outer2Field)}
                           >
-                            <Arrow end width={3} depth={0.05} color='#4080ff' detail={4} zBias={ZBIAS_DATA} />
+                            <Arrow flat end width={3} depth={0.05} color='#4080ff' detail={4} zBias={ZBIAS_DATA} />
                           </Sampler>
 
                           <Sampler
@@ -416,7 +416,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                             index
                             expr={arrowEmitter(inner2Field)}
                           >
-                            <Arrow end width={3} depth={0.05} color='#40c0ff' detail={4} zBias={ZBIAS_DATA} />
+                            <Arrow flat end width={3} depth={0.05} color='#40c0ff' detail={4} zBias={ZBIAS_DATA} />
                           </Sampler>
                         </> : null}
                       </TextureFrame>

@@ -20,7 +20,7 @@ const STYLE: CSSProperties = {
 const NOTE: CSSProperties = {
   position: 'absolute',
 
-  bottom: '20px',
+  bottom: '80px',
   left: '50%',
   width: '300px',
   marginLeft: '-150px',
@@ -178,7 +178,7 @@ export const BinaryControls: LC<BinaryControlsProps> = (props: BinaryControlsPro
       container,
       style: {...NOTE, opacity: note ? 1 : 0},
       children: (<>
-        Drag and drop a file here to view it
+        Drag and drop a file to view it
       </>)
     }),
     use(HTML, {

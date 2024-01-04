@@ -133,7 +133,7 @@ export const Plot2DPage: LC = () => {
 
             {/* Animated transform */}
             <Transform position={[150, 650]} scale={1.2}>
-              <Animate paused keyframes={KEYFRAMES} prop="rotation" ease="linear">
+              <Animate keyframes={KEYFRAMES} prop="rotation" ease="linear">
                 <Transform>
                   <Line
                     positions={[
@@ -150,7 +150,7 @@ export const Plot2DPage: LC = () => {
             </Transform>
 
             <Transform position={[150, 600]} scale={0.75}>
-              <Animate paused keyframes={KEYFRAMES} speed={0.5} prop="rotation" ease="linear">
+              <Animate keyframes={KEYFRAMES} speed={0.5} prop="rotation" ease="linear">
                 <Transform rotation={30}>
                   <Line
                     positions={[

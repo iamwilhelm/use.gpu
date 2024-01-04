@@ -6,7 +6,7 @@ import React, { Gather, memo, useOne } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, FlatCamera, Animate, LinearRGB,
+  Pass, FlatCamera, Animate, LinearRGB,
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
@@ -69,34 +69,32 @@ export const SceneBasicPage: LC = (props) => {
         Record<string, StorageSource>,
         TextureSource,
       ]) => (
-        <Loop>
-          <LinearRGB tonemap="aces">
-            <Cursor cursor='move' />
-            <Camera>
-              <Pass picking lights>
-                <AmbientLight intensity={0.2} />
-                <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
+        <LinearRGB tonemap="aces">
+          <Cursor cursor='move' />
+          <Camera>
+            <Pass picking lights>
+              <AmbientLight intensity={0.2} />
+              <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 
-                <Scene>
+              <Scene>
 
-                  <Animate prop="position" keyframes={KEYFRAMES} loop>
-                    <Node rotation={[30, - 30, -30]}>
-                      <PickableMesh mesh={mesh} texture={texture} />
-                    </Node>
-                  </Animate>
+                <Animate prop="position" keyframes={KEYFRAMES} loop>
+                  <Node rotation={[30, - 30, -30]}>
+                    <PickableMesh mesh={mesh} texture={texture} />
+                  </Node>
+                </Animate>
 
-                  <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
-                    <Node rotation={[30, - 30, -30]}>
-                      <PickableMesh mesh={mesh} texture={texture} />
-                    </Node>
-                  </Animate>
+                <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
+                  <Node rotation={[30, - 30, -30]}>
+                    <PickableMesh mesh={mesh} texture={texture} />
+                  </Node>
+                </Animate>
 
-                </Scene>
+              </Scene>
 
-              </Pass>
-            </Camera>
-          </LinearRGB>
-        </Loop>
+            </Pass>
+          </Camera>
+        </LinearRGB>
       )}
     />
   );

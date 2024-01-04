@@ -91,7 +91,7 @@ export const createElement = (type: ArrowFunction | string, props: any, ...child
   }
 
   if (props) {
-    if (props.children == null) props.children = toChildren(children);
+    if (props.children == null && children.length) props = {...props, children: toChildren(children)};
     return {f: type, args: [props], key: props.key, by};
   }
   else if (children.length) {

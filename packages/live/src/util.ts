@@ -225,6 +225,6 @@ export const compareFibers = (a: LiveFiber<any>, b: LiveFiber<any>) => {
 
 /** Tag an anonymous function with a random number ID. */
 export const tagFunction = <F extends ArrowFunction>(f: F, name?: string) => {
-  (f as any).displayName = name ?? `${Math.floor(Math.random() * 10000)}`;
+  if ((f as any).displayName == null) (f as any).displayName = name ?? `${Math.floor(Math.random() * 10000)}`;
   return f;
 }

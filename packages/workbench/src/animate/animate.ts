@@ -114,7 +114,10 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
   return fence(null, Run);
 };
 
-const makeValueRef = (v: TypedArray | number) => new Float32Array(v.length || 1);
+const makeValueRef = (v: number[][] | number[] | TypedArray | number) => {
+  if (typeof v === 'number' || typeof v[0] === 'number') return new Float32Array(v.length || 1);
+  return JSON.parse(JSON.stringify(v));
+}
 
 const evaluateKeyframe = <T>(
   target: T extends number ? RefObject<number> : T,
@@ -143,15 +146,27 @@ const evaluateKeyframe = <T>(
 };
 
 const interpolateValue = (
-  target: Float32Array | RefObject<number>,
-  a: Float32Array | number,
-  b: Float32Array | number,
+  target: number[][] | Float32Array,
+  a: number[][] | number[] | Float32Array | number,
+  b: number[][] | number[] | Float32Array | number,
   t: number,
 ) => {
   if (typeof a === 'number') target[0] = lerp(a as number, b as number, t);
-  else {
+  else if (typeof a[0] === 'number') {
     const n = target.length;
     for (let i = 0; i < n; ++i) target[i] = lerp(a[i], b[i], t);
+  }
+  else if (typeof a[0][0] === 'number') {
+    const n = target.length;
+    for (let i = 0; i < n; ++i) {
+      const aa = a[i];
+      const bb = b[i];
+      const tt = target[i];
+      const m = tt.length;
+      for (let j = 0; j < m; ++j) {
+        tt[j] = lerp(aa[j], bb[j], t);
+      }
+    }
   }
 };
 

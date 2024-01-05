@@ -158,7 +158,6 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
       if (started < 0) started = startedRef.current = elapsed;
       if (paused && !pausedRef.current) pausedRef.current = elapsed;
       
-      console.log({timestamp, elapsed, delta, paused, started})
       const values = flip ? values1 : values2;
       if (!paused) {
         // Deduct pause time from elapsed on resume

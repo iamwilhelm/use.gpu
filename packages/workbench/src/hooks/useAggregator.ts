@@ -17,6 +17,8 @@ import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getInstancedAggregate, combineInstances } from '../hooks/useInstancedSources';
 import { getStructAggregate } from '../hooks/useStructSources';
 
+const DEBUG = true;
+
 export const useAggregator = (
   schema: AggregateSchema,
   items: Record<string, AggregateValue>[],
@@ -68,6 +70,8 @@ export const makeAggregator = (
   const uploadRefs = byRefs ? () => {
     updateAggregateFromSchemaRefs(device, schema, aggregate, itemCount);
   } : null;
+
+  DEBUG && console.log('useAggregator', {initialItems, aggregate, allocInstances, allocVertices, allocIndices});
 
   return (items: ArrowAggregate[], count: number, indexed: number, instanced: number, offsets: number[]) => {
     itemCount = items.length;

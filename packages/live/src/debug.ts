@@ -8,18 +8,22 @@ const ARRAY_OR_BUFFER = /Array$|^ArrayBuffer$/;
 export type LoggingOptions = {
   tick: boolean,
   dispatch: boolean,
-  fiber: boolean,
+  mount: boolean,
+  render: boolean,
+  quote: boolean,
 };
 
 /** @hidden */
 export const LOGGING = {
   tick: false,
   dispatch: false,
-  fiber: false,
+  mount: false,
+  render: false,
+  quote: false,
 } as Record<string, boolean>;
 
 /** Turn on logging for the Live run-time. Very chatty.
-
+- `tick`: Log a divider between tree renders
 - `dispatch`: All dispatches to roots and sub-roots.
 - `fiber`: All updates to individual fibers.
 */
@@ -252,7 +256,7 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
     const signature = Object.keys(x).join('/');
     if (signature === 'f/args/key' || signature === 'f/arg/key') return `<${formatNodeName(x)} …/>`;
 
-    return '{...}';
+    return '{…}';
   }
   return '' + x;
 }

@@ -70,18 +70,18 @@ const makeInstancer = (
   const updateInstance = useInstance();
 
   const {color, position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useTraits(props);
-  const [matrix, normalMatrix] = useOne(() => [
+  const [matrix, normalMatrix, composed] = useOne(() => [
     mat4.create(),
     mat3.create(),
+    mat4.create(),
   ]);
 
   useOne(() => {
     if (m) {
       mat4.copy(matrix, m);
       if (p || r || q || s) {
-        const t = mat4.create();
-        composeTransform(t, p, r, q, s);
-        mat4.multiply(matrix, matrix, t);
+        composeTransform(composed, p, r, q, s);
+        mat4.multiply(matrix, matrix, composed);
       }
     }
     else if (p || r || q || s) {

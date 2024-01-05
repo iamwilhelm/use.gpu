@@ -166,7 +166,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
         uploadBufferRange(device, buffer, raw, from * stride, (to - from) * stride);
       }
     }
-    if ((window.TT = (window.TT||0)+1) < 10) console.log(aggregateBuffer, fields, indexBuffer)
+    //if ((window.TT = (window.TT||0)+1) < 10) console.log(aggregateBuffer, fields, indexBuffer)
     queue.length = 0;
 
     // Update instance ID buffer

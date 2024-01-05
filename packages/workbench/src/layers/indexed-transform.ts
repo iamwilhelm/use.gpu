@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
-import { provide, extend, useLog } from '@use-gpu/live';
+import { provide, extend } from '@use-gpu/live';
 import { MatrixContext } from '../providers/matrix-provider';
 import { TransformContext } from '../providers/transform-provider';
 import { useMatrixTransformSources } from '../hooks/useMatrixTransform';

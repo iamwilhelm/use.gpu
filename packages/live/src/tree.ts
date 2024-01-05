@@ -162,7 +162,7 @@ export const renderFibers = (
     host.depth(fiber.depth);
     host.__stats.dispatch++;
 
-    LOG && console.log('Next Sub-Root', formatNode(fiber));
+    LOG && console.log(`Next Sub-Root #${fiber.id}`, formatNode(fiber));
 
     const element = renderFiber(fiber);
     updateFiber(fiber, element);

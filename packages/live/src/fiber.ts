@@ -218,7 +218,7 @@ export const renderFiber = <F extends ArrowFunction>(
   else if ((f as any) === RECONCILE) return reconcileFiber(fiber);
   else if ((f as any) === DETACH)    return detachFiber(fiber);
 
-  const LOG = LOGGING.fiber;
+  const LOG = LOGGING.render;
   LOG && console.log('Rendering', formatNode(fiber));
 
   const {bound, args, yeeted} = fiber;
@@ -437,7 +437,7 @@ export const mountFiberContinuation = <F extends ArrowFunction>(
   }
 }
 
-// Reconcile one call on a fiber as part of an incremental mapped set
+// Reconcile one call on a fiber as part of an incremental mapped set (reconcile/quote)
 export const reconcileFiberCall = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   call: DeferredCall<any> | null | undefined,
@@ -447,45 +447,48 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
   keys?: (number | Map<Key, number>)[],
   depth?: number,
 ) => {
-  let {mounts, order, lookup} = fiber;
-  if (!mounts || !order || !lookup) throw new Error('Cannot reconcile incrementally on uninitialized mounts');
+  let {mounts, order, lookup, host, next} = fiber;
+  if (!mounts || !order || !lookup || !next) throw new Error('Cannot reconcile incrementally on uninitialized mounts');
 
   call = reactInterop(call, fiber) as DeferredCall<any> | null;
   if (Array.isArray(call)) call = {f: FRAGMENT, args: call} as any;
 
-  {
-    const mount = mounts.get(key);
-    const nextMount = updateMount(fiber, mount, call as any, key);
+  const empty = !mounts.size;
+  const mount = mounts.get(key);
+  const nextMount = updateMount(fiber, mount, call as any, key);
 
-    if (nextMount !== false) {
-      if (nextMount) {
+  if (nextMount !== false) {
+    if (nextMount) {
+      if (nextMount !== mount) {
         if (path != null) nextMount.path = path;
         if (keys != null) nextMount.keys = keys;
         if (depth != null) nextMount.depth = depth;
 
-        if (nextMount !== mount) {
-          if (order.length) {
-            order.length = 0;
-          }
-          fiber.host?.visit(fiber.next!);
-          pingFiber(fiber, false);
+        pingFiber(fiber, false);
+        mounts.set(key, nextMount);
 
-          mounts.set(key, nextMount);
+        // If new mount, need to re-order keys
+        if (!mount && (order.length || empty)) {
+          order.length = 0;
+
+          const LOG = LOGGING.quote;
+          LOG && console.log("Re-order quote", formatNode(next), 'by', formatNode(fiber));
+          if (host) host.visit(next);
         }
       }
-      else {
-        if (nextMount !== mount) {
-          mounts.delete(key);
-          order.splice(order!.indexOf(key), 1);
-        }
-      }
-
-      flushMount(nextMount, mount, fenced);
     }
+    else {
+      if (nextMount !== mount) {
+        mounts.delete(key);
+        order.splice(order!.indexOf(key), 1);
+      }
+    }
+
+    flushMount(nextMount, mount, fenced);
   }
 }
 
-// Reconcile multiple calls on a fiber
+// Reconcile multiple calls on a fiber (normal children)
 export const reconcileFiberCalls = (() => {
   const seen = new Set<Key>();
 
@@ -524,7 +527,7 @@ export const reconcileFiberCalls = (() => {
       else {
         key = j++;
       }
-      if (seen.has(key)) throw new Error(`Duplicate key '${key}' while reconciling ` + formatNode(fiber));
+      if (seen.has(key)) throw new Error(`Duplicate key '${key}' while reconciling ${formatNode(fiber)}`);
 
       seen.add(key);
       order[i++] = key;
@@ -552,6 +555,8 @@ export const reconcileFiberCalls = (() => {
 
     // If rekeyed, reorder queue and invalidate yeeted/quoted order
     if (rekeyed) {
+      const LOG = LOGGING.quote || LOGGING.render;
+      LOG && console.log(`Rekeying ${fiber.id} ${formatNode(fiber)}`, '->', order);
       fiber.host?.reorder(fiber);
       bustFiberQuote(fiber);
       bustFiberYeet(fiber, true);
@@ -586,18 +591,30 @@ export const reconcileFiberOrder = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
   const {order, mounts, lookup} = fiber;
-  if (!order || !mounts) return;
-  if (order.length === mounts.size) return;
+  if (!order || !mounts || !lookup) throw new Error("Incremental fiber should be pre-initialized");
 
+  // Re-order child keys
   order.length = 0;
   for (const k of mounts.keys()) order.push(k);
   order.sort((a, b) => compareFibers(mounts.get(a)!, mounts.get(b)!));
-  if (lookup) lookup.clear();
 
-  for (let i = 0, n = order.length; i < n; ++i) {
-    const o = order[i];
-    if (lookup) lookup.set(o, i);
+  // See if order changed
+  let same = true;
+  for (let i = 0, n = order.length; i < n; ++i) if (lookup.get(order[i]) !== i) {
+    same = false;
+    break;
   }
+  if (same) {
+    const LOG = LOGGING.quote;
+    LOG && console.log(`Quote order unchanged ${fiber.id}`, formatNode(fiber), order);
+    return;
+  }
+
+  const LOG = LOGGING.quote;
+  LOG && console.log(`Re-ordered quote ${fiber.id}`, formatNode(fiber), order);
+
+  lookup.clear();
+  for (let i = 0, n = order.length; i < n; ++i) lookup.set(order[i], i);
 
   // Reorder queue and invalidate yeeted/quoted order
   fiber.host?.reorder(fiber);
@@ -912,7 +929,7 @@ export const makeFiberReduction = <F extends ArrowFunction, R>(
   if (!next) return null;
   if (!then) return null;
 
-  const LOG = LOGGING.fiber;
+  const LOG = LOGGING.render;
   LOG && console.log('Reducing', formatNode(fiber));
 
   const ref = useOne(() => ({current: fallback}));
@@ -1135,10 +1152,6 @@ export const reconcileFiber = <F extends ArrowFunction>(
   }
 
   inlineFiberCall(fiber, calls);
-
-  // Flush immediate tail reconciler
-  const nextNext = fiber.next?.next;
-  //flushMount(nextNext, nextNext, true);
 }
 
 // Detach a fiber by mounting a subcontext manually and delegating the triggering of its execution
@@ -1162,6 +1175,9 @@ export const detachFiber = <F extends ArrowFunction>(
   let immediate = true;
   callback(() => {
     if (next && host) {
+      const LOG = LOGGING.render;
+      LOG && console.log("Run detached", formatNode(next), 'by', formatNode(fiber));
+
       if (immediate) {
         host.visit(next);
       }
@@ -1240,7 +1256,7 @@ export const updateMount = <P extends ArrowFunction>(
   key?: Key,
   keyed?: boolean,
 ): LiveFiber<any> | null | false => {
-  const LOG = LOGGING.fiber;
+  const LOG = LOGGING.mount;
   const {host} = parent;
 
   let from = mount?.f;
@@ -1304,7 +1320,12 @@ export const flushMount = <F extends ArrowFunction>(
     const {host} = mount;
 
     // Slice into new stack if too deep, or if fenced
-    if (host && (fenced || host?.slice(mount.depth))) return host.visit(mount);
+    if (host && (fenced || host?.slice(mount.depth))) {
+      const LOG = LOGGING.render;
+      LOG && console.log("Slice dispatch to", formatNode(mount));
+
+      return host.visit(mount);
+    }
 
     const element = renderFiber(mount);
     updateFiber(mount, element);
@@ -1318,10 +1339,10 @@ export const visitYeetRoot = <F extends ArrowFunction>(
 ) => {
   const {host, yeeted} = fiber;
   if (yeeted && (fiber.type === YEET || force)) {
-    const LOG = LOGGING.fiber;
+    const LOG = LOGGING.render;
     const {root} = yeeted;
 
-    LOG && console.log('Visit', formatNode(fiber), '->', formatNode(root));
+    LOG && console.log('Visit yeet root', formatNode(root), 'by', formatNode(fiber));
     bustFiberMemo(root);
     if (host) host.visit(root);
   }
@@ -1354,8 +1375,8 @@ export const bustFiberDeps = <F extends ArrowFunction>(
   // Bust far caches
   const {host} = fiber;
   if (host) for (const sub of host.traceDown(fiber)) {
-    const LOG = LOGGING.fiber;
-    LOG && console.log('Invalidating Node', formatNode(sub));
+    const LOG = LOGGING.render;
+    LOG && console.log(`Invalidating node #${sub.id}`, formatNode(sub), 'by', formatNode(fiber));
 
     host.visit(sub);
     bustFiberMemo(sub);
@@ -1371,15 +1392,21 @@ export const bustFiberQuote = <F extends ArrowFunction>(
   for (const k of quotes.keys()) {
     const {to, to: {next, order}} = quotes.get(k)!;
     if (next && order?.length) {
+      const LOG = LOGGING.quote;
+      LOG && console.log(`Invalidating quote #${to.id}`, formatNode(to), 'by', formatNode(fiber));
+
       order.length = 0;
-      host?.visit(next);
+      if (host) host.visit(next);
     }
   }
   if (unquote) {
     const {to, to: {next, order}} = unquote;
     if (next && order?.length) {
+      const LOG = LOGGING.quote;
+      LOG && console.log(`Invalidating unquote ${to.id}`, formatNode(to), 'by', formatNode(fiber));
+
       order.length = 0;
-      host?.visit(next);
+      if (host) host.visit(next);
     }
   }
 }

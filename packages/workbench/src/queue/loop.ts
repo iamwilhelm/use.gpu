@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, LiveNode, LiveFiber, Task, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
-import { use, detach, provide, unquote, yeet, gather, useCallback, useContext, useOne, useResource, useState, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
+import { useLog, use, detach, provide, unquote, yeet, gather, useCallback, useContext, useOne, useResource, useState, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
 
 import { useRenderContext } from '../providers/render-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
@@ -9,7 +9,7 @@ import { QueueReconciler } from '../reconcilers';
 
 const {reconcile, quote, signal} = QueueReconciler;
 
-const DEBUG = false;
+const DEBUG = true;
 
 export type LoopProps = {
   live?: boolean,
@@ -184,11 +184,13 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       });
     }
 
+    useLog({ts});
+
     return useOne(() => {
       DEBUG && console.log('Dispatch to queue');
       ref.version.queued = false;
       return [
-        signal(), // extra signal so that yeet can be memoized
+        signal(), // Extra signal so that yeet(ts) can be memoized and doesn't invalidate the next queue
         quote(yeet(ts)),
       ];
     }, version.rendered + dispatches);

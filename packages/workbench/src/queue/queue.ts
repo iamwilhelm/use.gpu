@@ -18,6 +18,7 @@ export const Queue: LC<QueueProps> = (props: PropsWithChildren<QueueProps>): Def
   const {nested, children} = props;
 
   const Resume = (ts: ArrowFunction[]) => {
+    console.log('<Queue> dispatch')
     const children: LiveElement = [];
     for (const task of ts) {
       const c = task();

@@ -31,7 +31,7 @@ export const makeTypedBuffer = (
     usage,
     mappedAtCreation: !!data,
   });
-  
+
   LOGGING.buffer && console.warn('Allocate typed buffer', {size, ...decodeUsageFlags(usage)});
 
   if (data) {

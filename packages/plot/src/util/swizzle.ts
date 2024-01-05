@@ -1,9 +1,16 @@
 import { mat4 } from 'gl-matrix';
 import { parseAxes } from '@use-gpu/parse';
+import zipObject from 'lodash/zipObject';
 
 const AXES = ['x', 'y', 'z', 'w'];
+const SWIZZLES = [
+  'xyzw', 'xywz', 'xzyw', 'xzwy', 'xwyz', 'xwzy',
+  'yxzw', 'yxwz', 'yzxw', 'yzwx', 'ywxz', 'ywzx',
+  'zyxw', 'zywx', 'zxyw', 'zxwy', 'zwyx', 'zwxy',
+  'wyzx', 'wyxz', 'wzyx', 'wzxy', 'wxyz', 'wxzy',
+];
 
-export const swizzleMatrix = (m: mat4, swizzle: string) => {
+export const makeSwizzleMatrix = (swizzle: string) => {
   let values = [];
   let n = swizzle.length;
   for (let i = 0; i < n; ++i) {
@@ -13,8 +20,11 @@ export const swizzleMatrix = (m: mat4, swizzle: string) => {
     if (c === 'z') values.push(0, 0, 1, 0);
     if (c === 'w') values.push(0, 0, 0, 1);
   }
-  return mat4.copy(m, values as any);
+  return mat4.fromValues(...values);
 };
+
+const SWIZZLE_MATRICES = zipObject(SWIZZLES, SWIZZLES.map(makeSwizzleMatrix));
+export const swizzleMatrix = (m: mat4, swizzle: string) => mat4.copy(m, SWIZZLE_MATRICES[swizzle]);
 
 export const toBasis = (axes: string) => {
   return parseAxes(axes);

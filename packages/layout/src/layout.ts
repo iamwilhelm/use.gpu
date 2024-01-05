@@ -136,7 +136,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
       repeat: 0,
       ...INSPECT_STYLE.parent,
     };
-    
+
     out.push(quote(yeet({
       count: 1,
       archetype: schemaToArchetype(UI_SCHEMA, attributes),

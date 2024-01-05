@@ -11,6 +11,7 @@ export type LoggingOptions = {
   mount: boolean,
   render: boolean,
   quote: boolean,
+  detach: boolean,
 };
 
 /** @hidden */
@@ -20,6 +21,7 @@ export const LOGGING = {
   mount: false,
   render: false,
   quote: false,
+  detach: false,
 } as Record<string, boolean>;
 
 /** Turn on logging for the Live run-time. Very chatty.

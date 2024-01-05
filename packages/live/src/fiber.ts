@@ -1175,7 +1175,7 @@ export const detachFiber = <F extends ArrowFunction>(
   let immediate = true;
   callback(() => {
     if (next && host) {
-      const LOG = LOGGING.render;
+      const LOG = LOGGING.render || LOGGING.detach;
       LOG && console.log("Run detached", formatNode(next), 'by', formatNode(fiber));
 
       if (immediate) {

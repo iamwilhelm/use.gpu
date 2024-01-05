@@ -7,7 +7,7 @@ import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
-import { TransformContext, MatrixContext, useCombinedMatrixTransform, QueueReconciler } from '@use-gpu/workbench';
+import { TransformContext, MatrixContext, useCombinedMatrixTransform, useDoubleBuffered, QueueReconciler } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
@@ -17,6 +17,7 @@ import { mat4 } from 'gl-matrix';
 import { AxesTrait, ObjectTrait } from '../traits';
 
 const {signal} = QueueReconciler;
+const makeMat4 = () => mat4.create();
 
 const Traits = combine(AxesTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);
@@ -33,6 +34,9 @@ export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildre
     position: p, scale: s, quaternion: q, rotation: r, matrix: m,
   } = useTraits(props);
 
+  const swapMatrix = useDoubleBuffered(makeMat4);
+  const composed = useOne(makeMat4);
+
   const matrix = useMemo(() => {
     const x = g[0][0];
     const y = g[1][0];
@@ -41,7 +45,7 @@ export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildre
     const dy = (g[1][1] - y) || 1;
     const dz = (g[2][1] - z) || 1;
 
-    const matrix = mat4.create();
+    const matrix = swapMatrix();
     mat4.set(matrix,
       2/dx, 0, 0, 0,
       0, 2/dy, 0, 0,
@@ -55,20 +59,18 @@ export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildre
 
     // Swizzle output axes
     if (a !== 'xyzw') {
-      const t = mat4.create();
-      swizzleMatrix(t, a);
-      mat4.multiply(matrix, t, matrix);
+      swizzleMatrix(composed, a);
+      mat4.multiply(matrix, composed, matrix);
     }
 
     // Then apply transform (so these are always relative to the world basis, not the internal basis)
     if (m) {
       mat4.multiply(matrix, m, matrix);
     }
-    
+
     if (p || r || q || s) {
-      const t = mat4.create();
-      composeTransform(t, p, r, q, s);
-      mat4.multiply(matrix, t, matrix);
+      composeTransform(composed, p, r, q, s);
+      mat4.multiply(matrix, composed, matrix);
     }
 
     return matrix;

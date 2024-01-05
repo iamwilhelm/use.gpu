@@ -128,7 +128,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
 
     const defines = useOne(() => ({ LINE_DETAIL: detail, GRID_AUTO: !!auto }), detail);
     const bound = useShader(getGridPosition, [data, m, m1, m2, s, autoBound], defines);
-  
+
     // Expose position source
     const source = useMemo(() => ({
       shader: bound,

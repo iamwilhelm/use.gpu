@@ -579,7 +579,7 @@ export const makeNumberWriter = (to: VectorLike, dims: number, fields?: number[]
         const o = i + fields[f++];
         const n = args.length;
         for (let j = 0; j < n; ++j) to[o + j] = args[j];
-        if (f === n) { f = 0; i += step; }        
+        if (f === n) { f = 0; i += step; }
       }),
     };
   }
@@ -621,7 +621,7 @@ export const makeNumberSplitter = (to: VectorLike[], dims: number) => {
 
 export const makeNumberReader = (from: VectorLike, dims: number) => {
   const d = toCPUDims(dims);
-  
+
   const reader = (
     (d === 1) ? (emit: Emit, i: number) => { emit(from[i]) } :
     (d === 2) ? (emit: Emit, i: number) => { const i2 = i*2; emit(from[i2], from[i2+1]); } :

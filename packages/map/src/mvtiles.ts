@@ -53,7 +53,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
   const layout = useLayoutContext();
   const styles = useMVTStyleContext();
   let [[minX, maxX], [minY, maxY]] = useRangeContext();
-
+  
   const flipY = layout[1] > layout[3];
   if (flipY) [minY, maxY] = [-maxY, -minY];
 
@@ -80,6 +80,8 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
   const h = maxIY - minIY;
 
   seen.clear();
+  
+  if (1/minIX === 0 || 1/maxIX === 0) debugger;
 
   const tesselate = 5 - zoom;
   const gz = 1 << (zoom);
@@ -131,7 +133,7 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
   const run = useCallback(async () => {
     const cached = cache.get(key);
     if (cached) return cached;
-    
+
     const url = getMVT(x, y, zoom);
     //URLS.add(url.split('?')[0]);
 

@@ -63,7 +63,7 @@ export const adjustSchema = <T>(
     const field = schema[k];
     let format = formats[k];
 
-    if (!format) out[k] = field; 
+    if (!format) out[k] = field;
     else {
       const depth = getUniformArrayDepth(field.format);
       for (let i = 0; i < depth; ++i) format = `array<${format}>`;

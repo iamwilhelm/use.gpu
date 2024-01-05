@@ -106,7 +106,7 @@ const resolveTypeSymbol = (bundle: ParsedBundle, f: FormatLike<string>): FormatL
     // Must be local
     return {format: typeName};
   }
-  
+
   return {format};
 }
 

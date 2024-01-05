@@ -50,7 +50,6 @@ export const Canvas: LiveComponent<CanvasProps> = (props: PropsWithChildren<Canv
     colorInput = COLOR_SPACE,
     samples = 1,
   } = props;
-  console.log({width, height, w: canvas.width, h: canvas.height})
 
   const device = useContext(DeviceContext);
 

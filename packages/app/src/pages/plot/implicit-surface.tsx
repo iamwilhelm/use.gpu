@@ -74,7 +74,7 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) =>
   const ny = vy - v;
   const nz = vz - v;
   */
-  
+
   // d/dx d/dy d/dz
   const x2 = x * 2;
   const y2 = y * 2;

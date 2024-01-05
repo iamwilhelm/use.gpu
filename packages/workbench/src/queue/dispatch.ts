@@ -76,7 +76,7 @@ export const dispatch = (props: DispatchProps) => {
     [computeShader],
     defines,
   );
-  
+
   // Rendering pipeline
   const [pipeline, isStale] = useComputePipelineAsync(device, module);
   if (!pipeline) return suspense ? SUSPEND : NO_CALL;

@@ -70,10 +70,10 @@ export const PlotPickingPage: LC = () => {
     <InfoBox>Use &lt;Pick&gt; for GPU-driven mouse picking on any shape or layer. Attach any u32 lookup index per shape or vertex.</InfoBox>
     <Camera>
       <Pass picking>
-      
+
         <Plot>
           <Grid axes="zx" width={2} color="#ffffff40" range={[[-5, 5], [0, 1], [-5, 5]]} />
-      
+
           <Pick
             onMouseOver={(mouse, index) => console.log('Round shape #' + index, mouse)}
           >{
@@ -83,7 +83,7 @@ export const PlotPickingPage: LC = () => {
                 <Polygon
                   key={i}
                   id={id}
-                  {...props} 
+                  {...props}
                   fill={hovered && (index === i) ? '#ffffff' : props.color}
                   stroke="#ffffff"
                   width={3}

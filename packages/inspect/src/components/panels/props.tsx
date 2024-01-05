@@ -115,7 +115,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, api}) => {
   const getQuote = () => {
     const {quote} = fiber;
     if (!quote) return null;
-    
+
     const {to} = quote;
     const f = to.mounts.get(fiber.id);
     if (f) return renderFiberButton(f, fibers, api);

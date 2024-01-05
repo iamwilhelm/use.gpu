@@ -99,7 +99,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
             render: memoLayout((
               box: Rectangle,
               origin: Rectangle,
-              z: number,              
+              z: number,
               clip: ShaderModule | null,
               mask: ShaderModule | null,
               transform: ShaderModule | null,

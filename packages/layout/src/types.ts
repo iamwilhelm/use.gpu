@@ -135,7 +135,7 @@ export type UIAggregate = LayoutShaders & {
   bounds: Rectangle,
   count: number,
   zIndex?: number,
-  
+
   attributes: {
     rectangles?: number[],
     colors?: number[],

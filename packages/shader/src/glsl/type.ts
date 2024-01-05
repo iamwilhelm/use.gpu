@@ -15,7 +15,7 @@ export const toTypeArgs = (t: any[]): any[] => {
 export const toTypeSymbol = (t: TypeLike): FormatLike<string> => {
   let type = toTypeString(t);
   if (!type.match(/[A-Z]/)) return {format: type};
-  
+
   let depth = 0;
   while (type.match(ARRAY_REGEXP)) {
     type = type.replace(ARRAY_REGEXP, '');

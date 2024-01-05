@@ -120,7 +120,7 @@ export type UniformFormat = UniformType | UniformAttribute[] | UniformNamedType;
 export type UniformAttribute = {
   name: string,
   format: UniformFormat,
-  type?: ShaderStructType, 
+  type?: ShaderStructType,
   args?: UniformFormat[] | null,
   attr?: UniformShaderAttribute[],
 };

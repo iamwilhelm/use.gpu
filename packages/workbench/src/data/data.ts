@@ -161,7 +161,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
 
     let hasSingle = false;
     let hasPlural = false;
-    
+
     for (const k in schema) if (keys.includes(k)) {
       const {format, prop = k, index, unwelded, ref} = schema[k];
       if (ref) throw new Error(`Ref '${k}' not supported in <Data>`);
@@ -178,7 +178,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
       attributes[k] = array;
     }
 
-    if (hasSingle && hasPlural && !segments) throw new Error(`Cannot mix array and non-array data without 'segment' handler`); 
+    if (hasSingle && hasPlural && !segments) throw new Error(`Cannot mix array and non-array data without 'segment' handler`);
 
     const archetype = schemaToArchetype(schema, attributes);
     if (attributes.instances) throw new Error(`Reserved attribute name 'instances'.`);

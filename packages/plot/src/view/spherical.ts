@@ -8,7 +8,7 @@ import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   MatrixContext, TransformContext, QueueReconciler,
-  useShaderRef, useShader, useCombinedEpsilonTransform,
+  useShaderRef, useShader, useCombinedEpsilonTransform, useDoubleBuffered,
 } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
@@ -22,6 +22,7 @@ import { AxesTrait, ObjectTrait } from '../traits';
 import { getSphericalPosition } from '@use-gpu/wgsl/transform/spherical.wgsl';
 
 const {signal} = QueueReconciler;
+const makeMat4 = () => mat4.create();
 
 const Traits = combine(AxesTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);
@@ -44,6 +45,9 @@ export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildre
     range: g, axes: a,
     position: p, scale: s, quaternion: q, rotation: r, matrix: m,
   } = useTraits(props);
+
+  const swapMatrix = useDoubleBuffered(makeMat4);
+  const composed = useOne(makeMat4);
 
   const [focus, aspectX, aspectY, scaleY, matrix, swizzle, range, epsilon] = useMemo(() => {
     const x = g[0][0];
@@ -90,7 +94,7 @@ export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildre
 
     const focus = bend > 0 ? 1 / bend - 1 : 0;
 
-    const matrix = mat4.create();
+    const matrix = swapMatrix();
     mat4.set(matrix,
       2/fdx, 0, 0, 0,
       0, 2/fdy, 0, 0,
@@ -104,9 +108,8 @@ export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildre
 
     // Swizzle output axes
     if (a !== 'xyzw') {
-      const t = mat4.create();
-      swizzleMatrix(t, a);
-      mat4.multiply(matrix, t, matrix);
+      swizzleMatrix(composed, a);
+      mat4.multiply(matrix, composed, matrix);
     }
 
     // Then apply transform (so these are always relative to the world basis, not the internal basis)
@@ -114,20 +117,18 @@ export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildre
       mat4.multiply(matrix, m, matrix);
     }
     if (p || r || q || s) {
-      const t = mat4.create();
-      composeTransform(t, p, r, q, s);
-      mat4.multiply(matrix, t, matrix);
+      composeTransform(composed, p, r, q, s);
+      mat4.multiply(matrix, composed, matrix);
     }
 
     // Swizzle active spherical axes
     let swizzle: string | null = null;
     if (on.slice(0, 3) !== 'xyz') {
       const order = swizzle = on;
-      const t = mat4.create();
 
       // Apply inverse basis as part of view matrix (right multiply)
-      swizzleMatrix(t, invertBasis(order));
-      mat4.multiply(matrix, matrix, t);
+      swizzleMatrix(composed, invertBasis(order));
+      mat4.multiply(matrix, matrix, composed);
     }
 
     // Adjust radial range

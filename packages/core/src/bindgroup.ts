@@ -149,7 +149,7 @@ export const getMinBindingSize = (
     console.warn({members, layout});
     return layout.length;
   }
-  
+
   if (typeof format === 'string') {
     format = format.replace(/^array<([^>]+)>$/, '$1');
     format = format.replace(/^vec3to4</, 'vec4<');

@@ -66,7 +66,7 @@ export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<Envir
   }, [environment, parent])
 
   return (
-    provide(EnvironmentContext, environment, 
+    provide(EnvironmentContext, environment,
       provide(MaterialContext, context, children)
     )
   );

@@ -138,7 +138,7 @@ export const Tensor: LiveComponent<TensorProps<unknown>> = memo(<S extends strin
   const render = getRenderFunc(props);
 
   const dataContext = useDataContext();
-  
+
   const context = !render && children ? useMemo(
     () => split
       ? ({...dataContext, ...value})

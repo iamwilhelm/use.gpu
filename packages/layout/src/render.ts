@@ -105,7 +105,7 @@ export const BoxLayout = memoRender((
   if (inspect) {
     let i = 0;
     const yeets = [] as UIAggregate[];
-    
+
     const attributes = {
       rectangle: box,
       uv: [0, 0, 1, 1],
@@ -218,7 +218,7 @@ export const InlineLayout = (
   if (inspect) {
     let i = 0;
     const yeets = [] as UIAggregate[];
-    
+
     const attributes = {
       rectangle: box,
       uv: [0, 0, 1, 1],

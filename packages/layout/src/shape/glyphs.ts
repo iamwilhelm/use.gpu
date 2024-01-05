@@ -138,7 +138,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
         }
       }, start, end);
     }
-    
+
     if (!count) return null;
 
     const attributes = {
@@ -150,7 +150,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       sdf: [radius, scale, size, 0],
       fill,
     };
-    
+
     console.log('glyphs')
 
     return yeet({

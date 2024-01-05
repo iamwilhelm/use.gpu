@@ -92,11 +92,11 @@ export const Plot3DPage: LC = () => {
                 const x = Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2;
                 const y = Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2;
                 const z = Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2;
-              
+
                 const r = 1;
                 const g = (1 - x - y) / 2;
                 const b = (1 - z) / 2;
-              
+
                 emit(x, y, z);
                 emit(r, g, b);
               }}

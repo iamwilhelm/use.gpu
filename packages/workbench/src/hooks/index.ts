@@ -6,6 +6,7 @@ export * from './useComputePipeline';
 export * from './useDataBinding';
 export * from './useDerivedSource';
 export * from './useDerivedState';
+export * from './useDoubleBuffered';
 export * from './useForceUpdate';
 export * from './useFrustumCuller';
 export * from './useInspectable';

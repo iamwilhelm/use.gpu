@@ -62,8 +62,8 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
   useLayoutEffect(() => {
     let timer: Timer | null = null;
     let reset: Timer | null = null;
-    
-    // 
+
+    //
     let queue: PingEntry[] = [];
     let hot: PingEntry[] = [];
     let version = 0;

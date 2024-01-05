@@ -144,7 +144,7 @@ const Bar = (
         radius: [size/2, size/2, size/2, size/2] as Rectangle,
         ...(inspect ? INSPECT_STYLE.parent : undefined),
       };
-      
+
       yeets.push({
         count: 1,
         archetype: schemaToArchetype(UI_SCHEMA, attributes),

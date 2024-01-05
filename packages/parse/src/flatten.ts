@@ -193,7 +193,7 @@ export const toVertexCount = (
   dims: number,
 ): number => {
   if (isTypedArray(xs?.array)) return xs.length;
-  
+
   const n = xs?.length;
   if (!n) return 0;
 

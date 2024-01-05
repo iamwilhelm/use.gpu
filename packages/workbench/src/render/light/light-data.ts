@@ -321,7 +321,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       order,
       subranges,
     }), [storage, texture, order, subranges]);
-    
+
     return [
       signal(),
       then ? then(env) : yeet(env),

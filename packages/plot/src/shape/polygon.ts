@@ -21,7 +21,7 @@ const Traits = combine(
   ZIndexTrait,
 );
 
-export type PolygonProps = TraitProps<typeof Traits> & 
+export type PolygonProps = TraitProps<typeof Traits> &
   Pick<Face,
     'position' | 'positions' |
     'depth' | 'depths' |

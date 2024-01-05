@@ -8,8 +8,8 @@ exports[`bind binds an external 1`] = `
 
 
     vec4 _01_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
-    
-//// @link sub 
+
+//// @link sub
 
 
     vec4 _01_getColor();
@@ -29,8 +29,8 @@ exports[`bind binds an external 2`] = `
 
 
     vec4 _01_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
-    
-//// @link sub 
+
+//// @link sub
 
 
     vec4 _01_getColor();
@@ -50,7 +50,7 @@ exports[`bind binds an external 3`] = `
 
 
     vec4 _01_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
-    
+
 //// @link sub _02_
 
 
@@ -60,8 +60,8 @@ exports[`bind binds an external 3`] = `
     vec4 _02_getColor() {
       return _01_getColor() + _02_colorUsed();
     }
-    
-//// @link main 
+
+//// @link main
 
 
     vec4 _02_getColor();
@@ -95,7 +95,7 @@ vec2 _VT_1_getSize(int index) {
   return _VT_1_getSizeStorage.data[index];
 }
 
-//// @link code 
+//// @link code
 
 
     vec4 _VT_1_getColor(int);

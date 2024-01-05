@@ -137,7 +137,7 @@ export const Inspect: React.FC<InspectProps> = ({
   const rootId = fiber.id;
 
   const api: InspectAPI = useMemo(() => {
-    
+
     const selectFiber = (fiber: LiveFiber<any> | null = null) =>
       updateSelected({ $set: fiber });
 
@@ -172,7 +172,7 @@ export const Inspect: React.FC<InspectProps> = ({
           depth: 0,
         };
       }));
-    
+
     const makeHandlers = (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>, renderDepth: number) => {
       const select = () => selectFiber(fiber);
       const hover = (e: Event) => hoverFiber(fiber, fibers, renderDepth, e.altKey);
@@ -215,7 +215,7 @@ export const Inspect: React.FC<InspectProps> = ({
       e.preventDefault();
     }
   };
-  
+
   return (<div className="LiveInspect">
     {open ? (
       <PingProvider fiber={fiber}>

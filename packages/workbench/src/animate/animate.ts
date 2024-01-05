@@ -158,6 +158,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
       if (started < 0) started = startedRef.current = elapsed;
       if (paused && !pausedRef.current) pausedRef.current = elapsed;
       
+      console.log({timestamp, elapsed, delta, paused, started})
       const values = flip ? values1 : values2;
       if (!paused) {
         // Deduct pause time from elapsed on resume
@@ -166,21 +167,17 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
           pausedRef.current = 0;
         }
       }
-      if (!paused || pausedRef.current === elapsed) {
-        // Run if not paused or first frame
-        flip = !flip;
 
-        const time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
-        const [t, max] = getLoopedTime(time, length, rest, repeat, mirror);
+      flip = !flip;
 
-        for (let k in values) values[k] = evaluateKeyframes(script[k], t, ease);
+      const time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
+      const [t, max] = getLoopedTime(time, length, rest, repeat, mirror);
 
-        if (time < max) useAnimationFrame();
-        else useNoAnimationFrame();
-      }
-      else {
-        useNoAnimationFrame();
-      }
+      for (let k in values) values[k] = evaluateKeyframes(script[k], t, ease);
+
+      // Run if not paused, not first frame or not end
+      if (!paused || pausedRef.current === elapsed && time < max) useAnimationFrame();
+      else useNoAnimationFrame();
 
       const render = getRenderFunc(props);
       if (render) return tracks ? render(values) : (prop ? render(values[prop]) : null);

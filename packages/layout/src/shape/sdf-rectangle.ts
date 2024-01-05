@@ -204,7 +204,7 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
         fill,
         st,
       };
-      
+
       return yeet({
         count: 1,
         archetype: schemaToArchetype(UI_SCHEMA, attributes),

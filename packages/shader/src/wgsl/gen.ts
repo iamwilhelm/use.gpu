@@ -137,9 +137,9 @@ export const makeBindingAccessors = (
 
         if (format === 'array<T>') t = `array<${t}>`;
         program.push(makeStorageAccessor(namespace, set, base, t, t, name, readWrite, args));
-        continue;        
+        continue;
       }
-      
+
       if (Array.isArray(formatIn) || Array.isArray(formatOut)) throw new Error(`Cannot bind data to a type`);
 
       if (formatIn === 'T' || formatOut === 'T') debugger;

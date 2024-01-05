@@ -298,7 +298,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         data,
         bound,
       };
-      
+
       return useRenderProp(props, gltfBound);
     };
 

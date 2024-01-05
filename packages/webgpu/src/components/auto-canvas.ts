@@ -81,7 +81,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   return (
     use(AutoSize, {
       canvas,
-      children: (width, height, pixelRatio) => 
+      children: (width, height, pixelRatio) =>
         use(Canvas, {
           ...rest,
           width,

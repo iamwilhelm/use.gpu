@@ -91,7 +91,7 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
 
       return source;
     }, [resource, sampler]);
-    
+
     return useRenderProp(props, source);
   });
 };

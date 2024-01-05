@@ -24,7 +24,7 @@ export const getSource = <T = any>(
 ) => {
   const s = source as any;
   let shader;
-  
+
   if (s == null) return null;
 
   // ParsedBundle | ParsedModule
@@ -37,7 +37,6 @@ export const getSource = <T = any>(
   if (shader) {
     const {format} = bundleToAttribute(shader);
     if (format === def.format) return shader;
-    console.warn(format, def.format)
   }
 
   const binding = makeShaderBinding<ShaderModule>(def, s);

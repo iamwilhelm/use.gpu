@@ -136,7 +136,7 @@ export const uploadStorage = (
   uploadBuffer(device, source.buffer, arrayBuffer);
 
   if (size) source.size = size;
-  else source.size[0] = count;
+  else source.size = [count];
 
   source.length = count;
   source.version = incrementVersion(source.version);

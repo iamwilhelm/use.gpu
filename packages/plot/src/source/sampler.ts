@@ -318,8 +318,6 @@ export const Sampler: LiveComponent<SamplerProps<unknown>> = memo(<S extends str
       : ({...dataContext, [as]: value}),
     [dataContext, value, as]) : useNoMemo();
 
-  console.log([...value.size], [...padded], {padded});
-
   return render ? render(value) : children ? provide(DataContext, context, children) : yeet(value);
 }, shouldEqual({
   size: sameShallow(),

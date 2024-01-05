@@ -3,7 +3,7 @@ import type { VectorLike } from '@use-gpu/traits';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { XYZW } from '@use-gpu/core';
 
-import { makeUseTrait, optional, combine, trait, useProp } from '@use-gpu/traits/live';
+import { makeUseTrait, optional, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { parseBoolean, parseIntegerPositive, parseAxis, parseVec4 } from '@use-gpu/parse';
 import { yeet, memo, use, fragment, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
@@ -58,7 +58,7 @@ export type GridProps =
 
 const NO_SCALE_PROPS: Partial<ScaleTrait> = {};
 
-export const Grid: LiveComponent<GridProps> = (props) => {
+export const Grid: LiveComponent<GridProps> = memo((props) => {
   const {
     axes, range, loop,
     origin, auto,
@@ -163,4 +163,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
       }) : null,
     ])
   ), [firstPositions, secondPositions, auto, flags]);
-};
+}, shouldEqual({
+  first: sameShallow(),
+  second: sameShallow(),
+}), 'Grid');

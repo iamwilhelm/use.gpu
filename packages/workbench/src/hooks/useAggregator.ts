@@ -3,7 +3,7 @@ import type { AggregateValue } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../providers/device-provider';
-import { useMemo, useOne } from '@use-gpu/live';
+import { useLog, useMemo, useOne } from '@use-gpu/live';
 import {
   schemaToAggregate,
   updateAggregateFromSchema,
@@ -65,7 +65,6 @@ export const makeAggregator = (
   };
 
   let itemCount = initialItems.length;
-
   const uploadRefs = byRefs ? () => {
     updateAggregateFromSchemaRefs(device, schema, aggregate, itemCount);
   } : null;

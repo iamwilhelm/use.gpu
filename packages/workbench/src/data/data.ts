@@ -7,7 +7,7 @@ import { QueueReconciler } from '../reconcilers';
 import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
-import { tagFunction, useFiber, yeet, useOne, useMemo, useNoMemo } from '@use-gpu/live';
+import { yeet, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   seq,
   toCPUDims,
@@ -92,8 +92,6 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
     live = false,
   } = props;
   
-  if (tensor[0] === 58080) debugger;
-
   const schema = useOne(() => normalizeSchema(propSchema), propSchema);
   const data = propData ? Array.isArray(propData) ? propData : [propData] : null;
   const itemCount = Math.max(0, count ?? (data?.length - skip));
@@ -148,7 +146,6 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
         if (indexedKey) indexCount = getVertexCount(schema, indexedKey, itemCount, data, virtual, skip);
       }
     }
-    if (chunks[0] === 58080) debugger;
 
     return [chunks, groups, vertexCount, indexedKey ? indexCount : vertexCount];
   }, [isArray, segments, itemCount, countKey, indexedKey, data, virtual, skip, ...(tensor ?? NO_TENSOR)]);
@@ -156,9 +153,6 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
   const allocItems = useBufferedSize(itemCount);
   const allocVertices = useBufferedSize(vertexCount);
   const allocIndices = useBufferedSize(indexCount);
-
-  if (allocIndices > 1e5) throw new Error();
-  if (tensor[0] === 58080) debugger;
 
   // Make arrays for merged attributes
   const [fields, attributes, archetype] = useMemo(() => {
@@ -216,6 +210,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
         b = o;
       }
     }
+    console.log('reeval')
 
     return slices;
   }, [
@@ -224,6 +219,13 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
     itemCount, skip,
     countKey, indexedKey,
   ]);
+
+  console.log([
+    fields,
+    live ? NaN : virtual ? (version ?? NaN) : null, propData,
+    itemCount, skip,
+    countKey, indexedKey,
+  ])
 
   // Get emitters for data + segment data
   const [mergedSchema, emitters, total, indexed, sparse] = useMemo(() => {
@@ -259,11 +261,9 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
     archetype,
     attributes: emitters,
   }], [total, indexed, itemCount, slices, archetype, emitters]);
-  if (tensor[0] === 58080) debugger;
 
   // Aggregate into struct buffers by access policy
   const {sources} = useAggregator(mergedSchema, items);
-  if (tensor[0] === 58080) debugger;
 
   useMemo(() => {
     // Tag output with tensor size
@@ -282,7 +282,6 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
   else useNoAnimationFrame();
 
   const trigger = useOne(() => signal(), items);
-  if (tensor[0] === 58080) debugger;
 
   const view = useRenderProp(props, sources);
   return [trigger, view];

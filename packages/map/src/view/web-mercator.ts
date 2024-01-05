@@ -2,11 +2,11 @@ import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { Swizzle } from '@use-gpu/plot';
 
 import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
-import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, provide, useContext, useDouble, useOne, useMemo } from '@use-gpu/live';
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext, QueueReconciler,
-  useShaderRef, useShader, useCombinedEpsilonTransform, useDoubleBuffered,
+  useShaderRef, useShader, useCombinedEpsilonTransform,
 } from '@use-gpu/workbench';
 
 import {
@@ -57,7 +57,7 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props: PropsWithChi
     position: p, scale: s, quaternion: q, rotation: r, matrix: m,
   } = useTraits(props);
 
-  const swapMatrix = useDoubleBuffered(makeMat4);
+  const swapMatrix = useDouble(makeMat4);
   const composed = useOne(makeMat4);
 
   const [matrix, swizzle, origin, range, epsilon] = useMemo(() => {

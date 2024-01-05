@@ -190,6 +190,7 @@ export const makeParseBasis = (defaults: string | number[], min: number = defaul
 export const parseRotation = (vec?: VectorLike | number): vec3 => {
   if (vec != null) {
     if (typeof vec === 'number') return vec3.fromValues(0, 0, vec);
+    if (vec.length === 1) return vec3.fromValues(0, 0, vec[0]);
     return vec3.fromValues(vec[0] ?? 0, vec[1] ?? 0, vec[2] ?? 0);
   }
   return vec3.fromValues(0, 0, 0);
@@ -198,6 +199,7 @@ export const parseRotation = (vec?: VectorLike | number): vec3 => {
 export const parseScale = (vec?: VectorLike | number): vec3 => {
   if (vec != null) {
     if (typeof vec === 'number') return vec3.fromValues(vec, vec, vec);
+    if (vec.length === 1) return vec3.fromValues(vec[0], vec[0], vec[0]);
     return vec3.fromValues(vec[0] ?? 1, vec[1] ?? 1, vec[2] ?? 1);
   }
   return vec3.fromValues(1, 1, 1);
@@ -223,8 +225,9 @@ export const clampNumber = (
 
 export const parseObject = <T>(value?: T) => typeof value === 'object' && value != null ? value : {};
 export const parseString = (s?: string) => s ?? '';
-export const parseNumber = (value?: number) => +(value || 0);
-export const parseInteger = (value?: number) => Math.round(+(value || 0));
+export const parseNumberLike = (value?: number | TypedArray) => value?.length ? value[0] : +(value || 0);
+export const parseNumber = (value?: number) => parseNumberLike(value);
+export const parseInteger = (value?: number) => Math.round(parseNumberLike(value));
 export const parseBoolean = (value?: boolean) => !!value;
 
 export const parseNumberUnsigned = clampNumber(0, null)(parseNumber);

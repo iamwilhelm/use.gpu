@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, LiveNode, LiveFiber, Task, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
-import { use, detach, provide, unquote, yeet, gather, useCallback, useContext, useOne, useResource, useState, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
+import { useLog, use, detach, provide, unquote, yeet, gather, useCallback, useContext, useOne, useResource, useState, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
 
 import { useRenderContext } from '../providers/render-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
@@ -92,13 +92,16 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
     };
 
     const render = (timestamp?: number) => {
-      DEBUG && console.log('Request sync render');
+      DEBUG && console.log('Dispatch loop');
       requestImmediateRender();
       ref.version.pending = false;
 
       // Loop continuously if live but abort on unmount
       if (live && mounted) request();
-      if (!mounted) return;
+      if (!mounted) {
+        DEBUG && console.log('Unmounted');
+        return;
+      }
 
       // Start elapsed timer once we have timing info
       if (timestamp != null) {
@@ -129,6 +132,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
 
     let view = useOne(() => provide(LoopContext, ref.loop, children), children);
 
+    console.log('---', ref.version.frame)
     const t = {...time};
     view = [
       provide(FrameContext, ref.version.frame,
@@ -170,15 +174,19 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       DEBUG && console.log('Dispatch sync render');
     }
     // Outside animation frame - async
-    else if (!version.pending && !version.queued) {
+    else if (!version.queued) {
       ref.version.queued = true;
 
       const {rendered} = version;
       DEBUG && console.log('Schedule async render');
       requestAnimationFrame(() => {
         // If no new calls rendered since last frame, dispatch existing queue
-        if (rendered === version.rendered) setDispatches(d => d + 1);
-        DEBUG && console.log('Dispatch async render');
+        if (rendered === version.rendered) {
+          setDispatches(d => d + 1);
+          DEBUG && console.log('Dispatch async render');
+        }
+        // Otherwise loop did fire
+        else DEBUG && console.log('Skip async render');
       });
     }
 

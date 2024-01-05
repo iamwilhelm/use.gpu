@@ -5,9 +5,9 @@ import type { TraitProps } from '@use-gpu/traits';
 
 import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
-import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, provide, useContext, useDouble, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
-import { TransformContext, MatrixContext, useCombinedMatrixTransform, useDoubleBuffered, QueueReconciler } from '@use-gpu/workbench';
+import { TransformContext, MatrixContext, useCombinedMatrixTransform, QueueReconciler } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
@@ -34,7 +34,7 @@ export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildre
     position: p, scale: s, quaternion: q, rotation: r, matrix: m,
   } = useTraits(props);
 
-  const swapMatrix = useDoubleBuffered(makeMat4);
+  const swapMatrix = useDouble(makeMat4);
   const composed = useOne(makeMat4);
 
   const matrix = useMemo(() => {

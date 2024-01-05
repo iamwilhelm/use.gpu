@@ -1,7 +1,7 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import { TraitProps } from '@use-gpu/traits';
-import { memo, provide, useMemo, useOne } from '@use-gpu/live';
-import { useDoubleBuffered, useMatrixContext, MatrixContext } from '@use-gpu/workbench';
+import { memo, provide, useDouble, useMemo, useOne } from '@use-gpu/live';
+import { useMatrixContext, MatrixContext } from '@use-gpu/workbench';
 import { mat4 } from 'gl-matrix';
 
 import { ObjectTrait, useObjectTrait } from './traits';
@@ -16,7 +16,7 @@ export const Node: LiveComponent<NodeProps> = (props: PropsWithChildren<NodeProp
   const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
   const {children} = props;
 
-  const swapMatrix = useDoubleBuffered(makeMat4);
+  const swapMatrix = useDouble(makeMat4);
   const composed = useOne(makeMat4);
 
   const combined = useMemo(() => {

@@ -4,7 +4,7 @@ import type { RefObject } from '@use-gpu/live';
 import type { TransformContextProps, TransformBounds } from '../providers/transform-provider';
 import type { MatrixRefs } from '../layers/types';
 
-import { useCallback, useMemo, useOne, useVersion, useNoCallback, useNoMemo, useNoOne, useNoVersion } from '@use-gpu/live';
+import { useCallback, useDouble, useMemo, useOne, useVersion, useNoCallback, useNoDouble, useNoMemo, useNoOne, useNoVersion } from '@use-gpu/live';
 import { bundleToAttribute, getBundleKey } from '@use-gpu/shader/wgsl';
 import { useMatrixContext, useNoMatrixContext } from '../providers/matrix-provider';
 import { getShader } from './useShader';
@@ -19,6 +19,7 @@ const NO_MATRIX = mat4.create();
 const MATRIX_BINDING = bundleToAttribute(getCartesianPosition, 'getTransformMatrix');
 
 const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u32'] } as UniformAttribute;
+const makeMat4 = () => mat4.create();
 
 export const useCombinedMatrix = (
   matrix?: mat4 | null,
@@ -26,11 +27,12 @@ export const useCombinedMatrix = (
 ): mat4 => {
   const parent = useMatrixContext();
   const version = useVersion(parent) + useVersion(matrix);
+  const swapMatrix = useDouble(makeMat4);
 
   return useOne(
     () => {
       if (!matrix) return parent;
-      return parent ? mat4.multiply(mat4.create(), parent, matrix) : matrix;
+      return parent ? mat4.multiply(swapMatrix(), parent, matrix) : matrix;
     },
     version
   );
@@ -40,6 +42,7 @@ export const useNoCombinedMatrix = () => {
   useNoMatrixContext();
   useNoVersion();
   useNoVersion();
+  useNoDouble();
   useNoOne();
 };
 

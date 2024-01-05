@@ -47,7 +47,6 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
       // texture starts at uv .5 (absolute coords)
       let uv2 = xy + 1.0 + vec2<f32>(mapping.xy);
       var sample = getAtlasTexture(uv2, 0.0);
-
       let uvo = uv * 2.0 - 1.0;
       let ray = decodeOctahedral(uvo);
 
@@ -62,9 +61,14 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
 
       let weight = length(cross(dx, dy));
       let s = sample * weight;
+
+      // Cap highlights for prebaked SH
+      //let s = min(vec4<f32>(2.0), sample) * weight;
+
+      // Test SH alignment
       //let s = weight * vec4<f32>(ray.x, ray.y, ray.z, 1.0);
 
-      // 0-2nd order specular (for capture)
+      // 0-2nd order specular (for SH bake only)
       if (SPECULAR_SH == 1) {
         let ss = s;
 

@@ -15,6 +15,8 @@ const NO_DEPS = [] as any[];
 const NO_RESOURCE = {tag: null, value: null};
 const STATE_SLOTS = 3;
 
+const HOOK_NAMES = ['useState', 'useMemo', 'useOne', 'useCallback', 'useResource', 'useContext', 'useCapture', 'useVersion', 'useHooks'];
+
 export const reserveState = (slots: number) => slots * STATE_SLOTS;
 
 export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hook) => {
@@ -24,7 +26,7 @@ export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hoo
 
   const marker = state![pointer];
   if (marker === undefined) state![pointer] = hookType;
-  else if (marker !== hookType) throw new Error(`Hooks were not called in the same order as last render in ${formatNode(fiber)}.`);
+  else if (marker !== hookType) throw new Error(`Hooks were not called in the same order as last render in ${formatNode(fiber)}.\nExpected '${HOOK_NAMES[marker]}', got '${HOOK_NAMES[hookType] ?? 'unknown'}'`);
 
   return pointer + 1;
 }
@@ -84,6 +86,8 @@ export const useNoHook = (hookType: Hook) => () => {
 type IsEqualMemoArgs<T extends Array<any>> = (prevArgs: T, nextArgs: T) => boolean;
 type IsEqualMemoProps<T> = (prevProps: T, nextArgs: T) => boolean;
 
+const makeDeps = () => [];
+
 /**
  * Memoize a live function on all its arguments (shallow comparison per arg)
  */
@@ -94,26 +98,23 @@ export const memoArgs = <F extends ArrowFunction>(
 ) => {
   const customMemo = typeof isEqualOrName === 'function' ? isEqualOrName as IsEqualMemoArgs<any> : null;
   if (typeof isEqualOrName === 'string') name = isEqualOrName;
+  
+  return f;
 
   const memoized = (...args: any[]) => {
     const fiber = useFiber();
     if (!fiber.version) fiber.version = 1;
 
-    if (customMemo) {
-      const ref = useRef(args);
-      if (!ref || !customMemo(ref.current, args)) fiber.version = incrementVersion(fiber.version!);
-      ref.current = args;
+    const ref = useRef(args);
+
+    if (fiber.version === fiber.memo) {
+      if (customMemo && !customMemo(ref.current, args)) fiber.version = incrementVersion(fiber.version!);
+      else if (!isSameDependencies(ref.current, args)) fiber.version = incrementVersion(fiber.version!);
     }
 
-    const deps = [fiber.version] as any[];
-    if (!customMemo) deps.push(...args);
+    ref.current = args;
 
-    const value = useHooks(() => {
-      deps[0] = fiber.version = incrementVersion(fiber.version!);
-      return f(...args);
-    }, deps);
-
-    return value;
+    return useHooks(() => f(...args), fiber.version);
   };
 
   const memoName = `Memo(${name ?? f.name ?? 'Component'})`;
@@ -138,29 +139,41 @@ export const memoProps = <F extends ArrowFunction>(
   const customMemo = typeof isEqualOrName === 'function' ? isEqualOrName as IsEqualMemoArgs<any> : null;
   if (typeof isEqualOrName === 'string') name = isEqualOrName;
 
-  const memoized = (props: Record<string, any>[]) => {
-    const fiber = useFiber();
-    if (!fiber.version) fiber.version = 1;
+  const memoized = (customMemo
+    ? (props: Record<string, any>[]) => {
+      const fiber = useFiber();
+      if (!fiber.version) fiber.version = 1;
 
-    if (customMemo) {
       const ref = useRef(props);
-      if (!ref || !customMemo(ref.current, props)) fiber.version = incrementVersion(fiber.version!);
+
+      if (fiber.version === fiber.memo) {
+        if (!customMemo(ref.current, props)) fiber.version = incrementVersion(fiber.version!);
+      }
       ref.current = props;
+
+      return useHooks(() => f(props), fiber.version);
     }
+    : (props: Record<string, any>[]) => {
+      const fiber = useFiber();
+      if (!fiber.version) fiber.version = 1;
 
-    const deps = [fiber.version] as any[];
-    if (!customMemo) for (let k in props) {
-      deps.push(k);
-      deps.push(props[k]);
+      const swapDeps = useDouble(makeDeps);
+      const deps = swapDeps(false);
+      deps.length = 0;
+      deps[0] = fiber.version;
+
+      for (const k in props) {
+        deps.push(k);
+        deps.push(props[k]);
+      }
+
+      return useHooks(() => {
+        swapDeps();
+        fiber.version = incrementVersion(fiber.version!);
+        return f(props);
+      }, deps);
     }
-
-    const value = useHooks(() => {
-      deps[0] = fiber.version = incrementVersion(fiber.version!);
-      return f(props);
-    }, deps);
-
-    return value;
-  };
+  );
 
   const memoName = `Memo(${name ?? f.name ?? 'Component'})`;
   const length = getArgCount(f);
@@ -238,7 +251,7 @@ export const useState = <T>(
  */
 export const useMemo = <T>(
   initialState: () => T,
-  dependencies: any[] = NO_DEPS,
+  dependencies: any[] = NO_DEPS
 ): T => {
   const fiber = useFiber();
 
@@ -288,7 +301,7 @@ export const useOne = <T>(
  */
 export const useCallback = <T extends Function>(
   initialValue: T,
-  dependencies: any[] = NO_DEPS,
+  dependencies: any[] = NO_DEPS
 ): T => {
   const fiber = useFiber();
 
@@ -332,7 +345,7 @@ export const useVersion = <T>(nextValue: T) => {
  */
 export const useResource = <R>(
   callback: (dispose: (f: Function) => void) => R,
-  dependencies: any[] = NO_DEPS,
+  dependencies: any[] = NO_DEPS
 ): R => {
   const fiber = useFiber();
 
@@ -504,7 +517,7 @@ export const useNoCapture = <C>(
  */
 export const useHooks = <T>(
   initialState: () => T,
-  dependencies: any[] = NO_DEPS,
+  dependencies: any[] | number = 0
 ): T => {
   const fiber = useFiber();
 
@@ -514,7 +527,8 @@ export const useHooks = <T>(
   const scope = state![i];
 
   const {pointer} = fiber;
-  const value = useMemo(() => {
+  const hook = typeof dependencies === 'number' ? useOne : useMemo;
+  const value = hook(() => {
     try {
       fiber.pointer = 0;
       fiber.state = scope;
@@ -536,7 +550,7 @@ export const useNoHooks = () => {
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.HOOKS);
-  const {state} = fiber;
+  const {pointer, state} = fiber;
   const scope = state?.[i];
 
   if (scope) {
@@ -548,12 +562,13 @@ export const useNoHooks = () => {
     }
     finally {
       state![i] = undefined;
-      fiber.pointer = pointer;
+      fiber.pointer = pointer + STATE_SLOTS;
       fiber.state = state;
     }
   }
-
-  pushState(fiber, Hook.MEMO);
+  else {
+    fiber.pointer = pointer + STATE_SLOTS;
+  }
 };
 
 // Togglable hooks
@@ -571,11 +586,35 @@ export const useLog = (values: Record<string, any>) => {
 };
 
 /**
+ * Double-buffered mutable reference.
+ */
+export const useDouble = <T>(
+  make: () => T,
+  dependencies: any[] = NO_DEPS
+): Get<T> => useMemo(() => makeDouble(make), dependencies);
+
+const makeDouble = <T>(make: Get<T>): Get<T> => {
+  const ref = {
+    front: make(),
+    back: make(),
+    flip: false,
+  };
+
+  return (swap: boolean = true) => {
+    let f = ref.flip;
+    if (swap) f = ref.flip = !ref.flip;
+    return f ? ref.front : ref.back;
+  };
+};
+
+export const useNoDouble = useNoMemo;
+
+/**
  * Async wrapper
  */
 export const useAwait = <T, E = Error>(
   f?: null | ((cancelled: () => boolean) => Promise<T>),
-  deps: any[] = NO_DEPS,
+  dependencies: any[],
 ): [T | undefined, E | undefined] => {
   const [value, setValue] = useState<[T | undefined, E | undefined]>([f ? undefined : null, undefined]);
   const loadingRef = useRef(false);
@@ -589,7 +628,7 @@ export const useAwait = <T, E = Error>(
     .then(value => { loadingRef.current = false; if (!cancelled) setValue([value, undefined]); })
     .catch(error => { loadingRef.current = false; if (!cancelled) setValue([undefined, error]); });
     dispose(() => { cancelled = true; });
-  }, deps);
+  }, dependencies);
 
   return [...value, loadingRef.current];
 };

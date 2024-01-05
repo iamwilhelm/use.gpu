@@ -287,7 +287,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
               console.log(out.join("\n"), {norm});
             },
           }),
-          */
+          /**/
         ];
 
         out.push(makeDispatch(makeInitShader(), 0));

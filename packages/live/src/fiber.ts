@@ -46,6 +46,14 @@ export const bind = <F extends ArrowFunction>(f: LiveFunction<F>, fiber?: LiveFi
       return value;
     }
   }
+  if (length === 2) {
+    return (arg1: any, arg2: any) => {
+      enterFiber(fiber!, base);
+      const value = f(arg1, arg2);
+      exitFiber(fiber!);
+      return value;
+    }
+  }
   return (...args: any[]) => {
     enterFiber(fiber!, base);
     const value = f.apply(null, args);

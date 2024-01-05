@@ -257,7 +257,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const panY = centered ? y - originY * (zoom - 1) / zoom + offsetY : y;
 
   const render = getRenderFunc(props);
-  return useMemo(() => render ? use(Inner, panX, panY, zoom, x, y, render) : null, [render, panX, panY, zoom]);
+  return useMemo(() => render ? use(Inner, panX, panY, zoom, x, y, render) : null, [panX, panY, zoom, x, y, render]);
 };
 
 const Inner = (

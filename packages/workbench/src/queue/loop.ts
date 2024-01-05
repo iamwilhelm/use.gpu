@@ -132,7 +132,6 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
 
     let view = useOne(() => provide(LoopContext, ref.loop, children), children);
 
-    console.log('---', ref.version.frame)
     const t = {...time};
     view = [
       provide(FrameContext, ref.version.frame,

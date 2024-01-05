@@ -154,22 +154,15 @@ export const getOnPaint = () => typeof window !== 'undefined' ? window.requestAn
 /** Compare dependency arrays */
 export const isSameDependencies = (
   prev: any[] | undefined,
-  next: any[] | undefined,
+  next: any[],
 ) => {
-  let valid = true;
-  if (next === undefined && prev === undefined) return true;
-  if (prev === undefined) valid = false;
-  if (next != null && prev != null) {
-    if (next === prev) return true;
+  if (prev === undefined) return false;
+  if (next === prev) return true;
 
-    const n = prev.length || 0;
-    if (n !== next.length || 0) valid = false;
-    else for (let i = 0; i < n; ++i) if (prev[i] !== next[i]) {
-      valid = false;
-      break;
-    }
-  }
-  return valid;
+  const l = prev.length;
+  if (l !== next.length) return false;
+  for (let i = 0; i < l; ++i) if (prev[i] !== next[i]) return false;
+  return true;
 }
 
 /** Check if B is a subnode of A */

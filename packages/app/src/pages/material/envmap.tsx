@@ -125,7 +125,6 @@ export const MaterialEnvMapPage: LC = (props) => {
                           </Pass>
                         </FlatCamera>
                       ) : null
-                    }
                   }</PanControls>
               </LinearRGB>
             }</PrefilteredEnvMap>

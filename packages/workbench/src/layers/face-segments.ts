@@ -40,7 +40,7 @@ export const getFaceSegmentsConcave = ({
 }) => {
   const count = accumulateChunks(chunks);
 
-  const indices = new Uint32Array(count * 3);
+  const indices = new Uint32Array(count * 4);
   const slices = new Uint32Array(groups?.length ?? chunks.length);
 
   const indexed = generateConcaveIndices(indices, slices, chunks, groups, positions, dims);

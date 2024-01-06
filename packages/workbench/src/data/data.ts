@@ -210,7 +210,6 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
         b = o;
       }
     }
-    console.log('reeval')
 
     return slices;
   }, [
@@ -219,13 +218,6 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
     itemCount, skip,
     countKey, indexedKey,
   ]);
-
-  console.log([
-    fields,
-    live ? NaN : virtual ? (version ?? NaN) : null, propData,
-    itemCount, skip,
-    countKey, indexedKey,
-  ])
 
   // Get emitters for data + segment data
   const [mergedSchema, emitters, total, indexed, sparse] = useMemo(() => {

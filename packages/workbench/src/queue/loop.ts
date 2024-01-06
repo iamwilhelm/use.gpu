@@ -52,6 +52,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       rendered: 0,
       pending: false,
       queued: false,
+      request: null,
     },
     loop: {
       buffered: true,
@@ -81,7 +82,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       DEBUG && console.log('Request animation frame');
 
       // Enqueue animated fiber for next frame
-      if (!ref.version.pending) queueMicrotask(() => requestAnimationFrame(render));
+      if (!ref.version.pending) ref.version.request = requestAnimationFrame(render);
       if (fiber && fibers.indexOf(fiber) < 0) fibers.push(fiber);
       ref.version.pending = true;
 
@@ -95,6 +96,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       DEBUG && console.log('Dispatch loop');
       requestImmediateRender();
       ref.version.pending = false;
+      ref.version.request = null;
 
       // Loop continuously if live but abort on unmount
       if (live && mounted) request();
@@ -206,6 +208,9 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
           unquote(
             detach(use(Run), (run: Task) => {
               ref.run = run;
+              // To avoid flashes, respond to outside updates immediately,
+              // as they are usually a resize event.
+              if (ref.version.request) cancelAnimationFrame(ref.version.request);
               render();
             })
           ),

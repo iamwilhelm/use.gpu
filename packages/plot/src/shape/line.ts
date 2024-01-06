@@ -38,6 +38,7 @@ export const RawLine: LiveComponent<LineProps> = (props) => {
 
       count,
       chunks,
+      groups,
       loop,
       loops,
 

@@ -42,6 +42,7 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       count,
       sparse,
       chunks,
+      groups,
       loop,
       loops,
       start,

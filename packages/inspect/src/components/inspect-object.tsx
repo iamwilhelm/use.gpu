@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { InspectProp } from './types';
 
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
-import { SplitRow, TreeRow, TreeIndent, Label, Spacer } from './layout';
+import { SplitRow, TreeRow, TreeIndent, Label, Spacer, Selectable } from './layout';
 import { IconItem, SVGChevronDown, SVGChevronRight } from './svg';
 import { useAddIns } from '../providers/add-in-provider';
 
@@ -56,7 +56,7 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
       extra = true;
     }
     if (object.reduce((b: boolean, o: any) => b && typeof o === 'number', true)) {
-      return <span>{`[${object.join(', ')}${extra ? '…' : ''}]`}</span>;
+      return <Selectable>{`[${object.join(', ')}${extra ? '…' : ''}]`}</Selectable>;
     }
   }
 
@@ -96,7 +96,15 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
     const icon = <IconItem height={16} top={2}>{expanded !== false ? <SVGChevronDown /> : <SVGChevronRight />}</IconItem>;
     const prefix = expandable ? icon : '';
 
+    let coords = [-1e3, -1e3];
+    const onPointerDown = expandable ? (e: any) => {
+      coords = [e.clientX, e.clientY];
+    } : undefined;
+
     const onClick = expandable ? (e: any) => {
+      const [x, y] = coords;
+      if (Math.abs(e.clientX - x) + Math.abs(e.clientY - y) > 2) return;
+
       toggleState(key);
       e.preventDefault();
       e.stopPropagation();
@@ -134,11 +142,11 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
     const showFull = (typeof object[k] === 'object' && depth < 20) || code;
     if (showFull && expanded) {
       return (
-        <div key={k} onClick={onClick}>
+        <div key={k} onPointerDown={onPointerDown} onClick={onClick}>
           <TreeRow>
             <SplitRow>
               <Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>
-              <div>{proto ?? ''}</div>
+              <Selectable>{proto ?? ''}</Selectable>
             </SplitRow>
           </TreeRow>
           <div>{full}</div>
@@ -147,11 +155,11 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
     }
 
     return (
-      <div key={k} onClick={onClick}>
+      <div key={k} onPointerDown={onPointerDown} onClick={onClick}>
         <TreeRow>
           <SplitRow>
             <Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>
-            <div>{compact}</div>
+            <Selectable>{compact}</Selectable>
           </SplitRow>
         </TreeRow>
       </div>

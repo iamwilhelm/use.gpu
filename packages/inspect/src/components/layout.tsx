@@ -82,7 +82,7 @@ export const OptionsContainer = styled('div', {
   width: '100%',
 });
 
-export const Selectable = styled('div', {
+export const Selectable = styled('span', {
   userSelect: 'text',
 });
 

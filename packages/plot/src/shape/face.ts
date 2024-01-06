@@ -6,7 +6,7 @@ import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
-import { getFaceSegments, useInspectHoverable, useTransformContext, FACE_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
+import { getFaceSegments, useInspectHoverable, useTransformContext, useScissorContext, FACE_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
 import { FaceTraits } from '../traits';
 
@@ -60,6 +60,7 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
+  const scissor = useScissorContext();
   const context = useTransformContext();
   const {transform, nonlinear, matrix: refs} = context;
 
@@ -77,6 +78,8 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
       attributes,
       flags,
       refs,
+      schema: formats ? schema : undefined,
+      scissor,
       sources,
       transform: nonlinear ?? context,
       zIndex,

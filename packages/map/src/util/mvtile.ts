@@ -166,7 +166,7 @@ export const getMVTShapes = (
   ];
   const style = styles['background'];
   if (style) {
-   // addPolygon([[[[0, 0], [256, 0], [256, 256], [0, 256]]]], {}, style, 256, toPoint4);
+    addPolygon([[[[0, 0], [256, 0], [256, 256], [0, 256]]]], {}, style, 256, toPoint4);
   }
 
   //const unstyled: string[] = [];

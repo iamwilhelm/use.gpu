@@ -6,7 +6,7 @@ import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
-import { getArrowSegments, useInspectHoverable, useTransformContext, ARROW_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
+import { getArrowSegments, useInspectHoverable, useTransformContext, useScissorContext, ARROW_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
 import { ArrowTraits } from '../traits';
 
@@ -69,6 +69,7 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
+  const scissor = useScissorContext();
   const context = useTransformContext();
   const {transform, nonlinear, matrix: refs} = context;
 
@@ -85,6 +86,7 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       attributes,
       flags,
       refs,
+      scissor,
       sources,
       transform: nonlinear ?? context,
       zIndex,

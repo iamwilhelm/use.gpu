@@ -62,11 +62,11 @@ export const cutPolygonWith = (
 
   const out = assembleCutRingWith(cut, getTangent).map(r => [r]);
   for (const h of holes) {
-    nextHole: for (const polygon of out) {
+    for (const polygon of out) {
       const [exterior] = polygon;
       if (pointInRing(exterior, h[0])) {
         polygon.push(h);
-        break nextHole;
+        break;
       }
     }
   }
@@ -105,11 +105,13 @@ export const cutRingWith = (
 
     let p: XY | null;
     if (f > 0 && f < 1) {
+      // If cut is in middle of edge
       const p = [
         Math.round(lerp(a[0], b[0], f)),
         Math.round(lerp(a[1], b[1], f)),
       ] as XY;
       if (va > 0) {
+        // If A is not clipped
         const cut = ring.slice(pos, i + 1);
         if (last) cut.unshift(last);
         cut.push(p);
@@ -117,22 +119,23 @@ export const cutRingWith = (
         last = null;
       }
       else {
+        // If B is not clipped
         last = p;
         pos = i + 1;
       }
     } else {
       if (va === 0) {
+        // If cut is on A
         if (vb < 0) {
           const cut = ring.slice(pos, i + 1);
           if (last) cut.unshift(last);
           if (!out.length || getRingArea(cut)) out.push(cut);
           last = null;
         }
-        if (vb === 0 && i === 0) {
-          last = a;
-        }
+        // If edge is parallel, keep it
       }
       else if (vb === 0) {
+        // If cut is on B
         if (va < 0) {
           last = b;
           pos = i + 2;
@@ -140,10 +143,11 @@ export const cutRingWith = (
       }
     }
   }
-
+  
   if (last) out[0] = [last, ...ring.slice(pos), ...(out[0] ?? [])];
   if (out[0] && !getRingArea(out[0])) out.shift();
   else if (out.length === 0 && ring.length) {
+    // If ring was not cut, find at least 1 point fully inside
     let i = 0;
     let r = null;
     while ((r = ring[i]) && getValue(r) === 0) { i++ };
@@ -236,7 +240,7 @@ export const clipTileEdges = (polygons: XY[][][], minX: number, minY: number, ma
       
       if (!cuts.length) loop.push(ring);
       else {
-        if (cuts[0] > 0) line.push(ring.slice(0, cuts[0] + 1));
+        if (cuts[0] > 1) line.push(ring.slice(0, cuts[0] + 1));
         for (let i = 0; i < cuts.length; ++i) {
           if (cuts[i] + 1 != cuts[i + 1]) line.push(ring.slice(cuts[i], (cuts[i + 1] ?? ring.length) + 1));
         }

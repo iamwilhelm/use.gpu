@@ -29,7 +29,7 @@ export const getMVTShapes = (
     point: {
       positions: [],
       color: [],
-      width: [],
+      size: [],
       depth: [],
       zBias: [],
     },
@@ -51,7 +51,6 @@ export const getMVTShapes = (
     face: {
       positions: [],
       color: [],
-      width: [],
       depth: [],
       zBias: [],
       concave: true,
@@ -92,7 +91,7 @@ export const getMVTShapes = (
     style: MVTStyleProperties,
     toPoint4: (xy: XY) => XYZW,
   ) => {
-    const positions = geometry.map((path) => path.map(({x, y}: Vec2) => toPoint4([x, y])));
+    const positions = geometry.map((path) => path.map(({x, y}: Vec2) => [x, y]));
 
     if (properties.name) {
       /*
@@ -128,7 +127,6 @@ export const getMVTShapes = (
 
     if (style.face.fill) {
       const positions = geometry.map(polygon => polygon.map((ring: XY[]) => ring.map((p: XY) => toPoint4(p))));
-      console.log(positions);
 
       shapes.face.positions.push(...positions);
       const n = geometry.length;

@@ -1,4 +1,4 @@
-import { cutPolygon, cutRing, assembleCutRing, getRingArea, pointInRing } from './tesselate';
+import { cutPolygons, cutPolygon, cutRing, assembleCutRing, getRingArea, pointInRing } from './tesselate';
 
 describe("tesselate", () => {
 
@@ -396,5 +396,31 @@ describe("tesselate", () => {
     expect(pointInRing(ring, [-1.5, 1.5])).toBe(false);
   });
 
+  it('does not insert duplicate vertices', () => {
+    let polygons = [[[[0, 0], [10, 0], [10, 10], [0, 10]]]];
+
+    const hasAnyDuplicates = (polygons: XY[][][]) => {
+      for (const poly of polygons) for (const ring of poly) if (hasDuplicates(ring)) return true;
+      return false;
+    };
+
+    const hasDuplicates = (ring: XY[]) => {
+      const n = ring.length - 1;
+      for (let i = 0; i < n; ++i) {
+        const a = ring[i];
+        const b = ring[i + 1];
+        if (a[0] === b[0] && a[1] === b[1]) return true;
+      }
+      return false;
+    }
+    
+    polygons = cutPolygons(polygons, 1, 0, 0);
+    expect(polygons && hasAnyDuplicates(polygons)).toBe(false);
+    expect(polygons).toMatchSnapshot();
+
+    polygons = cutPolygons(polygons, 0, 1, 0);
+    expect(polygons && hasAnyDuplicates(polygons)).toBe(false);
+    expect(polygons).toMatchSnapshot();
+  });
 
 });

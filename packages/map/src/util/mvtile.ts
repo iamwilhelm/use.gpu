@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { MVTStyleSheet, MVTStyleProperties } from '../types';
 import type { VectorTile } from 'mapbox-vector-tile';
 
-import { cutPolygons } from './tesselate';
+import { cutPolygons, clipTileEdges } from './tesselate';
 import earcut from 'earcut';
 
 type Vec2 = {x: number, y: number};
@@ -40,12 +40,21 @@ export const getMVTShapes = (
       depth: [],
       zBias: [],
     },
+    loop: {
+      positions: [],
+      color: [],
+      width: [],
+      depth: [],
+      zBias: [],
+      loop: true,
+    },
     face: {
       positions: [],
       color: [],
       width: [],
       depth: [],
       zBias: [],
+      concave: true,
     },
   };
 
@@ -96,7 +105,6 @@ export const getMVTShapes = (
     }
     else {
       shapes.line.positions.push(positions);
-      console.log('l', positions)
 
       const n = geometry.length;
       for (let i = 0; i < 1; ++i) {
@@ -120,6 +128,7 @@ export const getMVTShapes = (
 
     if (style.face.fill) {
       const positions = geometry.map(polygon => polygon.map((ring: XY[]) => ring.map((p: XY) => toPoint4(p))));
+      console.log(positions);
 
       shapes.face.positions.push(...positions);
       const n = geometry.length;
@@ -131,12 +140,18 @@ export const getMVTShapes = (
     }
 
     if (style.face.stroke) {
-      const positions = originalGeometry.flatMap(polygon => polygon.map((ring: XY[]) => ring.map((p: XY) => toPoint4(p))));
-      shapes.line.positions.push(positions);
-      console.log('f', positions)
-
-      const n = geometry.length;
-      for (let i = 0; i < 1; ++i) {
+      const {loop, line} = clipTileEdges(originalGeometry, 0, 0, extent, extent);
+      if (loop.length) {
+        const positions = loop.map((path: XY[]) => path.map((p: XY) => toPoint4(p)));
+        shapes.loop.positions.push(positions);
+        shapes.loop.color.push(style.face.stroke);
+        shapes.loop.width.push(style.face.width);
+        shapes.loop.depth.push(style.face.depth);
+        shapes.loop.zBias.push(style.face.zBias + 1);
+      }
+      if (line.length) {
+        const positions = line.map((path: XY[]) => path.map((p: XY) => toPoint4(p)));
+        shapes.line.positions.push(positions);
         shapes.line.color.push(style.face.stroke);
         shapes.line.width.push(style.face.width);
         shapes.line.depth.push(style.face.depth);
@@ -212,6 +227,7 @@ export const getMVTShapes = (
 
   if (!shapes.point.positions.length) delete shapes.point;
   if (!shapes.line.positions.length)  delete shapes.line;
+  if (!shapes.loop.positions.length)  delete shapes.loop;
   if (!shapes.face.positions.length)  delete shapes.face;
 
   return shapes;

@@ -157,12 +157,12 @@ export const MapWebMercatorPage: LC = () => {
                     </MapboxProvider>
                   ) : (
                     <MapTileProvider url={url}>
-                      <MVTiles detail={2} maxLevel={3} />
+                      <MVTiles detail={3} maxLevel={3} />
                     </MapTileProvider>
                   )}
                 </MVTStyles>
               </WebMercator>
-              <WebMercator
+              {false && <WebMercator
                 bend={0}
                 range={[[-1, 1], [-2/3, 2/3]]}
                 long={90}
@@ -230,7 +230,7 @@ export const MapWebMercatorPage: LC = () => {
                   />
                 </Scale>
 
-              </WebMercator>
+              </WebMercator>}
             </Animate>
           </Plot>
         </Pass>

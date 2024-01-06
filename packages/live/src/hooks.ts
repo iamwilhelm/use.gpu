@@ -98,8 +98,6 @@ export const memoArgs = <F extends ArrowFunction>(
 ) => {
   const customMemo = typeof isEqualOrName === 'function' ? isEqualOrName as IsEqualMemoArgs<any> : null;
   if (typeof isEqualOrName === 'string') name = isEqualOrName;
-  
-  return f;
 
   const memoized = (...args: any[]) => {
     const fiber = useFiber();

@@ -215,6 +215,38 @@ export const assembleCutRingWith = (
   return paths.map(({path}) => path);
 };
 
+export const clipTileEdges = (polygons: XY[][][], minX: number, minY: number, maxX: number, maxY: number) => {
+  const line = [];
+  const loop = [];
+
+  let section = null;
+  let cut = false;
+  let edge = false;
+
+  for (const polygon of polygons) {
+    for (const ring of polygon) {
+      const cuts = [];
+
+      let i = 0;
+      for (const p of ring) {
+        const [x, y] = p;
+        if (x <= minX || y <= minY || x >= maxX || y >= maxY) cuts.push(i);
+        ++i;
+      }
+      
+      if (!cuts.length) loop.push(ring);
+      else {
+        if (cuts[0] > 0) line.push(ring.slice(0, cuts[0] + 1));
+        for (let i = 0; i < cuts.length; ++i) {
+          if (cuts[i] + 1 != cuts[i + 1]) line.push(ring.slice(cuts[i], (cuts[i + 1] ?? ring.length) + 1));
+        }
+      }
+    }
+  }
+
+  return {line, loop};
+};
+
 export const getRingArea = (ring: XY[]): number => {
   let area = 0;
 

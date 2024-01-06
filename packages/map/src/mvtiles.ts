@@ -81,7 +81,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
 
   seen.clear();
   
-  if (1/minIX === 0 || 1/maxIX === 0) debugger;
+  if (1/minIX === 0 || 1/maxIX === 0) throw new Error("Map tile range is zero");
 
   const tesselate = 5 - zoom;
   const gz = 1 << (zoom);
@@ -156,6 +156,7 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
       const out = [];
       if (shapes.point) out.push(use(Point, shapes.point));
       if (shapes.line)  out.push(use(Line,  shapes.line));
+      if (shapes.loop)  out.push(use(Line,  shapes.loop));
       if (shapes.face)  out.push(use(Face,  shapes.face));
 
       cache.set(key, out);

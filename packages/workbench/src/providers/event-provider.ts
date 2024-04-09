@@ -258,3 +258,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((props: Eve
     )
   );
 }, 'EventProvider');
+
+export const useKeyboard = (id: number | null = null) => useContext(KeyboardContext).useKeyboard(id);
+export const useMouse = (id: number | null = null) => useContext(MouseContext).useMouse(id);
+export const useWheel = (id: number | null = null) => useContext(WheelContext).useWheel(id);

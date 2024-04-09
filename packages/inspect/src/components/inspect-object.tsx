@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useRef } from 'react';
 import { InspectProp } from './types';
 
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
@@ -86,6 +86,8 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
     object = o;
   }
 
+  const coordsRef = useRef([-1e3, -1e3]);
+
   keys = keys ?? Reflect.ownKeys(object);
   const fields = keys.map((k: string) => {
     const key = path +'/'+ k;
@@ -96,14 +98,15 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
     const icon = <IconItem height={16} top={2}>{expanded !== false ? <SVGChevronDown /> : <SVGChevronRight />}</IconItem>;
     const prefix = expandable ? icon : '';
 
-    let coords = [-1e3, -1e3];
     const onPointerDown = expandable ? (e: any) => {
-      coords = [e.clientX, e.clientY];
+      coordsRef.current = [e.clientX, e.clientY];
     } : undefined;
 
     const onClick = expandable ? (e: any) => {
-      const [x, y] = coords;
-      if (Math.abs(e.clientX - x) + Math.abs(e.clientY - y) > 2) return;
+      const {current: [x, y]} = coordsRef;
+      const dx = Math.abs(e.clientX - x);
+      const dy = Math.abs(e.clientY - y);
+      if (dx + dy > 2) return;
 
       toggleState(key);
       e.preventDefault();

@@ -34,25 +34,29 @@ export const makeGPUArray = (type: UniformType, length: number) => {
   return {array, dims, depth, length};
 };
 
-export const makeTensorArray = (type: UniformType, lengthOrData: number | VectorLike, size?: number[]): TensorArray => {
+export const makeTensorArray = (type: UniformType, size: number | number[]): TensorArray => {
+  const ctor  = getUniformArrayType(type);
+  const dims  = getUniformDims(type);
+  const align = getUniformAlign(type);
+
+  const d = toCPUDims(dims);
+  const sized = typeof size[0] === 'number';
+  const length = sized ? size.reduce((a, b) => a * b, 1) : size as number;
+
+  const n = length * d;
+  const array = new ctor(n);
+  return {array, dims: d, length, size: sized ? size : [length], format: type};
+};
+
+export const toTensorArray = (type: UniformType, data: VectorLike, size?: VectorLike): TensorArray => {
   const ctor  = getUniformArrayType(type);
   const dims  = getUniformDims(type);
   const align = getUniformAlign(type);
 
   const d = toCPUDims(dims);
 
-  let length = 0;
-  if (typeof lengthOrData === 'number') {
-    length = lengthOrData;
-
-    const n = length * d;
-    const array = new ctor(n);
-    return {array, dims: d, length, size: size ?? [length], format: type};
-  }
-  else {
-    length = (lengthOrData.length / dims)|0;
-    return {array: lengthOrData, dims: d, length, size: size ?? [length], format: type};
-  }
+  const length = (data.length / dims)|0;
+  return {array: data, dims: d, length, size: size ?? [length], format: type};
 };
 
 export const castRawArray = (buffer: ArrayBuffer | TypedArray, type: UniformType) => {
@@ -357,6 +361,7 @@ export const copyRecursiveNumberArray = (
     }
     return b;
   }
+  throw new Error("Unexpected array depth");
 };
 
 // Copy from 1d/2d/3d/4d number[][] into 1d/2d/3d/4d typed array, with specified w coordinate

@@ -331,9 +331,12 @@ export type TensorArray = {
   array: TypedArray,
   dims: number,
   length: number,
-  size: number[],
-  format?: UniformType,
+  format: UniformType,
+  size?: number[],
+  ragged?: Ragged,
 };
+
+export type Ragged = (number[] | TypedArray)[];
 
 export type VectorEmitter = (to: TypedArray, count: number, toIndex?: number, stride?: number) => void;
 export type VectorRefEmitter = (from: Lazy<number | number[] | TypedArray>, to: TypedArray, count: number, toIndex?: number, stride?: number) => void;

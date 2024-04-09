@@ -1,12 +1,12 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { TensorData } from '@use-gpu/core';
+import type { TensorArray } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/traits';
 
 import { makeUseTrait, optional, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { parseVec4 } from '@use-gpu/parse';
 import { memo, yeet, provide, useMemo, useNoMemo } from '@use-gpu/live';
-import { makeTensorArray, fillNumberArray } from '@use-gpu/core';
+import { toTensorArray, fillNumberArray } from '@use-gpu/core';
 import { getRenderFunc } from '@use-gpu/workbench';
 
 import { useDataContext, DataContext } from '../providers/data-provider';
@@ -34,8 +34,8 @@ const useTraits = makeUseTrait(Traits);
 
 export type ScaleProps = TraitProps<typeof Traits> & {
   /** Omit to provide data context `positions` and `values` instead. */
-  render?: (data: {positions: TensorData, values: TensorData}) => LiveElement,
-  children?: (data: {positions: TensorData, values: TensorData}) => LiveElement,
+  render?: (data: {positions: TensorArray, values: TensorArray}) => LiveElement,
+  children?: (data: {positions: TensorArray, values: TensorArray}) => LiveElement,
 };
 
 export const Scale: LiveComponent<ScaleProps> = memo((props: PropsWithChildren<ScaleProps>) => {
@@ -52,7 +52,7 @@ export const Scale: LiveComponent<ScaleProps> = memo((props: PropsWithChildren<S
   // Generate value scale
   const values = useMemo(() => {
     const f = (props.mode === 'log') ? logarithmic : linear;
-    return makeTensorArray('f32', new Float32Array(f(r[0], r[1], domainOptions)));
+    return toTensorArray('f32', new Float32Array(f(r[0], r[1], domainOptions)));
   }, [r[0], r[1], props]);
 
   // Generate positions aligned with origin
@@ -62,7 +62,7 @@ export const Scale: LiveComponent<ScaleProps> = memo((props: PropsWithChildren<S
     const array = new Float32Array(n * 4);
     fillNumberArray(origin, array, 4);
     for (let i = 0; i < n; ++i) array[i * 4 + axis] = vs[i];
-    return makeTensorArray('vec4<f32>', array);
+    return toTensorArray('vec4<f32>', array);
   }, [values, origin]);
 
   const render = getRenderFunc(props);

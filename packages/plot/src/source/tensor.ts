@@ -48,14 +48,14 @@ export type TensorProps<S extends string> = {
 } & {
   as?: string,
 
-  /** Omit to provide data context instead. */
   render?: (data: TensorArray) => LiveElement,
-  children?: (data: TensorArray) => LiveElement,
+  /** Element children will be provided data context. */
+  children?: LiveElement | ((data: TensorArray) => LiveElement),
 } & {
   as: S[],
-  /** Omit to provide data context instead. */
   render?: (data: Record<S, TensorArray>) => LiveElement,
-  children?: (data: Record<S, TensorArray>) => LiveElement,
+  /** Element children will be provided data context. */
+  children?: LiveElement | ((data: Record<S, TensorArray>) => LiveElement),
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;

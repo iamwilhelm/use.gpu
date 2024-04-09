@@ -281,6 +281,7 @@ export const generateConcaveIndices = (
     baseVertex += n;
     baseIndex += indices.length;
   }
+  if (baseIndex === 0) debugger;
 
   return baseIndex;
 }

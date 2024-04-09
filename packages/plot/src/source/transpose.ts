@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TensorData } from '@use-gpu/core';
+import type { TensorArray } from '@use-gpu/core';
 
 import { yeet, use, provide, useMemo, useNoMemo, useOne } from '@use-gpu/live';
 import { makeCopyPipe, toCPUDims } from '@use-gpu/core';
@@ -13,8 +13,8 @@ const toModulus = (size: number) => size.reduce((a, b) => (a.push(a.at(-1)! * b)
 
 export type TransposeProps = {
   as?: string,
-  tensor?: TensorData,
-  render?: (data: TensorData) => LiveElement,
+  tensor?: TensorArray,
+  render?: (data: TensorArray) => LiveElement,
 };
 
 export const Transpose: LiveComponent<TransposeProps> = (props) => {

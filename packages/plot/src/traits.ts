@@ -1,4 +1,4 @@
-import type { ColorLike, VectorLike, VectorLikes } from '@use-gpu/core';
+import type { ColorLike, Ragged, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
 import { useMemo, useOne } from '@use-gpu/live';
@@ -312,6 +312,7 @@ export const DataTrait = (keys: string[], canonical: string = 'positions') => {
     parsed: {
       formats: Record<string, string>,
       tensor: number[],
+      ragged: Ragged,
     },
   ) => {
     const dataContext = useDataContext();
@@ -326,14 +327,17 @@ export const DataTrait = (keys: string[], canonical: string = 'positions') => {
       let s = 0;
 
       for (const k in dataContext) if (match.has(k)) {
-        const {array, format, dims, size, version = 0} = dataContext[k];
+        const {array, format, dims, size, ragged, version = 0} = dataContext[k];
         if (!(props as any)[k]) {
           data[k] = array;
           formats[k] = format;
           d++;
           f++;
 
-          if (k === canonical) data.tensor = size;
+          if (k === canonical) {
+            data.tensor = size;
+            data.ragged = ragged;
+          }
         }
       }
 
@@ -427,8 +431,9 @@ export const SegmentsTrait = combine(
     },
   ) => {
     const [chunks, groups] = useProp(
-      props.positions ?? props.position,
+      props.positions ?? props.position ?? parsed.positions,
       (pos) => {
+        if (parsed.ragged) return parsed.ragged;
         if (parsed.tensor) {
           const [segment, ...rest] = parsed.tensor;
           const count = rest.reduce((a, b) => a * b, 1);
@@ -466,6 +471,7 @@ export const FacetedTrait = combine(
     const [chunks, groups] = useProp(
       props.positions ?? props.position,
       (pos) => {
+        if (parsed.ragged) return parsed.ragged;
         if (parsed.tensor) {
           const [segment, group, ...rest] = parsed.tensor;
           if (rest.length === 0) {

@@ -3,12 +3,13 @@ import type { TypedArray } from '@use-gpu/core';
 import type { Keyframe } from './types';
 
 import { clamp, lerp } from '@use-gpu/core';
-import { use, extend, fence, useCallback, useDouble, useMemo, useOne } from '@use-gpu/live';
+import { use, extend, mutate, fence, useCallback, useDouble, useMemo, useOne } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { getRenderFunc } from '../hooks/useRenderProp';
 
 import mapValues from 'lodash/mapValues';
+import zipObject from 'lodash/zipObject';
 
 const π = Math.PI;
 
@@ -75,6 +76,8 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
   const swapValues = useDouble(() => mapValues(script, keyframes => makeValueRef(keyframes[0][1])), Object.keys(script));
   const swapElements = useDouble(() => children ? extend(children, swapValues()) : null, [children, swapValues]);
 
+  const scalars = zipObject(Object.keys(script).filter(k => typeof script[k][0][1] === 'number'));
+
   const Run = useCallback(() => {
     const {
       timestamp,
@@ -98,29 +101,36 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
     const [t, max] = getLoopedTime(time, length, rest, repeat, mirror);
 
     const values = swapValues();
-    for (let k in values) evaluateKeyframe(values[k], script[k], t, ease);
+    for (let k in values) evaluateKeyframe(values, k, script[k], t, ease);
 
     // Run if not paused, not on first frame, or not past end
     if (!paused || pausedRef.current === elapsed && time < max) useAnimationFrame();
     else useNoAnimationFrame();
 
     if (render) return tracks ? render(values) : (prop ? render(values[prop]) : null);
-    else if (typeof children === 'object') return swapElements();
+    else if (typeof children === 'object') {
+      const elements = swapElements();
+      for (const k in scalars) scalars[k] = values[k];
+      mutate(elements, scalars);
+      return elements;
+    }
 
     return null;
   }, [script, swapValues, swapElements, render, children]);
 
-  // Fence so that continuation can change closure state
+  // Fence so that only continuation runs repeatedly
   return fence(null, Run);
 };
 
 const makeValueRef = (v: number[][] | number[] | TypedArray | number) => {
-  if (typeof v === 'number' || typeof v[0] === 'number') return new Float32Array(v.length || 1);
+  if (typeof v[0] === 'number') return new Float32Array(v.length || 1);
+  if (typeof v === 'number') return 0;
   return JSON.parse(JSON.stringify(v));
 }
 
 const evaluateKeyframe = <T>(
-  target: T extends number ? RefObject<number> : T,
+  values: Record<string, T>,
+  prop: string,
   keyframes: Keyframe<T>[],
   time: number,
   ease: string,
@@ -136,27 +146,30 @@ const evaluateKeyframe = <T>(
   let fraction = clamp(dt ? (time - start) / dt : 0, 0, 1);
 
   if (ease === 'bezier') {
-    interpolateValue(target, a[1], b[1], fraction);
+    interpolateValue(values, prop, a[1], b[1], fraction);
     //value = interpolateValueBezier(a[1], b[1], a[2], a[3], b[2], b[3], r);
   }
   else {
     if (ease === 'cosine') fraction = .5 - Math.cos(fraction * π) * .5;
-    interpolateValue(target, a[1], b[1], fraction);
+    interpolateValue(values, prop, a[1], b[1], fraction);
   }
 };
 
 const interpolateValue = (
-  target: number[][] | Float32Array,
+  values: Record<string, number | number[] | number[][] | Float32Array>,
+  prop: string,
   a: number[][] | number[] | Float32Array | number,
   b: number[][] | number[] | Float32Array | number,
   t: number,
 ) => {
-  if (typeof a === 'number') target[0] = lerp(a as number, b as number, t);
+  if (typeof a === 'number') values[prop] = lerp(a as number, b as number, t);
   else if (typeof a[0] === 'number') {
+    const target = values[prop];
     const n = target.length;
     for (let i = 0; i < n; ++i) target[i] = lerp(a[i], b[i], t);
   }
   else if (typeof a[0][0] === 'number') {
+    const target = values[prop];
     const n = target.length;
     for (let i = 0; i < n; ++i) {
       const aa = a[i];

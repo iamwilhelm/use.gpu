@@ -38,8 +38,8 @@ export type CanvasProps = {
 
 export const Canvas: LiveComponent<CanvasProps> = (props: PropsWithChildren<CanvasProps>) => {
   const {
-    width: propWidth,
-    height: propHeight,
+    width,
+    height,
     pixelRatio = 1,
     canvas,
     children,
@@ -50,9 +50,6 @@ export const Canvas: LiveComponent<CanvasProps> = (props: PropsWithChildren<Canv
     colorInput = COLOR_SPACE,
     samples = 1,
   } = props;
-
-  const width = propWidth * pixelRatio;
-  const height = propHeight * pixelRatio;
 
   const device = useContext(DeviceContext);
 

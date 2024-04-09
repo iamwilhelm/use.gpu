@@ -31,13 +31,13 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (props: PropsWithChildren<
   const [size, setSize] = useState(() => getCanvasSize(window, canvas));
 
   const [width, height, pixelRatio] = size;
-  const w = Math.round(width * pixelRatio);
-  const h = Math.round(height * pixelRatio);
+  const w = Math.round(width);
+  const h = Math.round(height);
 
   useOne(() => canvas.width = w, w);
   useOne(() => canvas.height = h, h);
-  useOne(() => canvas.style.width = `${Math.round(width)}px`, width);
-  useOne(() => canvas.style.height = `${Math.round(height)}px`, height);
+  useOne(() => canvas.style.width = `${Math.round(width / pixelRatio)}px`, width);
+  useOne(() => canvas.style.height = `${Math.round(height / pixelRatio)}px`, height);
 
   useResource((dispose) => {
     const resize = () => {
@@ -59,5 +59,5 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (props: PropsWithChildren<
   }, [canvas]);
 
   const render = getRenderFunc(props);
-  return render ? render(width, height, pixelRatio) : (children ?? null);
+  return render ? render(w, h, pixelRatio) : (children ?? null);
 };

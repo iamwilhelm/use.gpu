@@ -108,8 +108,32 @@ export const extend = (
     const [existing, ...rest] = calls.args;
     return ({...calls, args: [{...existing, ...props}, ...rest] });
   }
-  if (!calls) return calls;
+
   return ({...calls, args: [props] } as any);
+}
+
+/** Mutate arguments in-place on an existing call or calls. */
+export const mutate = (
+  calls: LiveNode<any>,
+  props: Record<string, any>,
+): LiveElement => {
+  if (typeof calls === 'string') throw new Error(`Cannot extend props of string child '${calls}'`);
+  if (typeof calls === 'function') throw new Error(`Cannot extend props of function child '${calls}'`);
+  if (!calls) return;
+
+  if (Array.isArray(calls)) {
+    calls.forEach(call => mutate(call, props)) as any;
+  }
+  else if ('props' in calls) {
+    for (const k in props) calls.props[k] = props[k];
+  }
+  else if (calls.args?.length) {
+    const ps = calls.args[0];
+    for (const k in props) ps[k] = props[k];
+  }
+  else {
+    calls.args = [props];
+  }
 }
 
 /** Morph a call to a Live function.

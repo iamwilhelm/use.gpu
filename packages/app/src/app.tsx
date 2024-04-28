@@ -42,6 +42,13 @@ const useInspector = () => {
   return inspect;
 };
 
+export const FPSToggle = () => {
+  const [fps, setFPS] = useState(false);
+  const {keyboard} = useKeyboard();
+  useOne(() => keyboard.keys.f && setFPS(!fps), keyboard.keys.f);
+  return fps ? <FPSCounter container="#use-gpu > .canvas" top={32} /> : null;
+};
+
 export const App: LC = hot(() => {
 
   const root = document.querySelector('#use-gpu')!;
@@ -123,13 +130,5 @@ export const App: LC = hot(() => {
   )
   // @ts-ignore
 }, module);
-
-export const FPSToggle = () => {
-  const [fps, setFPS] = useState(false);
-  const {keyboard} = useKeyboard();
-  useOne(() => keyboard.keys.f && setFPS(!fps), keyboard.keys.f);
-  return fps ? <FPSCounter container="#use-gpu > .canvas" top={32} /> : null;
-};
-
 
 App.displayName = 'App';

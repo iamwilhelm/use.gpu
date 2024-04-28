@@ -4,11 +4,11 @@ import { capture, yeet, useCapture, useNoCapture, useMemo, useOne, useRef, useRe
 import {
   makeIdAllocator,
   makeGPUArray, copyNumberArray,
-
+  
   normalizeSchema,
-  makeAggregateBuffer,
-  makeMultiAggregateBuffer,
-  makeMultiAggregateFields,
+  makeArrayAggregateBuffer,
+  makeStructAggregateBuffer,
+  makeStructAggregateFields,
   uploadStorage,
   getBoundingBox, toDataBounds,
   isUniformArrayType,
@@ -25,7 +25,7 @@ import { getInstancedAggregate } from '../hooks/useInstancedSources';
 
 const {signal} = QueueReconciler;
 
-type Queued = {instance: number, data: Record<string, any>};
+type Queued = {instances: number[], datas: Record<string, any>[]};
 type FieldBuffer = {
   buffer: GPUBuffer,
   array: TypedArray,
@@ -40,7 +40,12 @@ export type InstanceDataProps = {
   reserve?: number,
 
   render?: (useInstance: () => (data: Record<string, any>) => void) => LiveElement,
-  then?: (indices: StorageSource, data: StorageSource[]) => LiveElement,
+} & {
+  format: 'u16' | 'u32',
+  then?: (data: StorageSource[], indices: StorageSource) => LiveElement,
+} & {
+  format: undefined,
+  then?: (data: StorageSource[]) => LiveElement,
 };
 
 export const useNoInstance = () => {
@@ -52,7 +57,7 @@ export const useNoInstance = () => {
 export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
   const {
     schema: propSchema,
-    format = 'u16',
+    format,
     reserve = 64,
     then,
     render,
@@ -80,7 +85,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
 
   const [ids, queue, InstanceCapture] = useOne(() => [
     makeIdAllocator(0),
-    [] as Queued[],
+    {instances: [], datas: []} as Queued,
     makeCapture('InstanceCapture'),
   ]);
 
@@ -88,7 +93,10 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
   const useInstance = useMemo(() => {
 
     const makeUpdateInstance = (instance: number) => (data: Record<string, any>) => {
-      queue.push({instance, data});
+      queue.instances.push(instance);
+      queue.datas.push(data);
+
+      return instance;
     };
 
     const useInstance = () => {
@@ -115,7 +123,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
 
     // Make/resize data buffers + index buffer
     const [aggregateBuffer, indexBuffer, fields, sources] = useMemo(() => {
-      const aggregateBuffer = makeMultiAggregateBuffer(device, uniforms, alloc);
+      const aggregateBuffer = makeStructAggregateBuffer(device, uniforms, alloc);
       const {current: prevBuffer} = prevBufferRef;
 
       if (prevBuffer) {
@@ -124,10 +132,10 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
         copyNumberArray(from, to, 1, 1, 0, 0, Math.min(from.length, to.length));
       }
 
-      if (format !== 'u16' && format !== 'u32') throw new Error(`Unknown index format "${format}"`);
-      const indexBuffer = makeAggregateBuffer(device, format, alloc);
+      if (format != null && format !== 'u16' && format !== 'u32') throw new Error(`Unknown index format "${format}"`);
+      const indexBuffer = format ? makeArrayAggregateBuffer(device, format, alloc) : null;
 
-      const fields = makeMultiAggregateFields(aggregateBuffer);
+      const fields = makeStructAggregateFields(aggregateBuffer);
       const sources = getInstancedAggregate(aggregateBuffer);
 
       return [aggregateBuffer, indexBuffer, fields, sources];
@@ -139,7 +147,12 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
     // Update data sparsely while calculating upload ranges
     let ranges = [];
     let range = null;
-    for (const {instance, data} of queue) {
+    const {instances, datas} = queue;
+    const n = instances.length;
+    for (let i = 0; i < n; ++i) {
+      const instance = instances[i];
+      const data = datas[i];
+
       if (!range) ranges.push(range = [instance, instance + 1]);
       else if (range[1] === instance) range[1]++;
       else ranges.push(range = [instance, instance + 1]);
@@ -159,19 +172,22 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
     if (needsRefresh) ranges = [[0, size]];
 
     // Upload changed ranges
-    if (ranges.length) {
-      const {buffer, raw, layout} = aggregateBuffer;
-      const {length: stride} = layout;
+    const {buffer, raw, layout} = aggregateBuffer;
+    const {length: stride} = layout;
+    if (needsRefresh) {
+      uploadBufferRange(device, buffer, raw, 0, size * stride);
+    }
+    else if (ranges.length) {
       for (const [from, to] of ranges) {
         uploadBufferRange(device, buffer, raw, from * stride, (to - from) * stride);
       }
     }
-    //if ((window.TT = (window.TT||0)+1) < 10) console.log(aggregateBuffer, fields, indexBuffer)
-    queue.length = 0;
+    queue.instances.length = queue.datas.length = 0;
 
     // Update instance ID buffer
     const version = ids.version();
     useOne(() => {
+      if (!indexBuffer) return;
       const {buffer, array, source} = indexBuffer;
 
       let i = 0;

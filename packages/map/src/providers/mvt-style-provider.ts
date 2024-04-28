@@ -74,5 +74,5 @@ export const MVTStyles: LiveComponent<MVTStylesProps> = (props: PropsWithChildre
     return out;
   }, styles);
 
-  return provide(MVTStyleContext, styles, children);
+  return provide(MVTStyleContext, context, children);
 };

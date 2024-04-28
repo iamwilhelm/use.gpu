@@ -53,7 +53,7 @@ export const useMatrixTransform = (
   TransformContextProps,
   MatrixRefs,
 ] => {
-  const refs: RefObject<MatrixRefs> = useOne(() => ({
+  const refs: MatrixRefs = useOne(() => ({
     matrix: {current: matrix ?? NO_MATRIX},
     normalMatrix: {current: mat3.create()},
   }));

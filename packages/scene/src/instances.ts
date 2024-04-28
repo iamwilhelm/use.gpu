@@ -40,7 +40,7 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
     mesh,
     shaded,
     side,
-    format,
+    format = 'u16',
     render,
   } = props;
 

@@ -8,6 +8,16 @@ export type MatrixRefs = {
   normalMatrix: RefObject<mat3>,
 };
 
+export type MatrixState = {
+  matrix: mat4,
+  normalMatrix: mat3,
+};
+
+export type MatrixInstances = {
+  use: () => (state: MatrixState) => number,
+  instance: number,
+};
+
 export type TransformBounds = (bounds: DataBounds) => DataBounds;
 
 export type TransformContextProps = {

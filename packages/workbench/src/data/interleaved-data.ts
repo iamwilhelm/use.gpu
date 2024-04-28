@@ -11,8 +11,8 @@ import { yeet, extend, gather, useOne, useMemo, useNoMemo, incrementVersion } fr
 import {
   makePackedLayout,
   normalizeSchema,
-  makeMultiAggregateBuffer,
-  makeMultiAggregateFields,
+  makeStructAggregateBuffer,
+  makeStructAggregateFields,
   uploadStorage,
   getBoundingBox, toDataBounds,
   isUniformArrayType,
@@ -81,8 +81,8 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
 
   // Make aggregate buffer
   const [aggregateBuffer, fields] = useMemo(() => {
-    const aggregateBuffer = makeMultiAggregateBuffer(device, uniforms, bufferLength);
-    const fields = makeMultiAggregateFields(aggregateBuffer);
+    const aggregateBuffer = makeStructAggregateBuffer(device, uniforms, bufferLength);
+    const fields = makeStructAggregateFields(aggregateBuffer);
 
     return [aggregateBuffer, fields];
   }, [device, uniforms, bufferLength]);

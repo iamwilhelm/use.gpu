@@ -89,7 +89,7 @@ const arrayify = <A, B>(sizes: Record<A, B>): Record<A, B> => {
   return sizes;
 };
 
-export const UNIFORM_ATTRIBUTE_SIZES = arrayify(arrayify(shorthands({
+export const UNIFORM_ATTRIBUTE_SIZES = arrayify(arrayify(arrayify(shorthands({
   "bool":         1,
   "vec2<bool>":   2,
   "vec3<bool>":   3,
@@ -198,9 +198,9 @@ export const UNIFORM_ATTRIBUTE_SIZES = arrayify(arrayify(shorthands({
   "vec3to4<u32>": 12,
   "vec3to4<i32>": 12,
   "vec3to4<f32>": 12,
-}))) as Record<UniformType, number>;
+})))) as Record<UniformType, number>;
 
-export const UNIFORM_ATTRIBUTE_ALIGNS = arrayify(arrayify(shorthands({
+export const UNIFORM_ATTRIBUTE_ALIGNS = arrayify(arrayify(arrayify(shorthands({
   ...UNIFORM_ATTRIBUTE_SIZES,
 
   "bool":         0, // Not host-shareable
@@ -295,9 +295,9 @@ export const UNIFORM_ATTRIBUTE_ALIGNS = arrayify(arrayify(shorthands({
   "vec3to4<u32>": 0,
   "vec3to4<i32>": 0,
   "vec3to4<f32>": 0,
-}))) as Record<UniformType, number>;
+})))) as Record<UniformType, number>;
 
-export const UNIFORM_ARRAY_DIMS = arrayify(arrayify(shorthands({
+export const UNIFORM_ARRAY_DIMS = arrayify(arrayify(arrayify(shorthands({
   "bool":         1,
   "vec2<bool>":   2,
   "vec3<bool>":   3.5,
@@ -406,9 +406,9 @@ export const UNIFORM_ARRAY_DIMS = arrayify(arrayify(shorthands({
   "vec3to4<u32>": 3,
   "vec3to4<i32>": 3,
   "vec3to4<f32>": 3,
-}))) as Record<UniformType, number>;
+})))) as Record<UniformType, number>;
 
-export const UNIFORM_ARRAY_TYPES = arrayify(arrayify(shorthands({
+export const UNIFORM_ARRAY_TYPES = arrayify(arrayify(arrayify(shorthands({
   "bool":         Uint32Array,
   "vec2<bool>":   Uint32Array,
   "vec3<bool>":   Uint32Array,
@@ -517,7 +517,7 @@ export const UNIFORM_ARRAY_TYPES = arrayify(arrayify(shorthands({
   "vec3to4<u32>": Uint32Array,
   "vec3to4<i32>": Int32Array,
   "vec3to4<f32>": Float32Array,
-}))) as Record<UniformType, TypedArrayConstructor>;
+})))) as Record<UniformType, TypedArrayConstructor>;
 
 export const TEXTURE_FORMAT_SIZES = {
   // 8-bit formats

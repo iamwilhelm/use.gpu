@@ -327,11 +327,19 @@ export type Tuples<N extends number, T = number> = {
   iterate: (f: (...args: T[]) => void, start?: number, end?: number) => void;
 };
 
-export type TensorArray = {
+export type FieldArray = {
   array: TypedArray,
+  format: UniformType | UniformNamedType,
   dims: number,
   length: number,
+  depth: number,
+};
+
+export type TensorArray = {
+  array: TypedArray,
   format: UniformType,
+  dims: number,
+  length: number,
   size?: number[],
   ragged?: Ragged,
 };
@@ -409,16 +417,6 @@ export type ArchetypeField = {
   separate?: boolean,
 };
 
-export type Aggregate = {
-  aggregateBuffers: Record<string, AggregateBuffer | VirtualAggregateBuffer>,
-  bySelf?: { keys: string[], sources: Record<string, StorageSource> },
-  byItems?: MultiAggregateBuffer,
-  byVertices?: MultiAggregateBuffer,
-  byIndices?: MultiAggregateBuffer,
-  byRefs?: MultiAggregateBuffer,
-  refBuffers: Record<string, Lazy<any>[]>,
-};
-
 export type AggregateValue = number | number[] | TypedArray | VectorEmitter | VectorRefEmitter;
 
 export type AggregateItem = {
@@ -431,27 +429,51 @@ export type AggregateItem = {
   flags?: Record<string, any>,
 };
 
-export type AggregateBuffer = {
-  buffer: GPUBuffer,
-  array?: TypedArray,
-  source: StorageSource,
-  dims: number,
+export type ArrayAggregate = FieldArray & {
+  base?: number,
+  stride?: number,
 };
 
-export type MultiAggregateBuffer = {
-  buffer: GPUBuffer,
-  raw?: ArrayBuffer,
-  source: StorageSource,
+export type StructAggregate = {
+  raw: ArrayBuffer,
   layout: UniformLayout,
+  length: number,
   keys: string[],
 };
 
-export type VirtualAggregateBuffer = {
-  array: TypedArray,
-  base: number,
-  dims: number,
-  stride: number,
+export type CPUAggregate = {
+  aggregateBuffers: Record<string, ArrayAggregate>,
+  refBuffers: Record<string, Lazy<any>[]>,
+
+  bySelfs?: { keys: string[] },
+  byItems?: StructAggregate,
+  byVertices?: StructAggregate,
+  byIndices?: StructAggregate,
+  byRefs?: StructAggregate,
 };
+
+export type GPUAggregate = {
+  aggregateBuffers: Record<string, ArrayAggregateBuffer | ArrayAggregate>,
+  refBuffers: Record<string, Lazy<any>[]>,
+
+  bySelfs?: { keys: string[], sources: Record<string, StorageSource> },
+  byItems?: StructAggregateBuffer,
+  byVertices?: StructAggregateBuffer,
+  byIndices?: StructAggregateBuffer,
+  byRefs?: StructAggregateBuffer,
+};
+
+export type ArrayAggregateBuffer = ArrayAggregate & {
+  buffer: GPUBuffer,
+  source: StorageSource,
+};
+
+export type StructAggregateBuffer = StructAggregate & {
+  buffer: GPUBuffer,
+  source: StorageSource,
+};
+
+/*-----*/
 
 export type Atlas = {
   place: (key: number, w: number, h: number) => Rectangle,

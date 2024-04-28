@@ -220,8 +220,8 @@ export const assembleCutRingWith = (
 };
 
 export const clipTileEdges = (polygons: XY[][][], minX: number, minY: number, maxX: number, maxY: number) => {
-  const line = [];
-  const loop = [];
+  const lines = [];
+  const rings = [];
 
   let section = null;
   let cut = false;
@@ -238,17 +238,18 @@ export const clipTileEdges = (polygons: XY[][][], minX: number, minY: number, ma
         ++i;
       }
       
-      if (!cuts.length) loop.push(ring);
+      if (!cuts.length) rings.push(ring);
       else {
-        if (cuts[0] > 1) line.push(ring.slice(0, cuts[0] + 1));
+        if (cuts[0] > 1) lines.push(ring.slice(0, cuts[0] + 1));
         for (let i = 0; i < cuts.length; ++i) {
-          if (cuts[i] + 1 != cuts[i + 1]) line.push(ring.slice(cuts[i], (cuts[i + 1] ?? ring.length) + 1));
+          if (cuts[i] === ring.length - 1) continue;
+          if (cuts[i] + 1 != cuts[i + 1]) lines.push(ring.slice(cuts[i], (cuts[i + 1] ?? ring.length) + 1));
         }
       }
     }
   }
 
-  return {line, loop};
+  return {lines, rings};
 };
 
 export const getRingArea = (ring: XY[]): number => {

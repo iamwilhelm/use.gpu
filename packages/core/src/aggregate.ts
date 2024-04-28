@@ -1,7 +1,14 @@
-import type { AggregateBuffer, AggregateValue, MultiAggregateBuffer, UniformType, VirtualAggregateBuffer } from './types';
+import type {
+  AggregateValue,
+  ArrayAggregate,
+  StructAggregate,
+  ArrayAggregateBuffer,
+  StructAggregateBuffer,
+  UniformType,
+} from './types';
 
 import { resolve } from './lazy';
-import { makeStorageBuffer, uploadBuffer, uploadStorage } from './buffer';
+import { makeStorageBuffer, uploadStorage } from './buffer';
 import { incrementVersion } from './id';
 import {
   alignSizeTo,
@@ -38,11 +45,31 @@ export const getAggregateSummary = (items: AggregateItem[]) => {
   return {archetype, count: allCount, indexed: allIndexed, instanced: allInstanced, offsets: indexOffsets};
 };
 
-export const makeAggregateBuffer = (
+export const makeArrayAggregate = (
+  format: UniformType,
+  length: number,
+): ArrayAggregate => makeGPUArray(format, length);
+
+export const makeStructAggregate = (
+  uniforms: UniformAttribute[],
+  length: number,
+  keys?: string[],
+): StructAggregate => {
+  const layout = makeUniformLayout(uniforms);
+
+  const {length: bytes} = layout;
+  const raw = makeRawArray(bytes * length);
+
+  keys = keys ?? layout.attributes.map(({name}) => name);
+
+  return {raw, layout, length, keys};
+};
+
+export const makeArrayAggregateBuffer = (
   device: GPUDevice,
   format: UniformType,
   length: number,
-): AggregateBuffer => {
+): ArrayAggregateBuffer => {
   const {array, dims} = makeGPUArray(format, length);
 
   const buffer = makeStorageBuffer(device, array.byteLength);
@@ -54,21 +81,19 @@ export const makeAggregateBuffer = (
     version: 0,
   };
 
-  return {buffer, array, source, dims};
+  return {buffer, source, array, length, dims};
 }
 
-export const makeMultiAggregateBuffer = (
+export const makeStructAggregateBuffer = (
   device: GPUDevice,
   uniforms: UniformAttribute[],
   length: number,
   keys?: string[],
-): MultiAggregateBuffer => {
-  const layout = makeUniformLayout(uniforms);
+): StructAggregateBuffer => {
 
-  const {length: bytes} = layout;
-  const raw = makeRawArray(bytes * length);
+  const aggregate = makeStructAggregate(uniforms, length, keys);
 
-  const buffer = makeStorageBuffer(device, bytes * length);
+  const buffer = makeStorageBuffer(device, raw.byteLength);
   const source = {
     buffer,
     format: uniforms,
@@ -77,21 +102,19 @@ export const makeMultiAggregateBuffer = (
     version: 0,
   };
 
-  keys = keys ?? layout.attributes.map(({name}) => name);
-
-  return {buffer, raw, source, layout, keys};
+  return {buffer, source, ...aggregate};
 }
 
-export const makeMultiAggregateFields = (aggregateBuffer: AggregateBuffer) => {
-  const {layout: {length, attributes}, buffer, raw} = aggregateBuffer;
+export const makeStructAggregateFields = (structAggregate: StructAggregate) => {
+  const {layout: {length: layoutLength, attributes}, raw, length} = structAggregate;
 
-  const out: Record<string, VirtualAggregateBuffer> = {};
+  const out: Record<string, AggregateArray> = {};
   for (const {name, offset, format} of attributes) {
     const {array, dims} = castRawArray(raw, format);
 
     const elementSize = array.byteLength / array.length;
     const base = offset / elementSize;
-    const stride = length / elementSize;
+    const stride = layoutLength / elementSize;
 
     if (base !== (base|0) || stride !== (stride|0)) throw new Error('Unaligned field data');
 
@@ -99,22 +122,22 @@ export const makeMultiAggregateFields = (aggregateBuffer: AggregateBuffer) => {
       array,
       base,
       stride,
+      length,
       dims,
     };
   }
   return out;
 };
 
-export const updateAggregateBuffer = (
-  device: GPUDevice,
-  aggregate: AggregateBuffer | VirtualAggregateBuffer,
+export const updateAggregateArray = (
+  aggregate: AggregateBuffer | ArrayAggregate,
   items: AggregateItem[],
   key: string,
   unwelded?: boolean,
   single?: boolean,
   offsets?: number[],
 ) => {
-  const {buffer, array, source, dims, base, stride} = aggregate;
+  const {array, dims, base, stride} = aggregate;
 
   // vec3/mat3 to vec4/mat4 extension
   // 3.5 = 3to4, 7.5 = 6to8, 11.5 = 9to12, 15.5 = 12to16
@@ -144,45 +167,37 @@ export const updateAggregateBuffer = (
     i++;
   }
 
-  if (buffer) uploadStorage(device, source, array.buffer, b / dimsOut);
+  aggregate.length = b / dimsOut;
 }
 
-export const updateAggregateInstances = (
-  device: GPUDevice,
-  aggregate: AggregateBuffer,
-  items: AggregateItem[],
-  count: number,
-) => {
-  const {array, source, layout} = aggregate;
+export const updateAggregateInstances = (() => {
   const slices = [];
+  
+  return (
+    aggregate: ArrayAggregate,
+    items: AggregateItem[],
+    count: number,
+  ) => {
+    const {array} = aggregate;
 
-  for (const {count, indexed, slices: s} of items) {
-    if (s) slices.push(...s);
-    else slices.push(indexed ?? count);
+    for (const {count, indexed, slices: s} of items) {
+      if (s) slices.push(...s);
+      else slices.push(indexed ?? count);
+    }
+
+    spreadNumberArray(null, array, slices);
+    aggregate.length = count;
+
+    slices.length = 0;
   }
-
-  spreadNumberArray(null, array, slices);
-  uploadStorage(device, source, array.buffer, count);
-  return source;
-}
-
-export const updateMultiAggregateBuffer = (
-  device: GPUDevice,
-  aggregate: AggregateBuffer,
-  count: number,
-) => {
-  const {buffer, raw, source, layout} = aggregate;
-  uploadStorage(device, source, raw, count);
-  return source;
-}
+})();
 
 export const updateAggregateRefs = (
-  device: GPUDevice,
   aggregate: AggregateBuffer,
   refs: Lazy<any>[],
   count: number,
 ) => {
-  const {buffer, array, source, dims, base, stride} = aggregate;
+  const {array, dims, base, stride} = aggregate;
   const step = stride || dims;
 
   let b = base || 0;
@@ -191,5 +206,14 @@ export const updateAggregateRefs = (
     b += step;
   }
 
-  if (buffer) uploadStorage(device, source, array.buffer, count);
+  aggregate.length = count;
+}
+
+export const uploadAggregateBuffer = (
+  device: GPUDevice,
+  aggregate: ArrayAggregateBuffer | StructAggregateBuffer,
+) => {
+  const {buffer, array, raw, source, length} = aggregate;
+  uploadStorage(device, source, raw ?? array.buffer, length);
+  return source;
 }

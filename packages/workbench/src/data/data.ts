@@ -14,12 +14,12 @@ import {
   isUniformArrayType,
   getUniformDims,
 
-  makeCPUArray,
   copyRecursiveNumberArray,
   getBoundingBox,
   toDataBounds,
 
   normalizeSchema,
+  allocateSchema,
   schemaToArchetype,
   schemaToEmitters,
   getAggregateSummary,
@@ -40,6 +40,8 @@ export type SegmentsInfo = {
   ends: boolean[] | boolean,
 };
 
+export type SegmentDecorator = (args: SegmentsInfo) => Record<string, any>;
+
 export type DataProps<S extends DataSchema> = {
   /** WGSL schema of input data + accessors */
   schema: S,
@@ -55,6 +57,8 @@ export type DataProps<S extends DataSchema> = {
   version?: number,
   /** Resample data on every animation frame. */
   live?: boolean,
+  /** Data will never change */
+  immutable?: boolean,
 
   /** Global flag or per item `isLoop` accessor */
   loop?: BooleanList,
@@ -64,7 +68,7 @@ export type DataProps<S extends DataSchema> = {
   end?: BooleanList,
 
   /** Segment decorator(s) */
-  segments?: (args: SegmentsInfo) => Record<string, any>,
+  segments?: SegmentDecorator,
   /** Segments from tensor dimensions */
   tensor?: number[],
 
@@ -90,6 +94,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
     segments,
     tensor,
     live = false,
+    immutable = false,
   } = props;
   
   const schema = useOne(() => normalizeSchema(propSchema), propSchema);
@@ -155,36 +160,18 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
   const allocIndices = useBufferedSize(indexCount);
 
   // Make arrays for merged attributes
-  const [fields, attributes, archetype] = useMemo(() => {
-    const fields = {};
-    const attributes = {};
-
-    let hasSingle = false;
-    let hasPlural = false;
-
-    for (const k in schema) if (keys.includes(k)) {
-      const {format, prop = k, index, unwelded, ref} = schema[k];
-      if (ref) throw new Error(`Ref '${k}' not supported in <Data>`);
-
-      const isArray = isUniformArrayType(format);
-      const alloc = isArray ? (index || unwelded) ? allocIndices : allocVertices : allocItems;
-      const {array, dims, depth} = makeCPUArray(format, alloc);
-      if (depth > 1 && !segments && !tensor) throw new Error(`Cannot use nested array without 'segment' handler.`)
-
-      if (isArray) hasPlural = true;
-      else hasSingle = true;
-
-      fields[k] = {array, dims, depth, prop};
-      attributes[k] = array;
-    }
-
-    if (hasSingle && hasPlural && !segments) throw new Error(`Cannot mix array and non-array data without 'segment' handler`);
-
-    const archetype = schemaToArchetype(schema, attributes);
-    if (attributes.instances) throw new Error(`Reserved attribute name 'instances'.`);
-
-    return [fields, attributes, archetype];
-  }, [schema, allocItems, allocVertices, allocIndices]);
+  const hasSegments = segments || tensor || keys.includes('segments');
+  const [fields, attributes, archetype] = useMemo(
+    () => allocateSchema(
+      schema,
+      allocItems,
+      allocVertices,
+      allocIndices,
+      hasSegments,
+      (key: string) => keys.includes(key),
+    ),
+    [schema, keys, allocItems, allocVertices, allocIndices, hasSegments]
+  );
 
   // Blit all data into merged arrays if stale
   const slices = useMemo(() => {
@@ -273,10 +260,10 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
   if (live) useAnimationFrame();
   else useNoAnimationFrame();
 
-  const trigger = useOne(() => signal(), items);
+  const trigger = useOne(() => signal(), immutable ? null : items);
 
   const view = useRenderProp(props, sources);
-  return [trigger, view];
+  return immutable ? view : [trigger, view];
 };
 
 // Resolve loop/start/end flags into array
@@ -299,7 +286,7 @@ const getMultiChunkCount = (
   schema: DataSchema,
   key: string,
   itemCount: number,
-  data?: Record<string, any> | (Record<string, any>)[],
+  data?: Record<string, any>[],
   virtual?: Record<string, (i: number) => any>,
   skip: number = 0
 ) => {
@@ -332,7 +319,7 @@ const getVertexCount = (
   schema: DataSchema,
   key: string,
   itemCount: number,
-  data?: Record<string, any> | (Record<string, any>)[],
+  data?: Record<string, any>[],
   virtual?: Record<string, (i: number) => any>,
   skip: number = 0
 ) => {

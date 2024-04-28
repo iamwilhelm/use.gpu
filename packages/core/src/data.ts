@@ -1,4 +1,4 @@
-import type { Lazy, Emitter, VectorEmitter, Emit, TypedArray, TensorArray, VectorLike, UniformType, UniformAttribute } from './types';
+import type { Lazy, Emitter, VectorEmitter, Emit, TypedArray, FieldArray, TensorArray, VectorLike, UniformType, UniformAttribute } from './types';
 
 import { getUniformArrayType, getUniformArrayDepth, getUniformDims, getUniformAlign, toCPUDims, toGPUDims } from './uniform';
 import { isTypedArray } from './buffer';
@@ -11,7 +11,7 @@ export const alignSizeTo = (n: number, align: number) => Math.ceil(n / align) * 
 
 export const makeRawArray = (byteSize: number) => new ArrayBuffer(byteSize);
 
-export const makeCPUArray = (type: UniformType, length: number) => {
+export const makeCPUArray = (type: UniformType, length: number): FieldArray => {
   const ctor  = getUniformArrayType(type);
   const dims  = getUniformDims(type);
   const depth = getUniformArrayDepth(type);
@@ -19,10 +19,10 @@ export const makeCPUArray = (type: UniformType, length: number) => {
   const n = length * toCPUDims(dims);
 
   const array = new ctor(n);
-  return {array, dims, depth};
+  return {format: type, array, dims, depth, length};
 };
 
-export const makeGPUArray = (type: UniformType, length: number) => {
+export const makeGPUArray = (type: UniformType, length: number): FieldArray => {
   const ctor  = getUniformArrayType(type);
   const dims  = getUniformDims(type);
   const depth = getUniformArrayDepth(type);
@@ -31,7 +31,7 @@ export const makeGPUArray = (type: UniformType, length: number) => {
   const n = alignSizeTo(length * toGPUDims(dims), align || 4);
 
   const array = new ctor(n);
-  return {array, dims, depth, length};
+  return {format: type, array, dims, depth, length};
 };
 
 export const makeTensorArray = (type: UniformType, size: number | number[]): TensorArray => {
@@ -356,7 +356,7 @@ export const copyRecursiveNumberArray = (
     const n = from.length;
     let b = 0;
     for (let i = 0; i < n; ++i) {
-      const l = copyRecursiveNumberArray(from, to, fromDims, toDims, fromDepth - 1, b, w);
+      const l = copyRecursiveNumberArray(from[i], to, fromDims, toDims, fromDepth - 1, toIndex + b, w);
       b += l;
     }
     return b;

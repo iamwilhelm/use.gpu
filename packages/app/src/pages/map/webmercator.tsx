@@ -133,13 +133,14 @@ export const MapWebMercatorPage: LC = () => {
           <Plot>
             <Animate
               loop
+              paused
               delay={1}
               speed={2}
               tracks={tracks}
               duration={75}
             >
               <WebMercator
-                bend={0}
+                bend={1}
                 range={[[-1.5, 1.5], [-.5 - 2/3, .5 + 2/3]]}
                 long={90}
                 lat={20}

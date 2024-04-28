@@ -17,7 +17,7 @@ export const useInstancedSources = (
   uniforms: UniformAttribute[],
   index: UniformAttribute,
   values: Record<string, StorageSource>,
-  indices: StorageSource,
+  indices?: StorageSource | null,
 ) => (
   useMemo(() => getInstancedSources(uniforms, index, values, indices), [uniforms, index, values, indices])
 );
@@ -26,10 +26,10 @@ export const getInstancedSources = (
   uniforms: UniformAttribute[],
   index: UniformAttribute,
   values: Record<string, StorageSource>,
-  indices: StorageSource,
+  indices?: StorageSource | null,
 ) => {
   const boundValues = uniforms.map((uniform) => getSource(uniform, values[uniform.name]));
-  const boundIndices = getSource(index, indices);
+  const boundIndices = indices ? getSource(index, indices) : null;
 
   const instances = instanceWith(boundValues, boundIndices);
 

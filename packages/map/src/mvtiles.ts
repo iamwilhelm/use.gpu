@@ -1,17 +1,24 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 
-import { clamp } from '@use-gpu/core';
+import { clamp, adjustSchema } from '@use-gpu/core';
 import { gather, use, keyed, yeet, memo, useAwait, useCallback, useOne, useMemo } from '@use-gpu/live';
-import { VirtualLayers, useLayoutContext, useForceUpdate } from '@use-gpu/workbench';
-import { useRangeContext, Point, Line, Face } from '@use-gpu/plot';
+import { useLayoutContext, useForceUpdate, getLineSegments, getFaceSegmentsConcave, Data, PointLayer, LineLayer, FaceLayer, POINT_SCHEMA, LINE_SCHEMA, FACE_SCHEMA } from '@use-gpu/workbench';
+import { useRangeContext } from '@use-gpu/plot';
 
 import { useTileContext } from './providers/tile-provider';
 import { MVTStyleContextProps, useMVTStyleContext } from './providers/mvt-style-provider';
 
-import { getMVTShapes } from './util/mvtile';
+import { getMVTShapes, aggregateMVTShapes } from './util/mvtile';
 import LRU from 'lru-cache';
 
 import { VectorTile } from 'mapbox-vector-tile';
+
+const POS = {positions: 'vec2<f32>'};
+const SCHEMAS = {
+  point: adjustSchema(POINT_SCHEMA, POS),
+  line:  adjustSchema(LINE_SCHEMA, POS),
+  face:  adjustSchema(FACE_SCHEMA, POS),
+};
 
 const getKey = (x: number, y: number, zoom: number) => (zoom << 20) + (y << 10) + (x << 0);
 const parseKey = (v: number) => [v & 0x3FF, (v >> 10) & 0x3FF, (v >> 20) & 0x3FF];
@@ -152,12 +159,42 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
       // Load raw MVT
       const mvt = new VectorTile(new Uint8Array(ab));
       const shapes = getMVTShapes(x, y, zoom, mvt, styles, flipY, tesselate);
+      const aggregate = aggregateMVTShapes(shapes);
+      console.log({shapes, aggregate})
 
       const out = [];
-      if (shapes.point) out.push(use(Point, shapes.point));
-      if (shapes.line)  out.push(use(Line,  shapes.line));
-      if (shapes.loop)  out.push(use(Line,  shapes.loop));
-      if (shapes.face)  out.push(use(Face,  shapes.face));
+      if (aggregate.point) {
+        out.push(use(Data, {
+          immutable: true,
+          data: aggregate.point.attributes,
+          schema: SCHEMAS.point,
+          render: (props) => use(PointLayer, props),
+        }));
+      }
+      if (aggregate.line) {
+        out.push(use(Data, {
+          immutable: true,
+          data: aggregate.line.attributes,
+          schema: SCHEMAS.line,
+          render: (props) => use(LineLayer, props),
+        }));
+      }
+      if (aggregate.ring) {
+        out.push(use(Data, {
+          immutable: true,
+          data: aggregate.ring.attributes,
+          schema: SCHEMAS.line,
+          render: (props) => use(LineLayer, props),
+        }));
+      }
+      if (aggregate.face) {
+        out.push(use(Data, {
+          immutable: true,
+          data: aggregate.face.attributes,
+          schema: SCHEMAS.face,
+          render: (props) => use(FaceLayer, props),
+        }));
+      }
 
       cache.set(key, out);
       loaded.set(upKey, (loaded.get(upKey) || 0) + 1);

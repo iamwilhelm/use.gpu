@@ -192,6 +192,7 @@ export const schemaToEmitters = (
       }
     }
   }
+
   return attributes;
 };
 
@@ -302,7 +303,9 @@ export const schemaToAggregate = (
         refBuffers[key] = [];
       }
 
-      if (isSeparate) bySelf.push([key, alloc]);
+      if (isSeparate) {
+        bySelf.push([key, alloc]);
+      }
       else {
         const list = (
           // Uniform with lazy ref
@@ -330,7 +333,7 @@ export const schemaToAggregate = (
     const n = name ?? k;
     const ab = aggregateBuffers[n] = makeArrayAggregate(f, alloc);
 
-    bySelfs.keys.push(n);
+    bySelfs.keys.push([k, n]);
   };
 
   // Build grouped attribute struct
@@ -423,9 +426,9 @@ export const toGPUAggregate = (
   const ab = {...aggregateBuffers};
   const sources = {};
 
-  for (const k of bySelfs.keys) {
-    ab[k] = buildOne(ab[k]);
-    sources[k] = ab[k].source;
+  for (const [, n] of bySelfs.keys) {
+    ab[n] = buildOne(ab[n]);
+    sources[n] = ab[n].source;
   }
   if (ab.instances) {
     ab.instances = buildOne(ab.instances);
@@ -473,7 +476,7 @@ export const updateAggregateFromSchema = (
     updateAggregateArray(aggregateBuffers[name], items, k, index || unwelded, false, o);
   }
 
-  for (const k of bySelfs.keys) {
+  for (const [k] of bySelfs.keys) {
     const {name: n, index, unwelded} = schema[k];
     const name = n ?? k;
     const o = index ? indexOffsets : undefined;
@@ -502,8 +505,8 @@ export const uploadAggregateFromSchema = (
 ) => {
   const {aggregateBuffers, byInstances, byVertices, byIndices, bySelfs} = aggregate;
 
-  for (const k of bySelfs.keys) {
-    uploadAggregateBuffer(device, aggregateBuffers[k]);
+  for (const [, name] of bySelfs.keys) {
+    uploadAggregateBuffer(device, aggregateBuffers[name]);
   }
 
   const {instances} = aggregateBuffers;

@@ -445,7 +445,7 @@ export type CPUAggregate = {
   aggregateBuffers: Record<string, ArrayAggregate>,
   refBuffers: Record<string, Lazy<any>[]>,
 
-  bySelfs?: { keys: string[] },
+  bySelfs?: { keys: [string, string][] },
   byItems?: StructAggregate,
   byVertices?: StructAggregate,
   byIndices?: StructAggregate,
@@ -456,7 +456,7 @@ export type GPUAggregate = {
   aggregateBuffers: Record<string, ArrayAggregateBuffer | ArrayAggregate>,
   refBuffers: Record<string, Lazy<any>[]>,
 
-  bySelfs?: { keys: string[], sources: Record<string, StorageSource> },
+  bySelfs?: { keys: [string, string][], sources: Record<string, StorageSource> },
   byItems?: StructAggregateBuffer,
   byVertices?: StructAggregateBuffer,
   byIndices?: StructAggregateBuffer,

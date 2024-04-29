@@ -256,6 +256,8 @@ export const copyRawNumberArray = (
       to[b + i] = from[f + i];
     }
   }
+
+  return nd;
 }
 
 export const copyNumberArray = makeCopyPipe();

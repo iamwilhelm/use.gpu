@@ -93,7 +93,7 @@ export const makeStructAggregateBuffer = (
 
   const aggregate = makeStructAggregate(uniforms, length, keys);
 
-  const buffer = makeStorageBuffer(device, raw.byteLength);
+  const buffer = makeStorageBuffer(device, aggregate.raw.byteLength);
   const source = {
     buffer,
     format: uniforms,

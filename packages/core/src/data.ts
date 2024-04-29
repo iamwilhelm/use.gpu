@@ -190,7 +190,7 @@ export const makeCopyPipe = ({
       }
     }
   }
-  else {
+  else if (map !== IDENTITY) {
     const nd = n * toDims;
 
     if (typeof from === 'number') {
@@ -201,15 +201,62 @@ export const makeCopyPipe = ({
       }
     }
     else {
+      let b = t;
       for (let i = 0; i < nd; ++i) {
-        to[t] = map(from[f + i]);
-        t++;
+        to[b + i] = map(from[f + i]);
+      }
+    }
+  }
+  else {
+    const nd = n * toDims;
+
+    if (typeof from === 'number') {
+      for (let i = 0; i < n; ++i) {
+        to[t] = from;
+        for (let j = 1; j < toDims; ++j) to[t + j] = 0;
+        t += toDims;
+      }
+    }
+    else {
+      let b = t;
+      for (let i = 0; i < nd; ++i) {
+        to[b + i] = from[f + i];
       }
     }
   }
 
   return n * step;
 };
+
+export const copyRawNumberArray = (
+  from: VectorLike,
+  to: VectorLike,
+  dims: number = 1,
+  fromIndex: number = 0,
+  toIndex: number = 0,
+  count?: number,
+) => {
+  const n = count ?? ((from.length ?? 1) / dims);
+
+  let f = fromIndex;
+  let t = toIndex;
+
+  const nd = n * dims;
+
+  if (typeof from === 'number') {
+    for (let i = 0; i < n; ++i) {
+      to[t] = from;
+      for (let j = 1; j < toDims; ++j) to[t + j] = 0;
+      t += toDims;
+    }
+  }
+  else {
+    let b = t;
+    for (let i = 0; i < nd; ++i) {
+      to[b + i] = from[f + i];
+    }
+  }
+}
 
 export const copyNumberArray = makeCopyPipe();
 
@@ -339,6 +386,7 @@ export const copyRecursiveNumberArray = (
     }
     else if (typeof from[0] === 'number') {
       // Vector
+      if (fromDims === toDims) return copyRawNumberArray(from, to, toDims, 0, toIndex, from.length / fromDims);
       return copyNumberArray(from, to, fromDims, toDims, 0, toIndex, from.length / fromDims);
     }
   }

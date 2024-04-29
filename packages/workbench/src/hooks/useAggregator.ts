@@ -19,7 +19,7 @@ import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getInstancedAggregate, combineInstances } from '../hooks/useInstancedSources';
 import { getStructAggregate } from '../hooks/useStructSources';
 
-const DEBUG = true;
+const DEBUG = false;
 
 export const useAggregator = (
   schema: AggregateSchema,

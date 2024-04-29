@@ -1,16 +1,17 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 
 import { clamp, adjustSchema } from '@use-gpu/core';
-import { gather, use, keyed, yeet, memo, useAwait, useCallback, useOne, useMemo } from '@use-gpu/live';
+import { gather, use, keyed, yeet, memo, useAwait, useCallback, useOne, useMemo, useResource } from '@use-gpu/live';
 import { useLayoutContext, useForceUpdate, getLineSegments, getFaceSegmentsConcave, Data, PointLayer, LineLayer, FaceLayer, POINT_SCHEMA, LINE_SCHEMA, FACE_SCHEMA } from '@use-gpu/workbench';
 import { useRangeContext } from '@use-gpu/plot';
 
 import { useTileContext } from './providers/tile-provider';
 import { MVTStyleContextProps, useMVTStyleContext } from './providers/mvt-style-provider';
 
-import { getMVTShapes, aggregateMVTShapes } from './util/mvtile';
+import { MVTAggregates, getMVTShapes, aggregateMVTShapes } from './util/mvtile';
 import LRU from 'lru-cache';
 
+import { makeDispatch, getConcurrency } from './worker/dispatch';
 import { VectorTile } from 'mapbox-vector-tile';
 
 const POS = {positions: 'vec2<f32>'};
@@ -27,6 +28,10 @@ const getUpKey = (x: number, y: number, zoom: number) => getKey(x >> 1, y >> 1, 
 const getDownKey = (x: number, y: number, zoom: number, dx: number, dy: number) => getKey((x << 1) + dx, (y << 1) + dy, zoom - 1);
 
 //const URLS = new Set();
+
+type TileWorker = {
+  fetchMVT: (url: string) => Promise<MVTAggregates>,
+};
 
 export type MVTilesProps = {
   minLevel?: number,
@@ -45,11 +50,12 @@ export type MVTileProps = {
   key: number,
   hide?: boolean,
   tesselate?: number,
+  worker: TileWorker,
 };
 
 export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MVTilesProps>) => {
   const {
-    minLevel = 0,
+    minLevel = 1,
     maxLevel = Infinity,
     detail = 1,
     children,
@@ -61,6 +67,15 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
   const styles = useMVTStyleContext();
   let [[minX, maxX], [minY, maxY]] = useRangeContext();
   
+  const worker = useResource((dispose) => {
+    const worker = makeDispatch(
+      () => new Worker(new URL('./worker/worker.js', import.meta.url)),
+      getConcurrency(),
+    );
+    dispose(worker.terminate);
+    return worker;
+  });
+
   const flipY = layout[1] > layout[3];
   if (flipY) [minY, maxY] = [-maxY, -minY];
 
@@ -114,15 +129,15 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
       if (zoom > minLevel && upLoaded < upCount) {
         if (cache.has(upKey)) {
           if (!seen.has(upKey)) {
-            out.push(keyed(MVTile, upKey, {tiles, key: upKey, tesselate: tesselate + 1}));
+            out.push(keyed(MVTile, upKey, {tiles, key: upKey, tesselate: tesselate + 1, worker}));
             seen.add(upKey);
           }
-          out.push(keyed(MVTile, key, {tiles, key, tesselate, hide: true}));
+          out.push(keyed(MVTile, key, {tiles, key, tesselate, hide: true, worker}));
           seen.add(key);
           continue;
         }
       }
-      out.push(keyed(MVTile, key, {tiles, key, tesselate}));
+      out.push(keyed(MVTile, key, {tiles, key, tesselate, worker}));
       seen.add(key);
     }
   }
@@ -131,7 +146,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
 };
 
 const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
-  const {tiles: {cache, loaded, flipY, styles, forceUpdate}, key, hide, tesselate} = props;
+  const {tiles: {cache, loaded, flipY, styles, forceUpdate}, key, hide, tesselate, worker} = props;
   const {getMVT} = useTileContext();
 
   const [x, y, zoom] = parseKey(key);
@@ -145,6 +160,7 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
     //URLS.add(url.split('?')[0]);
 
     try {
+      /*
       const res = await fetch(url);
       let ab = await res.arrayBuffer();
 
@@ -161,6 +177,10 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
       const shapes = getMVTShapes(x, y, zoom, mvt, styles, flipY, tesselate);
       const aggregate = aggregateMVTShapes(shapes);
       console.log({shapes, aggregate})
+      */
+      const aggregate = await worker.loadMVT(
+        x, y, zoom, url, styles, flipY, tesselate,
+      );
 
       const out = [];
       if (aggregate.point) {

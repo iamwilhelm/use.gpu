@@ -133,7 +133,6 @@ export const MapWebMercatorPage: LC = () => {
           <Plot>
             <Animate
               loop
-              paused
               delay={1}
               speed={2}
               tracks={tracks}
@@ -153,11 +152,11 @@ export const MapWebMercatorPage: LC = () => {
                 <MVTStyles styles={styleSheet}>
                   {USE_MAPBOX ? (
                     <MapboxProvider accessToken={accessToken}>
-                      <MVTiles detail={2} />
+                      <MVTiles detail={1} />
                     </MapboxProvider>
                   ) : (
                     <MapTileProvider url={url}>
-                      <MVTiles detail={2} maxLevel={3} />
+                      <MVTiles detail={1} maxLevel={3} />
                     </MapTileProvider>
                   )}
                 </MVTStyles>

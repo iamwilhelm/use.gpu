@@ -29,43 +29,41 @@ const SCHEMAS = {
   line:  adjustSchema(LINE_SCHEMA, POS),
   face:  adjustSchema(FACE_SCHEMA, POS),
 };
-console.log({POINT_SCHEMA, LINE_SCHEMA, FACE_SCHEMA, SCHEMAS})
 
 type Vec2 = {x: number, y: number};
 
-type MVTShapes = {
+export type MVTShapes = {
   point?: MVTPoint,
   line?: MVTLine,
   ring?: MVTLine,
   face?: MVTFace,
 };
 
-type MVTAggregates = {
+export type MVTAggregates = {
   point?: MVTAggregate,
   line?: MVTAggregate,
   ring?: MVTAggregate,
   face?: MVTAggregate,
 };
 
-type MVTAggregate = Record<string, TypedArray>;
+export type MVTAggregate = Record<string, TypedArray>;
 
-type MVTShape = {
+export type MVTShape = {
   color: ColorLike[],
-  width: [],
-  depth: [],
-  zBias: [],
-  loop: true,
-}
+  width: number[],
+  depth: number[],
+  zBias: number[],
+};
 
-type MVTPoint = MVTShape & {
+export type MVTPoint = MVTShape & {
   positions: XY[][],
 };
 
-type MVTLine = MVTShape & {
+export type MVTLine = MVTShape & {
   positions: XY[][],
 };
 
-type MVTFace = MVTShape & {
+export type MVTFace = MVTShape & {
   positions: XY[][][],
 };
 

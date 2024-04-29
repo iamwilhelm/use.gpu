@@ -7,6 +7,7 @@ import { makeUseTrait, combine, TraitProps } from '@use-gpu/traits/live';
 import {
   FaceLayer,
   InstanceData,
+  UseInstance,
   IndexedTransform,
   useMatrixContext,
 } from '@use-gpu/workbench';
@@ -46,16 +47,17 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
 
   const Resume = useCallback((sources: Record<string, StorageSource>) => {
     const {matrices, normalMatrices, ...rest} = sources;
+    const instance = useCallback(() => matrices.length, [matrices]);
     return use(IndexedTransform, {
       ...sources,
-      children: use(FaceLayer, {...rest, mesh, shaded, side}),
+      children: use(FaceLayer, {...rest, instance, mesh, shaded, side}),
     });
   }, [mesh]);
 
   return use(InstanceData, {
     format,
     schema: INSTANCE_SCHEMA,
-    render: (useInstance: () => (data: Record<string, any>) => void) => {
+    render: (useInstance: UseInstance) => {
       const Instance = useOne(() => makeInstancer(useInstance), useInstance);
       return render ? render(Instance as any) : null;
     },
@@ -64,7 +66,7 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
 };
 
 const makeInstancer = (
-  useInstance: () => (data: Record<string, any>) => void,
+  useInstance: UseInstance,
 ) => tagFunction((props: Partial<ObjectTrait> & Partial) => {
   const parent = useMatrixContext();
   const updateInstance = useInstance();

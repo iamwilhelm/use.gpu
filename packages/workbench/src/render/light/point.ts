@@ -4,7 +4,7 @@ import type { LightKindProps } from './light';
 import type { BoundLight } from '../../light/types';
 
 import { use, yeet, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
-import { uploadBuffer } from '@use-gpu/core';
+import { alignSizeTo, uploadBuffer } from '@use-gpu/core';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { useBufferedSize } from '../../hooks/useBufferedSize';
@@ -60,7 +60,7 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
   const getPosition = useRawSource(sphere.attributes.positions, 'vec4<f32>');
   const getIndex = useRawSource(sphere.attributes.indices, 'u16');
 
-  const size = useBufferedSize(end - start);
+  const size = useBufferedSize(alignSizeTo(end - start, 2));
   const instances = useOne(() => new Uint16Array(size), size);
   const outsides = useOne(() => new Uint16Array(size), size);
   const insides = useOne(() => new Uint16Array(size), size);

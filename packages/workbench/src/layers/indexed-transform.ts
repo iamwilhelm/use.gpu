@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
-import { provide, extend } from '@use-gpu/live';
+import { provide, extend, useMemo } from '@use-gpu/live';
 import { MatrixContext } from '../providers/matrix-provider';
 import { TransformContext } from '../providers/transform-provider';
 import { useMatrixTransformSources } from '../hooks/useMatrixTransform';
@@ -22,11 +22,14 @@ export const IndexedTransform: FC<IndexedTransformProps> = (props: IndexedTransf
   const transform = useMatrixTransformSources(matrices, normalMatrices);
   const context = useCombinedTransform(transform);
 
-  return immediate ? (
-    extend(children, {transform: context})
-  ) : (
-    provide(MatrixContext, NO_MAT4,
-      provide(TransformContext, transform, children)
-    )
-  );
+  if (immediate) {
+    return useMemo(() => extend(children, {transform: context}), [children, context]);
+  }
+  else {
+    return useMemo(() => (
+      provide(MatrixContext, NO_MAT4,
+        provide(TransformContext, context, children)
+      )
+    ), [children, context]);
+  };
 };

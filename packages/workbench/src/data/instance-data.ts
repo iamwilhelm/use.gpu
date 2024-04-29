@@ -34,6 +34,8 @@ type FieldBuffer = {
   accessor: string,
 };
 
+export type UseInstance = () => (data: Record<string, any>) => void;
+
 export type InstanceDataProps = {
   format?: 'u16' | 'u32',
   schema: DataSchema,
@@ -136,7 +138,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
       const indexBuffer = format ? makeArrayAggregateBuffer(device, format, alloc) : null;
 
       const fields = makeStructAggregateFields(aggregateBuffer);
-      const sources = getInstancedAggregate(aggregateBuffer);
+      const sources = getInstancedAggregate(aggregateBuffer, indexBuffer);
 
       return [aggregateBuffer, indexBuffer, fields, sources];
     }, [device, uniforms, alloc]);
@@ -169,18 +171,19 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
         }
       }
     }
-    if (needsRefresh) ranges = [[0, size]];
 
     // Upload changed ranges
     const {buffer, raw, layout} = aggregateBuffer;
     const {length: stride} = layout;
     if (needsRefresh) {
       uploadBufferRange(device, buffer, raw, 0, size * stride);
+      versionRef.current = incrementVersion(versionRef.current);
     }
     else if (ranges.length) {
       for (const [from, to] of ranges) {
         uploadBufferRange(device, buffer, raw, from * stride, (to - from) * stride);
       }
+      versionRef.current = incrementVersion(versionRef.current);
     }
     queue.instances.length = queue.datas.length = 0;
 
@@ -199,7 +202,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
       source.version = version;
     }, version);
 
-    const trigger = useOne(() => signal(), version);
+    const trigger = useOne(() => signal(), versionRef.current);
     return then ? [trigger, then(sources)] : trigger;
   };
 

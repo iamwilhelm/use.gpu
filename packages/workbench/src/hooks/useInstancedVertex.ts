@@ -25,7 +25,7 @@ export const useInstancedVertex = (
     return [getVertex, elementCount, NO_INSTANCES];
   }
 
-  const instanceSize = !!instances ? useNoShaderRef() : useShaderRef(elementCount);
+  const instanceSize = instance == null ? useNoShaderRef() : useShaderRef(elementCount);
 
   return useMemo(() => {
 
@@ -37,7 +37,7 @@ export const useInstancedVertex = (
 
     const totalCount = () => {
       const l = resolve(elementCount) || 0;
-      return !instances ? l * (instance || 0) : l;
+      return instance != null ? l * resolve(instance) : l;
     };
 
     return [boundInstance, totalCount, INSTANCES];

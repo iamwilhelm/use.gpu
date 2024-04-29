@@ -65,7 +65,7 @@ export const styleSheet = {
   background: {
     face: {
       fill: parseColor('#0a0a10'),
-      zBias: -100,
+      zBias: -300,
     }
   },
 };

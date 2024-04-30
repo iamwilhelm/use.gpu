@@ -139,7 +139,7 @@ export const Sampler: LiveComponent<SamplerProps<unknown>> = memo(<S extends str
       }
       else {
         sampled = (<T>(emit: Emit, i: number, t: T) =>
-          expr(emit, min + i * step, i - border, t)) as any;
+          expr(emit, min + i * step, t)) as any;
       }
     }
     else if (n === 2) {

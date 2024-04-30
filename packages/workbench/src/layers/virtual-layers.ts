@@ -20,8 +20,9 @@ import { FaceLayer } from './face-layer';
 import { LineLayer } from './line-layer';
 import { PointLayer } from './point-layer';
 import { ArrowLayer } from './arrow-layer';
+import { LabelLayer } from './label-layer';
 
-import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA, INSTANCE_SCHEMA } from './schemas';
+import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA, LABEL_SCHEMA } from './schemas';
 
 const DEBUG = false;
 
@@ -35,7 +36,7 @@ const AGGREGATORS = {
   'face':  { schema: FACE_SCHEMA,  component: FaceLayer  },
   'line':  { schema: LINE_SCHEMA,  component: LineLayer  },
   'point': { schema: POINT_SCHEMA, component: PointLayer },
-  //'label': () => () => {},
+  'label': { schema: LABEL_SCHEMA, component: LabelLayer },
 } as Record<string, LayerAggregator>;
 
 const ORDER = {};

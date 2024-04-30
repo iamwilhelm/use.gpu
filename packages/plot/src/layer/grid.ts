@@ -64,7 +64,7 @@ export const Grid: LiveComponent<GridProps> = memo((props) => {
     origin, auto,
     ...flags
   } = useTraits(props);
-
+  
   const first = useScaleTrait(props.first ?? NO_SCALE_PROPS);
   const second = useScaleTrait(props.second ?? NO_SCALE_PROPS);
 
@@ -162,7 +162,7 @@ export const Grid: LiveComponent<GridProps> = memo((props) => {
         ...flags,
       }) : null,
     ])
-  ), [firstPositions, secondPositions, auto, flags]);
+  ), [firstPositions, secondPositions, auto, props]);
 }, shouldEqual({
   first: sameShallow(),
   second: sameShallow(),

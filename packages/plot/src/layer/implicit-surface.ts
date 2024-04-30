@@ -26,7 +26,7 @@ export const ImplicitSurface: LiveComponent<ImplicitSurfaceProps> = memo((props:
 
     schema: _,
     formats,
-    tensor = props.values?.size,
+    tensor,
 
     zBias,
     zIndex,
@@ -47,7 +47,7 @@ export const ImplicitSurface: LiveComponent<ImplicitSurfaceProps> = memo((props:
   return use(Data, {
     schema,
     data: {values, normals},
-    tensor: size ?? tensor,
+    tensor: size ?? tensor ?? props.values?.size,
     render: (sources: Record<string, ShaderSource>) => use(DualContourLayer, {
       range: r,
       zBias: z,

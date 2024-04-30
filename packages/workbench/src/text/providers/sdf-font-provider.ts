@@ -91,6 +91,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       args: ['vec2<f32>', 'f32'],
     };
 
+    // Read-out with LOD bias for sharper SDFs
     const biasedSource = {
       ...getShader(getLODBiasedTexture, [biasable, -0.5]),
       colorSpace: 'srgb',
@@ -102,8 +103,6 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   }, [width, height, radius, pad, subpixel, solidify, preprocess, postprocess]);
 
   const bounds = useMemo(() => makeBoundsTracker());
-
-  // Read-out with LOD bias for sharper SDFs
 
   // Provide context to map glyphs on-demand
   const context = useMemo(() => {

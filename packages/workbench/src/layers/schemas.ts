@@ -108,6 +108,16 @@ export const FACE_SCHEMA = {
   }),
 };
 
+export const LABEL_SCHEMA = {
+  ...SHAPE_SCHEMA,
+  ...MATRIX_SCHEMA,
+  ...expandArrays({
+    positions: {format: 'vec4<f32>', single: 'position'},
+    sizes:     {format: 'f32', single: 'size'},
+    depths:    {format: 'f32', single: 'depth'},
+  }),
+};
+
 export const SURFACE_SCHEMA = {
   ids:        {format: 'array<u32>'},
   lookups:    {format: 'array<u32>'},

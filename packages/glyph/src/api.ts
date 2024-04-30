@@ -20,6 +20,7 @@ export const RustText = (): RustTextAPI => {
 
   const fontMap = new Map<number, Font>();
   const pendingGlyphs = new Map<number, ArrowFunction[]>;
+  const debugListeners: ArrowFunction[] = [];
 
   for (let k in DEFAULT_FONTS) fontMap.set(+k, DEFAULT_FONTS[k]);
 
@@ -48,6 +49,8 @@ export const RustText = (): RustTextAPI => {
       if (font.buffer) useRustText.unload_font(k);
       else if (font.lazy) useRustText.unload_image_font(k);
     }
+
+    for (const cb of debugListeners) cb();
   }
 
   const resolveFont = (font: Partial<FontProps>): number | null => {
@@ -125,6 +128,7 @@ export const RustText = (): RustTextAPI => {
       const list = pendingGlyphs.get(key)!;
       pendingGlyphs.delete(key);
       for (const cb of list) cb();
+      for (const cb of debugListeners) cb();
     };
 
     const {sync, async, fetch: f} = lazy;
@@ -146,7 +150,15 @@ export const RustText = (): RustTextAPI => {
     return useRustText.find_glyph(fontId, packString(char));
   };
 
-  return {findGlyph, measureFont, measureSpans, measureGlyph, loadMissingGlyph, resolveFont, resolveFontStack, setFonts};
+  const debugListener = (cb: ArrowFunction) => {
+    debugListeners.push(cb);
+    return () => {
+      const i = debugListeners.indexOf(cb);
+      if (i >= 0) debugListeners.splice(i, 1);
+    };
+  };
+
+  return {findGlyph, measureFont, measureSpans, measureGlyph, loadMissingGlyph, resolveFont, resolveFontStack, setFonts, debugListener};
 }
 
 export const packStrings = (strings: string[] | string): Uint16Array => {

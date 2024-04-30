@@ -9,6 +9,7 @@ export * from './layer/implicit-surface';
 
 export * from './shape/arrow';
 export * from './shape/face';
+export * from './shape/label';
 export * from './shape/line';
 export * from './shape/point';
 export * from './shape/polygon';
@@ -17,9 +18,8 @@ export * from './source/tensor';
 export * from './source/sampler';
 export * from './source/scale';
 export * from './source/transpose';
-/*
-export * from './shape/label';
 
+/*
 export * from './layer/tick';
 */
 

@@ -54,6 +54,7 @@ export const Scale: LiveComponent<ScaleProps> = memo((props: PropsWithChildren<S
     const f = (props.mode === 'log') ? logarithmic : linear;
     return toTensorArray('f32', new Float32Array(f(r[0], r[1], domainOptions)));
   }, [r[0], r[1], props]);
+  const version = useMemo(() => [], [...values.array]);
 
   // Generate positions aligned with origin
   const n = values.length;
@@ -63,11 +64,11 @@ export const Scale: LiveComponent<ScaleProps> = memo((props: PropsWithChildren<S
     fillNumberArray(origin, array, 4);
     for (let i = 0; i < n; ++i) array[i * 4 + axis] = vs[i];
     return toTensorArray('vec4<f32>', array);
-  }, [values, origin]);
+  }, [version, origin]);
 
   const render = getRenderFunc(props);
 
-  const tensors = useMemo(() => ({positions, values}), [positions, values]);
+  const tensors = useMemo(() => ({positions, values}), [positions, version]);
   const dataContext = useDataContext();
   const context = !render && children ? useMemo(() => ({
     ...dataContext,

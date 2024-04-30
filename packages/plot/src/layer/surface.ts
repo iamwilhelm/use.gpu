@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { memo, use, useOne } from '@use-gpu/live';
+import { memo, use, useOne, useMemo } from '@use-gpu/live';
 import { makeUseTrait, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { adjustSchema } from '@use-gpu/core';
 import { useInspectHoverable, Data, SurfaceLayer, SURFACE_SCHEMA } from '@use-gpu/workbench';
@@ -29,7 +29,7 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
     lookups,
 
     size,
-    tensor = props.positions?.size,
+    tensor,
     formats,
 
     sources: extra,
@@ -46,8 +46,8 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
   return use(Data, {
     schema,
     data: {...parsed},
-    tensor: size ?? tensor,
-    render: (sources: Record<string, ShaderSource>) => use(SurfaceLayer, {
+    tensor: size ?? tensor ?? props.positions?.size,
+    render: (sources: Record<string, ShaderSource>) => useMemo(() => use(SurfaceLayer, {
       color,
       zBias: z,
       id,
@@ -55,7 +55,7 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
       ...sources,
       ...extra,
       ...flags,
-    }),
+    }), [color, z, id, lookup, sources, extra, props]),
   });
 }, shouldEqual({
   color: sameShallow(),

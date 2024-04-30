@@ -2,10 +2,11 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Atlas, Rectangle } from '@use-gpu/core';
 
-import { LOGGING, debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo } from '@use-gpu/live';
+import { LOGGING, debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo, useLog } from '@use-gpu/live';
 import { TextureSource } from '@use-gpu/core';
 import { useShader, useLambdaSource } from '@use-gpu/workbench';
 
+import { useFontDebug } from './providers/font-provider';
 import { useSDFFontContext } from './providers/sdf-font-provider';
 import { useLayoutContext } from '../providers/layout-provider';
 
@@ -43,6 +44,9 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = m
   }
   else useNoSDFFontContext();
 
+  useFontDebug();
+  useLog({sdfFont})
+
   if (!atlas) return;
 
   const {width: w, height: h} = atlas;
@@ -59,7 +63,7 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = m
   }), [atlas, source, atlas!.version, size, compact, dpi, sdfFont]);
 
   const [left, top] = useLayoutContext();
-  console.log('debugatlas')
+
   return useMemo(() => use(DebugAtlasShape, {
     ...shape,
     left,
@@ -95,6 +99,7 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
     dpi = 1,
     compact,
   } = props;
+  console.log('DebugAtlasShape')
 
   const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate, debugUploads} = atlas as any;
   const {id} = useFiber();

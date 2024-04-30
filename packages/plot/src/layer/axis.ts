@@ -84,7 +84,7 @@ export const Axis: LiveComponent<AxisProps> = memo((props) => {
 
       ...flags,
     })
-  ), [start, end, positions, segments, anchors, trims, n, flags]);
+  ), [start, end, positions, segments, anchors, trims, n, props]);
 }, shouldEqual({
   origin: sameShallow(),
   range: sameShallow(sameShallow()),

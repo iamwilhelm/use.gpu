@@ -142,9 +142,9 @@ export const LabelTrait = trait(
 
 export const LabelsTrait = trait(
   {
-    format:     optional(parseStringFormatter),
     sizes:      optional(parseScalarArray),
     depths:     optional(parseScalarArray),
+    expands:    optional(parseScalarArray),
   },
 );
 
@@ -689,6 +689,27 @@ export const FaceTraits = combine(
   ZIndexTrait,
 );
 
+export const LabelTraits = combine(
+  ColorsTrait(),
+  trait({
+    size: optional(parseNumber),
+    sizes: bindable(optional(parseScalarArray)),
+
+    values: bindable(optional(parseScalarArray)),
+    formatter: optional(parseStringFormatter),
+    precision: optional(parseNumber),
+  }),
+  VerticesTrait,
+  DataTrait(['positions', 'values', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'sizes']),
+
+  StringTrait,
+  StringsTrait,
+  LabelTrait,
+  LabelsTrait,
+  ROPTrait,
+  ZIndexTrait,
+);
+
 export const SurfaceTraits = combine(
   ColorsTrait({ composite: true }),
   Loop2DTrait,
@@ -724,3 +745,4 @@ export const ImplicitSurfaceTraits = combine(
     zBias: parseNumber,
   })
 );
+

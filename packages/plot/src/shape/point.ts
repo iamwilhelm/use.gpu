@@ -8,12 +8,9 @@ import { vec4 } from 'gl-matrix';
 
 import { useInspectHoverable, useTransformContext, POINT_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
-const {quote} = LayerReconciler;
-
-//import { PointLayer } from '@use-gpu/workbench';
-//import { DataContext } from '../providers/data-provider';
-
 import { PointTraits } from '../traits';
+
+const {quote} = LayerReconciler;
 
 const useTraits = makeUseTrait(PointTraits);
 
@@ -80,6 +77,6 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
 
   return quote(yeet(shapes));
 }, shouldEqual({
-  position: sameShallow(sameShallow()),
+  position: sameShallow(),
   color: sameShallow(),
 }), 'Point');

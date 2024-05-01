@@ -217,8 +217,12 @@ export const getBundleSummary = (bundle: ShaderModule, maxDepth: number = Infini
       }
 
       for (const k in links) if (links[k]) {
+        const key = getBundleKey(links[k]);
+        if (libMap.has(key)) continue;
+
         const sub = {link: k};
         allLinks.push(sub);
+        libMap.set(key, sub);
 
         recurse(links[k], sub, k, depth + 1);
       }

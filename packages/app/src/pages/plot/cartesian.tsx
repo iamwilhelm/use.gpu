@@ -78,6 +78,7 @@ export const PlotCartesianPage: LC = () => {
                     end
                   />
                   <Scale
+                    origin={[0, 0, 3]}
                     divide={5}
                     axis='x'
                   >

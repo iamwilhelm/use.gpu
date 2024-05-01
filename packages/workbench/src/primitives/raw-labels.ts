@@ -5,11 +5,10 @@ import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import { useDraw } from '../hooks/useDraw';
 
 import { use, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
-import { resolve, BLEND_ALPHA } from '@use-gpu/core';
 
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
+import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { TransformContextProps } from '../providers/transform-provider';
 
 import { useApplyTransform } from '../hooks/useApplyTransform';
@@ -54,7 +53,10 @@ export type RawLabelsProps = {
   colors?: ShaderSource,
   expands?: ShaderSource,
 
-  transform?: TransformContextProps | ShaderModule,
+  instance?: number,
+  instances?: ShaderSource,
+  transform?: TransformContextProps,
+
   texture?: TextureSource | LambdaSource | ShaderModule,
   flip?: [number, number],
 
@@ -70,6 +72,9 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     blend,
     id = 0,
     count = null,
+
+    instance,
+    instances,
     transform,
   } = props;
 
@@ -105,13 +110,18 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     useNoCallback();
   }
 
-  const t = props.texture;
-
-  const getVertex = useShader(getLabelVertex, [i, r, u, s, l, a, positions, c, o, z, d, f, e, q]);
+  const boundVertex = useShader(getLabelVertex, [i, r, u, s, l, a, positions, c, o, z, d, f, e, q]);
+  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, instance, instances, instanceCount);  
   const getPicking = usePickingShader(props);
+
+  const t = props.texture;
   const getFragment = useShader(getSDFRectangleFragment, [t], DEFINES);
-  const links = useOne(() => ({getVertex, getFragment, getPicking}),
-    getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
+
+  const links = useMemo(() => ({
+    getVertex,
+    getFragment,
+    getPicking,
+  }), [getVertex, getFragment, getPicking]);
 
   const [pipeline, defs] = usePipelineOptions({
     mode,
@@ -119,17 +129,18 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     stripIndexFormat: 'uint16',
     side: 'both',
     alphaToCoverage,
-    depthTest: false,
-    depthWrite: false,
+    depthTest,
+    depthWrite,
     blend,
   });
 
   const defines: Record<string, any> = useMemo(() => ({
     ...defs,
+    ...instanceDefs,
     HAS_EDGE_BLEED: true,
     HAS_MASK: false,
     DEBUG_SDF: false,
-  }), [defs]);
+  }), [defs, instanceDefs]);
 
   return useDraw({
     vertexCount,

@@ -39,8 +39,13 @@ export type LabelLayerProps = {
   weight?: string | number,
   style?: string,
 
+  instance?: number,
+  instances?: ShaderSource,
+  transform?: TransformContextProps,
+
   flip?: [number, number],
   sdfRadius?: number,
+
   detail?: number,
   count?: Lazy<number>,
   mode?: RenderPassMode | string,
@@ -72,8 +77,13 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
     weight,
     style,
 
+    instance,
+    instances,
+    transform,
+
     flip,
     sdfRadius,
+
     detail,
     count,
     mode = 'opaque',
@@ -114,6 +124,10 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
             uvs,
             sdf,
             texture: source,
+
+            instance,
+            instances,
+            transform,
 
             position,
             positions,

@@ -106,7 +106,7 @@ const Aggregate: LiveFunction<any> = (
     const upload = useOne(() => uploadRefs ? quote(yeet(uploadRefs)) : null, uploadRefs);
     return upload ? [upload, layer] : layer;
     // Exclude flags and contexts because they are factored into the archetype
-  }, [count, sources, uploadRefs]);
+  }, [count, sources, extra, uploadRefs]);
 };
 
 const provideContext = (

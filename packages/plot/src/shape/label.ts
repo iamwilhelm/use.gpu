@@ -63,13 +63,14 @@ export const Label: LiveComponent<LabelProps> = memo((props) => {
   const flip = [1, 1];
   if (layout[2] < layout[0]) flip[0] = -1;
   if (layout[3] < layout[1]) flip[1] = -1;
+  flags.flip = flip;
 
   // Resolve label strings
   const resolvedFormatter = useMemo(() => formatter ?? (x => formatNumber(x, precision)), [formatter, precision]);
   const resolvedLabels = labels != null ? (
     useMemo(() => labels ?? [label], [labels, label])
   ) : (
-    useMemo(() => toArrayMap(values, resolvedFormatter), [values, resolvedFormatter])
+    useMemo(() => values ? toArrayMap(values, resolvedFormatter) : [], [values, resolvedFormatter])
   );
   const resolvedSources = useMemo(() => ({...sources, labels: resolvedLabels}), [sources, resolvedLabels]);
 
@@ -107,57 +108,3 @@ export const Label: LiveComponent<LabelProps> = memo((props) => {
   position: sameShallow(),
   color: sameShallow(),
 }), 'Label');
-
-/*
-  const positions = useContext(DataContext) ?? undefined;
-  const values = useContext(ValuesContext);
-  const layout = useContext(LayoutContext);
-
-  const flip = [1, 1];
-  if (layout[2] < layout[0]) flip[0] = -1;
-  if (layout[3] < layout[1]) flip[1] = -1;
-
-  const count = useCallback(() => (positions as any)?.length || 0, [positions]);
-
-  const parsed = useTraits(props);
-
-  const {family, weight, style} = useFontTrait(props);
-  const {labels, format, size, depth, expand} = useLabelTrait(props);
-  const {placement, offset} = useAnchorTrait(props);
-
-  const color = useColorTrait(props);
-  const rop = useROPTrait(props);
-
-  const strings = useMemo(() => {
-    if (labels) return labels;
-    if (values) {
-      let v = values;
-      if (!Array.isArray(v)) v = Array.from(v);
-      if (format) return v.map(format);
-      return v.map(v => formatNumber(v, 3));
-    }
-    return [];
-  }, [labels, values, format])
-
-  return (
-    use(LabelLayer, {
-      labels: strings,
-      family,
-      weight,
-      style,
-
-      positions,
-      placement,
-      offset,
-      count,
-      size,
-      depth,
-      color,
-      expand,
-      flip,
-      ...rop,
-    })
-  );
-};
-
-*/

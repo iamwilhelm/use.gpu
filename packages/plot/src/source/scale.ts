@@ -61,7 +61,7 @@ export const Scale: LiveComponent<ScaleProps> = memo((props: PropsWithChildren<S
   const positions = useMemo(() => {
     const vs = values.array;
     const array = new Float32Array(n * 4);
-    fillNumberArray(origin, array, 4);
+    fillNumberArray(origin, array, 4, 4, 0, 0, n);
     for (let i = 0; i < n; ++i) array[i * 4 + axis] = vs[i];
     return toTensorArray('vec4<f32>', array);
   }, [version, origin]);

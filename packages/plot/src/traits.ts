@@ -702,6 +702,7 @@ export const LabelTraits = combine(
   VerticesTrait,
   DataTrait(['positions', 'values', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'sizes']),
 
+  AnchorTrait,
   StringTrait,
   StringsTrait,
   LabelTrait,

@@ -20,6 +20,8 @@ import {
   Scene, Node, Instances,
 } from '@use-gpu/scene';
 
+import { InfoBox } from '../../ui/info-box';
+
 const COLOR_ON = [1, 1, 1, 1];
 const COLOR_OFF = [0.5, 0.5, 0.5, 1.0];
 
@@ -43,7 +45,8 @@ const ROTATION_KEYFRAMES = [
 export const SceneInstancesPage: LC = (props) => {
   const geometry = useOne(() => makeBoxGeometry({ width: 2 }));
 
-  return (
+  return (<>
+    <InfoBox>Colored and transformed &lt;Instances&gt; of the same single mesh</InfoBox>
     <Gather
       children={[
         <GeometryData {...geometry} />,
@@ -112,7 +115,7 @@ export const SceneInstancesPage: LC = (props) => {
         </LinearRGB>
       )}
     />
-  );
+  </>);
 };
 
 const Camera = ({children}: PropsWithChildren<object>) => (

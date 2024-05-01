@@ -2,7 +2,7 @@ import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { UseGPURenderContext, ColorSpace } from '@use-gpu/core';
 
 import { useTimeContext } from '@use-gpu/workbench';
-import { useOne, useResource } from '@use-gpu/live';
+import { memo, useOne, useResource } from '@use-gpu/live';
 
 export type FPSCounterProps = {
   container?: Element | string | null,
@@ -14,7 +14,7 @@ export type FPSCounterProps = {
   samples?: number,
 };
 
-export const FPSCounter: LiveComponent<FPSCounterProps> = (props: PropsWithChildren<FPSCounterProps>) => {
+export const FPSCounter: LiveComponent<FPSCounterProps> = memo((props: PropsWithChildren<FPSCounterProps>) => {
   const {
     container,
 
@@ -33,7 +33,7 @@ export const FPSCounter: LiveComponent<FPSCounterProps> = (props: PropsWithChild
   if (time.delta) values.push(1000 / time.delta);
   if (values.length > samples) values.shift();
 
-  const [canvas, w, h, p] = useResource((dispose) => {
+  const [canvas, dpi, w, h, p] = useResource((dispose) => {
     const parent = typeof container === 'string' ? document.querySelector(container) : container;
     if (!parent) throw new Error(`Cannot find parent element '${container}'`);
 
@@ -54,18 +54,17 @@ export const FPSCounter: LiveComponent<FPSCounterProps> = (props: PropsWithChild
 
     dispose(() => parent.removeChild(canvas));
 
-    return [canvas, width * dpi, height * dpi, pad * dpi];
+    return [canvas, dpi, width, height, pad];
   }, [container]);
 
-  const context = useOne(() => canvas.getContext('2d'), canvas);
-  context.fillStyle = '#000000';
+  const context = canvas.getContext('2d');
+  context.resetTransform();
+  context.scale(dpi, dpi);
+  context.fillStyle = '#400000';
   context.fillRect(0, 0, w+p*2, h+p*2);
 
-  const min = values.reduce((a, b) => Math.min(a, b), Infinity);
   const max = values.reduce((a, b) => Math.max(a, b), -Infinity);
-  const avg = values.reduce((a, b) => a + b, 0) / (values.length || 1);
-
-  const jitter = (max - min) / 2;
+  const avg = 1000 / (values.reduce((a, b) => a + 1000 / b, 0) / (values.length || 1));
 
   const xs = width / samples;
   const skip = samples - values.length;
@@ -91,8 +90,10 @@ export const FPSCounter: LiveComponent<FPSCounterProps> = (props: PropsWithChild
     context.fillRect(x + p, line + hh - v + p, xs, v);
   }
 
-  const text = `${avg.toFixed(1)} fps - ${(1000 / avg).toFixed(1)}ms`;
-  context.fillStyle = '#c0c0c0';
-  context.font = 'bold 12px sans-serif';
-  context.fillText(text, p, p + font - 2);
-};
+  if (1/avg != 0) {
+    const text = `${(avg).toFixed(1)} fps - ${(1000 / avg).toFixed(1)}ms`;
+    context.fillStyle = '#c0c0c0';
+    context.font = `bold ${font}px sans-serif`;
+    context.fillText(text, p, p + font - 2);
+  }
+}, 'FPSCounter');

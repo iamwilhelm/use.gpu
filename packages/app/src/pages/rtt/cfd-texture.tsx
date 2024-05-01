@@ -22,6 +22,7 @@ import { main as advectVelocity }   from './cfd-texture/advect.wgsl';
 import { main as advectMcCormack }  from './cfd-texture/mccormack.wgsl';
 
 import { CFDControls } from '../../ui/cfd-controls';
+import { InfoBox } from '../../ui/info-box';
 
 // This is a compute-shader + textures implementation of fluid dynamics,
 // which uses float32 textures for storage. This tends to be more efficient
@@ -83,7 +84,8 @@ export const RTTCFDTexturePage: LC = () => {
 
   const root = document.querySelector('#use-gpu .canvas');
 
-  return (
+  return (<>
+    <InfoBox>Fluid dynamics simulation using a compute shader on texture buffers</InfoBox>
     <CFDControls
       container={root}
       hasInspect
@@ -188,7 +190,7 @@ export const RTTCFDTexturePage: LC = () => {
 
       />
     } />
-  );
+  </>);
 };
 
 const VisualizeField = ({field}: {field: TextureTarget}) => {

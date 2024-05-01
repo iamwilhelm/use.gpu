@@ -12,11 +12,14 @@ import {
 import { RawMesh } from '../mesh/components/raw-mesh';
 import { makeMesh, makeTexture } from '../../meshes/cube';
 
+import { InfoBox } from '../../ui/info-box';
+
 export const RTTLinearRGBPage: LC = () => {
   const mesh = makeMesh();
   const texture = makeTexture();
 
-  return (
+  return (<>
+    <InfoBox>Use Linear RGB for gamma-correct and HDR rendering</InfoBox>
     <LinearRGB>
       <Cursor cursor='move' />
       <Camera>
@@ -61,7 +64,7 @@ export const RTTLinearRGBPage: LC = () => {
         </Pass>
       </FlatCamera>
     </LinearRGB>
-  );
+  </>);
 };
 
 const Camera = ({children}: PropsWithChildren<object>) => (

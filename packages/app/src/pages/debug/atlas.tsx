@@ -9,6 +9,7 @@ import {
 } from '@use-gpu/layout';
 
 import { GlyphControls } from '../../ui/glyph-controls';
+import { InfoBox } from '../../ui/info-box';
 
 export const DebugAtlasPage: LC = () => {
 
@@ -49,7 +50,8 @@ export const DebugAtlasPage: LC = () => {
 
   const root = document.querySelector('#use-gpu .canvas');
 
-  return (
+  return (<>
+    <InfoBox>Text rendering is accomplished using SDFs stored in an atlas</InfoBox>
     <GlyphControls
       container={root}
       hasContours
@@ -70,5 +72,5 @@ export const DebugAtlasPage: LC = () => {
           />
         </DebugProvider>
     } />
-  )
+  </>)
 };

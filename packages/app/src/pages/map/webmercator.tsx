@@ -18,6 +18,7 @@ import {
 import { parseColor } from '@use-gpu/parse';
 
 import { PlotControls } from '../../ui/plot-controls';
+import { InfoBox } from '../../ui/info-box';
 
 import { vec3 } from 'gl-matrix';
 
@@ -126,6 +127,7 @@ export const MapWebMercatorPage: LC = () => {
   } as Tracks;
 
   return (<>
+    <InfoBox>Render MVT vector tiles in a Web Mercator projection using the map package.</InfoBox>
     <Cursor cursor='move' />
     <LinearRGB>
       <Camera>

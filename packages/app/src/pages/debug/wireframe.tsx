@@ -14,13 +14,15 @@ import {
 } from '@use-gpu/workbench';
 
 import { Scene, Node, Mesh, Primitive } from '@use-gpu/scene';
+import { InfoBox } from '../../ui/info-box';
 
 // Prefab geometry
 const boxGeometry = makeBoxGeometry();
 
 export const DebugWireframePage: LC = () => {
 
-  return (
+  return (<>
+    <InfoBox>Render anything as a wireframe using debug mode</InfoBox>
     <Camera>
       <Cursor cursor='move' />
       <Pass>
@@ -46,7 +48,7 @@ export const DebugWireframePage: LC = () => {
         </Scene>
       </Pass>
     </Camera>
-  );
+  </>);
 };
 
 const Camera = ({children}: PropsWithChildren<object>) => (

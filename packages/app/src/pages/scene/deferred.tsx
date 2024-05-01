@@ -19,6 +19,8 @@ import {
   Scene, Node, Mesh, Instances,
 } from '@use-gpu/scene';
 
+import { InfoBox } from '../../ui/info-box';
+
 const SHADOW_MAP_DIRECTIONAL = {
   size: [2048, 2048],
   span: [50, 50],
@@ -65,7 +67,8 @@ const lightData = [
 
 export const SceneDeferredPage: LC = (props) => {
 
-  return (
+  return (<>
+    <InfoBox>&lt;DirectionalLight&gt; and &lt;PointLight&gt; with shadow map (deferred renderer)</InfoBox>
     <Gather
       children={[
         <GeometryData {...boxGeometry} />,
@@ -157,7 +160,7 @@ export const SceneDeferredPage: LC = (props) => {
         </Loop>
       )}
     />
-  );
+  </>);
 };
 
 const Camera = ({children}: PropsWithChildren<object>) => (

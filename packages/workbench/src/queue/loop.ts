@@ -9,6 +9,7 @@ import { QueueReconciler } from '../reconcilers';
 
 const {reconcile, quote, signal} = QueueReconciler;
 
+const START = +new Date();
 const DEBUG = false;
 
 export type LoopProps = {
@@ -79,7 +80,10 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
     dispose(() => mounted = false);
 
     const request = (fiber?: LiveFiber<any>) => {
-      DEBUG && console.log('Request animation frame');
+      DEBUG && !ref.version.pending && console.log(
+        'Request animation frame',
+        +new Date() - START
+      );
 
       // Enqueue animated fiber for next frame
       if (!ref.version.pending) ref.version.request = requestAnimationFrame(render);
@@ -92,22 +96,34 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       return ref.time;
     };
 
+    const resetIfIdle = () => {
+      if (!ref.version.pending) {
+        requestAnimationFrame(() => time.timestamp = -Infinity);
+      }
+    };
+
     const render = (timestamp?: number) => {
-      DEBUG && console.log('Dispatch loop');
+      DEBUG && console.log('Dispatch loop', +new Date() - START);
       requestImmediateRender();
 
       ref.version.pending = false;
       ref.version.request = null;
 
-      // Loop continuously if live but abort on unmount
-      if (live && mounted) request();
+      // Abort on unmount
       if (!mounted) {
         DEBUG && console.log('Unmounted');
         return;
       }
 
+      // Loop continuously if live
+      if (live && mounted) request();
+
       // Start elapsed timer once we have timing info
       if (timestamp != null) {
+
+        // Check for variable frame rate shenanigans
+        if (timestamp - time.timestamp < 3) return request();
+
         if (time.timestamp === -Infinity) time.start = timestamp;
         else time.delta = timestamp - time.timestamp;
 
@@ -123,10 +139,8 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       const {run} = ref;
       if (run) run();
 
-
-      if (!ref.version.pending) {
-        requestAnimationFrame(() => time.timestamp = -Infinity);
-      }
+      // Check if animation stopped
+      queueMicrotask(resetIfIdle);
     };
 
     return [loop.request = request, render];

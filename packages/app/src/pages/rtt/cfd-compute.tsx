@@ -22,6 +22,7 @@ import { main as advectVelocity }   from './cfd-compute/advect.wgsl';
 import { main as advectMcCormack }  from './cfd-compute/mccormack.wgsl';
 
 import { CFDControls } from '../../ui/cfd-controls';
+import { InfoBox } from '../../ui/info-box';
 
 //
 // A pure compute-shader implementation of fluid dynamics,
@@ -87,7 +88,8 @@ export const RTTCFDComputePage: LC = () => {
 
   const root = document.querySelector('#use-gpu .canvas');
 
-  return (
+  return (<>
+    <InfoBox>Fluid dynamics simulation using a compute shader on storage buffers</InfoBox>
     <CFDControls
       container={root}
       hasInspect
@@ -191,7 +193,7 @@ export const RTTCFDComputePage: LC = () => {
           </>)}
       />
     } />
-  );
+  </>);
 };
 
 const VisualizeField = ({field}: {field: StorageTarget}) => {

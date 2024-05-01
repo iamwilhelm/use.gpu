@@ -18,6 +18,8 @@ import {
 } from '@use-gpu/layout';
 import { vec3 } from 'gl-matrix';
 
+import { InfoBox } from '../../ui/info-box';
+
 let t = 0;
 
 type TextProps = {
@@ -51,19 +53,14 @@ const Bold = ({children}: PropsWithChildren<object>) => (
 
 export const PresentSlidesPage: LC = () => {
 
-  return (
+  return (<>
+    <InfoBox>Render animated, reactive presentation slides using the Present package</InfoBox>
     <LinearRGB>
       <View>
         <Pass>
 
           <Present>
             <KeyboardControls />
-
-            <Overlay stay={2}>
-              <Absolute left={50} bottom={150} right={50}>
-                <ListItem align="center" fill="#404040">Overlay across slides</ListItem>
-              </Absolute>
-            </Overlay>
 
             <Slide effect={{type: 'wipe', direction: 'left'}}>
               <Absolute left={50} top={50} bottom={50} right={50}>
@@ -85,6 +82,13 @@ export const PresentSlidesPage: LC = () => {
                 </List>
               </Absolute>
             </Slide>
+
+            <Overlay stay={1}>
+              <Absolute left={50} bottom={150} right={50}>
+                <ListItem align="center" fill="#404040">Overlay across slides</ListItem>
+              </Absolute>
+            </Overlay>
+
             <Slide effect={{type: 'move', direction: 'left', duration: 1}}>
               <Absolute left={50} top={50} bottom={50} right={50}>
                 <Title>With Fancy Transitions</Title>
@@ -130,7 +134,7 @@ export const PresentSlidesPage: LC = () => {
         </Pass>
       </View>
     </LinearRGB>
-  );
+  </>);
 }
 
 const View = ({children}: PropsWithChildren<object>) => (

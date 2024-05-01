@@ -1,9 +1,11 @@
 0.11.0
 - `@use-gpu/core`: refactor data ingestion pipe
-- `@use-gpu/core`: add per-spread struct data aggregator
+- `@use-gpu/core`: add per-spread policy struct data aggregator
 - `@use-gpu/inspect`: improved tree view and value formatting
+- `@use-gpu/layout`: allow JSX text children on &lt;Text&gt;
 - `@use-gpu/live`: change `reconcile` and `quote` to be targeted to a context
 - `@use-gpu/live`: `useYolo` is now `useHooks`
+- `@use-gpu/map`: offload tile loading/tesselation to web workers
 - `@use-gpu/plot`: new "declarative mode" drawing primitives
 - `@use-gpu/plot`: aggregated matrix transforms
 - `@use-gpu/plot`: make DataContext a CPU-side concept

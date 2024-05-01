@@ -68,6 +68,8 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
   const api: PresentAPI = useOne(() => {
     const goTo = (step: number) => setState(s => {
       step = clamp(step, 0, s.length);
+      if (s.step === step) return s;
+
       onChange?.(step);
       return {...s, step};
     });

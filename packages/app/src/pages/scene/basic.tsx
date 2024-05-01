@@ -19,6 +19,8 @@ import {
   Scene, Node, Mesh,
 } from '@use-gpu/scene';
 
+import { InfoBox } from '../../ui/info-box';
+
 const COLOR_ON = [1, 1, 1, 1];
 const COLOR_OFF = [0.5, 0.5, 0.5, 1.0];
 
@@ -56,7 +58,8 @@ const PickableMesh = memo(({mesh, texture}: PickableMeshProps) => {
 export const SceneBasicPage: LC = (props) => {
   const geometry = useOne(() => makeBoxGeometry({ width: 2 }));
 
-  return (
+  return (<>
+    <InfoBox>Classic &lt;Scene&gt; tree with animated transform &lt;Node&gt; and clickable &lt;Mesh&gt;</InfoBox>
     <Gather
       children={[
         <GeometryData {...geometry} />,
@@ -97,7 +100,7 @@ export const SceneBasicPage: LC = (props) => {
         </LinearRGB>
       )}
     />
-  );
+  </>);
 };
 
 const Camera = ({children}: PropsWithChildren<object>) => (

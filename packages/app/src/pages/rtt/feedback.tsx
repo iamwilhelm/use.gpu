@@ -9,8 +9,11 @@ import {
   LinearRGB, FullScreen,
 } from '@use-gpu/workbench';
 
+import { InfoBox } from '../../ui/info-box';
+
 export const RTTFeedbackPage: LC = () => {
-  return (
+  return (<>
+    <InfoBox>Render targets with history can be used to create feedback loops</InfoBox>
     <Loop>
       <LinearRGB history={1} sampler={{minFilter: 'linear', magFilter: 'linear'}}>
         <OrbitCamera scale={1080}>
@@ -65,5 +68,5 @@ export const RTTFeedbackPage: LC = () => {
         </OrbitCamera>
       </LinearRGB>
     </Loop>
-  );
+  </>);
 };

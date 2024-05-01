@@ -13,6 +13,8 @@ import {
   UI, Layout, Absolute, Block, Flex, Inline, Text,
 } from '@use-gpu/layout';
 
+import { InfoBox } from '../../ui/info-box';
+
 //
 // Classic render-to-texture feedback effect with blur pyramid.
 // This uses plain render targets and render passes rather than compute kernels and dispatches.
@@ -261,7 +263,8 @@ export const RTTMultiscalePage: LC = () => {
   const paintRef = useRef(0);
   const getRandomSeed = () => [Math.random(), Math.random(), Math.random(), Math.random()];
 
-  return (
+  return (<>
+    <InfoBox>Set up classic Render-To-Texture pipelines and downsampling pyramids</InfoBox>
     <Gather
       children={[
         <RawTexture data={noiseData} sampler={LINEAR_SAMPLER} />,
@@ -388,5 +391,5 @@ export const RTTMultiscalePage: LC = () => {
         </Loop>
       )}
     />
-  );
+  </>);
 };

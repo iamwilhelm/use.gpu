@@ -45,6 +45,10 @@ const ROTATION_KEYFRAMES = [
 export const SceneInstancesPage: LC = (props) => {
   const geometry = useOne(() => makeBoxGeometry({ width: 2 }));
 
+  const rotations = seq(20).map(() => [Math.random()*360, Math.random()*360, Math.random()*360]);
+  const colors = seq(20).map(() => [Math.random()*Math.random(), Math.random(), Math.random()]);
+  const scale = [0.2, 0.2, 0.2];
+
   return (<>
     <InfoBox>Colored and transformed &lt;Instances&gt; of the same single mesh</InfoBox>
     <Gather
@@ -80,9 +84,9 @@ export const SceneInstancesPage: LC = (props) => {
                           {seq(20).map(i => (
                             <Animate prop="position" keyframes={POSITION_KEYFRAMES} loop delay={-i * 2} ease="linear">
                               <Instance
-                                rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
-                                scale={[0.2, 0.2, 0.2]}
-                                color={[Math.random()*Math.random(), Math.random(), Math.random()]}
+                                rotation={rotations[i]}
+                                scale={scale}
+                                color={colors[i]}
                               />
                             </Animate>
                           ))}
@@ -95,9 +99,9 @@ export const SceneInstancesPage: LC = (props) => {
                             {seq(20).map(i => (
                               <Animate prop="position" keyframes={POSITION_KEYFRAMES} loop delay={-i * 2} ease="linear">
                                 <Instance
-                                  rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
-                                  scale={[0.2, 0.2, 0.2]}
-                                  color={[Math.random()*Math.random(), Math.random(), Math.random()]}
+                                  rotation={rotations[i]}
+                                  scale={scale}
+                                  color={colors[i]}
                                 />
                               </Animate>
                             ))}

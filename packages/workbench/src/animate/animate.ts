@@ -86,7 +86,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
     } = useTimeContext();
 
     let {current: started} = startedRef;
-    if (started < 0) started = startedRef.current = elapsed;
+    if (started < 0 || started > elapsed) started = startedRef.current = elapsed;
     if (paused && !pausedRef.current) pausedRef.current = elapsed;
     
     if (!paused) {

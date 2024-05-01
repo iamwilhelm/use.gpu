@@ -47,8 +47,6 @@ export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => 
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getFragment, colorInput, colorSpace]);
 
-  console.log(props);
-
   // Inline the render fiber
   const call = {
     ...rest,

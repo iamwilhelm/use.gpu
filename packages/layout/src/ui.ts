@@ -17,7 +17,7 @@ import { overlapBounds, joinBounds } from './lib/util';
 
 const {signal} = QueueReconciler;
 
-const DEBUG = true;
+const DEBUG = false;
 
 export type UIProps = {
   children: LiveElement,

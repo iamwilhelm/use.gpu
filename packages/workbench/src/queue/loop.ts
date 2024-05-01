@@ -95,6 +95,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
     const render = (timestamp?: number) => {
       DEBUG && console.log('Dispatch loop');
       requestImmediateRender();
+
       ref.version.pending = false;
       ref.version.request = null;
 
@@ -121,6 +122,11 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       // Render detached children
       const {run} = ref;
       if (run) run();
+
+
+      if (!ref.version.pending) {
+        requestAnimationFrame(() => time.timestamp = -Infinity);
+      }
     };
 
     return [loop.request = request, render];

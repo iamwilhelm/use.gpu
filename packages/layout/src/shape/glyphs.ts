@@ -58,7 +58,6 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   } = props;
 
   const sdfFont = useSDFFontContext();
-  useMemo(() => console.log('glyph sdfFont'), [sdfFont]);
 
   return useMemo(() => {
     const { getGlyph, getScale, getRadius, getTexture } = sdfFont;

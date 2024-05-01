@@ -6,9 +6,9 @@ import { unquote, fence, yeet, use, useMemo, useOne, useFiber } from '@use-gpu/l
 import { useLayoutContext } from '@use-gpu/workbench';
 import { Transform } from '@use-gpu/layout';
 
-import { merge } from './lib/slides';
-import { usePresentTransition } from './hooks';
-import { useSlideTrait, makeUseTransitionTrait } from './traits';
+import { merge } from '../lib/slides';
+import { usePresentTransition } from '../hooks';
+import { useSlideTrait, makeUseTransitionTrait } from '../traits';
 
 export type StepProps = Partial<SlideTrait> & DeepPartial<TransitionTrait>;
 
@@ -24,7 +24,7 @@ export const Step: LC<StepProps> = (props: PropsWithChildren<StepProps>) => {
 
   const {id} = useFiber();
   const layout = useLayoutContext();
-  const {useUpdateTransition, ...transform} = usePresentTransition(id, layout, enterEffect, exitEffect);
+  const {useUpdateTransition, mask, transform} = usePresentTransition(id, layout, enterEffect, exitEffect);
 
   return fence(
     unquote(yeet({
@@ -36,7 +36,7 @@ export const Step: LC<StepProps> = (props: PropsWithChildren<StepProps>) => {
     })),
     () => {
       useUpdateTransition();
-      return useMemo(() => use(Transform, {...transform, children}), [transform, children]);
+      return useMemo(() => use(Transform, {mask, transform, children}), [mask, transform, children]);
     },
   );
 };

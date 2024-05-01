@@ -2,7 +2,7 @@ import type { LC } from '@use-gpu/live';
 
 import { useContext, useOne } from '@use-gpu/live';
 import { KeyboardContext } from '@use-gpu/workbench';
-import { usePresentContext } from './providers/present-provider';
+import { usePresentContext } from '../providers/present-provider';
 
 export type KeyboardControlsProps = {
   _unused?: null,

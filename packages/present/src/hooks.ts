@@ -128,6 +128,7 @@ export const makeUseTransition = (
 
     const fiber = useFiber();
     if (time < delay + duration) request(fiber);
+    else samplerRef.current = null;
 
     let offset = sampler(time);
     const {ease} = offset < 0 ? enter : exit;

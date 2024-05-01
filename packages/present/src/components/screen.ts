@@ -4,13 +4,12 @@ import type { ParsedEffect } from './types';
 import type { ColorLike } from '@use-gpu/traits';
 
 import { memo, use, useOne, useMemo } from '@use-gpu/live';
-import { useShader, useCombinedTransform, useLayoutContext, usePipelineOptions, useShaderRef, SDFRectangles, Virtual } from '@use-gpu/workbench';
+import { useDraw, useShader, useCombinedTransform, useLayoutContext, usePipelineOptions, useShaderRef } from '@use-gpu/workbench';
 import { getBundleKey } from '@use-gpu/shader/wgsl';
 
-import { usePresentTransition } from './hooks';
+import { usePresentTransition } from '../hooks';
 
 import { transformRectangle } from '@use-gpu/wgsl/layout/rectangle.wgsl';
-
 import { getScreenVertex } from '@use-gpu/wgsl/present/screen.wgsl';
 import { getScreenFragment } from '@use-gpu/wgsl/present/fragment.wgsl';
 

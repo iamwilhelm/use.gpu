@@ -14,11 +14,11 @@ import { UI, UILayers } from '@use-gpu/layout';
 import { makeParseColor, parseColor } from '@use-gpu/parse';
 import { useProp } from '@use-gpu/traits/live';
 
-import { resolveSlides } from './lib/slides';
-import { PresentContext, PresentAPI } from './providers/present-provider';
+import { resolveSlides } from '../lib/slides';
+import { PresentContext, PresentAPI } from '../providers/present-provider';
+import { PresentReconciler } from '../reconcilers';
+import { makeUseTransition } from '../hooks';
 
-import { PresentReconciler } from './reconcilers';
-import { makeUseTransition } from './hooks';
 import { Stage } from './stage';
 
 const {reconcile, quote} = PresentReconciler;

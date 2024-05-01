@@ -2,13 +2,14 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { DeepPartial, UniformAttribute } from '@use-gpu/core';
 import type { SlideTrait, TransitionTrait, SlideInfo } from './types';
 
-import { fragment, unquote, gather, fence, yeet, use, wrap, provide, useFiber, useMemo, useOne, useRef } from '@use-gpu/live';
+import { fragment, unquote, gather, yeet, use, wrap, provide, useFiber, useMemo, useOne, useRef } from '@use-gpu/live';
 import { Layout } from '@use-gpu/layout';
 
-import { PresentReconciler } from './reconcilers';
+import { resolveSlides } from '../lib/slides';
+import { PresentReconciler } from '../reconcilers';
+import { useSlideTrait, makeUseTransitionTrait } from '../traits';
 
-import { resolveSlides } from './lib/slides';
-import { useSlideTrait, makeUseTransitionTrait } from './traits';
+import { CaptureLayout } from './capture-layout';
 
 const {quote} = PresentReconciler;
 
@@ -29,9 +30,9 @@ export const Slide: LC<SlideProps> = (props: PropsWithChildren<SlideProps>) => {
     unquote(
       gather(
         quote(
-          fence(
-            wrap(Layout, children),
-            (ops: any) => {
+          use(CaptureLayout, {
+            children,
+            then: (ops: UIAggregate[]) => {
               return useMemo(
                 () => yeet({
                   id,
@@ -42,7 +43,7 @@ export const Slide: LC<SlideProps> = (props: PropsWithChildren<SlideProps>) => {
                 [id, ops, effect, enter, exit]
               );
             }
-          )
+          })
         ),
         (slides: SlideInfo[]) => {
           const {resolved, length} = resolveSlides(slides);

@@ -1,3 +1,13 @@
+0.11.x
+- add struct types and instancing operators
+- add automatic vec# casts between lambdas
+
+0.9.x
+- Add `minify` option to WGSL/GLSL transpiler
+- Reduce size of shader/AST metadata in builds
+- Allow `chainTo` to chain `(A, ...)->B` with `(B, ...)->C` if the rest signatures match
+- Allow run-time @linking of struct types
+
 0.8.x
 - `vec#<u8>` and `vec#<u16>` polyfill
 - export concrete lezer parser for syntax highlighting

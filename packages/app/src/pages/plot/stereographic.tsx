@@ -103,7 +103,7 @@ export const PlotStereographicPage: LC = () => {
                     offset={16}
                     expand={5}
                     depth={0.5}
-                    format={thetaFormatter}
+                    formatter={thetaFormatter}
                   />
                   <Label
                     placement='bottom'
@@ -112,7 +112,7 @@ export const PlotStereographicPage: LC = () => {
                     offset={16}
                     expand={0}
                     depth={0.5}
-                    format={thetaFormatter}
+                    formatter={thetaFormatter}
                   />
                 </Scale>
 

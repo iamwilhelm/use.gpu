@@ -87,7 +87,7 @@ export const PlotPolarPage: LC = () => {
                     offset={16}
                     expand={5}
                     depth={0.5}
-                    format={thetaFormatter}
+                    formatter={thetaFormatter}
                     blend="alpha"
                   />
                   <Label
@@ -97,7 +97,7 @@ export const PlotPolarPage: LC = () => {
                     offset={16}
                     expand={0}
                     depth={0.5}
-                    format={thetaFormatter}
+                    formatter={thetaFormatter}
                   />
                 </Scale>
 

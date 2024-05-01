@@ -21,6 +21,10 @@ import { getSDFRectangleFragment } from '@use-gpu/wgsl/instance/fragment/sdf-rec
 
 const DEFINES = {DEBUG_SDF: false};
 
+export type RawLabelsFlags = {
+  flip?: [number, number],
+} & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
+
 export type RawLabelsProps = {
   index?: number,
   indices?: ShaderSource,
@@ -58,10 +62,9 @@ export type RawLabelsProps = {
   transform?: TransformContextProps,
 
   texture?: TextureSource | LambdaSource | ShaderModule,
-  flip?: [number, number],
 
   count?: Lazy<number>,
-} & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
+} & RawLabelsFlags;
 
 export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsProps) => {
   const {

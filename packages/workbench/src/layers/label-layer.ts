@@ -8,14 +8,16 @@ import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useRawSource } from '../hooks/useRawSource';
 
+import { PipelineOptions } from '../hooks/usePipelineOptions';
+
 import { useFontFamily } from '../text/providers/font-provider';
 import { SDFFontProvider } from '../text/providers/sdf-font-provider';
 import { DebugAtlas } from '../text/debug-atlas';
 import { GlyphSource } from '../text/glyph-source';
 import { PanControls } from '../camera/pan-controls';
-import { RawLabels } from '../primitives/raw-labels';
+import { RawLabels, RawLabelsFlags } from '../primitives/raw-labels';
 
-export type LabelLayerProps = {
+export type LabelLayerProps = RawLabelsFlags & {
   position?: number[] | TypedArray,
   placement?: number[] | TypedArray,
   offset?: number,
@@ -48,8 +50,6 @@ export type LabelLayerProps = {
 
   detail?: number,
   count?: Lazy<number>,
-  mode?: RenderPassMode | string,
-  id?: number,
 };
 
 /** Draws flat text labels. */
@@ -88,6 +88,8 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
     count,
     mode = 'opaque',
     id = 0,
+
+    ...rest
   } = props;
 
   const key = useFiber().id;
@@ -147,6 +149,8 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
             flip,
             mode,
             id,
+
+            ...rest,
           });
         },
     })

@@ -6,7 +6,7 @@ import type { PipelineOptions } from '../hooks/usePipelineOptions';
 import { RawFaces } from '../primitives/raw-faces';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, useMemo, useOne, useLog } from '@use-gpu/live';
+import { use, memo, useMemo, useOne } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';
 
@@ -63,7 +63,6 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     id = 0,
     ...rest
   } = props;
-  useLog(props);
 
   const sizeExpr = useMemo(() => () =>
     resolve(size) ?? (props.positions as any)?.size,

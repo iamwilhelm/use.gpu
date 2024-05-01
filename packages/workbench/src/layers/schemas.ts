@@ -119,13 +119,17 @@ export const LABEL_SCHEMA = {
 };
 
 export const SURFACE_SCHEMA = {
-  ids:        {format: 'array<u32>'},
-  lookups:    {format: 'array<u32>'},
-  colors:     {format: 'array<vec4<f32>>'},
-  zBiases:    {format: 'array<f32>'},
+  ...SHAPE_SCHEMA,
   ...expandArrays({
     positions: {format: 'array<vec4<f32>>'},
-    debug: {format: 'f32'},
+  }),
+};
+
+export const TICK_SCHEMA = {
+  ...SHAPE_SCHEMA,
+  ...expandArrays({
+    positions: {format: 'array<vec4<f32>>'},
+    tangents: {format: 'array<vec4<f32>>'},
   }),
 };
 

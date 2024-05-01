@@ -4,7 +4,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import { memo, use, useOne, useMemo } from '@use-gpu/live';
 import { makeUseTrait, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { adjustSchema } from '@use-gpu/core';
-import { useInspectHoverable, Data, SurfaceLayer, SURFACE_SCHEMA } from '@use-gpu/workbench';
+import { Data, SurfaceLayer, SURFACE_SCHEMA } from '@use-gpu/workbench';
 
 import { SurfaceTraits } from '../traits';
 
@@ -37,9 +37,6 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
   } = parsed;
 
   const z = (zIndex && zBias == null) ? zIndex : zBias;
-
-  const hovered = useInspectHoverable();
-  if (hovered) flags.mode = "debug";
 
   const schema = useOne(() => adjustSchema(SURFACE_SCHEMA, formats), formats);
 

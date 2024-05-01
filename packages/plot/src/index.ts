@@ -6,6 +6,7 @@ export * from './layer/axis';
 export * from './layer/grid';
 export * from './layer/surface';
 export * from './layer/implicit-surface';
+export * from './layer/tick';
 
 export * from './shape/arrow';
 export * from './shape/face';
@@ -18,10 +19,6 @@ export * from './source/tensor';
 export * from './source/sampler';
 export * from './source/scale';
 export * from './source/transpose';
-
-/*
-export * from './layer/tick';
-*/
 
 export * from './view/cartesian';
 export * from './view/embedded';

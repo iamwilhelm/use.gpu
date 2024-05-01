@@ -711,6 +711,18 @@ export const LabelTraits = combine(
   ZIndexTrait,
 );
 
+export const TickTraits = combine(
+  ColorTrait,
+  LineTrait,
+  ROPTrait,
+  VerticesTrait,
+  trait({
+    tangent: optional(parsePosition),
+    tangents: optional(parsePositionArray),
+  }),
+  DataTrait(['positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'widths', 'tangents']),
+);
+
 export const SurfaceTraits = combine(
   ColorsTrait({ composite: true }),
   Loop2DTrait,

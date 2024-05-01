@@ -1,4 +1,4 @@
-import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule } from '../../types';
+import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, RefFlags as RF } from '../../types';
 import { loadVirtualModule } from '../shader';
 import { formatMurmur53, toMurmur53 } from '../hash';
 import { toBundle, toModule, getBundleHash, getBundleKey } from '../bundle';
@@ -23,6 +23,11 @@ export type MakeDiffAccessor = (
 const EXTERNALS = [{
   func: {name: 'getValue'},
   flags: 0,
+}] as any[];
+
+const makeDeclarations = (type: any, parameters: any) => [{
+  func: {name: 'diff', type, parameters},
+  flags: RF.Exported,
 }] as any[];
 
 export const makeDiffBy = (
@@ -65,15 +70,17 @@ export const makeDiffBy = (
   const f = formatFormat(format, type);
   const render = (namespace: string, rename: Map<string, string>) => {
     const format = rename.get(f) ?? f;
-    const name = rename.get(entry) ?? 'entry';
+    const name = rename.get(entry) ?? entry;
     const accessor = rename.get('getValue') ?? 'getValue';
     const sizes = getSizes.map(getSize => rename.get(getSize) ?? getSize);
     return makeDiffAccessor(name, accessor, sizes, args ?? [], format, offsets);
   }
 
+  const exports = makeDeclarations(format, args);
+
   const diff = loadVirtualModule(
     { render },
-    { symbols, externals },
+    { symbols, externals, exports },
     entry,
     rehash,
     code,

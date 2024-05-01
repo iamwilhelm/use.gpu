@@ -2,34 +2,22 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { UniformAttribute } from '@use-gpu/core';
 import type { VectorLike } from '@use-gpu/traits';
 
-import { makeUseTrait, trait, combine, optional, useProp } from '@use-gpu/traits/live';
+import { makeUseTrait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { parseNumber, parseVec4, parseIntegerPositive } from '@use-gpu/parse';
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { adjustSchema } from '@use-gpu/core';
 import { diffBy } from '@use-gpu/shader/wgsl';
-import { useSource, TickLayer } from '@use-gpu/workbench';
+import { Data, TickLayer, TICK_SCHEMA, useSource } from '@use-gpu/workbench';
 
 import { useDataContext, useNoDataContext } from '../providers/data-provider';
 import { RangeContext } from '../providers/range-provider';
 import { vec4 } from 'gl-matrix';
 
-import {
-  ColorTrait,
-  LineTrait,
-  ROPTrait,
-} from '../traits';
+import { TickTraits } from '../traits';
 
-const Traits = combine(
-  ColorTrait,
-  LineTrait,
-  ROPTrait,
-  trait({
-    position: parsePositionArray
-  }),
-);
+const useTraits = makeUseTrait(TickTraits);
 
-const useTraits = makeUseTrait(Traits);
-
-export type TickProps = TraitProps<typeof Traits> & {
+export type TickProps = TraitProps<typeof TickTraits> & {
   base?: number,
   size?: number,
   detail?: number,
@@ -48,37 +36,72 @@ export const Tick: LiveComponent<TickProps> = (props) => {
     offset = NO_OFFSET
   } = props;
 
-  const positions = useContext(DataContext) ?? undefined;
-  const count = useCallback(() => (positions as any)?.length, [positions]);
+  const parsed = useTraits(props);
+  const {
+    position,
+    positions,
+    tangent,
+    tangents,
+    color,
+    colors,
+    width,
+    widths,
+    depth,
+    depths,
+    zIndex,
+    zBias,
+    zBiases,
 
-  const {width, depth, join} = useLineTrait(props);
-  const color = useColorTrait(props);
-  const rop = useROPTrait(props);
+    id,
+    ids,
+    lookup,
+    lookups,
+
+    tensor,
+    formats,
+
+    sources: extra,
+    ...flags
+  } = parsed;
+
+  const z = (zIndex && zBias == null) ? zIndex : zBias;
+
+  const schema = useOne(() => adjustSchema(TICK_SCHEMA, formats), formats);
 
   const s = useProp(size, parseNumber);
   const d = useProp(detail, parseIntegerPositive);
   const o = useProp(offset, parseVec4);
 
-  const getPosition = useSource(GET_POSITION, positions);
-  const getSize = useSource(GET_SIZE, count);
-  const tangents = diffBy(getPosition, [-1], getSize);
+  return use(Data, {
+    schema,
+    data: {...parsed},
+    tensor: tensor ?? props.positions?.size,
+    render: (sources: Record<string, ShaderSource>) => {
+      const {positions, tangents} = sources;
+      const count = useCallback(() => (positions as any)?.length, [positions]);
+      
+      const getPosition = useSource(GET_POSITION, positions);
+      const getSize = useSource(GET_SIZE, count);
+      const resolvedTangents = useMemo(
+        () => tangents ?? diffBy(getPosition, [-1], getSize),
+        [tangents, getPosition, getSize]
+      );
 
-  return (
-    use(TickLayer, {
-      positions,
-      offset: o,
-      detail: d,
-      base,
-      tangents,
-      count,
-
-      color,
-      width,
-      depth,
-      size: s,
-      join,
-      ...rop,
-    })
-  );
+      return useMemo(() => use(TickLayer, {
+        size: s,
+        offset: o,
+        detail: d,
+        tangents: resolvedTangents,
+        width,
+        depth,
+        zBias: z,
+        id,
+        lookup,
+        ...sources,
+        ...extra,
+        ...flags,
+      }), [color, tangent, width, depth, z, id, lookup, sources, extra, props]);
+    }
+  });
 };
 

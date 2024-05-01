@@ -6,7 +6,9 @@ import type {
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { RawLines } from '../primitives/raw-lines';
+import { RawLines, RawLinesFlags } from '../primitives/raw-lines';
+
+import { PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { use, memo, provide, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -17,7 +19,7 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { getTickPosition } from '@use-gpu/wgsl/instance/vertex/tick.wgsl';
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 
-export type TickLayerProps = {
+export type TickLayerProps = RawLinesFlags & {
   position?: number[] | TypedArray,
   size?: number,
   width?: number,
@@ -38,12 +40,12 @@ export type TickLayerProps = {
   offsets?: ShaderSource,
   tangents?: ShaderSource,
 
-  join?: 'miter' | 'round' | 'bevel',
+  instance?: number,
+  instances?: ShaderSource,
+  transform?: TransformContextProps,
 
   detail?: number,
   count?: Lazy<number>,
-  mode?: RenderPassMode | string,
-  id?: number,
 };
 
 /** Draws tick marks on a scale, oriented along to the local transform at each point. */
@@ -69,10 +71,16 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
     bases,
     join,
 
+    instance,
+    instances,
+    transform,
+
     count = 1,
     detail = 1,
     mode = 'opaque',
     id = 0,
+
+    ...rest
   } = props;
 
   const key = useFiber().id;
@@ -106,9 +114,15 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
         zBiases,
         join,
 
+        instance,
+        instances,
+        transform,
+
         count: c,
         mode,
         id,
+
+        ...rest
       })
     )
   );

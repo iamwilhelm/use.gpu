@@ -104,7 +104,11 @@ export const allocateSchema = (
   allocIndices: number = 0,
   hasSegments?: boolean,
   predicate?: (prop: string) => boolean,
-) => {
+): {
+  fields: Record<string, FieldArray>,
+  attributes: Record<string, TypedArray>,
+  archetype: number,
+} => {
   const fields: Record<string, FieldArray> = {};
   const attributes: Record<string, TypedArray> = {};
 
@@ -132,7 +136,7 @@ export const allocateSchema = (
   const archetype = schemaToArchetype(schema, attributes);
   if (attributes.instances) throw new Error(`Reserved attribute name 'instances'.`);
 
-  return [fields, attributes, archetype];
+  return {fields, attributes, archetype};
 };
 
 /** Extract attributes from props using schema */

@@ -1,5 +1,5 @@
 import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
-import type { TypedArray, StorageSource, DeepPartial, Lazy } from '@use-gpu/core';
+import type { TypedArray, StorageSource, DeepPartial, Lazy, VectorLike } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
 
@@ -21,12 +21,12 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
 export type DispatchProps = {
-  size?: Lazy<number[]>,
-  group?: Lazy<number[]>,
+  size?: Lazy<number[] | VectorLike>,
+  group?: Lazy<number[] | VectorLike>,
   shader: ParsedBundle,
   defines?: Record<string, any>,
   indirect?: StorageSource,
-  shouldDispatch?: () => boolean | number | undefined,
+  shouldDispatch?: () => boolean | number | null | undefined,
   onDispatch?: () => void,
 };
 

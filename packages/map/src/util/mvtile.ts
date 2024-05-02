@@ -315,7 +315,7 @@ const aggregateMVTShape = (
   const dataCount = chunks.reduce((a, b) => a + b, 0);
 
   // Make arrays for merged attributes
-  const [fields, attributes, archetype] = allocateSchema(
+  const {fields, attributes, archetype} = allocateSchema(
     schema,
     itemCount,
     dataCount,

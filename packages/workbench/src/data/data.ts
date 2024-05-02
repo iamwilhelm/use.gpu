@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ArrowFunction, FromSchema, TypedArray, StorageSource, DataSchema, DataBounds } from '@use-gpu/core';
+import type { ArrowFunction, FromSchema, TypedArray, StorageSource, DataSchema, DataField, DataBounds, VectorLike, UniformType } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
@@ -33,8 +33,9 @@ type BooleanList = boolean | boolean[] | (<T>(i: number) => boolean);
 
 export type SegmentsInfo = {
   positions: TypedArray,
+  dims: number,
   chunks: number[] | TypedArray,
-  groups: number[] | TypedArray,
+  groups: number[] | TypedArray | null,
   loops: boolean[] | boolean,
   starts: boolean[] | boolean,
   ends: boolean[] | boolean,
@@ -80,7 +81,7 @@ export type DataProps<S extends DataSchema> = {
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Aggregate array-of-structs with fields `T | T[] | T[][]` into grouped storage sources. */
-export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(props: DataProps<S>) => {
+export const Data: LiveComponent<DataProps<DataSchema>> = <S extends DataSchema>(props: DataProps<S>) => {
   const {
     skip = 0,
     count,
@@ -98,8 +99,8 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
   } = props;
   
   const schema = useOne(() => normalizeSchema(propSchema), propSchema);
-  const data = propData ? Array.isArray(propData) ? propData : [propData] : null;
-  const itemCount = Math.max(0, count ?? (data?.length - skip));
+  const data: Record<string, any>[] | null = propData ? Array.isArray(propData) ? propData : [propData] : null;
+  const itemCount = Math.max(0, count ?? ((data?.length || 0) - skip));
 
   if (itemCount === 0) return null;
 
@@ -160,8 +161,8 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
   const allocIndices = useBufferedSize(indexCount);
 
   // Make arrays for merged attributes
-  const hasSegments = segments || tensor || keys.includes('segments');
-  const [fields, attributes, archetype] = useMemo(
+  const hasSegments = !!segments || !!tensor || keys.includes('segments');
+  const {fields, attributes, archetype} = useMemo(
     () => allocateSchema(
       schema,
       allocItems,
@@ -182,7 +183,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
       const accessor = virtual?.[k];
       if (!accessor && !data) continue;
 
-      const {array, dims, depth, prop} = fields[k];
+      const {array, dims, depth, prop = k} = fields[k];
       const slice = k === sliceKey;
 
       // Keep CPU-only layout, as useAggregator will widen for us
@@ -191,9 +192,9 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
       let b = 0;
       let o = 0;
       for (let i = 0; i < itemCount; ++i) {
-        const from = accessor ? accessor(i + skip) : data?.[i + skip][prop];
+        const from = accessor ? accessor(i + skip) : data ? data[i + skip][prop] : 0;
         o += copyRecursiveNumberArray(from, array, dimsIn, dimsIn, depth, o, 1);
-        if (slice) slices.push((o - b) / dimsIn + ((loops === true || loops?.[i]) ? 3 : 0));
+        if (slice) slices.push((o - b) / dimsIn + ((loops === true || (loops as boolean[])?.[i]) ? 3 : 0));
         b = o;
       }
     }
@@ -246,7 +247,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
 
   useMemo(() => {
     // Tag output with tensor size
-    if (tensor) for (const k in sources) sources[k].size = tensor;
+    if (tensor) for (const k in sources) (sources as any)[k].size = tensor;
 
     // Tag positions with bounds
     if (!fields.positions) return NO_BOUNDS;
@@ -254,7 +255,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
     const {array, dims} = fields.positions;
     const bounds = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
 
-    if (sources.positions && bounds) sources.positions.bounds = bounds;
+    if ('positions' in sources && bounds != null) sources.positions.bounds = bounds;
   }, [fields, items, sources, ...(tensor ?? NO_TENSOR)]);
 
   if (live) useAnimationFrame();
@@ -262,12 +263,16 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
 
   const trigger = useOne(() => signal(), immutable ? null : items);
 
-  const view = useRenderProp(props, sources);
+  const view = useRenderProp(props, sources as any);
   return immutable ? view : [trigger, view];
 };
 
 // Resolve loop/start/end flags into array
-const resolveSegmentFlag = (count: number, flag?: boolean, skip: number = 0): boolean | boolean[] => {
+const resolveSegmentFlag = (
+  count: number,
+  flag?: BooleanList,
+  skip: number = 0
+): boolean | boolean[] => {
   if (typeof flag === 'function') {
     let flags = [];
     for (let i = 0; i < count; ++i) flags.push((flag as ArrowFunction)(i + skip));
@@ -283,16 +288,18 @@ const resolveSegmentFlag = (count: number, flag?: boolean, skip: number = 0): bo
 
 // Get list of inner ragged chunk lengths plus outer ragged groupings
 const getMultiChunkCount = (
-  schema: DataSchema,
+  schema: Record<string, DataField>,
   key: string,
   itemCount: number,
-  data?: Record<string, any>[],
+  data?: Record<string, any>[] | null,
   virtual?: Record<string, (i: number) => any>,
   skip: number = 0
-) => {
+): [number, VectorLike, VectorLike | null] => {
   const {format, prop = key} = schema[key];
   const accessor = virtual?.[key];
-  const dims = getUniformDims(format);
+
+  const f = format as UniformType;
+  const dims = getUniformDims(f);
 
   let i = 0;
   const get = (accessor
@@ -316,16 +323,18 @@ const getMultiChunkCount = (
 
 // Get total vertex count
 const getVertexCount = (
-  schema: DataSchema,
+  schema: Record<string, DataField>,
   key: string,
   itemCount: number,
-  data?: Record<string, any>[],
+  data?: Record<string, any>[] | null,
   virtual?: Record<string, (i: number) => any>,
   skip: number = 0
 ) => {
   const {format, prop} = schema[key];
   const accessor = virtual?.[key];
-  const dims = toCPUDims(getUniformDims(format));
+
+  const f = format as UniformType;
+  const dims = toCPUDims(getUniformDims(f));
 
   let i = 0;
   const get = (accessor

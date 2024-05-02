@@ -53,11 +53,11 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
     () => {
       const out = [];
       for (const k in schema) {
-        const {format, index, unwelded, ref} = schema[k];
-        if (ref) throw new Error(`Ref '${k}' not supported in <Data>`);
+        const {format, index, unwelded} = schema[k];
+        const f = format as UniformType;
         if (index || unwelded) throw new Error(`Use <Data> for indexed and unwelded data`);
         if (isUniformArrayType(format)) throw new Error(`Use <Data> for array data`);
-        out.push({name: k, format});
+        out.push({name: k, format: f});
       }
       return out;
     },
@@ -95,7 +95,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
 
     let f = 0;
     for (const k in fields) {
-      const {array, base, stride, dims} = fields[k];
+      const {array, base = 0, stride = 1, dims} = fields[k];
 
       let src = attributes[f].offset / bytesPerElement;
       let dst = base;

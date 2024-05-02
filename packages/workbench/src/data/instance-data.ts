@@ -20,6 +20,7 @@ import {
 import { useDeviceContext } from '../providers/device-provider';
 import { QueueReconciler } from '../reconcilers';
 import { useBufferedSize } from '../hooks/useBufferedSize';
+import { getRenderFunc } from '../hooks/useRenderProp';
 import { getStructAggregate } from '../hooks/useStructSources';
 import { getInstancedAggregate } from '../hooks/useInstancedSources';
 
@@ -42,6 +43,7 @@ export type InstanceDataProps = {
   reserve?: number,
 
   render?: (useInstance: () => (data: Record<string, any>) => void) => LiveElement,
+  children?: (useInstance: () => (data: Record<string, any>) => void) => LiveElement,
 } & {
   format: 'u16' | 'u32',
   then?: (data: StorageSource[], indices: StorageSource) => LiveElement,
@@ -50,20 +52,12 @@ export type InstanceDataProps = {
   then?: (data: StorageSource[]) => LiveElement,
 };
 
-export const useNoInstance = () => {
-  useNoResource();
-  useNoCapture();
-  useNoOne();
-};
-
 export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
   const {
     schema: propSchema,
     format,
     reserve = 64,
     then,
-    render,
-    children,
   } = props;
 
   const device = useDeviceContext();
@@ -206,5 +200,6 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
     return then ? [trigger, then(sources)] : trigger;
   };
 
-  return render ? capture(InstanceCapture, render(useInstance), Resume) : null;
+  const render = getRenderFunc(props);
+  return render ? capture(InstanceCapture, render(useInstance), Resume) : children;
 };

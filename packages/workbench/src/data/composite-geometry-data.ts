@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
-import type { GPUGeometry, DataField, StorageSource, CPUGeometry } from '@use-gpu/core';
+import type { GPUGeometry, DataSchema, DataField, StorageSource, CPUGeometry, TypedArray } from '@use-gpu/core';
 
 import { keyed, yeet, gather, useMemo, useOne, useHooks } from '@use-gpu/live';
 import { formatToArchetype } from '@use-gpu/core';
@@ -30,30 +30,36 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
 
   const archetypes = Object.keys(partitions);
 
-  const schemas = useMemo(() =>
+  const schemas: Record<number, DataSchema> = useMemo(() =>
     mapValues(partitions, ([item]: CPUGeometry[], archetype: number) =>
       mapValues(item.attributes, (_, k) => ({
-        format: `array<${formats[k]}>`,
+        format: `array<${item.formats[k]}>`,
         index: k === 'indices',
-        unwelded: !!item.unwelded[k],
+        unwelded: !!item.unwelded?.[k],
       }))
-    ),
+    ) as any,
     // Diff archetypes by value
-    archetypes);
+    archetypes
+  );
 
-  const items = useMemo(() => {
-    mapValues(partitions, (items: CPUGeometry[], archetype: number) => items.map(i => i.attributes))
-  }, [data, schemas]);
+  const items: Record<number, Record<string, TypedArray>[]> = useMemo(() =>
+    mapValues(
+      partitions,
+      (items: CPUGeometry[], archetype: number): Record<string, TypedArray>[] =>
+        items.map(i => i.attributes)
+    ) as any,
+    [data, schemas]
+  );
 
   return gather(archetypes.map((archetype: string) => {
     const data = partitions[archetype];
     if (!data.length) return null;
 
-    const schema = schames[archetype];
+    const schema = (schemas as any)[archetype as any];
     const {topology, attributes, formats, unwelded} = data[0];
 
     return keyed(Data, archetype, {
-      data: items[archetype],
+      data: (items as any)[archetype as any],
       schema,
       render: (sources: Record<string, StorageSource>) => {
         const out = {

@@ -12,7 +12,7 @@ export const useDraw = (props: VirtualDraw) => {
   const useVariants = useVariantContext();
 
   const hovered = useInspectHoverable();
-  const memo = Object.values(props);
+  const memo = Object.values(props) as any[];
   memo.push(hovered);
   memo.push(useVariants);
 

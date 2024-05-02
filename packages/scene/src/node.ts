@@ -13,7 +13,7 @@ export type NodeProps = TraitProps<typeof ObjectTrait>;
 
 export const Node: LiveComponent<NodeProps> = (props: PropsWithChildren<NodeProps>) => {
   const parent = useMatrixContext();
-  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props) as any;
   const {children} = props;
 
   const [swapMatrix] = useDouble(makeMat4);

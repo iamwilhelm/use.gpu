@@ -10,6 +10,7 @@ import {
   parseMatrix,
   parseColorOpacity,
 } from '@use-gpu/parse';
+import { vec4 } from 'gl-matrix';
 
 export const ObjectTrait = trait({
   position:   optional(parsePosition),
@@ -28,7 +29,7 @@ export const ColorTrait = (
     opacity?: number,
   },
   parsed: {
-    color: TypedArray
+    color?: vec4
   },
 ) => {
   const {color, opacity = 1} = props;

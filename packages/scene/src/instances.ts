@@ -67,11 +67,11 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
 
 const makeInstancer = (
   useInstance: UseInstance,
-) => tagFunction((props: Partial<ObjectTrait> & Partial) => {
+) => tagFunction((props: Partial<InstanceProps>) => {
   const parent = useMatrixContext();
   const updateInstance = useInstance();
 
-  const {color, position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useTraits(props);
+  const {color, position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useTraits(props) as any;
   const ref = useOne(() => ({
     matrix: mat4.create(),
     normalMatrix: mat3.create(),

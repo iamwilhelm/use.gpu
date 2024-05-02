@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { ShaderSource } from '@use-gpu/shader/wgsl';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { provide, extend, useMemo } from '@use-gpu/live';
 import { MatrixContext } from '../providers/matrix-provider';
@@ -16,7 +16,7 @@ export type IndexedTransformProps = PropsWithChildren<{
   immediate?: boolean,
 }>;
 
-export const IndexedTransform: FC<IndexedTransformProps> = (props: IndexedTransformProps) => {
+export const IndexedTransform: LC<IndexedTransformProps> = (props: IndexedTransformProps) => {
   const {matrices, normalMatrices, immediate, children} = props;
 
   const transform = useMatrixTransformSources(matrices, normalMatrices);

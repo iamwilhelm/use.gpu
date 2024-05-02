@@ -214,7 +214,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
 
     const segmentData = segments({
         chunks: chunks!,
-        groups: groups!,
+        groups: groups,
         positions: array,
         dims: toCPUDims(dims),
         loops,
@@ -267,7 +267,7 @@ export const Data: LiveComponent<DataProps<unknown>> = <S extends DataSchema>(pr
 };
 
 // Resolve loop/start/end flags into array
-const resolveSegmentFlag = (count: number, flag?: Boolean, skip: number = 0) => {
+const resolveSegmentFlag = (count: number, flag?: boolean, skip: number = 0): boolean | boolean[] => {
   if (typeof flag === 'function') {
     let flags = [];
     for (let i = 0; i < count; ++i) flags.push((flag as ArrowFunction)(i + skip));
@@ -278,7 +278,7 @@ const resolveSegmentFlag = (count: number, flag?: Boolean, skip: number = 0) => 
     else if (flag.length > count) return flag.slice(0, count);
     return flag;
   }
-  return flag;
+  return !!flag;
 };
 
 // Get list of inner ragged chunk lengths plus outer ragged groupings

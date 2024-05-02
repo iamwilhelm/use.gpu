@@ -76,7 +76,7 @@ export const makeLinkBundle = (
   linker: Linker,
 ) => (
   source: ShaderModule,
-  links?: Record<string, ShaderModule | null>,
+  links?: Record<string, ShaderModule | null | undefined>,
   defines?: Record<string, ShaderDefine> | null,
 ) => {
   let bundle = toBundle(source);
@@ -91,7 +91,7 @@ export const makeLinkModule = (
 ) => (
   source: ParsedModule,
   libraries: Record<string, ShaderModule> = NO_LIBS,
-  links?: Record<string, ShaderModule | null>,
+  links?: Record<string, ShaderModule | null | undefined>,
   defines?: Record<string, ShaderDefine> | null,
 ) => {
   let bundle = toBundle(source);

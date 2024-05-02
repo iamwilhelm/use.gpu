@@ -7,7 +7,7 @@ import { offsetNumberArray } from './data';
 
 export const accumulateChunks = (
   chunks: VectorLike,
-  loops: VectorLike | boolean[] | boolean = false,
+  loops: VectorLike | boolean[] | boolean | null = false,
 ) => {
   const cs = chunks as any;
   const count = (
@@ -24,10 +24,10 @@ export const generateChunkSegments = (
   slices: VectorLike | null | undefined,
   unwelds: VectorLike | null | undefined,
   chunks: VectorLike,
-  groups: VectorLike | null,
-  loops: VectorLike | boolean[] | boolean = false,
-  starts: VectorLike | boolean[] | boolean = false,
-  ends: VectorLike | boolean[] | boolean = false,
+  groups: VectorLike | null | undefined,
+  loops: VectorLike | boolean[] | boolean | null = false,
+  starts: VectorLike | boolean[] | boolean | null = false,
+  ends: VectorLike | boolean[] | boolean | null = false,
 ) => {
   let pos = 0;
   let n = chunks.length;
@@ -98,7 +98,7 @@ export const generateChunkFaces = (
   to: TypedArray,
   slices: VectorLike | null | undefined,
   chunks: VectorLike,
-  groups: VectorLike | null,
+  groups: VectorLike | null | undefined,
 ) => {
   let pos = 0;
   let n = chunks.length;
@@ -133,9 +133,9 @@ export const generateChunkAnchors = (
   anchors: VectorLike,
   trims: VectorLike,
   chunks: VectorLike,
-  loops: boolean[] | boolean = false,
-  starts: boolean[] | boolean = false,
-  ends: boolean[] | boolean = false,
+  loops: boolean[] | boolean | null = false,
+  starts: boolean[] | boolean | null = false,
+  ends: boolean[] | boolean | null = false,
 ) => {
 
   const n = chunks.length;
@@ -191,7 +191,7 @@ export const generateConcaveIndices = (
   to: TypedArray,
   slices: VectorLike | null | undefined,
   chunks: VectorLike,
-  groups: VectorLike | null,
+  groups: VectorLike | null | undefined,
   positions: VectorLike,
   dims: number,
 ) => {

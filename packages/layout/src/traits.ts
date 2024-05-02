@@ -32,7 +32,7 @@ const BoxTrait = trait({
 });
 
 const ImageTrait = trait({
-  texture: optional(parseTexture),
+  texture: optional(parseTexture), // deprecated
   width: optional(parseDimension),
   height: optional(parseDimension),
   fit: parseFit,
@@ -50,6 +50,7 @@ const ElementTrait = trait({
   stroke: optional(parseColor),
   fill: optional(parseColor),
 
+  texture: optional(parseTexture),
   image: optional(makeParseTrait(ImageTrait)),
   zIndex: parseInteger,
 });

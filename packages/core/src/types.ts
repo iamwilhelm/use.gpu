@@ -211,7 +211,7 @@ export type ShaderStageDescriptor = {
 };
 
 // Shader bindings
-export type DataBinding<T = any, S extends ShaderModule = ShaderModule> = {
+export type DataBinding<T = any, S extends ShaderModule = any> = {
   uniform: UniformAttribute,
   storage?: StorageSource,
   texture?: TextureSource,
@@ -227,9 +227,9 @@ export type DataBounds = {
   max: VectorLike,
 };
 
-export type StorageSource<T extends ShaderModule = ShaderModule> = {
+export type StorageSource<T extends ShaderModule = any> = {
   buffer: GPUBuffer,
-  format: UniformType | UniformNamedType,
+  format: UniformFormat,
   type?: T,
 
   length: number,
@@ -244,7 +244,7 @@ export type StorageSource<T extends ShaderModule = ShaderModule> = {
   colorSpace?: ColorSpace,
 };
 
-export type LambdaSource<T extends ShaderModule = ShaderModule> = {
+export type LambdaSource<T extends ShaderModule = any> = {
   shader: T,
   length: number,
   size: VectorLike,

@@ -75,7 +75,7 @@ export type InlineRenderer = (
 ) => LiveElement;
 
 export type LayoutShaders = {
-  texture?: ShaderModule | null,
+  texture?: ShaderSource | null,
   transform?: ShaderModule | null,
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
@@ -132,7 +132,7 @@ export type InlineLine = {
 
 export type UIAggregate = LayoutShaders & {
   archetype?: number,
-  bounds: Rectangle,
+  bounds?: Rectangle,
   count: number,
   zIndex?: number,
 

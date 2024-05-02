@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/core';
 
 import { useProp } from '@use-gpu/traits/live';
-import { parsePosition } from '@use-gpu/parse';
+import { parseVec3 } from '@use-gpu/parse';
 import { useContext, useHooks, useOne, useRef, useResource, useState } from '@use-gpu/live';
 import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
@@ -45,7 +45,7 @@ export const FPSControls: LiveComponent<FPSControlsProps> = (props) => {
     render,
   } = props;
 
-  const initialPosition = useProp(props.position, parsePosition);
+  const initialPosition = useProp(props.position, parseVec3);
 
   const [bearing, setBearing]   = useDerivedState<number>(initialBearing, version);
   const [pitch, setPitch]       = useDerivedState<number>(initialPitch, version);

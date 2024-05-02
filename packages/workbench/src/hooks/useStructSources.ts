@@ -1,4 +1,4 @@
-import type { StorageSource, UniformAttribute } from '@use-gpu/core';
+import type { LambdaSource, StorageSource, StructAggregateBuffer, UniformAttribute } from '@use-gpu/core';
 
 import { useMemo, useOne } from '@use-gpu/live';
 import { explode, structType, bindEntryPoint } from '@use-gpu/shader/wgsl';
@@ -28,7 +28,7 @@ export const getStructSources = (
   const bound = getSource({name: name ?? 'storage', format: 'array<T>', type, args: null}, source);
   const exploded = explode(type, bound);
 
-  const sources = {};
+  const sources: Record<string, LambdaSource> = {};
   for (const {name} of uniforms) {
     sources[name] = getLambdaSource(bindEntryPoint(exploded, name), source);
   };
@@ -37,13 +37,13 @@ export const getStructSources = (
 };
 
 export const useStructAggregate = (
-  aggregateBuffer: MultiAggregateBuffer,
+  aggregateBuffer: StructAggregateBuffer,
 ) => {
   return useOne(() => getStructAggregate(aggregateBuffer), aggregateBuffer)
 };
 
 export const getStructAggregate = (
-  aggregateBuffer: MultiAggregateBuffer,
+  aggregateBuffer: StructAggregateBuffer,
 ) => {
   const {layout: {attributes}, source} = aggregateBuffer;
   const sources = getStructSources(attributes, source);

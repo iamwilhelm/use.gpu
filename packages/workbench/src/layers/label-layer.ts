@@ -10,6 +10,7 @@ import { useRawSource } from '../hooks/useRawSource';
 
 import { PipelineOptions } from '../hooks/usePipelineOptions';
 
+import { TransformContextProps } from '../providers/transform-provider';
 import { useFontFamily } from '../text/providers/font-provider';
 import { SDFFontProvider } from '../text/providers/sdf-font-provider';
 import { DebugAtlas } from '../text/debug-atlas';

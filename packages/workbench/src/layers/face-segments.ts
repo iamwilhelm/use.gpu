@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { StorageSource, VectorLike } from '@use-gpu/core';
+import type { StorageSource, VectorLike, TypedArray } from '@use-gpu/core';
 
 import { memo, yeet, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { accumulateChunks, generateChunkFaces, generateConcaveIndices, alignSizeTo } from '@use-gpu/core';
@@ -15,10 +15,9 @@ export type FaceSegmentsData = {
 export const getFaceSegments = ({
   chunks,
   groups,
-  dims,
 }: {
   chunks: VectorLike,
-  groups: VectorLike | null,
+  groups?: VectorLike | null,
 }) => {
   const count = accumulateChunks(chunks);
 
@@ -34,7 +33,7 @@ export const getFaceSegmentsConcave = ({
   chunks, groups, positions, dims,
 }: {
   chunks: VectorLike,
-  groups: VectorLike,
+  groups?: VectorLike | null,
   positions: TypedArray,
   dims: number,
 }) => {
@@ -61,7 +60,7 @@ export const useFaceSegmentsSource = (
 
 export const useFaceSegmentsConcaveSource = (
   chunks: VectorLike,
-  groups: VectorLike,
+  groups: VectorLike | null | undefined,
   positions: TypedArray,
   dims: number,
 ) => {
@@ -72,7 +71,7 @@ export const useFaceSegmentsConcaveSource = (
   i.length = indexed;
   i.size[0] = indexed;
 
-  return {count, indexed, segments};
+  return {count, indexed, indices};
 };
 
 export const useNoFaceSegments = useNoOne;

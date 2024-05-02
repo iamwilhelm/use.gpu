@@ -19,7 +19,7 @@ const expandArrays = (schema: Record<string, CompactSchema>): ArchetypeSchema =>
     const composite = isUniformArrayType(format);
     const array = `array<${format}>`;
 
-    if (ref) {
+    if (ref && single != null) {
       out[single] = { format: array, name: k, ref, ...rest };
       continue;
     }

@@ -82,13 +82,11 @@ export const useNoMatrixTransform = () => {
 };
 
 export const useMatrixTransformSources = (
-  matrix: ShaderSource,
-  normalMatrix: ShaderSource,
-): [
-  TransformContextProps,
-] => {
+  matrix?: ShaderSource,
+  normalMatrix?: ShaderSource,
+): TransformContextProps => {
   return useMemo(() => {
-    const m = getSource(MATRIX_BINDING, matrix);
+    const m = matrix ? getSource(MATRIX_BINDING, matrix) : null;
     const transform = getShader(getCartesianPosition, [m]);
     const differential = getShader(getMatrixDifferential, [m, normalMatrix]);
 

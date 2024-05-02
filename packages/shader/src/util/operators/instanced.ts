@@ -35,7 +35,7 @@ export const makeInstanceWith = (
   makeInstancedAccessor: MakeInstancedAccessor,
   bundleToAttribute: BundleToAttribute,
 ) => (
-  values: Record<string, ShaderModule>,
+  values: ShaderModule[],
   indices?: ShaderModule | null,
 ): ParsedBundle => {
 
@@ -60,7 +60,7 @@ export const makeInstanceWith = (
 
   const keys = Object.keys(values);
   for (const k in values) {
-    const value = values[k];
+    const value = (values as any)[k];
     const vBundle = toBundle(value);
     const v = bundleToAttribute(vBundle);
 

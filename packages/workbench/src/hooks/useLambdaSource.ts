@@ -20,12 +20,12 @@ export const getLambdaSource = (shader: ShaderModule, sourceProps: SourceLike) =
     get: (target, s) => {
       if (s === 'length') {
         if (sourceProps.length != null) return resolve(sourceProps.length);
-        if (sourceProps.size != null) return resolve(sourceProps.size).reduce((a, b) => a * b, 1);
+        if (sourceProps.size != null) return (resolve(sourceProps.size) as number[]).reduce((a, b) => a * b, 1);
         return 0;
       }
       if (s === 'size') {
         if (sourceProps.size != null) return resolve(sourceProps.size);
-        if (sourceProps.length != null) return [resolve(getProps.length)];
+        if (sourceProps.length != null) return [resolve(sourceProps.length)];
         return [0];
       }
       return (target as any)[s];

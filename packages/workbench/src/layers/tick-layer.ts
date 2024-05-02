@@ -12,7 +12,7 @@ import { PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { use, memo, provide, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
-import { TransformContext, useTransformContext, DEFAULT_TRANSFORM } from '../providers/transform-provider';
+import { TransformContextProps, TransformContext, useTransformContext, DEFAULT_TRANSFORM } from '../providers/transform-provider';
 import { useShader } from '../hooks/useShader';
 import { useShaderRef } from '../hooks/useShaderRef';
 
@@ -46,6 +46,7 @@ export type TickLayerProps = RawLinesFlags & {
 
   detail?: number,
   count?: Lazy<number>,
+  id?: number,
 };
 
 /** Draws tick marks on a scale, oriented along to the local transform at each point. */

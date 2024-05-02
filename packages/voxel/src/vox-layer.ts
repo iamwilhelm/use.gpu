@@ -482,7 +482,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
               shaded: true,
               blend,
               mode,
-              shouldDispatch: (uniforms: Record<string, any>) => {
+              shouldDispatch: (uniforms: Record<string, Ref<any>>) => {
                 insideRef.current = +inside(uniforms);
                 return !insideRef.current;
               },
@@ -496,7 +496,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
               depthTest: false,
               blend,
               mode,
-              shouldDispatch: (uniforms: Record<string, any>) => {
+              shouldDispatch: (uniforms: Record<string, Ref<any>>) => {
                 insideRef.current = +inside(uniforms);
                 originRef.current = origin(uniforms);
                 return !!insideRef.current;

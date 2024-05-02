@@ -31,7 +31,7 @@ describe('instanced', () => {
 
     const main = loadModule(code, 'main');
 
-    const loadIndex = instanceWith({ value1: sub1, value2: sub2 }, ind);
+    const loadIndex = instanceWith([sub1, sub2], ind);
     const bound = bindBundle(main, {loadIndex});
 
     const recode = linkBundle(bound);

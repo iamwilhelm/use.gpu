@@ -4,7 +4,7 @@ import React from '@use-gpu/live';
 import { LayoutControls } from '../../ui/layout-controls';
 
 import {
-  LinearRGB, Pass, FlatCamera, PanControls,
+  LinearRGB, Pass, FlatCamera, PanControls, ImageTexture,
   DebugProvider,
 } from '@use-gpu/workbench';
 import {
@@ -100,7 +100,26 @@ export const LayoutDisplayPage: LC = () => {
                       <Text size={16} color={WHITE} lineHeight={24}>{" exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."}</Text>
                     </Inline>
 
-                    <Block margin={[0, 20, 0, 0]} height={2} fill={WHITE} />
+                    <ImageTexture
+                      url="/textures/test.png"
+                      colorSpace="srgb"
+                      render={(texture) =>
+                        <Flex align="center" width="100%" height={300}>
+                          <Block
+                            fill="#3090ff" 
+                            width={300}
+                            height={300}
+                            margin={20}
+                            texture={texture}
+                            image={{
+                              fit: 'scale'
+                            }}
+                          />
+                        </Flex>
+                      }
+                    />
+
+                    <Block margin={[0, 40, 0, 0]} height={2} fill={WHITE} />
 
                     <Inline margin={MARGIN_TOP}>
                       <Text size={16} color={WHITE} weight="bold" lineHeight={24}>{"Lorem ipsum dolor sit amet,"}</Text>

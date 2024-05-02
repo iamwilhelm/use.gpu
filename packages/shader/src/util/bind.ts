@@ -13,7 +13,7 @@ const DEBUG = false;
 
 export type BindBundle = (
   bundle: ShaderModule,
-  linkDefs?: Record<string, ShaderModule | null>,
+  linkDefs?: Record<string, ShaderModule | null | undefined>,
   defines?: Record<string, ShaderDefine> | null,
   key?: string | number,
 ) => string;
@@ -21,7 +21,7 @@ export type BindBundle = (
 export type BindModule = (
   main: ParsedModule,
   libs?: Record<string, ShaderModule>,
-  linkDefs?: Record<string, ShaderModule | null>,
+  linkDefs?: Record<string, ShaderModule | null | undefined>,
   defines?: Record<string, ShaderDefine> | null,
   virtual?: ParsedModule[],
   key?: string | number,
@@ -39,7 +39,7 @@ export type MakeUniformBlock = (
 
 export const bindBundle = (
   subject: ShaderModule,
-  links: Record<string, ShaderModule | null> | null = null,
+  links: Record<string, ShaderModule | null | undefined> | null = null,
   defines: Record<string, ShaderDefine> | null = null,
 ): ParsedBundle => {
   const bundle = toBundle(subject);

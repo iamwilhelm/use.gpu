@@ -34,7 +34,7 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
     children,
   } = props;
 
-  const { width, height, radius, border, stroke, fill, image, zIndex } = useElementTrait(props);
+  const { width, height, radius, border, stroke, fill, texture, image, zIndex } = useElementTrait(props);
   const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const w = typeof width === 'number' ? width : 0;
@@ -68,6 +68,7 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
         border: hovered ? INSPECT_STYLE.parent.border : border ?? TRANSPARENT,
         radius,
 
+        texture,
         image,
         clip,
         mask,
@@ -106,11 +107,12 @@ export const useImplicitElement = (
   stroke: ColorLike,
   fill: ColorLike,
   image: Partial<ImageTrait>,
+  texture: ShaderSource | null | undefined,
   children: any,
 ) =>
   useMemo(() => {
     const element = (stroke || fill || image) ? (
-      use(Element, {radius, border, stroke, fill, image, absolute: true, under: true})
+      use(Element, {radius, border, stroke, fill, image, texture, absolute: true, under: true})
     ) : null;
     return element && children ? [element, children] : element ?? children;
-  }, [radius, border, stroke, fill, image, children]);
+  }, [radius, border, stroke, fill, texture, image, children]);

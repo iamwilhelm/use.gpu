@@ -102,7 +102,7 @@ export const makeBindingAccessors = (
   }, {
     symbols,
     declarations,
-  }, undefined, hash, code, key);
+  }, undefined, hash, code, key) as ShaderModule;
 
   const links: Record<string, ShaderModule> = {};
   for (const binding of constants) links[binding.uniform.name] = virtual;

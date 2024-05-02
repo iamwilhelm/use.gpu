@@ -9,6 +9,7 @@ export type RawLiveComponent<P> = (props: P) => LiveElement;
 export type PropsWithChildren<P> = P & { children?: string | LiveNode<any> };
 export type LiveComponent<P = object> = ((props: PropsWithChildren<P>) => any) & { displayName?: string };
 export type Component<P = object> = LiveComponent<P>;
+export type RenderProp<T extends any[]> = (...args: T) => LiveElement;
 export type LC<P = object> = LiveComponent<P>;
 export type Ref<T> = { current: T; };
 export type RefObject<T> = { current: T | null };

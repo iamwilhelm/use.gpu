@@ -14,6 +14,7 @@ import {
 
 import { getChainDifferential } from '@use-gpu/wgsl/transform/diff-chain.wgsl';
 import { getEpsilonDifferential } from '@use-gpu/wgsl/transform/diff-epsilon.wgsl';
+import { mat4 } from 'gl-matrix';
 
 export const useCombinedTransform = (
   transform?: TransformContextProps | ShaderModule | null,
@@ -31,7 +32,7 @@ export const useCombinedTransform = (
     const t = transform as ShaderModule;
     if (!key) key = getBundleKey(t) ^ (differential ? getBundleKey(differential) : 0);
 
-    return chainTransform({key, transform: t, differential, bounds}, parent);
+    return chainTransform({key, transform: t, differential, bounds}, parent) as TransformContextProps;
   }, [parent, transform, differential, bounds]);
 };
 
@@ -97,7 +98,7 @@ export const useNoCombinedMatrixTransform = () => {
 export const chainTransform = (
   a: TransformContextProps | null,
   b: TransformContextProps | null,
-): TransformContextProps => {
+): TransformContextProps | null => {
   if (a == null) return b;
   if (b == null) return a;
 

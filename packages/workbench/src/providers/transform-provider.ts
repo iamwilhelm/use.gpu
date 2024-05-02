@@ -23,12 +23,12 @@ export type TransformBounds = (bounds: DataBounds) => DataBounds;
 
 export type TransformContextProps = {
   key: number,
-  transform: ShaderModule | null,
-  differential: ShaderModule | null,
-  bounds: TransformBounds,
+  transform?: ShaderModule | null,
+  differential?: ShaderModule | null,
+  bounds?: TransformBounds | null,
 
-  nonlinear?: TransformContextProps,
-  matrix?: MatrixRefs,
+  nonlinear?: TransformContextProps | null,
+  matrix?: MatrixRefs | null,
 };
 
 export const DEFAULT_TRANSFORM = {

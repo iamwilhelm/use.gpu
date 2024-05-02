@@ -3,7 +3,6 @@ import type { Lazy, StorageSource, DataBounds } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/core';
 
-import { Virtual } from '../primitives/virtual';
 import { Readback } from '../primitives/readback';
 
 import { patch } from '@use-gpu/state';
@@ -23,7 +22,7 @@ import { useDraw } from '../hooks/useDraw';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useMaterialContext } from '../providers/material-provider';
-import { useTransformContext } from '../providers/transform-provider';
+import { TransformContextProps, useTransformContext } from '../providers/transform-provider';
 import { PassReconciler } from '../reconcilers';
 
 import { useInspectable } from '../hooks/useInspectable'
@@ -290,7 +289,6 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       pipeline,
       renderer: shaded ? 'shaded' : 'solid',
       mode,
-      id,
     }),
     /*
     use(Readback, { source: edgeStorage, then: (data) => {

@@ -3,6 +3,17 @@ import LRU from 'lru-cache';
 
 type ColorSpace = any;
 
+type TypedArray =
+  Int8Array |
+  Uint8Array |
+  Int16Array |
+  Uint16Array |
+  Int32Array |
+  Uint32Array |
+  Uint8ClampedArray |
+  Float32Array |
+  Float64Array;
+
 export type ASTParser<T extends SymbolTableT = any> = {
   getSymbolTable: () => T,
   getShakeTable: (table?: T) => ShakeTable | undefined,
@@ -118,7 +129,7 @@ export type StorageSource = {
   format: UniformFormat,
   type?: ShaderModule,
   length: number,
-  size: number[],
+  size: number[] | TypedArray,
   version: number,
 
   volatile?: number,
@@ -131,7 +142,7 @@ export type StorageSource = {
 export type LambdaSource<T = any> = {
   shader: T,
   length: number,
-  size: number[],
+  size: number[] | TypedArray,
   version: number,
 
   colorSpace?: ColorSpace,
@@ -143,7 +154,7 @@ export type TextureSource = {
   sampler: GPUSampler | GPUSamplerDescriptor | null,
   layout: string,
   format: string,
-  size: [number, number] | [number, number, number],
+  size: number[] | TypedArray,
   version: number,
 
   mips?: number,
@@ -157,7 +168,7 @@ export type TextureSource = {
 
 export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | TextureSource | ShaderModule;
 
-export type UniformFormat = string;
+export type UniformFormat<T extends string = string> = T | UniformAttribute[];
 
 export type UniformAttribute = {
   name: string,

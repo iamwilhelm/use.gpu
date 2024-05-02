@@ -4,7 +4,7 @@ import type { Rectangle } from '@use-gpu/core';
 import type { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, FitInto } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
-import { useProp } from '@use-gpu/traits/live';
+import { useProp, shouldEqual, sameArray, sameShallow } from '@use-gpu/traits/live';
 import { keyed, yeet, memo, gather, useFiber, useMemo } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
 import { makeBoxPicker, memoFit } from '../lib/util';
@@ -38,7 +38,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
     children,
   } = props;
 
-  const { width, height, aspect, radius, border, stroke, fill, image, zIndex } = useElementTrait(props);
+  const { width, height, aspect, radius, border, stroke, fill, image, texture, zIndex } = useElementTrait(props);
   const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionX);
@@ -51,7 +51,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
 
-  const c = useImplicitElement(radius, border, stroke, fill, image, children);
+  const c = useImplicitElement(radius, border, stroke, fill, image, texture, children);
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
@@ -136,4 +136,12 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
   };
 
   return c ? gather(c, Resume) : null;
-}, 'Flex');
+}, shouldEqual({
+  padding: sameShallow(),
+  margin:  sameShallow(),
+  radius:  sameShallow(),
+  border:  sameShallow(),
+  stroke:  sameShallow(),
+  fill:    sameShallow(),
+  image:   sameShallow(),
+}), 'Flex');

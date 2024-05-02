@@ -3,6 +3,7 @@ import type { TextureSource, Rectangle, XYZW } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { ImageTrait, Fit, Repeat, Anchor } from '../types';
 
+import { proxy } from '@use-gpu/core';
 import { use, yeet, memo, useContext, useMemo, useNoContext } from '@use-gpu/live';
 import { LayoutContext, getAlignmentAnchor, UI_SCHEMA } from '@use-gpu/workbench';
 import { schemaToArchetype } from '@use-gpu/core';
@@ -25,6 +26,7 @@ export type SDFRectangleProps = {
   origin?: Rectangle,
   zIndex?: number,
 
+  texture?: ShaderSource | null,
   image?: Partial<ImageTrait>,
 
   fill?: XYZW,
@@ -37,8 +39,11 @@ export type SDFRectangleProps = {
   transform?: ShaderModule | null,
 };
 
+let DEPRECATED_WARNING = false;
+
 export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
   const {
+    texture,
     image,
 
     fill,
@@ -64,32 +69,29 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
 
   return useMemo(() => {
     const st = origin ? getOriginProjection(layout, origin) : UV_SQUARE;
+    const tex = texture ?? image?.texture;
+    const repeat = image?.repeat;
+
+    if (!DEPRECATED_WARNING && image?.texture) {
+      console.warn("<Element image={{texture}}> is deprecated. Pass directly as texture={texture}.");
+      DEPRECATED_WARNING = true;
+    }
 
     const sampledTexture = useMemo(() => {
-      if (!image?.texture) return null;
+      if (!tex) return null;
 
-      const {texture, repeat} = image;
-      if (!('sampler' in texture)) return null;
+      if (!('sampler' in tex)) return null;
 
       const addressModeU = repeat === 'x' || repeat === 'xy' ? 'repeat' : 'clamp-to-edge';
       const addressModeV = repeat === 'y' || repeat === 'xy' ? 'repeat' : 'clamp-to-edge';
-      const sampler = texture.sampler !== null ? {
+      const sampler = tex.sampler !== null ? {
         minFilter: 'linear',
         magFilter: 'linear',
-        ...texture.sampler,
+        ...tex.sampler,
       } : null;
 
-      return {...texture, sampler};
-    }, [image?.texture, image?.repeat]);
-
-    if (sampledTexture) {
-      // Update volatile texture
-      if ('texture' in image!.texture!) {
-        sampledTexture.texture = image!.texture!.texture;
-        sampledTexture.view    = image!.texture!.view;
-        sampledTexture.size    = image!.texture!.size;
-      }
-    }
+      return proxy(tex, {sampler});
+    }, [tex, repeat]);
 
     let boxW = layout[2] - layout[0];
     let boxH = layout[3] - layout[1];
@@ -124,10 +126,11 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
       radius[3] = bl;
     }
 
+    console.log({image, texture, tex})
+
     let render;
-    if (image && image.texture) {
+    if (image && tex) {
       const {
-        texture,
         fit,
         width,
         height,
@@ -136,8 +139,8 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
       } = image;
 
       let uv = UV_SQUARE;
-      if ('size' in texture) {
-        const {size} = texture;
+      if ('size' in tex) {
+        const {size} = tex;
 
         if (fit !== 'scale') {
 
@@ -192,7 +195,7 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
         attributes,
         bounds: layout,
         transform,
-        texture: sampledTexture ?? image?.texture,
+        texture: sampledTexture ?? tex,
       });
     }
     else {

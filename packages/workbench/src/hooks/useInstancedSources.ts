@@ -1,4 +1,4 @@
-import type { StorageSource, UniformAttribute } from '@use-gpu/core';
+import type { StorageSource, UniformAttribute, StructAggregateBuffer } from '@use-gpu/core';
 
 import { useMemo } from '@use-gpu/live';
 import { chainTo, instanceWith, bindEntryPoint } from '@use-gpu/shader/wgsl';
@@ -42,7 +42,7 @@ export const getInstancedSources = (
 };
 
 export const useInstancedAggregate = (
-  aggregateBuffer: MultiAggregateBuffer,
+  aggregateBuffer: StructAggregateBuffer,
   instances?: StorageSource,
   format?: 'u16' | 'u32',
 ) => {
@@ -50,7 +50,7 @@ export const useInstancedAggregate = (
 };
 
 export const getInstancedAggregate = (
-  aggregateBuffer: MultiAggregateBuffer,
+  aggregateBuffer: StructAggregateBuffer,
   instances?: StorageSource,
   format: 'u16' | 'u32' = 'u32',
 ) => {

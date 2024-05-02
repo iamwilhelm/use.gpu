@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/core';
 
 import { useProp } from '@use-gpu/traits/live';
-import { parsePosition } from '@use-gpu/parse';
+import { parseVec3 } from '@use-gpu/parse';
 import { useContext, useOne, useResource, useState, useHooks } from '@use-gpu/live';
 import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { KeyboardContext, MouseContext, WheelContext } from '../providers/event-provider';
@@ -66,7 +66,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     active = true,
   } = props;
 
-  const initialTarget = useProp(props.target, parsePosition);
+  const initialTarget = useProp(props.target, parseVec3);
 
   const [radius, setRadius]   = useDerivedState<number>(initialRadius, version);
   const [bearing, setBearing] = useDerivedState<number>(initialBearing, version);

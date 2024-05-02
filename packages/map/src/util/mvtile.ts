@@ -1,4 +1,4 @@
-import type { AggregateSchema, AggregateValue, ColorLike, FieldArray, TypedArray, VectorEmitter, VectorLike, XY, XYZW } from '@use-gpu/core';
+import type { ArchetypeSchema, AggregateValue, ColorLike, FieldArray, TypedArray, VectorEmitter, VectorLike, XY, XYZW } from '@use-gpu/core';
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { SegmentDecorator } from '@use-gpu/workbench';
 import type { MVTStyleSheet, MVTStyleProperties } from '../types';
@@ -302,7 +302,7 @@ export const aggregateMVTShapes = (shapes: MVTShapes): MVTAggregates => {
 
 const aggregateMVTShape = (
   shape: MVTShape,
-  schema: AggregateSchema,
+  schema: ArchetypeSchema,
   segments?: SegmentDecorator,
   loop?: boolean,
   start?: boolean,
@@ -380,7 +380,7 @@ const aggregateMVTShape = (
 const decorateMVTSegments = (
   positions: FieldArray,
   attributes: Record<string, TypedArray>,
-  schema: AggregateSchema,
+  schema: ArchetypeSchema,
   count: number,
   chunks: VectorLike,
   groups: VectorLike | null,
@@ -389,7 +389,7 @@ const decorateMVTSegments = (
   starts: boolean[] | boolean = false,
   ends: boolean[] | boolean = false,
 ): [
-  AggregateSchema,
+  ArchetypeSchema,
   Record<string, TypedArray | VectorEmitter>,
   number,
   number,

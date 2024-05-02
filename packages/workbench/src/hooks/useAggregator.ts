@@ -1,5 +1,5 @@
 import type { LiveElement } from '@use-gpu/live';
-import type { AggregateSchema, AggregateItem, AggregateValue } from '@use-gpu/core';
+import type { ArchetypeSchema, AggregateItem, AggregateValue } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../providers/device-provider';
@@ -22,7 +22,7 @@ import { getStructAggregate } from '../hooks/useStructSources';
 const DEBUG = false;
 
 export const useAggregator = (
-  schema: AggregateSchema,
+  schema: ArchetypeSchema,
   items: AggregateItem[],
 ) => {
   const device = useDeviceContext();
@@ -41,7 +41,7 @@ export const useAggregator = (
 };
 
 export const makeAggregator = (
-  schema: AggregateSchema,
+  schema: ArchetypeSchema,
 ) => (
   device: GPUDevice,
   initialItems: Record<string, AggregateValue>[],

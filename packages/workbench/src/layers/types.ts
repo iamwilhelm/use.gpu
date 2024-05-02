@@ -1,8 +1,8 @@
 import type { LiveFunction, LiveComponent } from '@use-gpu/live';
-import type { AggregateSchema, TypedArray } from '@use-gpu/core';
+import type { ArchetypeSchema, TypedArray } from '@use-gpu/core';
 import type { PointShape } from '@use-gpu/parse';
-import type { LineLayerFlags } from '../line-layer';
-import type { FaceLayerFlags } from '../face-layer';
+import type { LineLayerFlags } from './line-layer';
+import type { FaceLayerFlags } from './face-layer';
 import type { PointLayerFlags } from './point-layer';
 import type { ArrowLayerFlags } from './arrow-layer';
 import type { MaterialContextProps } from '../providers/material-provider';
@@ -13,7 +13,7 @@ import { mat3, mat4 } from 'gl-matrix';
 export type LayerType = 'point' | 'line' | 'arrow' | 'face' | 'element';
 
 export type LayerAggregator = {
-  schema: AggregateSchema,
+  schema: ArchetypeSchema,
   component: LiveComponent,
 };
 
@@ -22,7 +22,7 @@ export type BaseAggregate = {
   transform?: TransformContextProps,
   material?: MaterialContextProps,
   scissor?: ScissorContextProps,
-  schema?: AggregateSchema,
+  schema?: ArchetypeSchema,
   sources?: Record<string, any>,
   zIndex?: number,
 };

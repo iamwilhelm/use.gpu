@@ -32,7 +32,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
     children,
   } = props;
 
-  const { width, height, aspect, radius, border, stroke, fill, image, zIndex } = useElementTrait(props);
+  const { width, height, aspect, radius, border, stroke, fill, image, texture, zIndex } = useElementTrait(props);
   const { margin: blockMargin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionY);
@@ -48,7 +48,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
 
-  const c = useImplicitElement(radius, border, stroke, fill, image, children);
+  const c = useImplicitElement(radius, border, stroke, fill, image, texture, children);
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
@@ -139,4 +139,5 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
   border:  sameShallow(),
   stroke:  sameShallow(),
   fill:    sameShallow(),
+  image:   sameShallow(),
 }), 'Block');

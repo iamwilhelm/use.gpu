@@ -13,7 +13,7 @@ import zipObject from 'lodash/zipObject';
 
 const π = Math.PI;
 
-export type AnimateProps<T> = {
+export type AnimateProps<T extends number | VectorLike | VectorLikes> = {
   loop?: boolean,
   mirror?: boolean,
   repeat?: number,
@@ -123,7 +123,8 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
 };
 
 const makeValueRef = (v: number[][] | number[] | TypedArray | number) => {
-  if (typeof v[0] === 'number') return new Float32Array(v.length || 1);
+  const vs = v as number[];
+  if (typeof vs[0] === 'number') return new Float32Array(vs.length || 1);
   if (typeof v === 'number') return 0;
   return JSON.parse(JSON.stringify(v));
 }
@@ -162,18 +163,23 @@ const interpolateValue = (
   b: number[][] | number[] | Float32Array | number,
   t: number,
 ) => {
+  const as = a as number[];
+  const bs = b as number[];
+  const aas = a as number[][];
+  const bbs = b as number[][];
+
   if (typeof a === 'number') values[prop] = lerp(a as number, b as number, t);
-  else if (typeof a[0] === 'number') {
+  else if (typeof as[0] === 'number') {
     const target = values[prop];
     const n = target.length;
-    for (let i = 0; i < n; ++i) target[i] = lerp(a[i], b[i], t);
+    for (let i = 0; i < n; ++i) target[i] = lerp(as[i], bs[i], t);
   }
-  else if (typeof a[0][0] === 'number') {
+  else if (typeof aas[0][0] === 'number') {
     const target = values[prop];
     const n = target.length;
     for (let i = 0; i < n; ++i) {
-      const aa = a[i];
-      const bb = b[i];
+      const aa = aas[i];
+      const bb = bbs[i];
       const tt = target[i];
       const m = tt.length;
       for (let j = 0; j < m; ++j) {

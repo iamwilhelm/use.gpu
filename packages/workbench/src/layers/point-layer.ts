@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { Lazy, UniformAttribute } from '@use-gpu/core';
+import type { Lazy, UniformAttribute, VectorLike } from '@use-gpu/core';
 import type { PointShape } from '@use-gpu/parse';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { PipelineOptions } from '../hooks/usePipelineOptions';

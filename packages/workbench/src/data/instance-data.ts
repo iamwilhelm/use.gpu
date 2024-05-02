@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataSchema, MultiAggregateBuffer, TypedArray, StorageSource, UniformType } from '@use-gpu/core';
+import type { DataSchema, StructAggregateBuffer, TypedArray, StorageSource, UniformType } from '@use-gpu/core';
 import { capture, yeet, useCapture, useNoCapture, useMemo, useOne, useRef, useResource, useNoResource, incrementVersion, makeCapture } from '@use-gpu/live';
 import {
   makeIdAllocator,
@@ -121,7 +121,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
     const size = Math.max(reserve, ids.max());
     const alloc = useBufferedSize(size);
 
-    const prevBufferRef = useRef(null as MultiAggregateBuffer | null);
+    const prevBufferRef = useRef(null as StructAggregateBuffer | null);
 
     // Make/resize data buffers + index buffer
     const [aggregateBuffer, indexBuffer, fields, sources] = useMemo(() => {

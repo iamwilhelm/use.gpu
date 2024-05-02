@@ -4,6 +4,7 @@ import type { Rectangle } from '@use-gpu/core';
 import type { LayoutElement, FitInto, Dimension, Direction } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
+import { shouldEqual, sameArray, sameShallow } from '@use-gpu/traits/live';
 import { memo, gather, keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
 import { makeBoxPicker, memoFit } from '../lib/util';
@@ -41,13 +42,13 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
     children,
   } = props;
 
-  const { width, height, aspect, radius, border, stroke, fill, image, zIndex } = useElementTrait(props);
+  const { width, height, aspect, radius, border, stroke, fill, image, texture, zIndex } = useElementTrait(props);
 
   const {id} = useFiber();
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
 
-  const c = useImplicitElement(radius, border, stroke, fill, image, children);
+  const c = useImplicitElement(radius, border, stroke, fill, image, texture, children);
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
@@ -93,4 +94,12 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
   };
 
   return gather(c, Resume);
-}, 'Absolute');
+}, shouldEqual({
+  padding: sameShallow(),
+  margin:  sameShallow(),
+  radius:  sameShallow(),
+  border:  sameShallow(),
+  stroke:  sameShallow(),
+  fill:    sameShallow(),
+  image:   sameShallow(),
+}), 'Absolute');

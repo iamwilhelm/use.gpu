@@ -1,4 +1,4 @@
-import type { TextureSource } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader/wgsl';
 import type { Alignment, AlignmentLike, Anchor, AnchorLike, Baseline, Dimension, Direction, Fit, Gap, GapLike, Margin, MarginLike, OverflowMode, Repeat } from './types';
 import { makeParseEnum, makeParseObject } from '@use-gpu/parse';
 
@@ -37,7 +37,7 @@ export const makeParseMargin = (def: Margin = [0, 0, 0, 0]) => (m?: MarginLike):
   m != null ? [m, m, m, m] :
   def;
 
-export const parseTexture    = makeParseObject<TextureSource>();
+export const parseTexture    = makeParseObject<ShaderSource | null>();
 
 export const parseAlignment  = makeParseEnum<Alignment>(['start', 'center', 'end', 'justify', 'justify-start', 'justify-center', 'justify-end', 'between', 'evenly']);
 export const parseAnchor     = makeParseEnum<Anchor>(['start', 'center', 'end']);
@@ -46,7 +46,7 @@ export const parseDirectionX = makeParseEnum<Direction>(['x', 'y', 'lr', 'rl', '
 export const parseDirectionY = makeParseEnum<Direction>(['y', 'x', 'lr', 'rl', 'tb', 'bt']);
 export const parseFit        = makeParseEnum<Fit>(['none', 'contain', 'cover', 'scale']);
 export const parseOverflow   = makeParseEnum<OverflowMode>(['visible', 'scroll', 'hidden', 'auto']);
-export const parseRepeat     = makeParseEnum<Repeat>(['x', 'y', 'xy', 'none']);
+export const parseRepeat     = makeParseEnum<Repeat>(['xy', 'x', 'y', 'none']);
 
 export const parseDimension   = makeParseDimension();
 export const parseAlignmentXY = makeParseAlignmentXY();

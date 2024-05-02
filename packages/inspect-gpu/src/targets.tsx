@@ -19,6 +19,7 @@ const {signal} = QueueReconciler;
 
 const SIZE = 512;
 const HEIGHT = SIZE + 24 * 2;
+const IMAGE_FIT = {fit: 'contain', align: 'center', repeat: 'none'};
 
 const NO_OPS: any[] = [];
 const toArray = <T,>(x?: T | T[]): T[] => Array.isArray(x) ? x : x ? [x] : NO_OPS;
@@ -235,7 +236,8 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
             stroke: '#808080',
             width, height,
             fill: [0, 0, 0, .5],
-            image: {texture, fit: 'contain', align: 'center', repeat: 'none'},
+            texture,
+            image: IMAGE_FIT,
           }),
           use(Inline, {
             children: use(Text, {

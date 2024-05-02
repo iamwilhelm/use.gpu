@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TypedArray, StorageSource, UniformType, VectorLike, DataSchema, DataBounds } from '@use-gpu/core';
+import type { TypedArray, LambdaSource, UniformType, VectorLike, DataSchema, DataBounds } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
@@ -29,8 +29,8 @@ export type InterleavedDataProps = {
   live?: boolean,
 
   /** Receive 1 source per field, in struct-of-array format. Leave empty to yeet sources instead. */
-  render?: (sources: Record<string, StorageSource>) => LiveElement,
-  children?: (sources: Record<string, StorageSource>) => LiveElement,
+  render?: (sources: Record<string, LambdaSource>) => LiveElement,
+  children?: (sources: Record<string, LambdaSource>) => LiveElement,
 };
 
 const NO_FIELDS = [] as [UniformType, string][];

@@ -13,7 +13,7 @@ const NO_INSTANCES = {HAS_INSTANCES: false};
 
 /** Instanced draw, repeated) or random access */
 export const useInstancedVertex = (
-  getVertex: ShaderSource,
+  getVertex: ShaderModule,
   instance?: Lazy<number>,
   instances?: ShaderSource,
   elementCount?: Lazy<number>,

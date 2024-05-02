@@ -27,7 +27,7 @@ export const useApplyTransform = (
   const context = replace ? (useNoTransformContext(), replace) : useTransformContext();
   const scissor = useScissorContext();
 
-  const {transform, bounds = null} = 'transform' in context ? context : {transform: context};
+  const {transform, bounds = null} = ('transform' in context ? context : {transform: context}) as TransformContextProps;
   const version = useVersion(positions) + useVersion(transform) + useVersion(scissor) + useVersion(bounds);
 
   return useOne(() => {

@@ -38,7 +38,7 @@ export const useCombinedTransform = (
 
 export const useCombinedEpsilonTransform = (
   transform: ShaderModule | null,
-  epsilon?: ShaderSource | Lazy<number> = 1e-3,
+  epsilon: ShaderSource | Lazy<number> = 1e-3,
 ) => {
   const parent = useTransformContext();
 
@@ -48,7 +48,7 @@ export const useCombinedEpsilonTransform = (
     const t = transform as ShaderModule;
     const k = getBundleKey(t);
 
-    const chained = chainTransform({key: k, transform}, parent);
+    const chained = chainTransform({key: k, transform}, parent)!;
     const differential = getShader(getEpsilonDifferential, [chained.transform, epsilon]);
 
     const key = k ^ getBundleKey(differential);
@@ -58,7 +58,7 @@ export const useCombinedEpsilonTransform = (
 
 export const useCombinedMatrixTransform = (
   matrix?: mat4 | null,
-): [TransformContextProps, mat4] => {
+): [TransformContextProps, mat4 | null] => {
   const parent = useTransformContext();
   const combined = useCombinedMatrix(matrix);
   if (!combined) {
@@ -73,7 +73,7 @@ export const useCombinedMatrixTransform = (
 
   const context = useMemo(() => {
     const prev = parent.nonlinear ?? parent;
-    const chained = chainTransform(props, prev);
+    const chained = chainTransform(props, prev)!;
     return {...chained, nonlinear: prev, matrix: refs};
   }, [props, parent]);
 

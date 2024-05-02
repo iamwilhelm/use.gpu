@@ -1,4 +1,4 @@
-import type { StorageSource, UniformAttribute, StructAggregateBuffer } from '@use-gpu/core';
+import type { StorageSource, LambdaSource, UniformAttribute, StructAggregateBuffer } from '@use-gpu/core';
 
 import { useMemo } from '@use-gpu/live';
 import { chainTo, instanceWith, bindEntryPoint } from '@use-gpu/shader/wgsl';
@@ -12,6 +12,7 @@ const INDEX = {
   u16: {name: 'instances', format: 'u16'},
   u32: {name: 'instances', format: 'u32'},
 };
+const NO_SIZE = {size: [0], length: 0};
 
 export const useInstancedSources = (
   uniforms: UniformAttribute[],
@@ -38,7 +39,7 @@ export const getInstancedSources = (
 
   const sources: Record<string, LambdaSource> = {};
   for (const {name} of uniforms) {
-    sources[name] = getLambdaSource(bindEntryPoint(instances, name), indices);
+    sources[name] = getLambdaSource(bindEntryPoint(instances, name), indices ?? NO_SIZE);
   };
 
   return [sources, instances];
@@ -68,8 +69,8 @@ export const getInstancedAggregate = (
 };
 
 export const combineInstances = (
-  a?: Record<string, StorageSource>,
-  b?: Record<string, StorageSource>,
+  a?: Record<string, ShaderModule>,
+  b?: Record<string, ShaderModule>,
 ) => {
   const {instances: ai} = a ?? NO_AGGREGATE;
   const {instances: bi} = b ?? NO_AGGREGATE;

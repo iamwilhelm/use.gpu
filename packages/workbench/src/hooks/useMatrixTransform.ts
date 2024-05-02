@@ -1,8 +1,7 @@
 import type { DataBounds, StorageSource, LambdaSource, TextureSource, TypedArray, UniformAttribute } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import type { RefObject } from '@use-gpu/live';
-import type { TransformContextProps, TransformBounds } from '../providers/transform-provider';
-import type { MatrixRefs } from '../layers/types';
+import type { TransformContextProps, TransformBounds, MatrixRefs } from '../providers/transform-provider';
 
 import { useCallback, useDouble, useMemo, useOne, useVersion, useNoCallback, useNoDouble, useNoMemo, useNoOne, useNoVersion } from '@use-gpu/live';
 import { bundleToAttribute, getBundleKey } from '@use-gpu/shader/wgsl';
@@ -24,7 +23,7 @@ const makeMat4 = () => mat4.create();
 export const useCombinedMatrix = (
   matrix?: mat4 | null,
   bounds?: TransformBounds | null,
-): mat4 => {
+): mat4 | null => {
   const parent = useMatrixContext();
   const version = useVersion(parent) + useVersion(matrix);
   const [swapMatrix] = useDouble(makeMat4);
@@ -61,7 +60,7 @@ export const useMatrixTransform = (
   useOne(() => {
     const m = matrix ?? NO_MATRIX;
     refs.matrix.current = m;
-    mat3.normalFromMat4(refs.normalMatrix.current, m);
+    mat3.normalFromMat4(refs.normalMatrix.current!, m);
   }, matrix);
 
   return useOne(() => {

@@ -20,7 +20,7 @@ export const getStructSources = (
   uniforms: UniformAttribute[],
   source: StorageSource,
   name?: string,
-): Record<String, LambdaSource> => {
+): Record<string, LambdaSource> => {
 
   name = name ?? 'get' + uniforms.map(u => toTitleCase(u.name)).join('');
 

@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, DeferredCall, PropsWithChildren, RefObject } from '@use-gpu/live';
-import type { TypedArray } from '@use-gpu/core';
+import type { TypedArray, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { Keyframe } from './types';
 
 import { clamp, lerp } from '@use-gpu/core';
@@ -129,7 +129,7 @@ const makeValueRef = (v: number[][] | number[] | TypedArray | number) => {
   return JSON.parse(JSON.stringify(v));
 }
 
-const evaluateKeyframe = <T>(
+const evaluateKeyframe = <T extends number | VectorLike | VectorLikes>(
   values: Record<string, T>,
   prop: string,
   keyframes: Keyframe<T>[],
@@ -147,12 +147,12 @@ const evaluateKeyframe = <T>(
   let fraction = clamp(dt ? (time - start) / dt : 0, 0, 1);
 
   if (ease === 'bezier') {
-    interpolateValue(values, prop, a[1], b[1], fraction);
+    interpolateValue(values as any, prop, a[1] as any, b[1] as any, fraction);
     //value = interpolateValueBezier(a[1], b[1], a[2], a[3], b[2], b[3], r);
   }
   else {
     if (ease === 'cosine') fraction = .5 - Math.cos(fraction * π) * .5;
-    interpolateValue(values, prop, a[1], b[1], fraction);
+    interpolateValue(values as any, prop, a[1] as any, b[1] as any, fraction);
   }
 };
 
@@ -170,12 +170,12 @@ const interpolateValue = (
 
   if (typeof a === 'number') values[prop] = lerp(a as number, b as number, t);
   else if (typeof as[0] === 'number') {
-    const target = values[prop];
+    const target = values[prop] as number[];
     const n = target.length;
     for (let i = 0; i < n; ++i) target[i] = lerp(as[i], bs[i], t);
   }
   else if (typeof aas[0][0] === 'number') {
-    const target = values[prop];
+    const target = values[prop] as number[][];
     const n = target.length;
     for (let i = 0; i < n; ++i) {
       const aa = aas[i];
@@ -189,7 +189,7 @@ const interpolateValue = (
   }
 };
 
-const getActiveKeyframe = <T>(keyframes: Keyframe<T>[], time: number) => {
+const getActiveKeyframe = <T extends number | VectorLike | VectorLikes>(keyframes: Keyframe<T>[], time: number) => {
   const n = keyframes.length;
   let i = 0;
   for (; i < n - 2; ++i) {

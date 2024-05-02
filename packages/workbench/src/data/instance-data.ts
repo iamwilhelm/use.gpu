@@ -1,5 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { DataSchema, StructAggregateBuffer, TypedArray, StorageSource, LambdaSource, UniformType } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 import { capture, yeet, useCapture, useNoCapture, useMemo, useOne, useRef, useResource, useNoResource, incrementVersion, makeCapture } from '@use-gpu/live';
 import {
   makeIdAllocator,
@@ -45,8 +46,8 @@ export type InstanceDataProps<I extends 'u16' | 'u32' | undefined> = {
   render?: (useInstance: () => (data: Record<string, any>) => void) => LiveElement,
   children?: (useInstance: () => (data: Record<string, any>) => void) => LiveElement,
   then?: 'u16' | 'u32' extends I
-    ? (data: Record<string, LambdaSource | StorageSource>, indices: StorageSource) => LiveElement
-    : (data: Record<string, LambdaSource | StorageSource>) => LiveElement
+    ? (data: Record<string, ShaderSource>, indices: StorageSource) => LiveElement
+    : (data: Record<string, ShaderSource>) => LiveElement
 };
 
 export const InstanceData: LiveComponent<InstanceDataProps<'u16' | 'u32' | undefined>> = <I extends 'u16' | 'u32' | undefined>(props: InstanceDataProps<I>) => {

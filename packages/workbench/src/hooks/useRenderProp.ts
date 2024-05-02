@@ -15,8 +15,8 @@ export const useRenderProp = <T extends any[]>(props: RenderProps<T>, ...args: T
   const call = getRenderFunc(props);
   if (!call && props.children)  throw new Error(`Expected render function as children, got: ${formatValue(props.children)}`);
 
-  const rendered = call ? useHooks(() => call(...args), [call, ...args]) : useNoHooks();
-  const returned = !call ? useMemo(() => yeet(...args), args) : useNoMemo();
+  const rendered = call ? useHooks(() => call(...args), [call, ...args]) : (useNoHooks(), null);
+  const returned = !call ? useMemo(() => yeet(...args), args) : (useNoMemo(), null);
 
   return call ? rendered : returned;
 };

@@ -22,7 +22,7 @@ export const useInstancedVertex = (
 
   if (!(instance != null || instances)) {
     useNoInstancedVertex();
-    return [getVertex, elementCount, NO_INSTANCES];
+    return [getVertex, elementCount || 0, NO_INSTANCES];
   }
 
   const instanceSize = instance == null ? useNoShaderRef() : useShaderRef(elementCount);

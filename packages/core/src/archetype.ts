@@ -8,6 +8,7 @@ import type {
   StorageSource,
   DataField,
   AggregateItem,
+  AggregateValue,
   ArchetypeSchema,
   ArchetypeField,
   VectorEmitter,
@@ -275,7 +276,7 @@ export const schemaToArchetype = (
 /** Create an aggregate for a schema and its attributes / refs */
 export const schemaToAggregate = (
   schema: ArchetypeSchema,
-  attributes: Record<string, TypedArray | VectorEmitter>,
+  attributes: Record<string, AggregateValue>,
   refs?: Record<string, RefObject<TypedArray | number>>,
   allocInstances: number = 0,
   allocVertices: number = 0,

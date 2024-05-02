@@ -1,6 +1,6 @@
 import type { LiveElement } from '@use-gpu/live';
-import type { ArchetypeSchema, AggregateItem, AggregateValue } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader/wgsl';
+import type { ArchetypeSchema, AggregateItem, AggregateValue, ArrayAggregateBuffer } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useLog, useMemo, useOne } from '@use-gpu/live';
@@ -10,10 +10,7 @@ import {
   updateAggregateFromSchema,
   uploadAggregateFromSchema,
   uploadAggregateFromSchemaRefs,
-
   getAggregateSummary,
-  updateAggregateBuffer,
-  updateAggregateIndex,
 } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getInstancedAggregate, combineInstances } from '../hooks/useInstancedSources';
@@ -44,7 +41,7 @@ export const makeAggregator = (
   schema: ArchetypeSchema,
 ) => (
   device: GPUDevice,
-  initialItems: Record<string, AggregateValue>[],
+  initialItems: AggregateItem[],
   allocInstances: number,
   allocVertices: number,
   allocIndices: number,
@@ -56,16 +53,16 @@ export const makeAggregator = (
   const aggregate = toGPUAggregate(device, cpuAggregate);
 
   const {aggregateBuffers, refBuffers, byRefs, byInstances, byVertices, byIndices, bySelfs} = aggregate;
-  const {instances} = aggregateBuffers;
+  const instances = aggregateBuffers.instances as ArrayAggregateBuffer;
 
-  const refSources  = byRefs && getInstancedAggregate(byRefs, instances);
-  const itemSources = byInstances && getInstancedAggregate(byInstances, instances);
+  const refSources  = byRefs && getInstancedAggregate(byRefs, instances?.source);
+  const itemSources = byInstances && getInstancedAggregate(byInstances, instances?.source);
 
   const sources = {
     ...combineInstances(refSources, itemSources),
     ...(byVertices ? getStructAggregate(byVertices) : undefined),
     ...(byIndices  ? getStructAggregate(byIndices)  : undefined),
-    ...bySelfs.sources,
+    ...bySelfs?.sources,
   };
 
   let itemCount = initialItems.length;
@@ -75,7 +72,7 @@ export const makeAggregator = (
 
   DEBUG && console.log('useAggregator', {initialItems, aggregate, allocInstances, allocVertices, allocIndices});
 
-  return (items: ArrowAggregate[], count: number, indexed: number, instanced: number, offsets: number[]) => {
+  return (items: AggregateItem[], count: number, indexed: number, instanced: number, offsets: number[]) => {
     itemCount = items.length;
 
     updateAggregateFromSchema(schema, aggregate, items, count, indexed, instanced, offsets);

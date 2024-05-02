@@ -59,12 +59,12 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
 
   // Make struct uniform layout
   const [bindings, layout] = useOne(() => {
-    const bindings = bundleToAttribute(format);
+    const bindings = bundleToAttribute(type);
     if (!Array.isArray(bindings.format)) throw new Error(`<StructData> type '${bindings.name}' is not a struct type`);
 
     const layout = makeUniformLayout(bindings.format);
     return [bindings, layout];
-  }, format);
+  }, type);
 
   // Get size
   const count = (length ?? (data?.length || 0));

@@ -25,7 +25,7 @@ import { getInterleaveIndex } from '@use-gpu/wgsl/instance/index/interleave.wgsl
 
 const {signal} = QueueReconciler;
 
-export type RawDataProps = {
+export type RawDataProps<I extends boolean> = {
   /** Set/override input length */
   length?: number,
 
@@ -46,25 +46,17 @@ export type RawDataProps = {
   time?: boolean,
 
   /** Split multiple emits into multiple source */
-  interleaved?: boolean,
-} & {
-  interleaved?: true
+  interleaved?: I,
 
   /** Leave empty to yeet source(s) instead. */
-  render?: (sources: ShaderSource[]) => LiveElement,
-  children?: (sources: ShaderSource[]) => LiveElement,
-} & {
-  interleaved?: false
-
-  /** Leave empty to yeet source(s) instead. */
-  render?: (source: ShaderSource) => LiveElement,
-  children?: (source: ShaderSource) => LiveElement,
-}
+  render?: I extends true ? (sources: ShaderSource[]) => LiveElement : (source: ShaderSource) => LiveElement,
+  children?: I extends true ? (sources: ShaderSource[]) => LiveElement : (source: ShaderSource) => LiveElement,
+};
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** 1D array of a WGSL type. Reads input `data` or samples a given `expr` of WGSL type `format`. */
-export const RawData: LiveComponent<RawDataProps> = (props) => {
+export const RawData: LiveComponent<RawDataProps<boolean>> = <I extends boolean>(props: RawDataProps<I>) => {
   const device = useContext(DeviceContext);
 
   const {
@@ -76,7 +68,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     time = false,
   } = props;
 
-  const items = Math.max(1, Math.round(props.items) || 0);
+  const items = Math.max(1, Math.round(props.items || 0));
   const count = (props.length ?? (data?.length || 0));
   const length = items * count;
   const alloc = useBufferedSize(count);
@@ -167,6 +159,6 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   }
 
   const trigger = useOne(() => signal(), source.version);
-  const view = useRenderProp(props, sources ?? source);
+  const view = useRenderProp(props as any, sources ?? source);
   return [trigger, view];
 };

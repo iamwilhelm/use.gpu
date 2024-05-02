@@ -61,7 +61,7 @@ export const getInstancedAggregate = (
   if (!instances) return sources;
 
   const {layout: {attributes}} = aggregateBuffer;
-  const [instanced, loadInstance] = getInstancedSources(attributes, INDEX[format], sources, instances.source);
+  const [instanced, loadInstance] = getInstancedSources(attributes, INDEX[format], sources, instances);
   instanced.instances = loadInstance;
 
   return instanced;

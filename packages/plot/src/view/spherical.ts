@@ -46,7 +46,7 @@ export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildre
     position: p, scale: s, quaternion: q, rotation: r, matrix: m,
   } = useTraits(props);
 
-  const swapMatrix = useDouble(makeMat4);
+  const [swapMatrix] = useDouble(makeMat4);
   const composed = useOne(makeMat4);
 
   const [focus, aspectX, aspectY, scaleY, matrix, swizzle, range, epsilon] = useMemo(() => {

@@ -1,5 +1,5 @@
 import type {
-  Initial, Setter, Reducer, Key, Task, ArrowFunction,
+  Initial, Setter, Reducer, DoubleState, Key, Task, ArrowFunction,
   LiveFunction, LiveFiber, LiveContext, LiveCapture,
   DeferredCall, HostInterface, Ref, RefObject, MutableRefObject,
 } from './types';
@@ -86,7 +86,7 @@ export const useNoHook = (hookType: Hook) => () => {
 type IsEqualMemoArgs<T extends Array<any>> = (prevArgs: T, nextArgs: T) => boolean;
 type IsEqualMemoProps<T> = (prevProps: T, nextArgs: T) => boolean;
 
-const makeDeps = () => [];
+const makeDeps = (): any[] => [];
 
 /**
  * Memoize a live function on all its arguments (shallow comparison per arg)
@@ -138,7 +138,7 @@ export const memoProps = <F extends ArrowFunction>(
   if (typeof isEqualOrName === 'string') name = isEqualOrName;
 
   const memoized = (customMemo
-    ? (props: Record<string, any>[]) => {
+    ? (props: Record<string, any>) => {
       const fiber = useFiber();
       if (!fiber.version) fiber.version = 1;
 
@@ -151,7 +151,7 @@ export const memoProps = <F extends ArrowFunction>(
 
       return useHooks(() => f(props), fiber.version);
     }
-    : (props: Record<string, any>[]) => {
+    : (props: Record<string, any>) => {
       const fiber = useFiber();
       if (!fiber.version) fiber.version = 1;
 
@@ -540,7 +540,7 @@ export const useHooks = <T>(
       fiber.pointer = pointer + STATE_SLOTS;
       fiber.state = state;
     }
-  }, dependencies);
+  }, dependencies as any);
 
   state![i + 1] = undefined;
 
@@ -592,17 +592,17 @@ export const useLog = (values: Record<string, any>) => {
 export const useDouble = <T>(
   make: () => T,
   dependencies: any[] = NO_DEPS
-): Get<T> => useMemo(() => makeDouble(make), dependencies);
+): DoubleState<T> => useMemo(() => makeDouble(make), dependencies);
 
-const makeDouble = <T>(make: Get<T>): Get<T> => {
+const makeDouble = <T>(make: () => T): DoubleState<T> => {
   const ref = {
     front: make(),
     back: make(),
     flip: false,
   };
   
-  const front = [ref.front, ref.back];
-  const back = [ref.back, ref.front];
+  const front: [T, T] = [ref.front, ref.back];
+  const back: [T, T] = [ref.back, ref.front];
 
   const get = () => {
     let f = ref.flip;
@@ -624,10 +624,10 @@ export const useNoDouble = useNoMemo;
  * Async wrapper
  */
 export const useAwait = <T, E = Error>(
-  f?: null | ((cancelled: () => boolean) => Promise<T>),
+  f: undefined | null | ((cancelled: () => boolean) => Promise<T>),
   dependencies: any[],
-): [T | undefined, E | undefined] => {
-  const [value, setValue] = useState<[T | undefined, E | undefined]>([f ? undefined : null, undefined]);
+): [T | undefined, E | undefined, boolean] => {
+  const [value, setValue] = useState<[T | undefined, E | undefined]>([(f ? undefined : null) as any, undefined]);
   const loadingRef = useRef(false);
 
   const ref = useResource((dispose) => {

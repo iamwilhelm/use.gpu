@@ -73,8 +73,8 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
   }, [script, duration]);
 
   const render = getRenderFunc(props);
-  const swapValues = useDouble(() => mapValues(script, keyframes => makeValueRef(keyframes[0][1])), Object.keys(script));
-  const swapElements = useDouble(() => children ? extend(children, swapValues()) : null, [children, swapValues]);
+  const [swapValues] = useDouble(() => mapValues(script, keyframes => makeValueRef(keyframes[0][1])), Object.keys(script));
+  const [swapElements] = useDouble(() => children ? extend(children, swapValues()) : null, [children, swapValues]);
 
   const scalars = zipObject(Object.keys(script).filter(k => typeof script[k][0][1] === 'number'));
 

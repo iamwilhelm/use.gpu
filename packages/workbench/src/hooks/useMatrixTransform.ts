@@ -27,7 +27,7 @@ export const useCombinedMatrix = (
 ): mat4 => {
   const parent = useMatrixContext();
   const version = useVersion(parent) + useVersion(matrix);
-  const swapMatrix = useDouble(makeMat4);
+  const [swapMatrix] = useDouble(makeMat4);
 
   return useOne(
     () => {

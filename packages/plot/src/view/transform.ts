@@ -40,7 +40,7 @@ export const Transform: LiveComponent<TransformProps> = (props: PropsWithChildre
     position: p, scale: s, quaternion: q, rotation: r, matrix: m,
   } = useTraits(props);
 
-  const swapMatrix = useDouble(makeMat4);
+  const [swapMatrix] = useDouble(makeMat4);
   const composed = useOne(makeMat4);
 
   const matrix = useMemo(() => {

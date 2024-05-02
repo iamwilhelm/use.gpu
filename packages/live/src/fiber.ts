@@ -1,5 +1,5 @@
 import type {
-  HostInterface, LiveFiber, LiveFunction, LiveContext, LiveElement,
+  HostInterface, LiveFiber, LiveFunction, LiveContext, LiveElement, LiveReconciler,
   FiberYeet, FiberQuote, FiberQuotes, FiberGather, FiberContext, ContextValues, ContextRoots,
   OnFiber, DeferredCall, DeferredCallInterop, Key, ArrowFunction,
 } from './types';
@@ -19,7 +19,7 @@ const NO_FIBER = () => () => {};
 const NOP = () => {};
 const EMPTY_ARRAY = [] as any[];
 const ROOT_PATH = [0] as Key[];
-const NO_QUOTES = new Map() as FiberQuotes;
+const NO_QUOTES = new Map() as FiberQuotes<any>;
 const NO_CONTEXT = {
   values: new Map() as ContextValues,
   roots: new Map() as ContextRoots,
@@ -184,11 +184,11 @@ export const makeYeetState = <F extends ArrowFunction, A, B, C>(
 });
 
 // Make fiber quote state
-export const makeQuoteState = <F extends ArrowFunction>(
+export const makeQuoteState = <F extends ArrowFunction, T>(
   root: number,
   from: LiveFiber<F>,
   to: LiveFiber<F>,
-  reconciler?: LiveReconciler,
+  reconciler?: LiveReconciler<T>,
 ): FiberQuote<any> => ({
   root,
   from: from.id,
@@ -950,9 +950,9 @@ export const makeFiberReduction = <F extends ArrowFunction, R>(
 };
 
 // Mount quoted calls on a fiber's continuation
-export const mountFiberQuote = <F extends ArrowFunction>(
+export const mountFiberQuote = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
-  reconciler: LiveReconciler,
+  reconciler: LiveReconciler<T>,
   calls: LiveElement | LiveElement[],
 ) => {
   const {quotes} = fiber;
@@ -1001,7 +1001,7 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
   reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
 
-  const mount = to.mounts!.get(id);
+  const mount = to.mounts!.get(id)!;
   const {quotes} = mount;
 
   if (quotes.get(reconciler!)?.to !== fiber) {
@@ -1215,7 +1215,7 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
     fiber.quote = null;
   }
   if (fiber.type === QUOTE) {
-    const {to} = quote;
+    const {to} = quote!;
     if (to.bound) {
       reconcileFiberCall(to, null, id, true);
       pingFiber(to, false);

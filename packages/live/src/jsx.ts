@@ -57,7 +57,7 @@ export const createElement = (type: ArrowFunction | string, props: any, ...child
         return mapReduce(toChildren(props?.children ?? children), props?.map, props?.reduce, props?.then, props?.fallback, props?.key);
 
       case RECONCILE:
-        return reconcile(toChildren(props?.children ?? children), props?.key);
+        return reconcileTo(props?.to, toChildren(props?.children ?? children), props?.key);
 
       case PROVIDE:
         return provide(props?.context, props?.value, toChildren(props?.children ?? children), props?.key);

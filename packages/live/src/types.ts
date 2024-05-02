@@ -46,6 +46,7 @@ export type Initial<T> = (() => T) | T;
 export type Reducer<T> = T | ((t: T) => T);
 export type Setter<T> = (t: Reducer<T>) => void;
 export type Resource<T> = () => (void | Task | [T, Task]);
+export type DoubleState<T> = [() => T, () => [T, T]];
 
 // Renderer options
 export type RenderOptions = {
@@ -190,10 +191,10 @@ export type FiberQuote<F extends ArrowFunction> = {
   root: number,
   from: number,
   to: LiveFiber<F>,
-  reconciler?: LiveReconciler,
+  reconciler?: LiveReconciler<any>,
 };
 
-export type FiberQuotes<F extends ArrowFunction> = Map<LiveReconciler, FiberQuote<F>>;
+export type FiberQuotes<F extends ArrowFunction> = Map<LiveReconciler<any>, FiberQuote<F>>;
 
 // Priority queue
 export type FiberQueue = {

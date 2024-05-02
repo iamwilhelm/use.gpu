@@ -16,7 +16,7 @@ export const Node: LiveComponent<NodeProps> = (props: PropsWithChildren<NodeProp
   const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
   const {children} = props;
 
-  const swapMatrix = useDouble(makeMat4);
+  const [swapMatrix] = useDouble(makeMat4);
   const composed = useOne(makeMat4);
 
   const combined = useMemo(() => {

@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataSchema, StructAggregateBuffer, TypedArray, StorageSource, UniformType } from '@use-gpu/core';
+import type { DataSchema, StructAggregateBuffer, TypedArray, StorageSource, LambdaSource, UniformType } from '@use-gpu/core';
 import { capture, yeet, useCapture, useNoCapture, useMemo, useOne, useRef, useResource, useNoResource, incrementVersion, makeCapture } from '@use-gpu/live';
 import {
   makeIdAllocator,
@@ -37,22 +37,19 @@ type FieldBuffer = {
 
 export type UseInstance = () => (data: Record<string, any>) => void;
 
-export type InstanceDataProps = {
-  format?: 'u16' | 'u32',
+export type InstanceDataProps<I extends 'u16' | 'u32' | undefined> = {
+  format?: I,
   schema: DataSchema,
   reserve?: number,
 
   render?: (useInstance: () => (data: Record<string, any>) => void) => LiveElement,
   children?: (useInstance: () => (data: Record<string, any>) => void) => LiveElement,
-} & {
-  format: 'u16' | 'u32',
-  then?: (data: StorageSource[], indices: StorageSource) => LiveElement,
-} & {
-  format: undefined,
-  then?: (data: StorageSource[]) => LiveElement,
+  then?: 'u16' | 'u32' extends I
+    ? (data: Record<string, LambdaSource | StorageSource>, indices: StorageSource) => LiveElement
+    : (data: Record<string, LambdaSource | StorageSource>) => LiveElement
 };
 
-export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
+export const InstanceData: LiveComponent<InstanceDataProps<'u16' | 'u32' | undefined>> = <I extends 'u16' | 'u32' | undefined>(props: InstanceDataProps<I>) => {
   const {
     schema: propSchema,
     format,
@@ -68,11 +65,11 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
     () => {
       const out = [];
       for (const k in schema) {
-        const {format, index, unwelded, ref} = schema[k];
-        if (ref) throw new Error(`Ref '${k}' not supported in <InstanceData>. Use <Data>.`);
+        const {format, index, unwelded} = schema[k];
+        const f = format as UniformType;
         if (index || unwelded) throw new Error(`Indexed and unwelded data not supported in <InstanceData>. Use <Data>.`);
-        if (isUniformArrayType(format)) throw new Error(`Array data not supported in <InstanceData>. Use <Data>.`);
-        out.push({name: k, format});
+        if (isUniformArrayType(f)) throw new Error(`Array data not supported in <InstanceData>. Use <Data>.`);
+        out.push({name: k, format: f});
       }
       return out;
     },
@@ -132,7 +129,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
       const indexBuffer = format ? makeArrayAggregateBuffer(device, format, alloc) : null;
 
       const fields = makeStructAggregateFields(aggregateBuffer);
-      const sources = getInstancedAggregate(aggregateBuffer, indexBuffer);
+      const sources = getInstancedAggregate(aggregateBuffer, indexBuffer?.source);
 
       return [aggregateBuffer, indexBuffer, fields, sources];
     }, [device, uniforms, alloc]);
@@ -155,7 +152,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
 
       for (const k in fields) {
         const {prop = k} = schema[k];
-        const {array, base, stride, dims} = fields[k];
+        const {array, base = 0, stride = 1, dims} = fields[k];
         const v = data[prop];
 
         if (v != null) {
@@ -197,9 +194,9 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
     }, version);
 
     const trigger = useOne(() => signal(), versionRef.current);
-    return then ? [trigger, then(sources)] : trigger;
+    return then ? [trigger, then(sources, indexBuffer?.source as any)] : trigger;
   };
 
   const render = getRenderFunc(props);
-  return render ? capture(InstanceCapture, render(useInstance), Resume) : children;
+  return render ? capture(InstanceCapture, render(useInstance), Resume) : null;
 };

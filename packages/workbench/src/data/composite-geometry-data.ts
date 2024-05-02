@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
-import type { GPUGeometry, DataSchema, DataField, StorageSource, CPUGeometry, TypedArray } from '@use-gpu/core';
+import type { GPUGeometry, DataSchema, DataField, StorageSource, LambdaSource, CPUGeometry, TypedArray } from '@use-gpu/core';
 
 import { keyed, yeet, gather, useMemo, useOne, useHooks } from '@use-gpu/live';
 import { formatToArchetype } from '@use-gpu/core';
@@ -61,7 +61,7 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
     return keyed(Data, archetype, {
       data: (items as any)[archetype as any],
       schema,
-      render: (sources: Record<string, StorageSource>) => {
+      render: (sources: Record<string, StorageSource | LambdaSource>) => {
         const out = {
           archetype,
           attributes: sources,

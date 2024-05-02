@@ -94,7 +94,7 @@ export type GPUGeometry = {
   topology?: GPUPrimitiveTopology,
   bounds?: DataBounds,
   count?: number,
-  attributes: Record<string, StorageSource>,
+  attributes: Record<string, StorageSource | LambdaSource>,
   unwelded?: Record<string, boolean>,
 };
 

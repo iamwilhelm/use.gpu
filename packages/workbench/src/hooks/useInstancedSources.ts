@@ -27,13 +27,16 @@ export const getInstancedSources = (
   index: UniformAttribute,
   values: Record<string, StorageSource>,
   indices?: StorageSource | null,
-) => {
+): [
+  Record<string, LambdaSource>,
+  LambdaSource,
+] => {
   const boundValues = uniforms.map((uniform) => getSource(uniform, values[uniform.name]));
   const boundIndices = indices ? getSource(index, indices) : null;
 
   const instances = instanceWith(boundValues, boundIndices);
 
-  const sources = {};
+  const sources: Record<string, LambdaSource> = {};
   for (const {name} of uniforms) {
     sources[name] = getLambdaSource(bindEntryPoint(instances, name), indices);
   };
@@ -43,7 +46,7 @@ export const getInstancedSources = (
 
 export const useInstancedAggregate = (
   aggregateBuffer: StructAggregateBuffer,
-  instances?: StorageSource,
+  instances?: StorageSource | null,
   format?: 'u16' | 'u32',
 ) => {
   return useMemo(() => getInstancedAggregate(aggregateBuffer, instances, format), [aggregateBuffer, instances, format]);
@@ -51,7 +54,7 @@ export const useInstancedAggregate = (
 
 export const getInstancedAggregate = (
   aggregateBuffer: StructAggregateBuffer,
-  instances?: StorageSource,
+  instances?: StorageSource | null,
   format: 'u16' | 'u32' = 'u32',
 ) => {
   const sources = getStructAggregate(aggregateBuffer);

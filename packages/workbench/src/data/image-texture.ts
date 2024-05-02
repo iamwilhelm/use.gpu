@@ -26,6 +26,7 @@ export type ImageTextureProps = {
   sampler?: GPUSamplerDescriptor,
   /** Leave empty to yeet texture instead. */
   render?: (source: TextureSource | null) => LiveElement,
+  children?: (source: TextureSource | null) => LiveElement,
 };
 
 const countMips = (width: number, height: number): number => {

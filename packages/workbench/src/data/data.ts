@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ArrowFunction, FromSchema, TypedArray, StorageSource, DataSchema, DataField, DataBounds, VectorLike, UniformType } from '@use-gpu/core';
+import type { ArrowFunction, FromSchema, TypedArray, StorageSource, LambdaSource, DataSchema, DataField, DataBounds, VectorLike, UniformType } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
@@ -74,8 +74,8 @@ export type DataProps<S extends DataSchema> = {
   tensor?: number[],
 
   /** Receive 1 source per field, in virtual struct-of-array format. Leave empty to yeet sources instead. */
-  render?: (sources: FromSchema<S, StorageSource>) => LiveElement,
-  children?: (sources: FromSchema<S, StorageSource>) => LiveElement,
+  render?: (sources: FromSchema<S, StorageSource | LambdaSource>) => LiveElement,
+  children?: (sources: FromSchema<S, StorageSource | LambdaSource>) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
@@ -255,7 +255,7 @@ export const Data: LiveComponent<DataProps<DataSchema>> = <S extends DataSchema>
     const {array, dims} = fields.positions;
     const bounds = toDataBounds(getBoundingBox(array, toCPUDims(dims)));
 
-    if ('positions' in sources && bounds != null) sources.positions.bounds = bounds;
+    if ('positions' in sources && bounds != null) (sources.positions as any).bounds = bounds;
   }, [fields, items, sources, ...(tensor ?? NO_TENSOR)]);
 
   if (live) useAnimationFrame();

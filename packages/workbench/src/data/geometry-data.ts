@@ -1,6 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ShaderSource } from '@use-gpu/shader';
-import type { StorageSource, CPUGeometry, GPUGeometry } from '@use-gpu/core';
+import type { CPUGeometry, GPUGeometry, StorageSource, LambdaSource } from '@use-gpu/core';
 
 import { use, yeet, useMemo } from '@use-gpu/live';
 import mapValues from 'lodash/mapValues';
@@ -35,7 +34,7 @@ export const GeometryData: LiveComponent<GeometryDataProps> = (props: GeometryDa
     use(Data, {
       schema,
       data: attributes,
-      render: (sources: StorageSource[]) => {
+      render: (sources: Record<string, StorageSource | LambdaSource>) => {
         const out = {
           count,
           topology,

@@ -21,7 +21,7 @@ export type FetchProps<T> = {
   then?: (t: any) => T,
 
   render?: (t: T) => LiveElement,
-  children?: (t: T) => Livelement,
+  children?: (t: T) => LiveElement,
 };
 
 export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) => {

@@ -35,7 +35,7 @@ export type RawDataProps = {
   /** Input data */
   data?: number[] | TypedArray,
   /** Input emitter expression */
-  expr?: Emitter<Time>,
+  expr?: Emitter,
   /** Emit N items per expr call. Output size is `[items, N]` if items > 1. */
   items?: number,
   /** Emit 0 or N items per expr call. Output size is `[N]` or `[items, N]`. */

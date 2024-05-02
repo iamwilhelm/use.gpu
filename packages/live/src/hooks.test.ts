@@ -1,6 +1,6 @@
 import type { LiveFiber, LiveComponent, LiveFunction, DeferredCall } from './types';
 
-import { bind } from './fiber';
+import { bind, makeFiber } from './fiber';
 import { use, provide, makeContext } from './builtin';
 import { makeHostFiber, renderSync } from './tree';
 import { useCallback, useContext, useMemo, useOne, useResource, useState, memoArgs, memoProps } from './hooks';
@@ -10,6 +10,17 @@ type NumberReturner = () => number;
 type FunctionReturner = () => () => any;
 type PropNumberReturner = (x: number) => number;
 
+const bindWithMemo = (f: LiveFunction) => {
+  const fiber = makeFiber(f, null);
+  const bound = bind(f, fiber);
+  const flush = () => fiber.memo = fiber.version;
+  return (...args: any[]) => {
+    const r = bound(...args);
+    flush();
+    return r;
+  };
+};
+
 it('memoizes a function', () => {
 
   const F: LiveFunction<PropNumberReturner> = memoArgs((x: number): number => {
@@ -17,14 +28,14 @@ it('memoizes a function', () => {
   });
 
   {
-    const result1 = bind(F)(1);
-    const result2 = bind(F)(1);
+    const result1 = bindWithMemo(F)(1);
+    const result2 = bindWithMemo(F)(1);
 
     expect(result1).not.toBe(result2);
   }
 
   {
-    const bound = bind(F);
+    const bound = bindWithMemo(F);
 
     const result1 = bound(1);
     const result2 = bound(1);
@@ -38,12 +49,19 @@ it('memoizes a function', () => {
 it('memoizes a component', () => {
 
   // @ts-ignore
-  const F: LiveFunction<NumberReturner> = memoProps((props): number => {
+  const F: LiveFunction<NumberReturner> = memoProps((props: {foo: number, bar: number}) => {
     return Math.random();
   });
 
   {
-    const bound = bind(F);
+    const result1 = bindWithMemo(F)({ foo: 1, bar: 3 });
+    const result2 = bindWithMemo(F)({ foo: 1, bar: 3 });
+
+    expect(result1).not.toBe(result2);
+  }
+
+  {
+    const bound = bindWithMemo(F);
     const result1 = bound({foo: 1, bar: 1});
     const result2 = bound({foo: 1, bar: 2});
 
@@ -51,7 +69,7 @@ it('memoizes a component', () => {
   }
 
   {
-    const bound = bind(F);
+    const bound = bindWithMemo(F);
     const result1 = bound({foo: 1, bar: 1});
     const result2 = bound({foo: 1, bar: 1});
 
@@ -175,9 +193,9 @@ it('holds state in memoized component (hook)', () => {
   {
 
     i = 0;
-    const result1 = bind(F)(1);
+    const result1 = bindWithMemo(F)(1);
     i = 0;
-    const result2 = bind(F)(1);
+    const result2 = bindWithMemo(F)(1);
 
     expect(result1).not.toBe(result2);
   }
@@ -185,7 +203,7 @@ it('holds state in memoized component (hook)', () => {
   {
     i = 0;
 
-    const bound = bind(F);
+    const bound = bindWithMemo(F);
     const result1 = bound(1);
     const result2 = bound(1);
     const result3 = bound(2);

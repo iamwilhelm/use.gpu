@@ -107,7 +107,7 @@ export const memoArgs = <F extends ArrowFunction>(
 
     if (fiber.version === fiber.memo) {
       if (customMemo && !customMemo(ref.current, args)) fiber.version = incrementVersion(fiber.version!);
-      else if (!isSameDependencies(ref.current, args)) fiber.version = incrementVersion(fiber.version!);
+      else if (ref.current !== args && !isSameDependencies(ref.current, args)) fiber.version = incrementVersion(fiber.version!);
     }
 
     ref.current = args;
@@ -155,21 +155,23 @@ export const memoProps = <F extends ArrowFunction>(
       const fiber = useFiber();
       if (!fiber.version) fiber.version = 1;
 
-      const swapDeps = useDouble(makeDeps);
-      const deps = swapDeps(false);
-      deps.length = 0;
-      deps[0] = fiber.version;
+      const [swapDeps, getDeps] = useDouble(makeDeps);
+      const [deps, saved] = getDeps();
 
+      deps.length = 0;
       for (const k in props) {
         deps.push(k);
         deps.push(props[k]);
       }
 
-      return useHooks(() => {
-        swapDeps();
-        fiber.version = incrementVersion(fiber.version!);
-        return f(props);
-      }, deps);
+      if (fiber.version === fiber.memo) {
+        if (!isSameDependencies(deps, saved)) {
+          fiber.version = incrementVersion(fiber.version!);
+        }
+      }
+      swapDeps();
+
+      return useHooks(() => f(props), fiber.version);
     }
   );
 
@@ -526,6 +528,7 @@ export const useHooks = <T>(
 
   const {pointer} = fiber;
   const hook = typeof dependencies === 'number' ? useOne : useMemo;
+
   const value = hook(() => {
     try {
       fiber.pointer = 0;
@@ -597,12 +600,22 @@ const makeDouble = <T>(make: Get<T>): Get<T> => {
     back: make(),
     flip: false,
   };
+  
+  const front = [ref.front, ref.back];
+  const back = [ref.back, ref.front];
 
-  return (swap: boolean = true) => {
+  const get = () => {
     let f = ref.flip;
-    if (swap) f = ref.flip = !ref.flip;
+    return f ? front : back;
+  };
+
+  const swap = () => {
+    let f = ref.flip;
+    f = ref.flip = !ref.flip;
     return f ? ref.front : ref.back;
   };
+
+  return [swap, get];
 };
 
 export const useNoDouble = useNoMemo;

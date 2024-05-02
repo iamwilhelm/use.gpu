@@ -18,7 +18,7 @@ import { TransformContextProps } from '../providers/transform-provider';
 
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { getShader, useShader, useNoShader } from '../hooks/useShader';
-import { useSource, useNoSource } from '../hooks/useSource';
+import { useSource } from '../hooks/useSource';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';

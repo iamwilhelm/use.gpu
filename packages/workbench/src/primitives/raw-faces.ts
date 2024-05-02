@@ -17,7 +17,7 @@ import { useScissorContext } from '../providers/scissor-provider';
 import { TransformContextProps } from '../providers/transform-provider';
 
 import { useShader, useNoShader } from '../hooks/useShader';
-import { useSource, useNoSource } from '../hooks/useSource';
+import { useSource } from '../hooks/useSource';
 import { useCombinedTransform, useNoCombinedTransform } from '../hooks/useCombinedTransform';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';

@@ -606,4 +606,4 @@ type RawUniformType =
   | "vec3to4<f32>"
 ;
 
-export type UniformType = RawUniformType | `array<${RawUniformType}>` | `array<array<${RawUniformType}>>`;
+export type UniformType = RawUniformType | `array<${RawUniformType}>` | `array<array<${RawUniformType}>>` | `array<array<array<${RawUniformType}>>>`;

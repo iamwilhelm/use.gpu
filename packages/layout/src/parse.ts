@@ -1,4 +1,4 @@
-import type { ShaderSource } from '@use-gpu/shader/wgsl';
+import type { ShaderSource } from '@use-gpu/shader';
 import type { Alignment, AlignmentLike, Anchor, AnchorLike, Baseline, Dimension, Direction, Fit, Gap, GapLike, Margin, MarginLike, OverflowMode, Repeat } from './types';
 import { makeParseEnum, makeParseObject } from '@use-gpu/parse';
 

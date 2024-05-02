@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { Lazy, TextureSource, LambdaSource, DataBounds, VectorLike } from '@use-gpu/core';
+import type { Lazy, TextureSource, LambdaSource, DataBounds, VectorLike, UniformAttribute } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
@@ -14,12 +14,14 @@ import { TransformContextProps } from '../providers/transform-provider';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useShader } from '../hooks/useShader';
+import { useSource } from '../hooks/useSource';
 import { useDataLength } from '../hooks/useDataBinding';
 
 import { getLabelVertex } from '@use-gpu/wgsl/instance/vertex/label.wgsl';
 import { getSDFRectangleFragment } from '@use-gpu/wgsl/instance/fragment/sdf-rectangle.wgsl';
 
 const DEFINES = {DEBUG_SDF: false};
+const POSITIONS: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
 
 export type RawLabelsFlags = {
   flip?: [number, number],
@@ -91,7 +93,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   const l = useShaderRef(props.layout, props.layouts);
   const a = useShaderRef(props.sdf, props.sdfs);
 
-  const p = useShaderRef(props.position, props.positions);
+  const p = useSource(POSITIONS, useShaderRef(props.position, props.positions));
   const c = useShaderRef(props.placement, props.placements);
   const o = useShaderRef(props.offset, props.offsets);
   const z = useShaderRef(props.size, props.sizes);

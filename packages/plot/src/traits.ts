@@ -1,5 +1,5 @@
 import type { ColorLike, Ragged, VectorLike, VectorLikes } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader/wgsl';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { useMemo, useOne } from '@use-gpu/live';
 import { trait, combine, optional, useProp } from '@use-gpu/traits/live';

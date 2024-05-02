@@ -172,7 +172,7 @@ export type UniformFormat<T extends string = string> = T | UniformAttribute[];
 
 export type UniformAttribute = {
   name: string,
-  format: UniformFormat,
+  format: UniformFormat<any>,
   type?: ShaderModule,
   args?: any[] | null,
   members?: UniformAttribute[],

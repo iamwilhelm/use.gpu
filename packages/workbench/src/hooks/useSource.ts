@@ -39,7 +39,7 @@ export const getSource = <T = any>(
     if (format === def.format) return shader;
   }
 
-  const binding = makeShaderBinding<ShaderModule>(def, s);
+  const binding = makeShaderBinding<ShaderModule>(def, s) as any;
   return bindingToModule(binding);
 };
 

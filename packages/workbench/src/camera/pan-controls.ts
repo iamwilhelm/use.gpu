@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
 import { lerp } from '@use-gpu/core';
 import { use, useCallback, useContext, useMemo, useOne, useRef, useResource, useState, useHooks } from '@use-gpu/live';
-import { MouseContext, WheelContext, KeyboardContext } from '../providers/event-provider';
+import { useMouse, useWheel, useKeyboard } from '../providers/event-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { LayoutContext } from '../providers/layout-provider';
@@ -86,12 +86,8 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     offsetY = -h * (anchor[1] - 0.5);
   }
 
-  const { useMouse } = useContext(MouseContext);
-  const { useWheel } = useContext(WheelContext);
-  const { useKeyboard } = useContext(KeyboardContext);
-
   const { mouse } = useMouse();
-  const { wheel } = useWheel();
+  const { wheel, stop: stopWheel } = useWheel();
   const { keyboard } = useKeyboard();
 
   const now = +new Date();
@@ -219,7 +215,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   }, mouse);
 
   useOne(() => {
-    const {moveX, moveY, stop, stopped} = wheel;
+    const {moveX, moveY, stopped} = wheel;
     if (!active || stopped) return;
 
     if (!!scroll !== (keyboard.modifiers.shift || keyboard.modifiers.alt)) {
@@ -250,7 +246,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
       }
     }
 
-    stop();
+    stopWheel();
   }, wheel);
 
   const panX = centered ? x - originX * (zoom - 1) / zoom + offsetX : x;

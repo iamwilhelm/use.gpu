@@ -4,7 +4,7 @@ import type { GPUGeometry, DataField, StorageSource, CPUGeometry } from '@use-gp
 
 import { keyed, yeet, gather, useMemo, useOne, useHooks } from '@use-gpu/live';
 import { formatToArchetype } from '@use-gpu/core';
-import mapObject from 'lodash/zipObject';
+import mapValues from 'lodash/mapValues';
 import groupBy from 'lodash/groupBy';
 import { useRenderProp } from '../hooks/useRenderProp';
 
@@ -31,8 +31,8 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
   const archetypes = Object.keys(partitions);
 
   const schemas = useMemo(() =>
-    mapObject(partitions, ([item]: CPUGeometry[], archetype: number) =>
-      mapObject(item.attributes, (_, k) => ({
+    mapValues(partitions, ([item]: CPUGeometry[], archetype: number) =>
+      mapValues(item.attributes, (_, k) => ({
         format: `array<${formats[k]}>`,
         index: k === 'indices',
         unwelded: !!item.unwelded[k],
@@ -42,7 +42,7 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
     archetypes);
 
   const items = useMemo(() => {
-    mapObject(partitions, (items: CPUGeometry[], archetype: number) => items.map(i => i.attributes))
+    mapValues(partitions, (items: CPUGeometry[], archetype: number) => items.map(i => i.attributes))
   }, [data, schemas]);
 
   return gather(archetypes.map((archetype: string) => {

@@ -6,10 +6,11 @@ import { parseVec3 } from '@use-gpu/parse';
 import { useContext, useHooks, useOne, useRef, useResource, useState } from '@use-gpu/live';
 import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
-import { KeyboardContext, MouseContext } from '../providers/event-provider';
+import { useKeyboard, useMouse, useMouseLock } from '../providers/event-provider';
 import { usePerFrame } from '../providers/frame-provider';
 import { LayoutContext } from '../providers/layout-provider';
 import { useDerivedState } from '../hooks/useDerivedState';
+import { getRenderFunc } from '../hooks/useRenderProp';
 import { mat4, vec3 } from 'gl-matrix';
 
 const CAPTURE_EVENT = {capture: true};
@@ -28,7 +29,8 @@ export type FPSControlsProps = {
   moveSpeed?: number,
 
   active?: boolean,
-  render: (phi: number, theta: number, position: vec3) => LiveElement,
+  render?: (phi: number, theta: number, position: vec3) => LiveElement,
+  children?: (phi: number, theta: number, position: vec3) => LiveElement,
 };
 
 export const FPSControls: LiveComponent<FPSControlsProps> = (props) => {
@@ -42,7 +44,6 @@ export const FPSControls: LiveComponent<FPSControlsProps> = (props) => {
     moveSpeed    = 15,
 
     active = true,
-    render,
   } = props;
 
   const initialPosition = useProp(props.position, parseVec3);
@@ -53,14 +54,12 @@ export const FPSControls: LiveComponent<FPSControlsProps> = (props) => {
 
   const [velocity, setVelocity] = useState<vec3>(() => vec3.create());
 
-  const { useMouse, hasLock, beginLock, endLock } = useContext(MouseContext);
-  const { useKeyboard } = useContext(KeyboardContext);
-
   const layout = useContext(LayoutContext);
   const frame = usePerFrame();
 
   const { mouse } = useMouse();
   const { keyboard } = useKeyboard();
+  const { hasLock, beginLock, endLock } = useMouseLock();
 
   const size = Math.min(Math.abs(layout[2] - layout[0]), Math.abs(layout[3] - layout[1]));
 
@@ -141,5 +140,6 @@ export const FPSControls: LiveComponent<FPSControlsProps> = (props) => {
   if (moving) useAnimationFrame();
   else useNoAnimationFrame();
 
-  return useHooks(() => render(bearing, pitch, position), [render, bearing, pitch, position]);
+  const render = getRenderFunc(props);
+  return useHooks(() => render?.(bearing, pitch, position), [render, bearing, pitch, position]);
 };

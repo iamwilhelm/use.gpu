@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, Ref } from '@use-gpu/live';
-import type { StorageSource, Lazy } from '@use-gpu/core';
+import type { StorageSource, Lazy, VectorLike } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { yeet, useMemo, useNoMemo, useOne, useRef } from '@use-gpu/live';
@@ -25,7 +25,7 @@ export type KernelProps = {
   args?: Lazy<any>[],
   initial?: boolean,
   history?: boolean | number,
-  size?: Lazy<number[]>,
+  size?: Lazy<number[] | VectorLike>,
   swap?: boolean,
 };
 

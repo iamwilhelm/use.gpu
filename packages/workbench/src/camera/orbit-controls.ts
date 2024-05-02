@@ -40,8 +40,8 @@ export type OrbitControlsProps = {
   maxPitch?: number,
 
   active?: boolean,
-  render: (radius: number, bearing: number, pitch: number, target: vec3) => LiveElement,
-  children: (radius: number, bearing: number, pitch: number, target: vec3) => LiveElement,
+  render?: (radius: number, bearing: number, pitch: number, target: vec3) => LiveElement,
+  children?: (radius: number, bearing: number, pitch: number, target: vec3) => LiveElement,
 };
 
 export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
@@ -119,7 +119,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   }, mouse);
 
   useOne(() => {
-    const {moveX, moveY, spinY, stop, stopped} = wheel;
+    const {moveX, moveY, spinY, stopped} = wheel;
     const speedY = radiusSpeed;
     if (!active || stopped) return;
 
@@ -134,5 +134,5 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   }, wheel);
 
   const render = getRenderFunc(props);
-  return useHooks(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);
+  return useHooks(() => render?.(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);
 };

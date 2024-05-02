@@ -5,7 +5,8 @@ import { getRenderFunc } from '@use-gpu/workbench';
 export type AutoSizeProps = {
   canvas: HTMLCanvasElement,
   render?: (width: number, height: number, pixelRatio: number) => LiveElement,
-}
+  children?: (width: number, height: number, pixelRatio: number) => LiveElement,
+};
 
 const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, number, number] => {
   const pixelRatio = window?.devicePixelRatio ?? 1;

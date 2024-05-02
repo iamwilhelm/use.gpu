@@ -11,7 +11,6 @@ const makeGetMVT = (template: string) => {
   return (x: number, y: number, zoom: number) => {
     const ts = {x, y, zoom} as Record<string, number>;
     const url = chunks.map((chunk, i) => i % 2 ? ts[chunk] : chunk).join('');
-    console.log(url)
     return url;
   };
 };

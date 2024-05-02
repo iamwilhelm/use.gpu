@@ -31,7 +31,7 @@ export const makeCastAccessor = (
   args: string[],
   from: string,
   to: string,
-  swizzle: string | CastTo,
+  swizzle: string | CastTo | null,
 ) => {
   const symbols = args.map((t, i) => `${arg(i)}`);
 
@@ -48,7 +48,7 @@ export const makeSwizzleAccessor = (
   name: string,
   from: string,
   to: string,
-  swizzle: string | CastTo,
+  swizzle: string | CastTo | null,
 ) => {
   const ret = makeSwizzle(from, to, arg(0), swizzle);
   return `${to} ${name}(${from} ${arg(0)}) {

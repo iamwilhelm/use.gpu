@@ -157,7 +157,7 @@ export type TextureSource = {
 
 export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | TextureSource | ShaderModule;
 
-export type UniformFormat = string | UniformAttribute[];
+export type UniformFormat = string;
 
 export type UniformAttribute = {
   name: string,

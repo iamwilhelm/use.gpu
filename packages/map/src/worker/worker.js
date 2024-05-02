@@ -3,8 +3,6 @@ import { VectorTile } from 'mapbox-vector-tile';
 import { getMVTShapes, aggregateMVTShapes } from '../util/mvtile';
 
 const loadMVT = async (x, y, zoom, url, styles, flipY, tesselate) => {
-  console.log('loadMVT', x, y, zoom, url, styles, flipY, tesselate);
-
   const res = await fetch(url);
   let ab = await res.arrayBuffer();
 

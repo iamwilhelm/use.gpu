@@ -1,4 +1,4 @@
-import { TypeLike } from '../types';
+import { FormatLike, TypeLike } from '../types';
 
 const ARRAY_REGEXP = /\[[^\]]+\]/;
 

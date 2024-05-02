@@ -63,6 +63,7 @@ export const makeBindingAccessors = (
     const program: string[] = [];
 
     for (const {uniform: {name, format: formatOut, args}} of constants) {
+      if (typeof formatOut !== 'string') throw new Error("GLSL struct types not implemented");
       program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, formatOut, name, args));
     }
 
@@ -71,11 +72,12 @@ export const makeBindingAccessors = (
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
 
-      if (typeof format === 'object') {
+      if (typeof formatIn === 'object') {
         throw new Error("Virtual struct types not supported in GLSL");
         continue;
       }
 
+      if (typeof formatOut !== 'string') throw new Error("GLSL struct types not implemented");
       program.push(makeStorageAccessor(namespace, set, base, formatOut, formatIn, name));
     }
 
@@ -84,6 +86,8 @@ export const makeBindingAccessors = (
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
       volatile ? volatileBase++ : bindingBase++;
+
+      if (typeof formatOut !== 'string') throw new Error("GLSL struct types not implemented");
       program.push(makeTextureAccessor(namespace, set, base, formatOut, formatIn, name, layout, variant, absolute));
     }
 

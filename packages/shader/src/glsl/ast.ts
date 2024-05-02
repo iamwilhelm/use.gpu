@@ -2,7 +2,6 @@ import { SyntaxNode, TreeCursor, Tree } from '@lezer/common';
 import {
   CompressedNode,
   SymbolTable,
-  string,
   ModuleRef,
   ImportRef,
   PrototypeRef,
@@ -398,7 +397,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const globals = uniq(globalled.flatMap(r => r.symbols));
     const symbols = uniq(refs.flatMap(r => r.symbols));
 
-    const types = exported.filter(d => d.struct).flatMap(t => t.symbols);
+    const types = exported.filter(d => (d as DeclarationRef).struct).flatMap(t => t.symbols);
 
     const scope = new Set(symbols ?? []);
     for (let ref of refs) if (ref.identifiers) {

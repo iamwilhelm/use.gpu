@@ -1,3 +1,4 @@
+process.env.BROWSERSLIST_IGNORE_OLD_DATA = 1;
 module.exports = {
   "presets": [
     ["@babel/preset-env", {

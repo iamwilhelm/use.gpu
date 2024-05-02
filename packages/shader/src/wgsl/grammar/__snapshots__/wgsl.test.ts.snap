@@ -665,3 +665,68 @@ Program                                                     ⮐ ⮐ fn _0n_getIn
           Identifier                                        vertexIndex
           Identifier                                        elementIndex
 `;
+
+exports[`WGSL grammar snapshots parses a test program 18`] = `
+Program                                                     ⮐ ⮐ fn main() {⮐   let ACES_OUTPUT = mat3x3(⮐      1.60475, -0.10208, -0.00327,⮐     -0.53108,  1.10813, -0.07276,⮐     -0.07367, -0.00605,  1.07602,⮐   );⮐ }⮐ ⮐ 
+  LocalDeclaration                                          ⮐ ⮐ fn main() {⮐   let ACES_OUTPUT = mat3x3(⮐      1.60475, -0.10208, -0.00327,⮐     -0.53108,  1.10813, -0.07276,⮐     -0.07367, -0.00605,  1.07602,⮐   );⮐ }
+    FunctionDeclaration                                     ⮐ ⮐ fn main() {⮐   let ACES_OUTPUT = mat3x3(⮐      1.60475, -0.10208, -0.00327,⮐     -0.53108,  1.10813, -0.07276,⮐     -0.07367, -0.00605,  1.07602,⮐   );⮐ }
+      AttributeList                                         
+      FunctionHeader                                        fn main()
+        Keyword                                             fn
+        Identifier                                          main
+        ParamList                                           
+        ReturnType                                          
+      CompoundStatement                                     {⮐   let ACES_OUTPUT = mat3x3(⮐      1.60475, -0.10208, -0.00327,⮐     -0.53108,  1.10813, -0.07276,⮐     -0.07367, -0.00605,  1.07602,⮐   );⮐ }
+        Statement                                           let ACES_OUTPUT = mat3x3(⮐      1.60475, -0.10208, -0.00327,⮐     -0.53108,  1.10813, -0.07276,⮐     -0.07367, -0.00605,  1.07602,⮐   );
+          Keyword                                           let
+          VariableIdentifier                                ACES_OUTPUT
+            Identifier                                      ACES_OUTPUT
+          Assign                                            =
+          Value                                             mat3x3(⮐      1.60475, -0.10208, -0.00327,⮐     -0.53108,  1.10813, -0.07276,⮐     -0.07367, -0.00605,  1.07602,⮐   )
+            TypeDeclaration                                 mat3x3
+              Type                                          mat3x3
+            FloatLiteral                                    1.60475
+            Sub                                             -
+            FloatLiteral                                    0.10208
+            Sub                                             -
+            FloatLiteral                                    0.00327
+            Sub                                             -
+            FloatLiteral                                    0.53108
+            FloatLiteral                                    1.10813
+            Sub                                             -
+            FloatLiteral                                    0.07276
+            Sub                                             -
+            FloatLiteral                                    0.07367
+            Sub                                             -
+            FloatLiteral                                    0.00605
+            FloatLiteral                                    1.07602
+`;
+
+exports[`WGSL grammar snapshots parses a test program 19`] = `
+Program                                                     ⮐ ⮐ const ACES_OUTPUT = mat3x3(⮐    1.60475, -0.10208, -0.00327,⮐   -0.53108,  1.10813, -0.07276,⮐   -0.07367, -0.00605,  1.07602,⮐ );⮐ ⮐ 
+  LocalDeclaration                                          ⮐ ⮐ const ACES_OUTPUT = mat3x3(⮐    1.60475, -0.10208, -0.00327,⮐   -0.53108,  1.10813, -0.07276,⮐   -0.07367, -0.00605,  1.07602,⮐ );
+    GlobalConstantDeclaration                               ⮐ ⮐ const ACES_OUTPUT = mat3x3(⮐    1.60475, -0.10208, -0.00327,⮐   -0.53108,  1.10813, -0.07276,⮐   -0.07367, -0.00605,  1.07602,⮐ )
+      AttributeList                                         
+      Keyword                                               const
+      VariableIdentifier                                    ACES_OUTPUT
+        Identifier                                          ACES_OUTPUT
+      Assign                                                =
+      Value                                                 mat3x3(⮐    1.60475, -0.10208, -0.00327,⮐   -0.53108,  1.10813, -0.07276,⮐   -0.07367, -0.00605,  1.07602,⮐ )
+        TypeDeclaration                                     mat3x3
+          Type                                              mat3x3
+        FloatLiteral                                        1.60475
+        Sub                                                 -
+        FloatLiteral                                        0.10208
+        Sub                                                 -
+        FloatLiteral                                        0.00327
+        Sub                                                 -
+        FloatLiteral                                        0.53108
+        FloatLiteral                                        1.10813
+        Sub                                                 -
+        FloatLiteral                                        0.07276
+        Sub                                                 -
+        FloatLiteral                                        0.07367
+        Sub                                                 -
+        FloatLiteral                                        0.00605
+        FloatLiteral                                        1.07602
+`;

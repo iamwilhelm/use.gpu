@@ -5,6 +5,7 @@
 @skip { space | Comment }
 @external tokens untilEOLToken from "./tokens" { untilEOL }
 @external tokens untilCommentCloseToken from "./tokens" { untilCommentClose }
+@precedence { unary }
 
 unit { globalDirective* globalDeclaration* }
 
@@ -273,6 +274,11 @@ literalOrIdentifier {
 }
 
 constLiteral {
+  Sub (
+    IntLiteral |
+    UintLiteral |
+    FloatLiteral
+  ) !unary |
   IntLiteral |
   UintLiteral |
   FloatLiteral |

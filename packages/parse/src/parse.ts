@@ -5,7 +5,7 @@ import type {
 import type { Parser, Join, Placement, PointShape, Domain } from './types';
 import { seq } from '@use-gpu/core';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
-import { toScalarArray, toVectorArray, toMultiVectorArray, toMultiScalarArray, toMultiMultiVectorArray, toCompositeChunks, toMultiCompositeChunks } from './flatten';
+import { toScalarArray, toVectorArray, toMultiVectorArray, toMultiScalarArray, toMultiMultiVectorArray } from './flatten';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
 const NO_VEC3 = vec3.fromValues(0, 0, 0);
@@ -115,7 +115,7 @@ export const makeParseScalarArray = <T extends TypedArrayConstructor>(
 ) => (
   vec: VectorLike | TensorArray
 ): InstanceType<T> => {
-  return (toScalarArray(vec, constructor) ?? new constructor(0)) as T;
+  return (toScalarArray(vec, constructor) ?? new constructor(0)) as InstanceType<T>;
 };
 
 export const makeParseScalarArrayLike = <T extends TypedArrayConstructor>(
@@ -124,7 +124,7 @@ export const makeParseScalarArrayLike = <T extends TypedArrayConstructor>(
   vec: number | VectorLike | TensorArray,
 ): number | InstanceType<T> => {
   if (typeof vec === 'number') return vec;
-  return (toScalarArray(vec, constructor) ?? new constructor(0)) as T;
+  return (toScalarArray(vec, constructor) ?? new constructor(0)) as InstanceType<T>;
 };
 
 export const makeParseMultiScalarArray = <T extends TypedArrayConstructor>(
@@ -132,7 +132,7 @@ export const makeParseMultiScalarArray = <T extends TypedArrayConstructor>(
 ) => (
   vecs: VectorLikes | TensorArray
 ): InstanceType<T> => {
-  return (toMultiScalarArray(vecs, constructor) ?? new constructor(0)) as T;
+  return (toMultiScalarArray(vecs, constructor) ?? new constructor(0)) as InstanceType<T>;
 };
 
 export const makeParseVectorArray = <T extends TypedArrayConstructor>(
@@ -142,7 +142,7 @@ export const makeParseVectorArray = <T extends TypedArrayConstructor>(
 ) => (
   vecs: VectorLikes | TensorArray
 ): InstanceType<T> => {
-  return (toVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as T;
+  return (toVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as InstanceType<T>;
 };
 
 export const makeParseMultiVectorArray = <T extends TypedArrayConstructor>(
@@ -150,9 +150,9 @@ export const makeParseMultiVectorArray = <T extends TypedArrayConstructor>(
   w: number = 0,
   constructor: T,
 ) => (
-  vecs: VectorLikes | TensorArray
+  vecs: VectorLikes | VectorLikes[] | TensorArray
 ): InstanceType<T> => {
-  return (toMultiVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as T;
+  return (toMultiVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as InstanceType<T>;
 };
 
 export const makeParseMultiMultiVectorArray = <T extends TypedArrayConstructor>(
@@ -160,9 +160,9 @@ export const makeParseMultiMultiVectorArray = <T extends TypedArrayConstructor>(
   w: number = 0,
   constructor: T,
 ) => (
-  vecs: VectorLikes | TensorArray
+  vecs: VectorLikes | VectorLikes[] | VectorLikes[][] | TensorArray
 ): InstanceType<T> => {
-  return (toMultiMultiVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as T;
+  return (toMultiMultiVectorArray(vecs, dims, w, constructor) ?? new constructor(0)) as InstanceType<T>;
 };
 
 export const makeParseBasis = (defaults: string | number[], min: number = defaults.length) => {
@@ -225,7 +225,7 @@ export const clampNumber = (
 
 export const parseObject = <T>(value?: T) => typeof value === 'object' && value != null ? value : {};
 export const parseString = (s?: string) => s ?? '';
-export const parseNumberLike = (value?: number | TypedArray) => value?.length ? value[0] : +(value || 0);
+export const parseNumberLike = (value?: number | TypedArray) => +(Array.isArray(value) ? value[0] : value) || 0;
 export const parseNumber = (value?: number) => parseNumberLike(value);
 export const parseInteger = (value?: number) => Math.round(parseNumberLike(value));
 export const parseBoolean = (value?: boolean) => !!value;
@@ -303,34 +303,38 @@ export const parseColor = (color?: ColorLike) => parseColorOpacity(color);
 export const parseStringArray = makeParseArray(NO_STRINGS, parseString);
 
 export const parseBooleanArray = (vec: VectorLike): Uint8Array =>
-  vec ? toScalarArray(vec, Uint8Array) as Uint8Array : new Uint8Array();
+  vec ? toScalarArray(vec, Uint8Array) as any as Uint8Array : new Uint8Array();
 
 export const parseBooleanArrayLike = (vec: VectorLike): Uint8Array =>
 typeof
-  vec ? toScalarArray(vec, Uint8Array) as Uint8Array : new Uint8Array();
+  vec ? toScalarArray(vec, Uint8Array) as any as Uint8Array : new Uint8Array();
 
-export const parseColorArray = (colors: ColorLikes): Float32Array => {
-  if (isTypedArray(colors)) return colors as Float32Array;
-  if (isTypedArray(colors?.array)) return colors.array;
-  const parsed = colors ? (colors as any[]).map(parseColor) : [];
+export const parseColorArray = (colors: ColorLikes | TensorArray): Float32Array => {
+  const cs = colors as any;
+  if (isTypedArray(cs)) return cs as Float32Array;
+  if (isTypedArray(cs?.array)) return cs.array;
+  const parsed = cs ? cs.map(parseColor) : [];
   return parseVec4Array(parsed);
 };
 
-export const parseColorArrayLike = (colors: ColorLikes): Float32Array => {
-  if (isTypedArray(colors)) return colors as Float32Array;
-  if (isTypedArray(colors?.array)) return colors.array;
-  if (Array.isArray(colors) && typeof colors[0] !== 'number') {
-    return parseVec4Array(colors.map(parseColor));
+export const parseColorArrayLike = (colors: ColorLikes | TensorArray): Float32Array => {
+  const cs = colors as any;
+  if (isTypedArray(cs)) return cs as Float32Array;
+  if (isTypedArray(cs?.array)) return cs.array;
+  if (Array.isArray(cs) && typeof cs[0] !== 'number') {
+    return parseVec4Array(cs.map(parseColor));
   }
-  return parseColor(colors);
+  return parseColor(cs) as Float32Array;
 };
 
-export const parseColorMultiArray = (colors: ColorLikes | ColorLikes[]): Float32Array => {
-  if (isTypedArray(colors)) return colors as Float32Array;
-  if (Array.isArray(colors[0]) && typeof colors[0][0] !== 'number') {
-    return parseVec4MultiArray(colors.map(cs => cs.map(parseColor)));
+export const parseColorMultiArray = (colors: ColorLikes | ColorLikes[] | TensorArray): Float32Array => {
+  const cs = colors as any;
+  if (isTypedArray(cs)) return colors as Float32Array;
+  if (isTypedArray(cs?.array)) return cs.array;
+  if (Array.isArray(cs) && Array.isArray(cs[0]) && typeof cs[0][0] !== 'number') {
+    return parseVec4MultiArray((cs as ColorLike[][]).map(cs => cs.map(parseColor)));
   }
-  return parseVec4Array((colors as any[]).map(parseColor));
+  return parseVec4Array(cs.map(parseColor));
 };
 
 export const parseIntegerArray    = makeParseScalarArray(Int32Array);

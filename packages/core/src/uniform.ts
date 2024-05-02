@@ -20,17 +20,18 @@ import { alignSizeTo } from './data';
 import { resolve } from './lazy';
 
 const NO_BINDINGS = {} as any;
+const noSetter = (format: string): UniformByteSetter => () => { throw new Error(`Setter unimplemented for '${format}'`); }
 
 export const isUniformVecType = (type: string) => !!type.match(/^(vec[0-9])+/);
 export const isUniformArrayType = (type: string) => !!type.match(/^array</);
 
-export const getUniformArrayDepth = (type: string) => (type.match(/^(array<)+/)?.[0]?.length || 0) / 6;
-export const getUniformElementType = (type: string) =>
+export const getUniformArrayDepth = (type: string): number => (type.match(/^(array<)+/)?.[0]?.length || 0) / 6;
+export const getUniformElementType = (type: string): string =>
   isUniformArrayType(type)
   ? getUniformElementType(type.replace(/^array<(.*)>$/, '$1'))
   : type;
 
-export const toTypeString = (t: string | any) => {
+export const toTypeString = (t: string | any): string => {
   if (typeof t === 'string') return t;
   if (t.entry != null) return `T<${t.entry}>`;
   if (t.module?.entry != null) return `T<${t.module.entry}>`;
@@ -46,10 +47,10 @@ export const toGPUDims = (dims: number): number => Math.ceil(dims);
 export const getUniformDims = (format: UniformType): number => UNIFORM_ARRAY_DIMS[format];
 export const getUniformSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformAlign = (format: UniformType): number => UNIFORM_ATTRIBUTE_ALIGNS[format];
-export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
+export const getUniformByteSetter = (format: UniformType): UniformByteSetter => (UNIFORM_BYTE_SETTERS as any)[format] ?? noSetter(format);
 
 export const getUniformArrayType = (format: UniformType): TypedArrayConstructor => UNIFORM_ARRAY_TYPES[format];
-export const getUniformArraySize = (format: UniformType, length: number): TypedArrayConstructor => {
+export const getUniformArraySize = (format: UniformType, length: number): number => {
   const size = getUniformSize(format);
   return alignSizeTo(length * size, 4);
 };
@@ -338,7 +339,7 @@ export const makePackedLayout = (
   for (const {name, format} of uniforms) {
     if (typeof format === 'object') throw new Error(`Struct cannot be used as uniform member types`);
 
-    const s = getUniformSize(format);
+    const s = getUniformSize(format as UniformType);
     const o = alignSizeTo(offset, align);
     out.push({name, offset: o, format});
 
@@ -360,10 +361,10 @@ export const makeUniformLayout = (
   for (const {name, format} of uniforms) {
     if (typeof format === 'object') throw new Error(`Struct cannot be used as uniform member types`);
 
-    const a = getUniformAlign(format);
+    const a = getUniformAlign(format as UniformType);
     if (a === 0) throw new Error(`Type ${format} is not host-shareable or unimplemented`);
 
-    const s = getUniformSize(format);
+    const s = getUniformSize(format as UniformType);
     const o = alignSizeTo(offset, a);
     out.push({name, offset: o, format});
     max = Math.max(max, a);
@@ -427,7 +428,7 @@ export const makeLayoutFiller = (
     if (!attr) return;
 
     const {offset, format} = attr;
-    const setter = getUniformByteSetter(format);
+    const setter = getUniformByteSetter(format as UniformType);
 
     const o = value;
     const v = resolve(o);
@@ -441,7 +442,7 @@ export const makeLayoutFiller = (
       if (!attr) continue;
 
       const {offset, format} = attr;
-      const setter = getUniformByteSetter(format);
+      const setter = getUniformByteSetter(format as UniformType);
 
       const o = item[k];
       const v = resolve(o);

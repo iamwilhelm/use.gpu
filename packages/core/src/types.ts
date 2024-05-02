@@ -190,7 +190,7 @@ export type UniformValueSetter = (index: number, field: number, value: any) => v
 export type UniformByteSetter = (view: DataView, offset: number, data: any) => void;
 
 // Shaders
-export type ShaderStructType = ShaderModule & {entry: 'string'};
+export type ShaderStructType = ShaderModule & {entry?: string};
 
 export type ShaderModule = {
   module?: Record<string, any>, // ParsedBundle
@@ -211,7 +211,7 @@ export type ShaderStageDescriptor = {
 };
 
 // Shader bindings
-export type DataBinding<T = any, S = any> = {
+export type DataBinding<T = any, S extends ShaderModule = ShaderModule> = {
   uniform: UniformAttribute,
   storage?: StorageSource,
   texture?: TextureSource,
@@ -221,10 +221,10 @@ export type DataBinding<T = any, S = any> = {
 
 export type DataBoundingBox = {min: VectorLike, max: VectorLike};
 export type DataBounds = {
-  center: number[],
+  center: VectorLike,
   radius: number,
-  min: number[],
-  max: number[],
+  min: VectorLike,
+  max: VectorLike,
 };
 
 export type StorageSource<T extends ShaderModule = ShaderModule> = {
@@ -233,7 +233,7 @@ export type StorageSource<T extends ShaderModule = ShaderModule> = {
   type?: T,
 
   length: number,
-  size: number[],
+  size: VectorLike,
   version: number,
 
   bounds?: DataBounds,
@@ -247,7 +247,7 @@ export type StorageSource<T extends ShaderModule = ShaderModule> = {
 export type LambdaSource<T extends ShaderModule = ShaderModule> = {
   shader: T,
   length: number,
-  size: number[],
+  size: VectorLike,
   version: number,
 
   bounds?: DataBounds,
@@ -260,7 +260,7 @@ export type TextureSource = {
   sampler: GPUSampler | GPUSamplerDescriptor | null,
   layout: string,
   format: string,
-  size: [number, number] | [number, number, number],
+  size: VectorLike,
   version: number,
 
   mips?: number,
@@ -284,7 +284,7 @@ export type TextureTarget = TextureSource & {
 
 export type DataTexture = {
   data: TypedArray,
-  size: [number, number] | [number, number, number],
+  size: VectorLike,
   format?: GPUTextureFormat,
   colorSpace?: ColorSpace,
   layout?: string,
@@ -292,7 +292,7 @@ export type DataTexture = {
 
 export type ExternalTexture = {
   format: GPUTextureFormat,
-  size: [number, number] | [number, number, number],
+  size: VectorLike,
   colorSpace?: ColorSpace,
   layout?: string,
 };
@@ -332,7 +332,9 @@ export type FieldArray = {
   format: UniformType | UniformNamedType,
   dims: number,
   length: number,
-  depth: number,
+
+  depth?: number,
+  prop?: string,
 };
 
 export type TensorArray = {
@@ -340,8 +342,10 @@ export type TensorArray = {
   format: UniformType,
   dims: number,
   length: number,
-  size?: number[],
+  size: VectorLike,
   ragged?: Ragged,
+
+  version?: number,
 };
 
 export type Ragged = (number[] | TypedArray)[];
@@ -355,9 +359,9 @@ export type Writer = {
   reset: () => void,
 };
 
-export type Emit = <T extends Array = any[]>(...args: T) => void;
+export type Emit = <T extends any[] = any[]>(...args: T) => void;
 
-export type Emitter<T extends Array = any[]> = {
+export type Emitter<T extends any[] = any[]> = {
   (emit: Emit, ...args: T): void;
 };
 
@@ -424,8 +428,10 @@ export type AggregateItem = {
   count: number,
   indexed?: number,
   instanced?: number,
+
+  attributes: Record<string, AggregateValue>,
   slices?: number[],
-  attributes?: Record<string, AggregateValue>,
+  refs?: Record<string, any>,
   flags?: Record<string, any>,
 };
 
@@ -446,7 +452,7 @@ export type CPUAggregate = {
   refBuffers: Record<string, Lazy<any>[]>,
 
   bySelfs?: { keys: [string, string][] },
-  byItems?: StructAggregate,
+  byInstances?: StructAggregate,
   byVertices?: StructAggregate,
   byIndices?: StructAggregate,
   byRefs?: StructAggregate,
@@ -457,7 +463,7 @@ export type GPUAggregate = {
   refBuffers: Record<string, Lazy<any>[]>,
 
   bySelfs?: { keys: [string, string][], sources: Record<string, StorageSource> },
-  byItems?: StructAggregateBuffer,
+  byInstances?: StructAggregateBuffer,
   byVertices?: StructAggregateBuffer,
   byIndices?: StructAggregateBuffer,
   byRefs?: StructAggregateBuffer,

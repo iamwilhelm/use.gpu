@@ -1,10 +1,15 @@
 import type {
+  AggregateItem,
   AggregateValue,
   ArrayAggregate,
   StructAggregate,
   ArrayAggregateBuffer,
   StructAggregateBuffer,
+  StorageSource,
+  UniformAttribute,
   UniformType,
+  VectorEmitter,
+  Lazy,
 } from './types';
 
 import { resolve } from './lazy';
@@ -81,7 +86,7 @@ export const makeArrayAggregateBuffer = (
     version: 0,
   };
 
-  return {buffer, source, array, length, dims};
+  return {buffer, source, array, length, dims, format: 'array<T>'};
 }
 
 export const makeStructAggregateBuffer = (
@@ -94,9 +99,9 @@ export const makeStructAggregateBuffer = (
   const aggregate = makeStructAggregate(uniforms, length, keys);
 
   const buffer = makeStorageBuffer(device, aggregate.raw.byteLength);
-  const source = {
+  const source: StorageSource = {
     buffer,
-    format: uniforms,
+    format: 'array<T>',
     length,
     size: [length],
     version: 0,
@@ -108,9 +113,9 @@ export const makeStructAggregateBuffer = (
 export const makeStructAggregateFields = (structAggregate: StructAggregate) => {
   const {layout: {length: layoutLength, attributes}, raw, length} = structAggregate;
 
-  const out: Record<string, AggregateArray> = {};
+  const out: Record<string, ArrayAggregate> = {};
   for (const {name, offset, format} of attributes) {
-    const {array, dims} = castRawArray(raw, format);
+    const {array, dims} = castRawArray(raw, format as any);
 
     const elementSize = array.byteLength / array.length;
     const base = offset / elementSize;
@@ -124,13 +129,14 @@ export const makeStructAggregateFields = (structAggregate: StructAggregate) => {
       stride,
       length,
       dims,
+      format: format as any,
     };
   }
   return out;
 };
 
 export const updateAggregateArray = (
-  aggregate: AggregateBuffer | ArrayAggregate,
+  aggregate: ArrayAggregateBuffer | ArrayAggregate,
   items: AggregateItem[],
   key: string,
   unwelded?: boolean,
@@ -159,7 +165,7 @@ export const updateAggregateArray = (
 
     const c = single ? instanced : unwelded ? indexed : count;
 
-    if (typeof values === 'function') values(array, b, c, stride);
+    if (typeof values === 'function') (values as VectorEmitter)(array, b, c, stride);
     else if (offsets) offsetNumberArray(values, array, offsets[i], dimsIn, dimsOut, 0, b, c, stride);
     else copyNumberArray(values, array, dimsIn, dimsOut, 0, b, c, stride);
 
@@ -171,7 +177,7 @@ export const updateAggregateArray = (
 }
 
 export const updateAggregateInstances = (() => {
-  const slices = [];
+  const slices: number[] = [];
   
   return (
     aggregate: ArrayAggregate,
@@ -193,7 +199,7 @@ export const updateAggregateInstances = (() => {
 })();
 
 export const updateAggregateRefs = (
-  aggregate: AggregateBuffer,
+  aggregate: ArrayAggregateBuffer | ArrayAggregate,
   refs: Lazy<any>[],
   count: number,
 ) => {
@@ -213,7 +219,7 @@ export const uploadAggregateBuffer = (
   device: GPUDevice,
   aggregate: ArrayAggregateBuffer | StructAggregateBuffer,
 ) => {
-  const {buffer, array, raw, source, length} = aggregate;
+  const {buffer, array, raw, source, length} = aggregate as any;
   uploadStorage(device, source, raw ?? array.buffer, length);
   return source;
 }

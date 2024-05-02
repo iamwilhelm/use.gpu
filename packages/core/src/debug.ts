@@ -5,7 +5,7 @@ export const LOGGING = {
 } as Record<string, boolean>;
 
 export const decodeUsageFlags = (flags: GPUBufferUsageFlags) => {
-  const out = {};
-  for (const k in GPUBufferUsage) if (flags & GPUBufferUsage[k]) out[k] = true;
+  const out: Record<string, true>  = {};
+  for (const k in GPUBufferUsage) if (flags & (GPUBufferUsage as any)[k]) out[k] = true;
   return out;
 };

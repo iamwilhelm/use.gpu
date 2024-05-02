@@ -42,9 +42,9 @@ export const pick = <T>(
 ) => {
   return new Proxy([], {
     get: (target, s) => {
-      if (typeof s === 'number') return accessor(i + skip);
+      if (typeof s === 'number') return accessor(s + skip);
       if (s === 'length') return count;
-      return target[s];
+      return null;
     }
   });
 };

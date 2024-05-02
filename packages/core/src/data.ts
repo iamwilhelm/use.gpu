@@ -1,4 +1,4 @@
-import type { Lazy, Emitter, VectorEmitter, Emit, TypedArray, FieldArray, TensorArray, VectorLike, UniformType, UniformAttribute } from './types';
+import type { Lazy, Emitter, Writer, VectorEmitter, Emit, TypedArray, FieldArray, TensorArray, VectorLike, VectorLikes, UniformType, UniformAttribute } from './types';
 
 import { getUniformArrayType, getUniformArrayDepth, getUniformDims, getUniformAlign, toCPUDims, toGPUDims } from './uniform';
 import { isTypedArray } from './buffer';
@@ -40,15 +40,15 @@ export const makeTensorArray = (type: UniformType, size: number | number[]): Ten
   const align = getUniformAlign(type);
 
   const d = toCPUDims(dims);
-  const sized = typeof size[0] === 'number';
-  const length = sized ? size.reduce((a, b) => a * b, 1) : size as number;
+  const scalar = typeof size === 'number';
+  const length = !scalar ? size.reduce((a, b) => a * b, 1) : size;
 
   const n = length * d;
   const array = new ctor(n);
-  return {array, dims: d, length, size: sized ? size : [length], format: type};
+  return {array, dims: d, length, size: !scalar ? size : [length], format: type};
 };
 
-export const toTensorArray = (type: UniformType, data: VectorLike, size?: VectorLike): TensorArray => {
+export const toTensorArray = (type: UniformType, data: TypedArray, size?: VectorLike): TensorArray => {
   const ctor  = getUniformArrayType(type);
   const dims  = getUniformDims(type);
   const align = getUniformAlign(type);
@@ -63,7 +63,7 @@ export const castRawArray = (buffer: ArrayBuffer | TypedArray, type: UniformType
   const ctor = getUniformArrayType(type);
   const dims = getUniformDims(type);
 
-  const array = new ctor(buffer.buffer ?? buffer);
+  const array = new ctor((buffer as TypedArray).buffer ?? buffer);
   return {array, dims};
 };
 
@@ -86,7 +86,7 @@ export const makeCopyPipe = ({
   stride?: number,
 ) => {
 
-  const n = count ?? ((from.length ?? 1) / fromDims);
+  const n = count ?? (((from as VectorLike).length ?? 1) / fromDims);
   const step = stride ?? toDims;
 
   let f = fromIndex;
@@ -246,8 +246,8 @@ export const copyRawNumberArray = (
   if (typeof from === 'number') {
     for (let i = 0; i < n; ++i) {
       to[t] = from;
-      for (let j = 1; j < toDims; ++j) to[t + j] = 0;
-      t += toDims;
+      for (let j = 1; j < dims; ++j) to[t + j] = 0;
+      t += dims;
     }
   }
   else {
@@ -263,13 +263,13 @@ export const copyRawNumberArray = (
 export const copyNumberArray = makeCopyPipe();
 
 export const unweldNumberArray = (() => {
-  let arg;
+  let arg: VectorLike;
   const index = (i: number) => arg[i];
   const copyWithIndex = makeCopyPipe({index});
   return (
     from: VectorLike | number,
     to: TypedArray,
-    indices: TypedArray,
+    indices: VectorLike,
     fromDims: number = 1,
     toDims: number = fromDims,
     fromIndex: number = 0,
@@ -283,7 +283,7 @@ export const unweldNumberArray = (() => {
 })();
 
 export const offsetNumberArray = (() => {
-  let arg;
+  let arg: number;
   const map = (x: number) => x + arg;
   const copyWithOffset = makeCopyPipe({map});
   return (
@@ -307,7 +307,7 @@ export const fillNumberArray = (() => {
   const copyWithZeroIndex = makeCopyPipe({index});
   return (
     from: VectorLike | number,
-    to: VectorLike,
+    to: TypedArray,
     fromDims: number = 1,
     toDims: number = fromDims,
     fromIndex: number = 0,
@@ -348,7 +348,7 @@ export const fillNumberArray = (() => {
 export const spreadNumberArray = (
   from: VectorLike | number | null,
   to: TypedArray,
-  slices: TypedArray,
+  slices: VectorLike,
   fromDims: number = 1,
   toDims: number = fromDims,
   fromIndex: number = 0,
@@ -371,7 +371,7 @@ export const spreadNumberArray = (
 
 // Copy from any-nested 1d/2d/3d/4d number[] with array depth known ahead of time
 export const copyRecursiveNumberArray = (
-  from: VectorLike | number,
+  from: VectorLike | VectorLike[] | number,
   to: TypedArray,
   fromDims: number = 1,
   toDims: number = fromDims,
@@ -388,21 +388,21 @@ export const copyRecursiveNumberArray = (
     }
     else if (typeof from[0] === 'number') {
       // Vector
-      if (fromDims === toDims) return copyRawNumberArray(from, to, toDims, 0, toIndex, from.length / fromDims);
-      return copyNumberArray(from, to, fromDims, toDims, 0, toIndex, from.length / fromDims);
+      if (fromDims === toDims) return copyRawNumberArray(from as VectorLike, to, toDims, 0, toIndex, from.length / fromDims);
+      return copyNumberArray(from as VectorLike, to, fromDims, toDims, 0, toIndex, from.length / fromDims);
     }
   }
-  else if (fromDepth === 1) {
+  else if (fromDepth === 1 && Array.isArray(from)) {
     if (typeof from[0] === 'number') {
       // Scalar array or flattened vectors
-      return copyNumberArray(from, to, fromDims, toDims, 0, toIndex, from.length / fromDims);
+      return copyNumberArray(from as VectorLike, to, fromDims, toDims, 0, toIndex, from.length / fromDims);
     }
     if (typeof from[0][0] === 'number') {
       // Vector array or flattened multivectors
-      return copyNestedNumberArray(from, to, fromDims, toDims, 0, toIndex, from.length, w);
+      return copyNestedNumberArray(from as VectorLike[], to, fromDims, toDims, 0, toIndex, from.length, w);
     }
   }
-  else if (fromDepth >= 2) {
+  else if (fromDepth >= 2 && Array.isArray(from)) {
     const n = from.length;
     let b = 0;
     for (let i = 0; i < n; ++i) {
@@ -416,7 +416,7 @@ export const copyRecursiveNumberArray = (
 
 // Copy from 1d/2d/3d/4d number[][] into 1d/2d/3d/4d typed array, with specified w coordinate
 export const copyNestedNumberArray = (
-  from: number[][] | TypedArray[],
+  from: VectorLike[],
   to: TypedArray,
   fromDims: number,
   toDims: number,
@@ -539,7 +539,7 @@ export const makeSpreadEmitter = (
   toDims: number = fromDims,
   fromIndex: number = 0,
 ) => (
-  to: VectorLike,
+  to: TypedArray,
   toIndex: number = 0,
   count: number = 0,
   stride?: number,
@@ -560,7 +560,7 @@ export const makeUnweldEmitter = (
 
 export const toUnweldedArray = (
   from: VectorLike | number,
-  indices: TypedArray,
+  indices: VectorLike,
   fromDims: number = 1,
   toDims: number = fromDims,
   fromIndex: number = 0,
@@ -568,7 +568,7 @@ export const toUnweldedArray = (
   count?: number,
   stride?: number,
 ) => {
-  const ctor = from.constructor ?? Float32Array;
+  const ctor = (from.constructor ?? Float32Array) as any;
   const to = new ctor(indices.length * toDims);
   unweldNumberArray(from, to, indices, fromDims, toDims, fromIndex, toIndex, count, stride);
   return to;
@@ -588,7 +588,7 @@ export const makeNumberWriter = (to: VectorLike, dims: number, fields?: number[]
 
   const step = stride ?? d;
 
-  if (fields?.length > 1) {
+  if (fields && fields?.length > 1) {
     const n = fields.length;
 
     if      (dims === 1)   emit = (a: number) => {

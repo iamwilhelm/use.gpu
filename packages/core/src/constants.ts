@@ -75,17 +75,19 @@ export const VERTEX_TO_UNIFORM = {
   "sint32x4": "vec4<i32>",
 };
 
-const shorthands = <A, B>(sizes: Record<A, B>): Record<A, B> => {
-  for (const k of Object.keys(sizes)) {
+/** @hidden */
+export const shorthands = <A extends string, B>(sizes: Record<A, B>): Record<A, B> => {
+  for (const k of Object.keys(sizes) as A[]) {
     let match;
-    if (match = k.match(/^vec([0-9])<([iuf])32>$/)) sizes[`vec${match[1]}${match[2]}`] = sizes[k];
-    if (match = k.match(/^vec([0-9])<f16>$/)) sizes[`vec${match[1]}h`] = sizes[k];
+    if (match = k.match(/^vec([0-9])<([iuf])32>$/)) (sizes as any)[`vec${match[1]}${match[2]}`] = sizes[k];
+    if (match = k.match(/^vec([0-9])<f16>$/)) (sizes as any)[`vec${match[1]}h`] = sizes[k];
   }
   return sizes;
 };
 
-const arrayify = <A, B>(sizes: Record<A, B>): Record<A, B> => {
-  for (const k of Object.keys(sizes)) (sizes as any)[`array<${k}>` as any] = sizes[k];
+/** @hidden */
+export const arrayify = <A extends string, B>(sizes: Record<A, B>): Record<A, B> => {
+  for (const k of Object.keys(sizes) as A[]) (sizes as any)[`array<${k}>` as any] = sizes[k];
   return sizes;
 };
 

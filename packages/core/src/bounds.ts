@@ -250,7 +250,7 @@ export const toDataBounds = (box: DataBoundingBox): DataBounds => {
   return {
     center: min.map((v: number, i: number) => (v + max[i]) / 2),
     radius: Math.sqrt(
-      min
+      (min as number[])
       .map((v: number, i: number) => (max[i] - v) / 2)
       .map((v: number) => v * v)
       .reduce((a: number, b: number) => a + b, 0)

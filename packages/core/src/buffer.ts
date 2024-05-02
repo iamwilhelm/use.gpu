@@ -1,4 +1,4 @@
-import type { StorageSource, TypedArrayConstructor, TypedArray } from './types';
+import type { StorageSource, TypedArrayConstructor, TypedArray, TensorArray } from './types';
 import { TYPED_ARRAYS, TEXTURE_FORMAT_SIZES, TEXTURE_FORMAT_DIMS } from './constants';
 import { incrementVersion } from './id';
 import { LOGGING, decodeUsageFlags } from './debug';
@@ -128,10 +128,10 @@ export const uploadBufferRange = (
 
 export const uploadStorage = (
   device: GPUDevice,
-  source: StorageStorage,
+  source: StorageSource,
   arrayBuffer: ArrayBuffer,
   count: number,
-  size?: number,
+  size?: number[],
 ) => {
   uploadBuffer(device, source.buffer, arrayBuffer);
 
@@ -145,11 +145,11 @@ export const uploadStorage = (
 export const updateTensor = (
   tensor: TensorArray,
   count: number,
-  size?: number,
+  size?: number[],
 ) => {
   if (size) tensor.size = size;
   else tensor.size[0] = count;
 
   tensor.length = count;
-  tensor.version = incrementVersion(tensor.version);
+  tensor.version = incrementVersion(tensor.version || 0);
 };

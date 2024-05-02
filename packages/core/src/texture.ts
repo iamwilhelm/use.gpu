@@ -1,4 +1,4 @@
-import type { DataTexture, ExternalTexture, DataBinding, XY, XYZ, TextureSource } from './types';
+import type { DataTexture, ExternalTexture, DataBinding, VectorLike, XY, XYZ, TextureSource } from './types';
 import { TYPED_ARRAYS, TEXTURE_FORMAT_SIZES, TEXTURE_FORMAT_DIMS } from './constants';
 
 const NO_OFFSET = [0, 0, 0] as XYZ;
@@ -99,7 +99,7 @@ export const makeRawTexture = (
 }
 
 export const makeTextureDataLayout = (
-  size: XY | XYZ,
+  size: VectorLike,
   format: GPUTextureFormat,
 ) => {
   const [w, h, d] = size as XYZ;
@@ -120,8 +120,8 @@ export const uploadDataTexture = (
   device: GPUDevice,
   texture: GPUTexture,
   dataTexture: DataTexture,
-  size?: XY | XYZ,
-  offset: XY | XYZ = NO_OFFSET,
+  size?: VectorLike,
+  offset: VectorLike = NO_OFFSET,
   mipLevel: GPUIntegerCoordinate = 0,
 ): void => {
   const {data, size: s, format} = dataTexture;
@@ -134,8 +134,8 @@ export const uploadTexture = (
   texture: GPUTexture,
   data: ArrayBuffer,
   layout: GPUImageDataLayout,
-  size: XY | XYZ,
-  offset: XY | XYZ = NO_OFFSET,
+  size: VectorLike,
+  offset: VectorLike = NO_OFFSET,
   mipLevel: GPUIntegerCoordinate = 0,
   aspect: GPUTextureAspect = "all",
 ): void => {

@@ -2,12 +2,20 @@ import type {
   CPUAggregate,
   GPUAggregate,
   ArrayAggregate,
+  ArrayAggregateBuffer,
   StructAggregate,
+  StructAggregateBuffer,
+  StorageSource,
+  DataField,
+  AggregateItem,
   ArchetypeSchema,
   ArchetypeField,
   VectorEmitter,
   VectorRefEmitter,
+  FieldArray,
+  TypedArray,
   UniformType,
+  VectorLike,
 } from './types';
 import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
 import { isTypedArray } from './buffer';
@@ -37,7 +45,7 @@ import {
   toGPUDims,
 } from './uniform';
 
-type Item = Record<string, any>;
+type RefObject<T> = { current: T };
 
 const NO_OFFSETS: number[] = [];
 
@@ -54,10 +62,10 @@ export const formatToArchetype = (
 };
 
 /** Normalized simplified schema syntax */
-export const normalizeSchema = <T>(
-  schema: Record<string, string | T>,
-) => {
-  const out = {};
+export const normalizeSchema = (
+  schema: Record<string, string | DataField>,
+): Record<string, DataField> => {
+  const out: Record<string, DataField> = {};
   for (const k in schema) {
     const f = schema[k];
     out[k] = typeof f === 'string' ? {format: f} : f;
@@ -66,22 +74,23 @@ export const normalizeSchema = <T>(
 };
 
 /** Tweak types in existing schema */
-export const adjustSchema = <T>(
+export const adjustSchema = <T extends DataField | ArchetypeField>(
   schema: Record<string, string | T>,
   formats?: Record<string, string>,
 ) => {
   if (!formats) return schema;
 
-  const out = {};
+  const out: Record<string, any> = {};
   for (const k in schema) {
-    const field = schema[k];
+    const s = schema[k] as any;
     let format = formats[k];
 
-    if (!format) out[k] = field;
+    if (!format) out[k] = s;
+    else if (typeof s === 'string') out[k] = format;
     else {
-      const depth = getUniformArrayDepth(field.format);
+      const depth = getUniformArrayDepth(s.format);
       for (let i = 0; i < depth; ++i) format = `array<${format}>`;
-      out[k] = {...field, format};
+      out[k] = {...s, format} as T;
     }
   }
   return out;
@@ -89,7 +98,7 @@ export const adjustSchema = <T>(
 
 /** Allocate separate field arrays for a schema */
 export const allocateSchema = (
-  schema: ArchetypeSchema,
+  schema: Record<string, DataField> | ArchetypeSchema,
   allocInstances: number = 0,
   allocVertices: number = 0,
   allocIndices: number = 0,
@@ -103,17 +112,18 @@ export const allocateSchema = (
   let hasPlural = false;
 
   for (const k in schema) if (!predicate || predicate(k)) {
-    const {format, prop = k, index, unwelded, ref} = schema[k];
-    if (ref) throw new Error(`Ref '${k}' not supported as field`);
+    const {format, prop = k, index, unwelded} = schema[k] as DataField;
 
-    const isArray = isUniformArrayType(format);
+    const f = format as any;
+
+    const isArray = isUniformArrayType(f);
     const alloc = isArray ? (index || unwelded) ? allocIndices : allocVertices : allocInstances;
-    const {array, dims, depth} = makeCPUArray(format, alloc);
+    const {array, dims, depth} = makeCPUArray(f, alloc);
 
     if (isArray) hasPlural = true;
     else hasSingle = true;
 
-    fields[k] = {array, dims, depth, prop};
+    fields[k] = {array, dims, depth, format: f, length: alloc, prop};
     attributes[k] = array;
   }
 
@@ -167,13 +177,13 @@ export const schemaToEmitters = (
 
     const values = props[key];
     if (values != null) {
-      const dims = getUniformDims(format);
-      const isArray = isUniformArrayType(format);
+      const dims = getUniformDims(format as any);
+      const isArray = isUniformArrayType(format as any);
 
       if (isArray) {
         if (!(unwelded || index) && unwelds) {
           // Unweld welded attribute
-          attributes[key] = makeUnweldEmitter(values, unwelds, toCPUDims(dims), toGPUDims(dims));
+          attributes[key] = makeUnweldEmitter(values, unwelds as VectorLike, toCPUDims(dims), toGPUDims(dims));
         }
         else {
           // Direct attribute
@@ -182,8 +192,8 @@ export const schemaToEmitters = (
       }
       else {
         // Single per slice
-        if (spread && values.length > dims) {
-          attributes[spread] = makeSpreadEmitter(values, slices, toCPUDims(dims), toGPUDims(dims));
+        if (spread && (values as any).length > dims) {
+          attributes[spread] = makeSpreadEmitter(values, slices as VectorLike, toCPUDims(dims), toGPUDims(dims));
         }
         // Single per item
         else {
@@ -214,14 +224,14 @@ export const emitAttributes = (
     if (isTypedArray(values)) {
       attributes[key] = values;
     }
-    else {
+    else if (typeof values === 'function') {
       const isArray = isUniformArrayType(format);
       const count = (
         !isArray ? allocInstances :
         unwelded || index ? allocIndices :
         allocVertices
       );
-      const {array, dims} = makeCPUArray(format, count);
+      const {array, dims} = makeCPUArray(format as any, count);
       values(array, 0, count);
 
       attributes[key] = array;
@@ -234,7 +244,7 @@ export const emitAttributes = (
 export const schemaToArchetype = (
   schema: ArchetypeSchema,
   attributes: Record<string, TypedArray | VectorEmitter>,
-  flags: Record<string, any>,
+  flags?: Record<string, any>,
   refs?: Record<string, any>,
   sources?: Record<string, any>,
 ) => {
@@ -245,8 +255,8 @@ export const schemaToArchetype = (
 
     if (values != null) {
       // Providing an array to a non-array attribute triggers spread
-      const dims = getUniformDims(format);
-      const isSpread = spread && !isUniformArrayType(format) && values.length > dims;
+      const dims = getUniformDims(format as any);
+      const isSpread = spread && !isUniformArrayType(format as any) && values.length > dims;
 
       tokens.push(isSpread ? spread : key, format);
     }
@@ -295,7 +305,7 @@ export const schemaToAggregate = (
       const attr = [key, alloc];
 
       // Separate emulated types like u8/u16
-      const isEmulated = getUniformAlign(format) === 0;
+      const isEmulated = getUniformAlign(format as any) === 0;
       const isSeparate = separate || isEmulated;
 
       if (hasRef) {
@@ -324,7 +334,7 @@ export const schemaToAggregate = (
     }
   }
 
-  const bySelfs: { keys: string[] } = { keys: [] };
+  const bySelfs: { keys: [string, string][] } = { keys: [] };
 
   // Build stand-alone attribute
   const buildOne = (k: string, alloc: number) => {
@@ -337,7 +347,7 @@ export const schemaToAggregate = (
   };
 
   // Build grouped attribute struct
-  const buildGroup = (keys: string[], alloc: number, force: boolean) => {
+  const buildGroup = (keys: string[], alloc: number, force?: boolean) => {
     if (keys.length === 0) return;
     if (keys.length === 1 && !force) {
       buildOne(keys[0], alloc);
@@ -345,7 +355,7 @@ export const schemaToAggregate = (
     }
     else {
       // Sort by descending alignment
-      keys.sort((a, b) => getUniformAlign(schema[b].format) - getUniformAlign(schema[a].format));
+      keys.sort((a, b) => getUniformAlign(schema[b].format as any) - getUniformAlign(schema[a].format as any));
 
       const uniforms = keys.map(k => ({
         format: getUniformElementType(schema[k].format) as UniformType,
@@ -408,14 +418,14 @@ export const toGPUAggregate = (
     return {...aggregate, buffer, source};
   };
 
-  const buildGroup = (aggregate?: StructAggregate) => {
+  const buildGroup = (aggregate?: StructAggregate): StructAggregateBuffer | undefined => {
     if (!aggregate) return;
 
     const {raw, layout, length} = aggregate;
     const buffer = makeStorageBuffer(device, raw);
-    const source = {
+    const source: StorageSource = {
       buffer,
-      format: layout.attributes,
+      format: 'array<T>',
       length,
       size: [length],
       version: 0,
@@ -424,17 +434,18 @@ export const toGPUAggregate = (
   };
   
   const ab = {...aggregateBuffers};
-  const sources = {};
+  const sources: Record<string, StorageSource> = {};
 
-  for (const [, n] of bySelfs.keys) {
-    ab[n] = buildOne(ab[n]);
-    sources[n] = ab[n].source;
+  if (bySelfs) for (const [, n] of bySelfs.keys) {
+    const abn = buildOne(ab[n]);
+    ab[n] = abn;
+    sources[n] = abn.source;
   }
   if (ab.instances) {
     ab.instances = buildOne(ab.instances);
   }
 
-  const bs = {...bySelfs, sources};
+  const bs = {keys: [], ...bySelfs, sources};
 
   return {
     aggregateBuffers: ab,
@@ -451,7 +462,7 @@ export const toGPUAggregate = (
 export const updateAggregateFromSchema = (
   schema: ArchetypeSchema,
   aggregate: CPUAggregate | GPUAggregate,
-  items: Item[],
+  items: AggregateItem[],
   count: number,
   indexed: number = 0,
   instanced: number = items.length,
@@ -476,7 +487,7 @@ export const updateAggregateFromSchema = (
     updateAggregateArray(aggregateBuffers[name], items, k, index || unwelded, false, o);
   }
 
-  for (const [k] of bySelfs.keys) {
+  if (bySelfs) for (const [k] of bySelfs.keys) {
     const {name: n, index, unwelded} = schema[k];
     const name = n ?? k;
     const o = index ? indexOffsets : undefined;
@@ -505,13 +516,13 @@ export const uploadAggregateFromSchema = (
 ) => {
   const {aggregateBuffers, byInstances, byVertices, byIndices, bySelfs} = aggregate;
 
-  for (const [, name] of bySelfs.keys) {
-    uploadAggregateBuffer(device, aggregateBuffers[name]);
+  if (bySelfs?.keys) for (const [, name] of bySelfs.keys) {
+    uploadAggregateBuffer(device, aggregateBuffers[name] as ArrayAggregateBuffer);
   }
 
   const {instances} = aggregateBuffers;
   if (instances) {
-    uploadAggregateBuffer(device, instances);
+    uploadAggregateBuffer(device, instances as ArrayAggregateBuffer);
   }
 
   if (byInstances) uploadAggregateBuffer(device, byInstances);
@@ -535,5 +546,5 @@ export const uploadAggregateFromSchemaRefs = (
     updateAggregateRefs(aggregateBuffers[name], refBuffers[k], 1);
   }
 
-  if (byRefs) uploadAggregateBuffer(device, byRefs, count);
+  if (byRefs) uploadAggregateBuffer(device, byRefs);
 };

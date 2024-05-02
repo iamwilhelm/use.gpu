@@ -1,4 +1,4 @@
-import type { DataBinding, StorageSource, ShaderStructType, UniformType } from './types';
+import type { DataBinding, StorageSource, ShaderStructType, UniformFormat, UniformAttribute, UniformType } from './types';
 import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
 import { makeUniformLayout, toTypeString } from './uniform';
 
@@ -136,32 +136,29 @@ export const getMinBindingSize = (
   type?: ShaderStructType,
 ) => {
   if (type) {
-    console.warn('getMinBindingSize module', {format, type});
-
     const {module} = type;
-    const {entry, table: {declarations}} = module;
+    const {entry, table: {declarations}} = module as any;
     const {struct} = declarations.find((d: any) => d.struct?.name === entry);
     if (!struct) return 0;
 
     const members = struct.members.map((m: any) => ({name: m.name, format: toTypeString(m.type)}));
     const layout = makeUniformLayout(members);
 
-    console.warn({members, layout});
     return layout.length;
-  }
-
-  if (typeof format === 'string') {
-    format = format.replace(/^array<([^>]+)>$/, '$1');
-    format = format.replace(/^vec3to4</, 'vec4<');
-    format = format.replace(/^(u|i)(8|16)$/, 'u32');
-    const size = (UNIFORM_ATTRIBUTE_SIZES as any)[format] ?? 0;
-    const align = (UNIFORM_ATTRIBUTE_ALIGNS as any)[format] ?? 0;
-    return align ? Math.ceil(size / align) * align : size;
   }
 
   if (Array.isArray(format)) {
     const layout = makeUniformLayout(format);
     return layout.length;
+  }
+  else if (typeof format === 'string') {
+    let f = format as string;
+    f = f.replace(/^array<([^>]+)>$/, '$1');
+    f = f.replace(/^vec3to4</, 'vec4<');
+    f = f.replace(/^(u|i)(8|16)$/, 'u32');
+    const size = (UNIFORM_ATTRIBUTE_SIZES as any)[f] ?? 0;
+    const align = (UNIFORM_ATTRIBUTE_ALIGNS as any)[f] ?? 0;
+    return align ? Math.ceil(size / align) * align : size;
   }
 
   return 0;

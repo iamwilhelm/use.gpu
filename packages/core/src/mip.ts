@@ -1,4 +1,4 @@
-import type { Rectangle, XY, XYZ, TextureSource, VertexData } from './types';
+import type { Rectangle, VectorLike, TextureSource, VertexData } from './types';
 
 import { makeVertexAttributeLayout } from './attribute';
 import { makeColorAttachment, makeColorState } from './color';
@@ -63,7 +63,7 @@ fn fragmentMain(
 
 const MIP_UVS = makeVertexAttributeLayout([{ name: 'uv', format: 'float32x2' }]);
 
-const makeMipMesh = (bounds: Rectangle[], size: XY | XYZ): VertexData => {
+const makeMipMesh = (bounds: Rectangle[], size: VectorLike): VertexData => {
   let i = 0;
   const [w, h] = size;
 

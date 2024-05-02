@@ -9,17 +9,18 @@ export const accumulateChunks = (
   chunks: VectorLike,
   loops: VectorLike | boolean[] | boolean = false,
 ) => {
+  const cs = chunks as any;
   const count = (
-    loops === true ? chunks.reduce((a, b, i) => a + b + 3, 0) :
-    loops ? chunks.reduce((a, b, i) => a + b + (loops[i] ? 3 : 0), 0) :
-    chunks.reduce((a, b, i) => a + b, 0)
+    loops === true ? cs.reduce((a: number, b: number, i: number) => a + b + 3, 0) :
+    loops ? cs.reduce((a: number, b: number, i: number) => a + b + (loops[i] ? 3 : 0), 0) :
+    cs.reduce((a: number, b: number, i: number) => a + b, 0)
   );
   return count;
 };
 
 /** Generate segment data for line-likes */
 export const generateChunkSegments = (
-  to: VectorLike,
+  to: TypedArray,
   slices: VectorLike | null | undefined,
   unwelds: VectorLike | null | undefined,
   chunks: VectorLike,
@@ -94,7 +95,7 @@ export const generateChunkSegments = (
 
 /** Generate segment data for face-likes */
 export const generateChunkFaces = (
-  to: VectorLike,
+  to: TypedArray,
   slices: VectorLike | null | undefined,
   chunks: VectorLike,
   groups: VectorLike | null,
@@ -187,7 +188,7 @@ export const generateChunkAnchors = (
 
 /** Triangulate concave polygons with holes */
 export const generateConcaveIndices = (
-  to: VectorLike,
+  to: TypedArray,
   slices: VectorLike | null | undefined,
   chunks: VectorLike,
   groups: VectorLike | null,
@@ -275,7 +276,7 @@ export const generateConcaveIndices = (
     scratch.length = 0;
     holes.length = 0;
 
-    slices[i] = n;
+    if (slices) slices[i] = n;
 
     baseChunk += gs[i];
     baseVertex += n;

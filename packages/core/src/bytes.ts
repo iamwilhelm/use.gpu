@@ -1,3 +1,5 @@
+import { arrayify, shorthands } from './constants';
+
 export const setUint8  = (view: DataView, offset: number, value: number): void => view.setUint8(offset, value);
 export const setUint16 = (view: DataView, offset: number, value: number): void => view.setUint16(offset, value, true);
 export const setUint32 = (view: DataView, offset: number, value: number): void => view.setUint32(offset, value, true);
@@ -96,7 +98,7 @@ export const setFloat64Nx3 = (n: number) => (view: DataView, offset: number, dat
   }
 };
 
-export const UNIFORM_BYTE_SETTERS = {
+export const UNIFORM_BYTE_SETTERS = arrayify(arrayify(arrayify(shorthands({
   "bool":             setUint8,
   "vec2<bool>":       setUint8N(2),
   "vec3<bool>":       setUint8N(3),
@@ -206,4 +208,4 @@ export const UNIFORM_BYTE_SETTERS = {
   "vec3to4<u32>": setUint32N(3),
   "vec3to4<i32>": setInt32N(3),
   "vec3to4<f32>": setFloat32N(3),
-};
+}))));

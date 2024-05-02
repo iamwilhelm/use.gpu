@@ -13,24 +13,24 @@ export const shouldEqual = (spec: Record<string, MemoCompare>) => {
   };
 };
 
-export const sameArray = (same?: MemoCompare<any>) => (a: any, b: any) => {
+export const sameArray = (same?: MemoCompare) => (a: any, b: any) => {
   const isA = typeof a === 'object' && 'length' in a;
   const isB = typeof b === 'object' && 'length' in b;
 
   return (isA && isB) ? compareArray(a, b, same) : a === b;
 };
 
-export const sameObject = (same?: MemoCompare<any>) => (a: any, b: any) => {
+export const sameObject = (same?: MemoCompare) => (a: any, b: any) => {
   const isA = typeof a === 'object' && !!a;
   const isB = typeof b === 'object' && !!b;
   return (isA && isB) ? compareObject(a, b, same) : a === b;
 };
 
-export const sameShallow = (same?: MemoCompare<any>) => (a: any, b: any) => (
-  sameArray(a, b, same) || sameObject(a, b, same)
+export const sameShallow = (same?: MemoCompare) => (a: any, b: any) => (
+  sameArray(same)(a, b) || sameObject(same)(a, b)
 );
 
-export const sameDeep = (same?: MemoCompare<any>) => {
+export const sameDeep = (same?: MemoCompare) => {
   const combined = (a: any, b: any) => (
     Array.isArray(a) && Array.isArray(b) ? compareArray(a, b, combined) :
     typeof a === 'object' && typeof b === 'object' && a && b ? compareObject(a, b, combined) :
@@ -41,7 +41,7 @@ export const sameDeep = (same?: MemoCompare<any>) => {
 
 export const sameJson = () => (a: any, b: any) => a === b || JSON.stringify(a) === JSON.stringify(b);
 
-const compareArray = (a: any[], b: any[], same?: MemoCompare<any>) => {
+const compareArray = (a: any[], b: any[], same?: MemoCompare) => {
   const an = a.length;
   const bn = b.length;
 
@@ -51,7 +51,7 @@ const compareArray = (a: any[], b: any[], same?: MemoCompare<any>) => {
   return true;
 };
 
-const compareObject = (a: Props, b: Props, same?: MemoCompare<any>) => {
+const compareObject = (a: Props, b: Props, same?: MemoCompare) => {
   for (const k in b) if (!a.hasOwnProperty(k)) return false;
   if (same) for (const k in a) if (!same(a[k], b[k])) return false;
   else for (const k in a) if (a[k] !== b[k]) return false;

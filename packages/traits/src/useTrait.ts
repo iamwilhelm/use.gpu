@@ -43,7 +43,7 @@ export const trait = <
 export const combine: TraitCombinator = (
   ...traits: Trait<any, any>[]
 ): Trait<any, any> => {
-  const ts = traits.flatMap(t => t[TRAIT] ?? t);
+  const ts = traits.flatMap(t => (t as any)[TRAIT] ?? t);
   const parse = (
     input: any,
     output: any,

@@ -80,7 +80,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   const layout = useContext(LayoutContext);
 
   const { mouse } = useMouse();
-  const { wheel } = useWheel();
+  const { wheel, stop: stopWheel } = useWheel();
   const { keyboard } = useKeyboard();
 
   const size = Math.min(Math.abs(layout[2] - layout[0]), Math.abs(layout[3] - layout[1]));
@@ -130,7 +130,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     }
     else if (spinY) setRadius((radius: number) => maybeClamp(radius * Math.pow(2, spinY * speedY), minRadius, maxRadius));
 
-    if (active) stop();
+    if (active) stopWheel();
   }, wheel);
 
   const render = getRenderFunc(props);

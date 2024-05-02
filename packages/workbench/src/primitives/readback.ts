@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { StorageSource, TypedArray } from '@use-gpu/core';
+import type { StorageSource, TypedArray, UniformType } from '@use-gpu/core';
 
 import { use, memo, yeet, useMemo, useOne, useRef, useResource } from '@use-gpu/live';
 import { getUniformArraySize, getUniformArrayType } from '@use-gpu/core';
@@ -28,11 +28,12 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
   } = props;
 
   const device = useDeviceContext();
+  const format = source.format as UniformType;
 
   const storages = [
-    useScratchSource(source.format, READBACK_SOURCE),
-    useScratchSource(source.format, READBACK_SOURCE),
-    useScratchSource(source.format, READBACK_SOURCE),
+    useScratchSource(format, READBACK_SOURCE),
+    useScratchSource(format, READBACK_SOURCE),
+    useScratchSource(format, READBACK_SOURCE),
   ];
 
   const mapped = useOne(() => [false, false, false]);
@@ -63,7 +64,7 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
       const i = requested = mapped.indexOf(false);
       if (i >= 0) {
         const [storage, allocate] = storages[i];
-        const byteLength = getUniformArraySize(source.format, source.length);
+        const byteLength = getUniformArraySize(format, source.length);
         allocate(source.length);
 
         const commandEncoder = device.createCommandEncoder();
@@ -85,7 +86,7 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
 
         if (cancelled) return null;
 
-        const ctor = getUniformArrayType(source.format);
+        const ctor = getUniformArrayType(format);
         const array = new ctor(buffer.getMappedRange());
         const data = array.slice();
 

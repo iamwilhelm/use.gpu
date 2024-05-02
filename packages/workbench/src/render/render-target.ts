@@ -173,6 +173,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
       size,
       volatile,
       version: 0,
+      swap: null as any,
     }) as TextureTarget;
 
     const sources = history ? seq(history).map(makeSource) : undefined;

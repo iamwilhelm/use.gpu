@@ -14,7 +14,7 @@ export type QueueProps = {
 /** Dispatch queue. Used by `<WebGPU>` to reconcile quoted drawing commands (yeeted lambdas).
 
 Also used to set up nested queues and gather immediate dispatches. */
-export const Queue: LC<QueueProps> = (props: PropsWithChildren<QueueProps>): DeferredCall<any> => {
+export const Queue: LC<QueueProps> = (props: PropsWithChildren<QueueProps>) => {
   const {nested, children} = props;
 
   const Resume = (ts: ArrowFunction[]) => {

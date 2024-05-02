@@ -34,6 +34,8 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
     ...rest
   } = props;
 
+  if (gV == null) throw new Error("No vertex shader provided");
+
   const topology = (propPipeline as any)?.primitive?.topology ?? 'triangle-list';
 
   const device = useDeviceContext();
@@ -61,13 +63,13 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
         getVertex,
         wireframeCommand,
         wireframeIndirect,
-      } = getWireframeIndirect(device, gV, indirect, topology));
+      } = getWireframeIndirect(device, gV!, indirect, topology));
     } else  {
       ({
         getVertex,
         vertexCount,
         instanceCount,
-      } = getWireframe(gV, vC, iC, topology));
+      } = getWireframe(gV!, vC, iC, topology));
     }
 
     const links = {getVertex};

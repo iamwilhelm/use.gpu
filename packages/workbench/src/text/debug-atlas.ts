@@ -1,18 +1,19 @@
-import type { LiveComponent } from '@use-gpu/live';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { Atlas, Rectangle } from '@use-gpu/core';
+import type { Atlas, Rectangle, TextureSource, LambdaSource } from '@use-gpu/core';
 
 import { LOGGING, debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo, useLog } from '@use-gpu/live';
-import { TextureSource } from '@use-gpu/core';
 import { useShader, useLambdaSource } from '@use-gpu/workbench';
 
 import { useFontDebug } from './providers/font-provider';
-import { useSDFFontContext } from './providers/sdf-font-provider';
+import { useSDFFontContext, useNoSDFFontContext } from './providers/sdf-font-provider';
 import { useLayoutContext } from '../providers/layout-provider';
 
 //LOGGING.fiber = true;
 
 import { wgsl } from '@use-gpu/shader/wgsl';
+
+type UIAggregate = any;
 
 export type DebugAtlasProps = {
   atlas: Atlas,
@@ -104,7 +105,7 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
   const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate, debugUploads} = atlas as any;
   const {id} = useFiber();
 
-  const yeets = [];
+  const yeets: UIAggregate[] = [];
   const pos = [] as number[];
 
   const width = size;
@@ -122,7 +123,7 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
 
   const boundSource = useLambdaSource(useShader(premultiply, [source]), source);
 
-  const addRectangle = (attributes: any, texture: TextureSource) => {
+  const addRectangle = (attributes: any, texture: TextureSource | LambdaSource | null = null) => {
     yeets.push({
       count: 1,
       archetype: 999,

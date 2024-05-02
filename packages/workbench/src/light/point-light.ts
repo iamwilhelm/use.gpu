@@ -50,7 +50,7 @@ export const PointLight: LC<PointLightProps> = memo((props: PointLightProps) => 
     const blur  = parseNumber(shadowMap.blur ?? DEFAULT_SHADOW_MAP.blur);
 
     const matrix = mat4.create();
-    mat4.fromTranslation(matrix, position);
+    mat4.fromTranslation(matrix, position as vec3);
 
     if (parent) mat4.multiply(matrix, parent, matrix);
 

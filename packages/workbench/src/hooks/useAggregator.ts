@@ -1,5 +1,5 @@
 import type { LiveElement } from '@use-gpu/live';
-import type { AggregateSchema, AggregateValue } from '@use-gpu/core';
+import type { AggregateSchema, AggregateItem, AggregateValue } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../providers/device-provider';
@@ -23,7 +23,7 @@ const DEBUG = false;
 
 export const useAggregator = (
   schema: AggregateSchema,
-  items: Record<string, AggregateValue>[],
+  items: AggregateItem[],
 ) => {
   const device = useDeviceContext();
   const {archetype, count, indexed, instanced, offsets} = useOne(() => getAggregateSummary(items), items);

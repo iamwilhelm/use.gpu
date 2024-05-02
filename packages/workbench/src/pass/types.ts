@@ -1,5 +1,5 @@
 import type { DataBounds, Lazy, RenderPassMode, StorageSource, TextureSource } from '@use-gpu/core';
-import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
+import type { LiveComponent, ArrowFunction, Ref } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Update } from '@use-gpu/state';
 import type { BoundLight } from '../light/types';
@@ -30,7 +30,7 @@ export type RenderCounter = (v: number, t: number) => void;
 export type RenderToPass = (
   passEncoder: GPURenderPassEncoder,
   countGeometry: RenderCounter,
-  uniforms: Record<string, any>,
+  uniforms: Record<string, Ref<any>>,
   flip?: boolean,
 ) => void;
 
@@ -69,11 +69,11 @@ export type VirtualDraw = {
   instanceCount?: Lazy<number>,
   firstVertex?: Lazy<number>,
   firstInstance?: Lazy<number>,
-  bounds?: Lazy<DataBounds>,
+  bounds?: Lazy<DataBounds> | null,
   indirect?: StorageSource,
 
-  links: Record<string, ShaderModule>,
+  links: Record<string, ShaderModule | null | undefined>,
 
-  shouldDispatch?: () => boolean | number | undefined,
-  onDispatch?: () => void,
+  shouldDispatch?: (u: Record<string, any>) => boolean | number | null | undefined,
+  onDispatch?: (u: Record<string, any>) => void,
 };

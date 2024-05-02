@@ -80,6 +80,4 @@ export const FullScreenRenderer: LC<FullScreenRendererProps> = memo((props: Prop
       )
     )
   );
-
-  return provide(PassContext, context, multiGather(children, Resume));
 }, 'FullScreenRenderer');

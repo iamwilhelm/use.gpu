@@ -1,10 +1,12 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TextureSource, Lazy } from '@use-gpu/core';
+import type { TextureSource, LambdaSource, Lazy } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { yeet, useMemo, useHooks } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
+
 import { useShaderRefs } from '../hooks/useShaderRef';
+import { useLambdaSource } from '../hooks/useLambdaSource';
 import { getDerivedSource } from '../hooks/useDerivedSource';
 import { getShader } from '../hooks/useShader';
 import { useRenderProp } from '../hooks/useRenderProp';
@@ -17,11 +19,12 @@ export type TextureShaderProps = {
   sources?: ShaderSource[],
   args?: Lazy<any>[],
 
-  render?: (source: ShaderModule) => LiveElement,
-  children?: (source: ShaderModule) => LiveElement,
+  render?: (source: LambdaSource) => LiveElement,
+  children?: (source: LambdaSource) => LiveElement,
 };
 
 const NO_SOURCES: ShaderSource[] = [];
+const NO_SOURCE = { length: 0, size: [0] };
 
 /** Texture shader for custom UV sampling of a 2D input texture.
 
@@ -60,11 +63,10 @@ export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
       return links[k] ? links[k] : allArgs.shift();
     });
 
-    return getDerivedSource(
-      { shader: getShader(shader, values) } as any,
-      { size: () => (source as any)?.size ?? null, length: () => (source as any)?.length ?? null }
-    );
+    return getShader(shader, values);
   }, [shader, texture, args.length, source, sources]);
 
-  return useRenderProp(props, getTexture);
+  const output = useLambdaSource(getTexture, texture ?? source ?? NO_SOURCE);
+
+  return useRenderProp(props, output);
 };

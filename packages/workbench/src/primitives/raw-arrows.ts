@@ -65,7 +65,7 @@ export type RawArrowsProps = {
   transform?: TransformContextProps | ShaderModule,
 
   count?: number,
-} & PickingSource & RawArrowsProps;
+} & PickingSource & RawArrowsFlags;
 
 const ZERO = [0, 0, 0, 1];
 

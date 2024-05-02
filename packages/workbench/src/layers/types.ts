@@ -1,5 +1,5 @@
 import type { LiveFunction, LiveComponent } from '@use-gpu/live';
-import type { AggregateSchema } from '@use-gpu/core';
+import type { AggregateSchema, TypedArray } from '@use-gpu/core';
 import type { PointShape } from '@use-gpu/parse';
 import type { LineLayerFlags } from '../line-layer';
 import type { FaceLayerFlags } from '../face-layer';
@@ -133,9 +133,11 @@ export type FaceAggregate = ShapeAggregate & {
   },
 };
 
-export type LayerAggregate = {
-  point: PointAggregate | PointAggregate[],
-  line: LineAggregate | LineAggregate[],
-  arrow: ArrowAggregate | ArrowAggregate[],
-  face: FaceAggregate | FaceAggregate[],
+export type LayerAggregate = PointAggregate | LineAggregate | ArrowAggregate | FaceAggregate;
+
+export type LayerAggregates = {
+  point?: PointAggregate | PointAggregate[],
+  line?: LineAggregate | LineAggregate[],
+  arrow?: ArrowAggregate | ArrowAggregate[],
+  face?: FaceAggregate | FaceAggregate[],
 };

@@ -26,7 +26,7 @@ export type DirectionalLightProps = {
   debug?: boolean,
 };
 
-const DEFAULT_DIRECTION = vec3.fromValues(1, 3, 2);
+const DEFAULT_DIRECTION = vec4.fromValues(1, 3, 2, 0);
 
 const DEFAULT_SHADOW_MAP = {
   size: [1024, 1024],

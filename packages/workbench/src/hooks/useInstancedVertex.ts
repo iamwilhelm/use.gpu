@@ -1,5 +1,5 @@
 import type { Lazy } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader';
+import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import { resolve } from '@use-gpu/core';
 import { useMemo, useNoMemo, useCallback, useNoCallback } from '@use-gpu/live';
 import { useShaderRef, useNoShaderRef } from '../hooks/useShaderRef';
@@ -18,7 +18,7 @@ export const useInstancedVertex = (
   instances?: ShaderSource,
   elementCount?: Lazy<number>,
   mapIndex?: ShaderSource,
-): [ShaderSource, Lazy<number>, Record<string, boolean>] => {
+): [ShaderModule, Lazy<number>, Record<string, boolean>] => {
 
   if (!(instance != null || instances)) {
     useNoInstancedVertex();

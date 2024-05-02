@@ -20,7 +20,7 @@ export type DomeLightProps = {
   bleed?: number,
 };
 
-const DEFAULT_DIRECTION = vec3.fromValues(0, -1, 0);
+const DEFAULT_DIRECTION = vec4.fromValues(0, -1, 0, 1);
 
 export const DomeLight = memo((props: DomeLightProps) => {
 

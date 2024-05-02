@@ -1,14 +1,14 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { StorageSource, Lazy } from '@use-gpu/core';
+import type { StorageSource, LambdaSource, Lazy, TensorArray } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { yeet, useMemo, useHooks } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useShaderRefs } from '../hooks/useShaderRef';
-import { getDerivedSource } from '../hooks/useDerivedSource';
 import { useLambdaSource } from '../hooks/useLambdaSource';
-import { useTensorSource, useNoTensorSource } from '../hooks/useRawSource';
+import { useRawTensorSource, useNoRawTensorSource } from '../hooks/useRawSource';
+import { getDerivedSource } from '../hooks/useDerivedSource';
 import { getShader } from '../hooks/useShader';
 import { useRenderProp } from '../hooks/useRenderProp';
 
@@ -20,11 +20,12 @@ export type DataShaderProps = {
   sources?: ShaderSource[],
   args?: Lazy<any>[],
 
-  render?: (source: ShaderModule) => LiveElement,
-  children?: (source: ShaderModule) => LiveElement,
+  render?: (source: LambdaSource) => LiveElement,
+  children?: (source: LambdaSource) => LiveElement,
 };
 
 const NO_SOURCES: ShaderSource[] = [];
+const NO_SOURCE = { length: 0, size: [0] };
 
 /** Sample shader for sampling of a linear input buffer.
 
@@ -45,7 +46,7 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
 
   const argRefs = useShaderRefs(...args);
 
-  const source = data ? useTensorSource(data) : (useNoTensorSource(), props.source);
+  const source = data ? useRawTensorSource(data) : (useNoRawTensorSource(), props.source);
 
   const getData = useMemo(() => {
     const s = (source ? [source] : NO_SOURCES).map(s => ((s as any)?.buffer)
@@ -67,7 +68,7 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
     return getShader(shader, values);
   }, [shader, args.length, source, sources]);
 
-  const output = useLambdaSource(getData, data ?? source);
+  const output = useLambdaSource(getData, data ?? source ?? NO_SOURCE);
 
-  return useRenderProp(props, getData);
+  return useRenderProp(props, output);
 };

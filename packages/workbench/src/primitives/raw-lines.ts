@@ -4,7 +4,7 @@ import type {
   UniformPipe, UniformAttribute, UniformType,
   VertexData, DataBounds,
 } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader';
+import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
 
@@ -26,7 +26,6 @@ import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
-import { getInstancedIndex } from '@use-gpu/wgsl/instance/instanced-index.wgsl';
 
 const POSITIONS: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
 
@@ -47,6 +46,8 @@ export type RawLinesProps = {
   size?: number,
 
   positions?: ShaderSource,
+  indices?: ShaderSource,
+
   segments?: ShaderSource,
   uvs?: ShaderSource,
   sts?: ShaderSource,

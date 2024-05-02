@@ -87,8 +87,11 @@ export type KeyboardState = {
   soft: boolean,
 };
 
+export type Stoppable<T> = T & { stopped: boolean };
+
 export type MouseEventState = {
-  mouse: MouseState & { stop: () => void },
+  mouse: MouseState & { stopped: boolean },
+
   index: number,
   hovered: boolean,
   captured: boolean,
@@ -100,14 +103,14 @@ export type MouseEventState = {
 };
 
 export type WheelEventState = {
-  wheel: WheelState & { stop: () => void },
+  wheel: WheelState & { stopped: boolean },
   index: number,
 
   stop: () => void,
 };
 
 export type KeyboardEventState = {
-  keyboard: KeyboardState & { stop: () => void },
+  keyboard: KeyboardState & { stopped: boolean },
 
   stop: () => void,
 };
@@ -167,13 +170,17 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((props: Eve
     }),
   }));
 
-  const stopMouse    = useOne(() => (mouse    as any).stop = () => mouse.stopped    = true, mouse);
-  const stopWheel    = useOne(() => (wheel    as any).stop = () => wheel.stopped    = true, wheel);
-  const stopKeyboard = useOne(() => (keyboard as any).stop = () => keyboard.stopped = true, keyboard);
+  const m = mouse as Stoppable<MouseState>;
+  const w = wheel as Stoppable<WheelState>;
+  const k = keyboard as Stoppable<KeyboardState>;
 
-  mouse.stopped    = false;
-  wheel.stopped    = false;
-  keyboard.stopped = false;
+  const stopMouse    = useOne(() => () => m.stopped = true, mouse);
+  const stopWheel    = useOne(() => () => w.stopped = true, wheel);
+  const stopKeyboard = useOne(() => () => k.stopped = true, keyboard);
+
+  m.stopped = false;
+  w.stopped = false;
+  k.stopped = false;
 
   const mouseContext = useMemo(() => ({
     mouse,

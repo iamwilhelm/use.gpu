@@ -1,11 +1,11 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike, Lazy, TextureSource, LambdaSource } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
+import type { TransformContextProps } from '@use-gpu/workbench';
 
 import { useDraw } from '../hooks/useDraw';
 
 import { use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
-import { getBundleKey } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -40,8 +40,11 @@ export type SDFRectanglesProps = {
   repeats?: ShaderSource,
   sdfs?: ShaderSource,
 
-  texture?: TextureSource | LambdaSource | ShaderModule,
+  instance?: number,
+  instances?: ShaderSource,
   transform?: TransformContextProps | ShaderModule,
+
+  texture?: TextureSource | LambdaSource | ShaderModule,
   clip?: ShaderModule,
   mask?: ShaderSource,
 
@@ -92,8 +95,7 @@ export const SDFRectangles: LiveComponent<SDFRectanglesProps> = memo((props: SDF
   const getPicking = usePickingShader(props);
   const getFragment = useShader(getSDFRectangleFragment, [t, m]);
 
-  const links = useOne(() => ({getVertex, getFragment, getPicking}),
-    getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
+  const links = useOne(() => ({getVertex, getFragment, getPicking}), [getVertex, getFragment, getPicking]);
 
   const [pipeline, defs] = usePipelineOptions({
     mode,

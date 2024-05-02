@@ -204,7 +204,7 @@ export const LightDraw = (
   vertexCount: Lazy<number>,
   instanceCount: Lazy<number>,
   firstInstance: Lazy<number>,
-  links: Record<string, ShaderModule>,
+  links: Record<string, ShaderModule | undefined>,
   pipeline?: Update<GPURenderPipelineDescriptor>,
   mode?: string,
 ) => yeet(useLightDraw(vertexCount, instanceCount, firstInstance, links, pipeline, mode));
@@ -213,7 +213,7 @@ export const useLightDraw = (
   vertexCount: Lazy<number>,
   instanceCount: Lazy<number>,
   firstInstance: Lazy<number>,
-  links: Record<string, ShaderModule>,
+  links: Record<string, ShaderModule | undefined>,
   pipeline?: Update<GPURenderPipelineDescriptor>,
   mode = 'light',
 ) => {

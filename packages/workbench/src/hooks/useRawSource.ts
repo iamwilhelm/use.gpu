@@ -73,7 +73,7 @@ export const useNoRawSource = () => {
   useNoMemo();
 };
 
-export const useTensorSource = (data: TensorArray, options: RawSourceOptions = NO_OPTIONS) =>
+export const useRawTensorSource = (data: TensorArray, options: RawSourceOptions = NO_OPTIONS) =>
   useRawSource(data.array, data.format, options, data.version);
 
-export const useNoTensorSource = useNoRawSource;
+export const useNoRawTensorSource = useNoRawSource;

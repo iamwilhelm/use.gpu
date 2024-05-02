@@ -1,7 +1,7 @@
-import type { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live';
-import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader/wgsl';
-import type { LayerAggregator, LayerAggregate } from './types';
+import type { LiveComponent, LiveFunction, LiveElement, DeferredCall } from '@use-gpu/live';
+import type { UniformType, TypedArray, StorageSource } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
+import type { LayerAggregator, LayerAggregate, LayerAggregates } from './types';
 
 import { use, keyed, fragment, yeet, provide, multiGather, unquote, extend, useMemo, useOne } from '@use-gpu/live';
 import { mixBits53, getObjectKey } from '@use-gpu/state';
@@ -39,21 +39,21 @@ const AGGREGATORS = {
   'label': { schema: LABEL_SCHEMA, component: LabelLayer },
 } as Record<string, LayerAggregator>;
 
-const ORDER = {};
+const ORDER: Record<string, number> = {};
 ['face', 'line', 'arrow', 'point'].forEach((type, i) => ORDER[type] = i);
 
 /** Aggregate (point / line / face) geometry from children to produce merged layers. */
 export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props: VirtualLayersProps) => {
   const {reconcile, quote} = LayerReconciler;
 
-  const {zBias, items, children} = props;
+  const {items, children} = props;
   return items ? Resume(items) : children ? (
     reconcile(quote(multiGather(unquote(children), Resume)))
   ) : null;
 };
 
 const Resume = (
-  aggregates: Record<string, LayerAggregate[]>,
+  aggregates: LayerAggregates,
 ) => useOne(() => {
   const {signal} = QueueReconciler;
   const els: LiveElement[] = [signal()];
@@ -64,7 +64,7 @@ const Resume = (
   const partitioner = makePartitioner();
 
   for (const type of types) {
-    const items = aggregates[type];
+    const items = (aggregates as any)[type];
     if (!items.length) continue;
 
     const layerAggregator = AGGREGATORS[type];
@@ -95,7 +95,7 @@ const Aggregate: LiveFunction<any> = (
   const {count, sources, uploadRefs} = useAggregator(item.schema ?? schema, items);
 
   return useMemo(() => {
-    const {matrices, normalMatrices, ...rest} = sources;
+    const {matrices, normalMatrices, ...rest} = sources as Record<string, any>;
     const props = {count, ...rest, ...extra, ...flags};
 
     DEBUG && console.log(component.name, {props, items, sources});
@@ -111,7 +111,7 @@ const Aggregate: LiveFunction<any> = (
 
 const provideContext = (
   element: LiveElement,
-  item?: LayerAggregate,
+  item: LayerAggregate,
   refSources?: Record<string, ShaderSource>,
 ) => {
   if (!element) return null;
@@ -121,19 +121,21 @@ const provideContext = (
   const hasTransform = !!transform?.key;
   const hasMaterial = !!material;
   const hasScissor = !!scissor;
+  
+  const key = (element as DeferredCall<any>)?.key;
 
   let view = element;
   if (hasRefTransform) {
     view = use(IndexedTransform, {...refSources, immediate: true, children: view});
   }
   if (hasTransform) {
-    view = provide(TransformContext, transform, view, element.key);
+    view = provide(TransformContext, transform, view, key);
   }
   if (hasMaterial) {
-    view = provide(MaterialContext, material, view, element.key);
+    view = provide(MaterialContext, material, view, key);
   }
   if (hasScissor) {
-    view = provide(ScissorContext, scissor, view, element.key);
+    view = provide(ScissorContext, scissor, view, key);
   }
   return view;
 };
@@ -154,6 +156,7 @@ type Partition = {
   key: number,
   type: string,
   items: LayerAggregate[],
+  zIndex: number,
 };
 
 const makePartitioner = () => {

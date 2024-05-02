@@ -1,4 +1,5 @@
 import type { UseGPURenderContext } from '@use-gpu/core';
+import type { Ref } from '@use-gpu/live';
 import type { Culler, Renderable } from './types';
 
 import { resolve, proxy } from '@use-gpu/core';
@@ -76,7 +77,7 @@ export const drawToPass = (
   calls: Renderable[],
   passEncoder: GPURenderPassEncoder,
   countGeometry: (v: number, t: number) => void,
-  uniforms: Record<string, any>,
+  uniforms: Record<string, Ref<any>>,
   sign: number = 1,
   flip: boolean = false,
 ) => {

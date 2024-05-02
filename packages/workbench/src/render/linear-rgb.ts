@@ -81,7 +81,7 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: PropsWithChildre
         }),
       ], [target, filter, children]);
 
-      return then ? [view, then(texture)] : view;
+      return then ? [view, then(target.source!)] : view;
     },
   );
 };

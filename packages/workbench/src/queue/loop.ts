@@ -26,6 +26,9 @@ export type LoopRef = {
   version: {
     frame: number,
     rendered: number,
+    pending: boolean,
+    queued: boolean,
+    request: number | null,
   },
   loop: {
     request?: (fiber?: LiveFiber<any>) => TimeContextProps,
@@ -152,7 +155,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
   const Run = useCallback(tagFunction(() => {
     const {time, version, loop, children} = ref;
 
-    let view = useOne(() => provide(LoopContext, ref.loop, children), children);
+    let view: LiveElement = useOne(() => provide(LoopContext, ref.loop, children), children);
 
     const t = {...time};
     view = [

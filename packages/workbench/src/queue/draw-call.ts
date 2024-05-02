@@ -33,7 +33,7 @@ export type DrawCallProps = {
   instanceCount?: Lazy<number>,
   firstVertex?: Lazy<number>,
   firstInstance?: Lazy<number>,
-  bounds?: Lazy<DataBounds>,
+  bounds?: Lazy<DataBounds> | null,
   indirect?: StorageSource | null,
 
   vertex: ParsedBundle,
@@ -48,7 +48,7 @@ export type DrawCallProps = {
 
   renderContext: UseGPURenderContext,
 
-  shouldDispatch?: (uniforms: Record<string, Ref<any>>) => boolean | number | undefined,
+  shouldDispatch?: (uniforms: Record<string, Ref<any>>) => boolean | number | null | undefined,
   onDispatch?: (uniforms: Record<string, Ref<any>>) => void,
 
   defines?: Record<string, any>,
@@ -264,7 +264,11 @@ export const drawCall = (props: DrawCallProps) => {
 
     if (indirect) passEncoder.drawIndirect(indirect.buffer, indirect.byteOffset ?? 0);
     else {
-      if (Number.isNaN(v * i * fv * fi)) console.warn('NaN draw call', getBundleLabel(vertexShader), getBundleLabel(fragmentShader));
+      if (Number.isNaN(v * i * fv * fi)) console.warn(
+        'NaN draw call',
+        vertexShader && getBundleLabel(vertexShader),
+        fragmentShader && getBundleLabel(fragmentShader),
+      );
       else passEncoder.draw(v, i, fv, fi);
     }
   };

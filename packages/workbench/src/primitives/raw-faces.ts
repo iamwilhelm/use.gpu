@@ -69,7 +69,7 @@ export type RawFacesProps = {
   mesh?: GPUGeometry,
   count?: Lazy<number>,
 
-  shouldDispatch?: (u: Record<string, any>) => boolean | number | null,
+  shouldDispatch?: (u: Record<string, any>) => boolean | number | null | undefined,
   onDispatch?: (u: Record<string, any>) => void,
 } & PickingSource & RawFacesFlags;
 
@@ -161,7 +161,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     attr.instance,
     attr.instances,
     instanceCount,
-    !props.segments ? getInstancedFaceIndex : null,
+    !props.segments ? getInstancedFaceIndex : undefined,
   );
   const getPicking = usePickingShader(attr);
 

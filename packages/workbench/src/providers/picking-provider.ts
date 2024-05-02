@@ -26,5 +26,5 @@ export type PickingSource = {
 
 export const usePickingShader = ({id, ids, lookup, lookups, uvPicking}: PickingSource) => {
   const defs = useOne(() => ({UV_PICKING: !!uvPicking}), uvPicking);
-  return id ?? ids ? useShader(getPickingID, [id ?? ids, lookup ?? lookups], defs) : useNoShader();
+  return id ?? ids ? useShader(getPickingID, [id ?? ids, lookup ?? lookups], defs) : (useNoShader(), undefined);
 };

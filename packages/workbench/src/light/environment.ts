@@ -60,7 +60,7 @@ export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<Envir
   const context = useMemo(() => {
     return patch(parent, {
       shaded: {
-        applyEnvironment: $set(getShader(applyPBREnvironment, [environment])),
+        applyEnvironment: $set(getShader(applyPBREnvironment, [environment]) as ShaderModule | null | undefined),
       },
     });
   }, [environment, parent])

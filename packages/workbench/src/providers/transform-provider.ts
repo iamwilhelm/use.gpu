@@ -1,7 +1,8 @@
 import type { ShaderModule } from '@use-gpu/shader';
 import type { DataBounds } from '@use-gpu/core';
+import type { RefObject } from '@use-gpu/live';
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
-import { mat4, vec4 } from 'gl-matrix';
+import { mat4, mat3, vec4 } from 'gl-matrix';
 
 export type MatrixRefs = {
   matrix: RefObject<mat4>,

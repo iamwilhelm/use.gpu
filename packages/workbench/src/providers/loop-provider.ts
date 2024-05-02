@@ -4,7 +4,7 @@ import { TimeContext, TimeContextProps } from './time-provider';
 
 type LoopContextProps = {
   buffered: boolean,
-  request: (fiber: LiveFiber<any>) => TimeContextProps,
+  request: (fiber?: LiveFiber<any>) => TimeContextProps,
 };
 
 export const LoopContext = makeContext<LoopContextProps>({

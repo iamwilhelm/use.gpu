@@ -12,6 +12,9 @@ export type FPSCounterProps = {
   width?: number,
   height?: number,
   samples?: number,
+
+  pad?: number,
+  font?: number,
 };
 
 export const FPSCounter: LiveComponent<FPSCounterProps> = memo((props: PropsWithChildren<FPSCounterProps>) => {
@@ -29,7 +32,7 @@ export const FPSCounter: LiveComponent<FPSCounterProps> = memo((props: PropsWith
 
   const time = useTimeContext();
   
-  const values = useOne(() => []);
+  const values: number[] = useOne(() => []);
   if (time.delta) values.push(1000 / time.delta);
   if (values.length > samples) values.shift();
 
@@ -58,6 +61,8 @@ export const FPSCounter: LiveComponent<FPSCounterProps> = memo((props: PropsWith
   }, [container]);
 
   const context = canvas.getContext('2d');
+  if (!context) return;
+
   context.resetTransform();
   context.scale(dpi, dpi);
   context.fillStyle = '#400000';

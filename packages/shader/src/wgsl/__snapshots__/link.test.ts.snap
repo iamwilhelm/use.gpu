@@ -6,8 +6,8 @@ exports[`link hoists an enable directive 1`] = `
 
 
     fn _01_main() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
-
-//// @link main
+    
+//// @link main 
 
 
     fn main() -> @location(0) vec4<f32> {
@@ -22,18 +22,18 @@ exports[`link lifts recursive dependency 1`] = `
 
     // Lifted Code
     fn _01_getLifted() {};
-
+    
 //// @link getColor2 _02_
 
 
     fn _02_getColor2() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
-
+    
 //// @link getColor1 _03_
 
 
     fn _03_getColor1() -> vec4<f32> { return _02_getColor2(); }
-
-//// @link main
+    
+//// @link main 
 
 
     fn main() -> vec4<f32> {
@@ -47,7 +47,7 @@ exports[`link links a global across a module 1`] = `
 
 
     fn getPosition(index: i32) -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
-
+    
 //// @link sub2 _02_
 
 
@@ -57,8 +57,8 @@ exports[`link links a global across a module 1`] = `
       _02_getPosition();
       return vec4<f32>(1.0, 0.0, 1.0, 1.0);
     }
-
-//// @link main
+    
+//// @link main 
 
 
     fn main() {
@@ -74,7 +74,7 @@ exports[`link links a struct and field 1`] = `
     struct _01_Foo { bar: f32 };
     fn _01_access(foo: _01_Foo) -> f32 { return foo.bar; }
 
-//// @link main
+//// @link main 
 
 
     fn main() {
@@ -88,8 +88,8 @@ exports[`link links an external 1`] = `
 
 
     fn _01_main() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
-
-//// @link main
+    
+//// @link main 
 
 
     fn main() -> @location(0) vec4<f32> {
@@ -103,22 +103,22 @@ exports[`link links quad vertex 1`] = `
 
 
     fn _01_getPosition(index: i32) -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
-
+    
 //// @link main _02_
 
 
     fn _02_getColor(index: i32) -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
-
+    
 //// @link main _03_
 
 
     fn _03_getSize(index: i32) -> f32 { return 1.0; }
-
+    
 //// @link main _04_
 
 
     fn _04_getDepth(index: i32) -> f32 { return 0.5; }
-
+    
 //// @link @use-gpu/wgsl/use/types _05_
 
 
@@ -184,7 +184,7 @@ fn _07_getQuadUV(vertex: i32) -> vec2<f32> {
 }
 
 
-//// @link getQuadVertex
+//// @link getQuadVertex 
 
 
 fn getQuadVertex(vertexIndex: i32, instanceIndex: i32) -> _05_SolidVertex {
@@ -231,8 +231,8 @@ exports[`link links same module twice with different entry point 1`] = `
     fn _01_getPosition(index: i32) -> vec4<f32> { return vec4<f32>(_01_used(), 0.0, 1.0, 1.0); }
 
     fn _01_getColor(index: i32) -> vec4<f32> { return vec4<f32>(_01_used(), 0.0, 1.0, 1.0); }
-
-//// @link main
+    
+//// @link main 
 
 
     fn main() {
@@ -247,8 +247,8 @@ exports[`link substitutes attributes 1`] = `
 
 
     fn _01_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
-
-//// @link main
+    
+//// @link main 
 
 
     @group(0) @binding(0) var<uniform> color: vec4<f32>;
@@ -266,8 +266,8 @@ exports[`link tree shakes around identifiers 1`] = `
     fn _01_used() -> f32 { return 1.0; }
 fn _01_getPosition(index: i32) -> vec4<f32> { return vec4<f32>(_01_used(), 0.0, 1.0, 1.0); }
 
-
-//// @link main
+    
+//// @link main 
 
 
     fn main() {
@@ -283,8 +283,8 @@ exports[`link tree shakes around identifiers 2`] = `
     fn _01_used() -> f32 { return 1.0; }
 fn _01_getPosition(index: i32) -> vec4<f32> { return vec4<f32>(_01_used(), 0.0, 1.0, 1.0); }
 
-
-//// @link main
+    
+//// @link main 
 
 
     fn main() {
@@ -301,8 +301,8 @@ exports[`link tree shakes constants 1`] = `
 fn _01_getColor() -> vec4<f32> {
       return _01_colorUsed;
     }
-
-//// @link main
+    
+//// @link main 
 
 
     fn main() {
@@ -319,8 +319,8 @@ exports[`link tree shakes constants 2`] = `
 fn _01_getColor() -> vec4<f32> {
       return _01_colorUsed;
     }
-
-//// @link main
+    
+//// @link main 
 
 
     fn main() {

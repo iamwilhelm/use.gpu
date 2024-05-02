@@ -7,18 +7,18 @@ exports[`link lifts recursive dependency 1`] = `
 
     // Lifted Code
     void _01_getLifted() {}
-
+    
 //// @link getColor2 _02_
 
 
     vec4 _02_getColor2() { return vec4(1.0, 0.0, 1.0, 1.0); }
-
+    
 //// @link getColor1 _03_
 
 
     vec4 _03_getColor1() { return _02_getColor2(); }
-
-//// @link main
+    
+//// @link main 
 
 
     void main() {
@@ -33,7 +33,7 @@ exports[`link links a global across a module 1`] = `
 
 
     vec4 getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
-
+    
 //// @link sub2 _02_
 
 
@@ -43,8 +43,8 @@ exports[`link links a global across a module 1`] = `
       _02_getPosition();
       return vec4(1.0, 0.0, 1.0, 1.0);
     }
-
-//// @link main
+    
+//// @link main 
 
 
     vec4 getPosition(int index);
@@ -60,8 +60,8 @@ exports[`link links an external 1`] = `
 
 
     vec4 _01_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
-
-//// @link main
+    
+//// @link main 
 
 
     vec4 _01_getColor();
@@ -79,22 +79,22 @@ exports[`link links quad vertex 1`] = `
 
 
     vec4 _01_getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
-
+    
 //// @link main _02_
 
 
     vec4 _02_getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
-
+    
 //// @link main _03_
 
 
     float _03_getSize(int index) { return 1.0; }
-
+    
 //// @link main _04_
 
 
     float _04_getDepth(int index) { return 0.5; }
-
+    
 //// @link use/types _05_
 
 struct _05_SolidVertex {
@@ -153,7 +153,7 @@ vec2 _07_getQuadUV(int vertex) {
   return vec2(_07_getQuadIndex(vertex));
 }
 
-//// @link getQuadVertex
+//// @link getQuadVertex 
 
 vec4 _01_getPosition(int);
 vec4 _02_getColor(int);
@@ -170,7 +170,7 @@ _05_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
 
   vec2 uv = _07_getQuadUV(vertexIndex);
   vec2 xy = uv * 2.0 - 1.0;
-
+  
   // Lerp between fixed size and full perspective.
   float pixelScale = _06_getPerspectiveScale(center.w, depth);
   size *= pixelScale;
@@ -200,8 +200,8 @@ exports[`link links same module twice with different entry point 1`] = `
     vec4 _01_getPosition(int index) { return vec4(_01_used(), 0.0, 1.0, 1.0); }
 
     vec4 _01_getColor(int index) { return vec4(_01_used(), 0.0, 1.0, 1.0); }
-
-//// @link main
+    
+//// @link main 
 
 
     vec4 _01_getPosition(int index);
@@ -222,8 +222,8 @@ exports[`link tree shakes around identifiers 1`] = `
 
     vec4 _01_getPosition(int index) { return vec4(_01_used(), 0.0, 1.0, 1.0); }
 
-
-//// @link main
+    
+//// @link main 
 
 
     vec4 _01_getPosition(int index);
@@ -242,8 +242,8 @@ exports[`link tree shakes around identifiers 2`] = `
 
     vec4 _01_getPosition(int index) { return vec4(_01_used(), 0.0, 1.0, 1.0); }
 
-
-//// @link main
+    
+//// @link main 
 
 
     vec4 _01_getPosition(int index);
@@ -262,8 +262,8 @@ exports[`link tree shakes constants 1`] = `
     vec4 _01_getColor() {
       return _01_colorUsed;
     }
-
-//// @link main
+    
+//// @link main 
 
 
     vec4 _01_getColor();
@@ -282,8 +282,8 @@ exports[`link tree shakes constants 2`] = `
     vec4 _01_getColor() {
       return _01_colorUsed;
     }
-
-//// @link main
+    
+//// @link main 
 
 
     vec4 _01_getColor();

@@ -486,7 +486,7 @@ texelFormat {
 
   @precedence {
     commentLine, Div,
-    FloatLiteral, UintLiteral, IntLiteral, Sub,
+    Sub, FloatLiteral, UintLiteral, IntLiteral,
     Identifier
   }
 }

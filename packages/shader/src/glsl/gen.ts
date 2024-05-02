@@ -76,7 +76,7 @@ export const makeBindingAccessors = (
         continue;
       }
 
-      program.push(makeStorageAccessor(namespace, set, base, formatOut, format, name));
+      program.push(makeStorageAccessor(namespace, set, base, formatOut, formatIn, name));
     }
 
     for (const {uniform: {name, format: formatOut, args}, texture} of textures) {

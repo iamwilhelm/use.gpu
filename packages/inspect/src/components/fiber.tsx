@@ -33,6 +33,7 @@ type FiberNavProps = {
 };
 
 type FiberNodeProps = {
+  state: InspectState,
   api: InspectAPI,
   fiber: LiveFiber<any>,
   fibers: Map<number, LiveFiber<any>>,
@@ -46,6 +47,7 @@ type FiberNodeProps = {
   builtins?: boolean,
   highlight?: boolean,
   continuation?: boolean,
+  builtin?: boolean,
   wide?: boolean,
   indented?: number,
 }
@@ -349,8 +351,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       parents={parents}
       precedes={precedes}
       depends={depends}
-      quoted={quoted}
-      unquoted={unquoted}
+      quoted={!!quoted}
+      unquoted={!!unquoted}
       depth={styleDepth}
       runCount={runCounts}
       onClick={select}
@@ -359,7 +361,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       onMouseLeave={unhover}
       ref={rowRef}
       ooo={ooo}
-      absolute={shouldAbsolute}
+      absolute={!!shouldAbsolute}
     />
   ) : null;
   //if (shouldAbsolute) nodeRender = <div style={{position: 'absolute'}}>{nodeRender}</div>;

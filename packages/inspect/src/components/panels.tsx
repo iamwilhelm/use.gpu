@@ -64,7 +64,7 @@ export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
 
   const handleSelectFiber = (fiber: number | LiveFiber<any>) => {
     const f = typeof fiber === 'number' ? fibers.get(fiber) : fiber;
-    selectFiber(f);
+    api.selectFiber(f);
   };
 
   const Wrap = fullSize ? InsetLeftRightBottom : Inset;

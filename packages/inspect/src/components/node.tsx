@@ -27,6 +27,7 @@ type NodeProps = {
   runCount?: boolean,
   absolute?: boolean,
   onClick?: (e: any) => void,
+  onDoubleClick?: (e: any) => void,
   onMouseEnter?: (e: any) => void,
   onMouseLeave?: (e: any) => void,
 };
@@ -72,7 +73,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
 
   const [version, pinged] = usePingTracker(fiber);
 
-  const classes: string[] = version >= 0 ? [version > 1 ? 'pinged' : 'mounted'] : [];
+  const classes: string[] = +version >= 0 ? [+version > 1 ? 'pinged' : 'mounted'] : [];
 
   if (!pinged) classes.push('cold');
   if (selected) classes.push('selected');
@@ -106,7 +107,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
       className={"fiber-tree-node " + className}
       onClick={handleClick}
       onDoubleClick={(e) => {
-        onDoubleClick();
+        onDoubleClick?.(e);
         e.stopPropagation();
       }}
       onMouseEnter={onMouseEnter}

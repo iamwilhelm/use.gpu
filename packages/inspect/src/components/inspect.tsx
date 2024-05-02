@@ -148,7 +148,7 @@ export const Inspect: React.FC<InspectProps> = ({
 
     const hoverFiber = (
       fiber: LiveFiber<any> | null = null,
-      fibers: Map<LiveFiber<any>> | null,
+      fibers: Map<number, LiveFiber<any>> | null,
       renderDepth: number = 0,
       sticky?: boolean,
     ) =>
@@ -173,10 +173,10 @@ export const Inspect: React.FC<InspectProps> = ({
         };
       }));
 
-    const makeHandlers = (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>, renderDepth: number) => {
+    const makeHandlers = (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>, renderDepth: number = 0) => {
       const select = () => selectFiber(fiber);
-      const hover = (e: Event) => hoverFiber(fiber, fibers, renderDepth, e.altKey);
-      const unhover = (e: Event) => hoverFiber(null, null, 0, e.altKey);
+      const hover = (e: MouseEvent) => hoverFiber(fiber, fibers, renderDepth, e.altKey);
+      const unhover = (e: MouseEvent) => hoverFiber(null, null, 0, e.altKey);
       const focus = () => focusFiber(fiber);
 
       return {select, hover, unhover, focus};
@@ -284,7 +284,7 @@ const HostHighlight = (props: HostHighlightProps) => {
         api.hoverFiber(fiber, fibers);
       }
       else {
-        api.hoverFiber(null);
+        api.hoverFiber(null, fibers);
       }
     };
 

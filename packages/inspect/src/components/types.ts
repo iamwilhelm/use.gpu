@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { LiveFiber } from '@use-gpu/live';
+import type { Cursor } from '@use-gpu/state';
 
 export type ExpandState = Record<string | number, boolean>;
 export type PingState = Record<number, number>;
@@ -49,7 +50,7 @@ export type InspectProps = {
   id: string,
   label: string,
   enabled: (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>) => boolean,
-  render: (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>, selectFiber: (fiber: LiveFiber<any>) => void) => ReactNode,
+  render: (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>, api: InspectAPI) => ReactNode,
 };
 
 export type InspectProp = {
@@ -58,7 +59,7 @@ export type InspectProp = {
   render: (prop: any) => ReactNode,
 };
 
-type Handler = (event: Event) => void;
+type Handler<E extends Event> = (event: E) => void;
 
 export type InspectState = {
   expandedCursor: Cursor<ExpandState>,
@@ -68,14 +69,14 @@ export type InspectState = {
 };
 
 export type InspectAPI = {
-  selectFiber: (fiber: LiveFiber<any> | null = null) => void,
-  focusFiber: (fiber: LiveFiber<any>) => void,
-  hoverFiber: (fiber: LiveFiber<any> | null = null, by?: LiveFiber<any> | null, renderDepth?: number) => void,
-  makeHandlers: (fiber: LiveFiber<any>) => {
-    select: Handler,
-    hover: Handler,
-    unhover: Handler,
-    focus: Handler,
+  selectFiber: (fiber: LiveFiber<any> | null | undefined) => void,
+  focusFiber: (fiber: LiveFiber<any> | null | undefined) => void,
+  hoverFiber: (fiber: LiveFiber<any> | null | undefined, fibers: Map<number, LiveFiber<any>>, renderDepth?: number) => void,
+  makeHandlers: (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>, renderDepth?: number) => {
+    select: Handler<MouseEvent>,
+    hover: Handler<MouseEvent>,
+    unhover: Handler<MouseEvent>,
+    focus: Handler<FocusEvent>,
   },
 };
 

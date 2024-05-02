@@ -117,7 +117,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, api}) => {
     if (!quote) return null;
 
     const {to} = quote;
-    const f = to.mounts.get(fiber.id);
+    const f = to.mounts?.get(fiber.id);
     if (f) return renderFiberButton(f, fibers, api);
     return null;
   };
@@ -186,8 +186,8 @@ const renderFiberButton = (
   return (
     <Fiber
       key={fiber.id}
-      onMouseEnter={(e) => e.altKey ? api.hoverFiber(fiber, fibers, 0, false) : null}
-      onMouseLeave={(e) => e.altKey ? api.hoverFiber(null, null, 0, false) : null}
+      onMouseEnter={(e: MouseEvent) => e.altKey ? api.hoverFiber(fiber, fibers, 0) : null}
+      onMouseLeave={(e: MouseEvent) => e.altKey ? api.hoverFiber(null, fibers, 0) : null}
       onClick={() => api.selectFiber(fiber)}
     ><div>
       {parts[0]}

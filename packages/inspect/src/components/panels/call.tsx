@@ -19,7 +19,7 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
   const {id, depth, runs, path, order, keys, type, state, context, yeeted, quotes, quote, unquote, mount, mounts, next, ...rest} = fiber;
 
   let props = {id, runs, depth, path, keys, '[internals]': rest} as any;
-  let env = {context, yeeted, quotes, unquote, quote: quote?.displayName} as any;
+  let env = {context, yeeted, quotes, unquote, quote: (quote as any)?.displayName} as any;
   let rendered = {type, mount, mounts, next, order} as any;
 
   if (!mount) delete rendered.mount;
@@ -65,7 +65,7 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
 
 const hookToObject = (
   state?: any[],
-) => {
+): Record<string, any> | null => {
   if (!state) return null;
 
   const [type, a, b] = state;

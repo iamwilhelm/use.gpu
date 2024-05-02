@@ -88,7 +88,8 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
 
   const coordsRef = useRef([-1e3, -1e3]);
 
-  keys = keys ?? Reflect.ownKeys(object);
+  keys = keys ?? Reflect.ownKeys(object) as string[];
+
   const fields = keys.map((k: string) => {
     const key = path +'/'+ k;
     const code = (typeof object[k] === 'string' && object[k].length > 80 && object[k].match(/\n/));

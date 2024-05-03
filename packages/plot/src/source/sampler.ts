@@ -59,13 +59,13 @@ export type SamplerProps<S extends string | string[]> = {
 
   /** Omit to provide data context instead. */
   render?: S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement,
-  children?: S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement,
+  children?: LiveElement | (S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement),
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Up-to-4D array of a WGSL type. Samples a given `expr` on the given `range`. */
-export const Sampler: LiveComponent<SamplerProps<string | string[]>> = memo(<S extends string | string[]>(props: SamplerProps<S>) => {
+export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>> = memo(<S extends string | string[]>(props: SamplerProps<S>) => {
   const {
     axis,
     axes = 'xyzw',

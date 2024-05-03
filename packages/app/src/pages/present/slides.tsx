@@ -1,4 +1,4 @@
-import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ColorLike } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
@@ -24,7 +24,7 @@ let t = 0;
 
 type TextProps = {
   fill?: ColorLike,
-  align?: 'left' | 'center' | 'right',
+  align?: 'start' | 'center' | 'end',
 };
 
 const Title = ({align, children}: PropsWithChildren<TextProps>) => (
@@ -116,7 +116,7 @@ export const PresentSlidesPage: LC = () => {
                 <Absolute bottom={100} height={40} left={10} right={10}>
                   <Flex width="100%" height="100%" align="center">
                     <Block fill={[0, 0, 0, .95]} padding={[20, 10]} radius={4}>
-                      <PresentInfo>{(step, length) => (
+                      <PresentInfo>{(step: number, length: number) => (
                         <Inline align="center">
                           <Text color="rgba(255, 255, 255, 0.8)" size={24}>{step} / {length}</Text>
                         </Inline>

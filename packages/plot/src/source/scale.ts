@@ -35,7 +35,7 @@ const useTraits = makeUseTrait(Traits);
 export type ScaleProps = TraitProps<typeof Traits> & {
   /** Omit to provide data context `positions` and `values` instead. */
   render?: (data: {positions: TensorArray, values: TensorArray}) => LiveElement,
-  children?: (data: {positions: TensorArray, values: TensorArray}) => LiveElement,
+  children?: LiveElement | ((data: {positions: TensorArray, values: TensorArray}) => LiveElement),
 };
 
 export const Scale: LiveComponent<ScaleProps> = memo((props: PropsWithChildren<ScaleProps>) => {

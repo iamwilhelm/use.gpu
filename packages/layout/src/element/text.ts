@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement, DeferredCall } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, LiveNode, DeferredCall, ArrowFunction } from '@use-gpu/live';
 import type { ColorLike, XYZW, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Baseline, InlineLine } from '../types';
@@ -12,6 +12,8 @@ import { Glyphs } from '../shape/glyphs';
 import { memoInline } from '../lib/util';
 
 const {quote} = LayerReconciler;
+
+type TextElement = string | number | LiveNode;
 
 export type TextProps = {
   opacity?: number,
@@ -29,14 +31,17 @@ export type TextProps = {
 
   inline?: Baseline,
   text?: string,
-  children?: string,
+
+  children?: TextElement | TextElement[],
 };
+
+type SpanProps = Omit<TextProps, 'children'> & { children?: any };
 
 const BLACK: XYZW = [0, 0, 0, 1];
 const NO_MARGIN: XYZW = [0, 0, 0, 0];
 const NO_STROKE: XYZW = [0.0, 0.0, 0.0, 0.0];
 
-const toSpan = (props: TextProps) => (child: LiveElement) =>
+const toSpan = (props: TextProps) => (child: TextElement) =>
   child != null
     ? typeof child !== 'object'
       ? use(Span, {
@@ -49,7 +54,7 @@ const toSpan = (props: TextProps) => (child: LiveElement) =>
       : child
     : null;
 
-export const Text: LiveComponent<TextProps> = memo((props) => {
+export const Text: LiveComponent<TextProps> = memo((props: TextProps) => {
 
   // Handle JSX array children
   const content = props.children ?? props.text;
@@ -65,7 +70,7 @@ export const Text: LiveComponent<TextProps> = memo((props) => {
     }
     else {
       // Inline single string
-      return InnerSpan(props);
+      return InnerSpan(props as SpanProps);
     }
   }
 
@@ -74,7 +79,7 @@ export const Text: LiveComponent<TextProps> = memo((props) => {
   color: sameShallow(),
 }), 'Text');
 
-const InnerSpan: LiveComponent<Omit<TextProps, 'children'>> = (props) => {
+const InnerSpan: LiveComponent<SpanProps> = (props: SpanProps) => {
 
   const {
     family,

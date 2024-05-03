@@ -6,7 +6,7 @@ export type LiveFunction<F extends Function = ArrowFunction> = F;
 export type RawLiveComponent<P> = (props: P) => LiveElement;
 
 // React/JSX types interop
-export type PropsWithChildren<P> = P & { children?: string | LiveNode<any> };
+export type PropsWithChildren<P> = P & { children?: string | number | ArrowFunction | LiveNode<any> };
 export type LiveComponent<P = object> = ((props: PropsWithChildren<P>) => any) & { displayName?: string };
 export type Component<P = object> = LiveComponent<P>;
 export type RenderProp<T extends any[]> = (...args: T) => LiveElement;
@@ -23,7 +23,7 @@ export type ReactElementInterop = {
 
 export type LivePure<F extends Function = ArrowFunction> = undefined | null | DeferredCall<F> | LivePure<any>[];
 export type LiveElement<F extends Function = ArrowFunction> = undefined | null | DeferredCall<F> | LiveElement[] | ReactElementInterop;
-export type LiveNode<F extends Function = ArrowFunction> = LiveElement<F> | string | ArrowFunction | Array<LiveNode<any>>;
+export type LiveNode<F extends Function = ArrowFunction> = LiveElement<F> | string | number | ArrowFunction | Array<LiveNode<any>>;
 
 // Mounting key
 export type Key = string | number;

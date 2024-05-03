@@ -49,14 +49,14 @@ export type RawDataProps<I extends boolean> = {
   interleaved?: I,
 
   /** Leave empty to yeet source(s) instead. */
-  render?: I extends true ? (sources: ShaderSource[]) => LiveElement : (source: ShaderSource) => LiveElement,
-  children?: I extends true ? (sources: ShaderSource[]) => LiveElement : (source: ShaderSource) => LiveElement,
+  render?: true extends I ? (sources: ShaderSource[]) => LiveElement : (source: ShaderSource) => LiveElement,
+  children?: true extends I ? (sources: ShaderSource[]) => LiveElement : (source: ShaderSource) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** 1D array of a WGSL type. Reads input `data` or samples a given `expr` of WGSL type `format`. */
-export const RawData: LiveComponent<RawDataProps<boolean>> = <I extends boolean>(props: RawDataProps<I>) => {
+export const RawData: LiveComponent<RawDataProps<unknown & boolean>> = <I extends boolean>(props: RawDataProps<I>) => {
   const device = useContext(DeviceContext);
 
   const {

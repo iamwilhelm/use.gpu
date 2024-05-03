@@ -1,5 +1,6 @@
 import type { LC } from '@use-gpu/live';
 import type { Emit, Time } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import React from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
@@ -52,7 +53,7 @@ export const RTTFeedbackPage: LC = () => {
                 emit(r, g, b, 0.5);
               }}
             >{
-              ([positions, colors]: StorageSource[]) => (
+              ([positions, colors]: ShaderSource[]) => (
                 <PointLayer
                   positions={positions}
                   colors={colors}

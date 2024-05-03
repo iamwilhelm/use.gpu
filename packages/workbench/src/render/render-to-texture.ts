@@ -25,7 +25,7 @@ const NO_SAMPLER: Partial<GPUSamplerDescriptor> = {};
 export type RenderToTextureProps = {
   target?: UseGPURenderContext,
   render?: (texture: TextureTarget) => LiveElement,
-  children?: (texture: TextureTarget) => LiveElement,
+  children?: LiveElement | ((texture: TextureTarget) => LiveElement),
 };
 
 /** Render to a given off-screen target, or the current target (if inside a `@{<RenderTarget>}`). */

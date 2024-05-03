@@ -97,6 +97,7 @@ export const extend = (
   props: Record<string, any>,
 ): LiveElement => {
   if (typeof calls === 'string') throw new Error(`Cannot extend props of string child '${calls}'`);
+  if (typeof calls === 'number') throw new Error(`Cannot extend props of number child '${calls}'`);
   if (typeof calls === 'function') throw new Error(`Cannot extend props of function child '${calls}'`);
   if (!calls) return calls;
 
@@ -118,6 +119,7 @@ export const mutate = (
   props: Record<string, any>,
 ): LiveElement => {
   if (typeof calls === 'string') throw new Error(`Cannot extend props of string child '${calls}'`);
+  if (typeof calls === 'number') throw new Error(`Cannot extend props of number child '${calls}'`);
   if (typeof calls === 'function') throw new Error(`Cannot extend props of function child '${calls}'`);
   if (!calls) return;
 

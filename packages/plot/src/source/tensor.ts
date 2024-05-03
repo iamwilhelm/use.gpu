@@ -48,13 +48,13 @@ export type TensorProps<S extends string | string[]> = {
 
   /** Omit to provide data context instead. */
   render?: S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement,
-  children?: S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement,
+  children?: LiveElement | (S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement),
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Sample up-to-4D array of a WGSL type. Reads input `data` or samples a given `expr`. */
-export const Tensor: LiveComponent<TensorProps<string>> = memo(<S extends string | string[]>(props: TensorProps<S>) => {
+export const Tensor: LiveComponent<TensorProps<unknown & (string | string[])>> = memo(<S extends string | string[]>(props: TensorProps<S>) => {
   const {
     format = 'f32',
     length: l = 0,

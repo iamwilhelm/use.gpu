@@ -1,5 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { TypedArray, UniformAttribute } from '@use-gpu/core';
+import type { TypedArray, UniformAttribute, UniformType } from '@use-gpu/core';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { toUnweldedArray, formatToArchetype, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
@@ -27,7 +27,7 @@ export const useGLTFGeometry = (
 
   const geometry = useMemo(() => {
     const attributes: Record<string, TypedArray> = {};
-    const formats: Record<string, string> = {};
+    const formats: Record<string, UniformType> = {};
 
     if (POSITION   != null) {
       attributes.positions = arrays[POSITION];

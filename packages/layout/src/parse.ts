@@ -2,8 +2,6 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { Alignment, AlignmentLike, Anchor, AnchorLike, Baseline, Dimension, Direction, Fit, Gap, GapLike, Margin, MarginLike, OverflowMode, Repeat } from './types';
 import { makeParseEnum, makeParseObject } from '@use-gpu/parse';
 
-const explode = new Proxy({}, {get: () => { throw new Error('Invalid texture source'); }}) as any as TextureSource;
-
 export const makeParseDimension = (def: Dimension | null = null) => (x?: string | number): Dimension | null => {
   if (typeof x === 'string' || typeof x === 'number') return x;
   return def;
@@ -37,7 +35,7 @@ export const makeParseMargin = (def: Margin = [0, 0, 0, 0]) => (m?: MarginLike):
   m != null ? [m, m, m, m] :
   def;
 
-export const parseTexture    = makeParseObject<ShaderSource | null>();
+export const parseTexture    = makeParseObject<ShaderSource>();
 
 export const parseAlignment  = makeParseEnum<Alignment>(['start', 'center', 'end', 'justify', 'justify-start', 'justify-center', 'justify-end', 'between', 'evenly']);
 export const parseAnchor     = makeParseEnum<Anchor>(['start', 'center', 'end']);

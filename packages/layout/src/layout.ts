@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { XY, XYZW, Rectangle } from '@use-gpu/core';
-import type { Placement } from '@use-gpu/traits';
+import type { Placement } from '@use-gpu/parse';
 import type { FitInto, LayoutElement, LayoutPicker } from './types';
 
 import { parsePlacement } from '@use-gpu/parse';

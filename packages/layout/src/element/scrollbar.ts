@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ColorLike, TextureSource, XY, XYZW, Rectangle } from '@use-gpu/core';
+import type { ColorLike, TextureSource, XY, XYZW, Rectangle, TypedArray } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Direction, OverflowMode, FitInto, UIAggregate } from '../types';
 

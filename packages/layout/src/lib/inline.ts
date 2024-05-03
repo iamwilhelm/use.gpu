@@ -1,5 +1,5 @@
 import type { XY, XYZW, Rectangle } from '@use-gpu/core';
-import type { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, FitInto, Margin, Alignment, Anchor, Base } from '../types';
+import type { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, FitInto, Margin, Alignment, Anchor, Baseline } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
 import { makeInlineCursor } from './cursor';
@@ -108,7 +108,7 @@ export const fitInline = (
   into: FitInto,
   direction: Direction,
   align: Alignment,
-  anchor: Base,
+  anchor: Baseline,
   wrap: boolean,
   snap: boolean,
 ) => {

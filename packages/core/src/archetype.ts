@@ -248,7 +248,7 @@ export const emitAttributes = (
 /** Calculate archetype ID for a schema and its attributes, flags, refs and extra sources */
 export const schemaToArchetype = (
   schema: ArchetypeSchema,
-  attributes: Record<string, TypedArray | VectorEmitter>,
+  attributes: Record<string, AggregateValue | undefined>,
   flags?: Record<string, any>,
   refs?: Record<string, any>,
   sources?: Record<string, any>,
@@ -261,7 +261,7 @@ export const schemaToArchetype = (
     if (values != null) {
       // Providing an array to a non-array attribute triggers spread
       const dims = getUniformDims(format as any);
-      const isSpread = spread && !isUniformArrayType(format as any) && values.length > dims;
+      const isSpread = spread && !isUniformArrayType(format as any) && (values as number[]).length > dims;
 
       tokens.push(isSpread ? spread : key, format);
     }

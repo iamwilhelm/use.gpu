@@ -163,7 +163,5 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       transform,
       zIndex,
     });
-
-    return yeet(render);
   }, [props, sdfFont, zIndex]);
 };

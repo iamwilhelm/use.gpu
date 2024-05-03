@@ -21,7 +21,7 @@ import {
   parseTexture,
 } from './parse';
 
-const BoxTrait = trait({
+export const BoxTrait = trait({
   grow: parseNumber,
   shrink: parseNumber,
   margin: parseMargin,
@@ -31,7 +31,7 @@ const BoxTrait = trait({
   shrink: 1,
 });
 
-const ImageTrait = trait({
+export const ImageTrait = trait({
   texture: optional(parseTexture), // deprecated
   width: optional(parseDimension),
   height: optional(parseDimension),
@@ -40,7 +40,7 @@ const ImageTrait = trait({
   align: parseAnchorXY,
 });
 
-const ElementTrait = trait({
+export const ElementTrait = trait({
   width: optional(parseDimension),
   height: optional(parseDimension),
   aspect: optional(parseNumber),

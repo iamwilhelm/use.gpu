@@ -40,7 +40,10 @@ export const isTypedArray = (() => {
 
 ///////////////////////////
 
-export const makeParseObject = <T>() => (value?: T) => typeof value === 'object' && value != null ? value : {};
+export const makeParseObject = <T extends object>() => (value?: T): T => {
+  if (typeof value === 'object' && value != null) return value;
+  throw new Error(`Expected object, got: '${JSON.stringify(value)}'`);
+};
 
 export const makeParseArray = <T>(
   defaults: T[],

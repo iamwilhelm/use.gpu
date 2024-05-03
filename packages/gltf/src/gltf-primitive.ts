@@ -97,8 +97,6 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     view = provide(TransformContext, context, view);
   }
   else {
-    useNoMatrixBounds();
-    useNoMatrixTransform();
     useNoCombinedMatrixTransform();
   }
 

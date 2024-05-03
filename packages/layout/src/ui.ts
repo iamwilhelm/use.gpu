@@ -1,5 +1,5 @@
 import type { LC, LiveFunction, LiveElement } from '@use-gpu/live';
-import type { AggregateBuffer, Atlas, Rectangle, TextureSource, UniformType, TypedArray, StorageSource } from '@use-gpu/core';
+import type { Atlas, Rectangle, TextureSource, UniformType, TypedArray, StorageSource } from '@use-gpu/core';
 import type { UIAggregate } from './types';
 
 import {
@@ -24,7 +24,7 @@ export type UIProps = {
 };
 
 export type UILayersProps = {
-  items: (UIAggregate | null)[],
+  items: UIAggregate[],
 };
 
 export const UI: LC<UIProps> = (props) => {
@@ -36,7 +36,7 @@ export const UI: LC<UIProps> = (props) => {
       quote(
         gather(
           wrap(SDFFontProvider, unquote(children)),
-          (items: (UIAggregate | null)[]) => {
+          (items: UIAggregate[]) => {
             if (!Array.isArray(items)) items = [items];
             return UILayers({items});
           }
@@ -54,7 +54,7 @@ export const UILayers: LC<UILayersProps> = ({
 
   const partitioner = makePartitioner();
 
-  items.sort((a, b) => a.zIndex - b.zIndex);
+  items.sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
   for (let item of items) if (item) {
     partitioner.push(item);
   }
@@ -70,7 +70,7 @@ export const UILayers: LC<UILayersProps> = ({
 };
 
 const Layer: LiveFunction<any> = (
-  items: LayerAggregate[],
+  items: UIAggregate[],
 ) => {
   const [item] = items;
   const {transform, clip, mask, texture} = item;
@@ -88,7 +88,7 @@ const Layer: LiveFunction<any> = (
   }, [count, sources, contours]);
 };
 
-const getItemTypeKey = (item: LayerAggregate) =>
+const getItemTypeKey = (item: UIAggregate) =>
   ('texture' in item && item.texture
     ? hashBits53(getObjectKey(item.texture))
     : 0) ^

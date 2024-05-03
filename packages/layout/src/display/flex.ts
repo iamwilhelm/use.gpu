@@ -38,7 +38,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
     children,
   } = props;
 
-  const { width, height, aspect, radius, border, stroke, fill, image, texture, zIndex } = useElementTrait(props);
+  const { width, height, aspect, zIndex } = useElementTrait(props);
   const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionX);
@@ -51,7 +51,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
 
-  const c = useImplicitElement(radius, border, stroke, fill, image, texture, children);
+  const c = useImplicitElement(props);
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {

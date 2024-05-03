@@ -1,8 +1,7 @@
-import type { LiveComponent, DeferredCall } from '@use-gpu/live';
-import type { XYZW, Rectangle } from '@use-gpu/core';
+import type { LiveComponent, LiveElement, DeferredCall } from '@use-gpu/live';
+import type { ColorLike, XYZW, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { ColorLike } from '@use-gpu/traits';
-import type { Base, InlineLine } from '../types';
+import type { Baseline, InlineLine } from '../types';
 
 import { useProp, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { parseColor, parseNumber } from '@use-gpu/parse';
@@ -28,7 +27,7 @@ export type TextProps = {
   detail?: number,
   snap?: boolean,
 
-  inline?: Base,
+  inline?: Baseline,
   text?: string,
   children?: string,
 };
@@ -54,19 +53,20 @@ export const Text: LiveComponent<TextProps> = memo((props) => {
 
   // Handle JSX array children
   const content = props.children ?? props.text;
-  if (Array.isArray(content)) {
-    // Escape loose strings to <Span>
-    const fragment = content.map(toSpan(props));
-    if (content.length > 1 || typeof fragment[0] === 'object') return fragment;
-  }
-  else if (content?.f) {
-    console.log(content);
-    // Render nested <Element>
-    return content;
-  }
-  else if (content != null) {
-    // Inline single string
-    return InnerSpan(props);
+  if (content != null) {
+    if (Array.isArray(content)) {
+      // Escape loose strings to <Span>
+      const fragment = content.map(toSpan(props));
+      if (content.length > 1 || typeof fragment[0] === 'object') return fragment;
+    }
+    else if (typeof content === 'object' && ('f' in content || 'props' in content)) {
+      // Render nested <Element>
+      return content;
+    }
+    else {
+      // Inline single string
+      return InnerSpan(props);
+    }
   }
 
   return null;
@@ -90,7 +90,7 @@ const InnerSpan: LiveComponent<Omit<TextProps, 'children'>> = (props) => {
     children,
   } = props;
 
-  const content = children ?? text;
+  const content = (children ?? text) as string | string[];
 
   const font = useFontFamily(family, weight, style);
   const {spans, glyphs, breaks} = useFontText(font, content, size);

@@ -1,15 +1,14 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { TextureSource, XYZW, Rectangle } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
-import type { ColorLike } from '@use-gpu/traits';
-import type { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoXY, ImageTrait } from '../types';
+import type { ColorLike, TextureSource, XYZW, Rectangle } from '@use-gpu/core';
+import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
+import type { MarginLike, AutoXY } from '../types';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { use, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { evaluateDimension } from '../parse';
 import { useInspectHoverable, LayerReconciler } from '@use-gpu/workbench';
 
-import type { BoxTrait, ElementTrait, RefProps } from '../types';
-import { useBoxTrait, useElementTrait } from '../traits';
+import { BoxTrait, ElementTrait, ImageTrait, useBoxTrait, useElementTrait } from '../traits';
 import { INSPECT_STYLE } from '../lib/constants';
 import { memoLayout } from '../lib/util';
 
@@ -17,7 +16,10 @@ import { SDFRectangle } from '../shape/sdf-rectangle';
 
 const {quote} = LayerReconciler;
 
-export type ElementProps = Partial<BoxTrait> & Partial<ElementTrait> & Partial<RefProps> & {
+export type ElementProps =
+  TraitProps<typeof BoxTrait> &
+  TraitProps<typeof ElementTrait> &
+{
   snap?: boolean,
   absolute?: boolean,
   under?: boolean,
@@ -75,7 +77,6 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
         transform,
         zIndex: z + zIndex,
       }),
-      id
     )));
 
     return {
@@ -102,13 +103,15 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
 };
 
 export const useImplicitElement = (
-  radius: MarginLike,
-  border: MarginLike,
-  stroke: ColorLike,
-  fill: ColorLike,
-  image: Partial<ImageTrait>,
-  texture: ShaderSource | null | undefined,
-  children: any,
+  {radius, border, stroke, fill, image, texture, children}: {
+    radius?: MarginLike,
+    border?: MarginLike,
+    stroke?: ColorLike,
+    fill?: ColorLike,
+    image?: Partial<TraitProps<typeof ImageTrait>>,
+    texture?: ShaderSource | null | undefined,
+    children?: any,
+  },
 ) =>
   useMemo(() => {
     const element = (stroke || fill || image) ? (

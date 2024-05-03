@@ -1,8 +1,10 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { TextureSource, Rectangle, XYZW } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
-import type { ImageTrait, Fit, Repeat, Anchor } from '../types';
+import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
+import type { TraitProps } from '@use-gpu/traits';
+import type { Fit, Repeat, Anchor } from '../types';
 
+import { ImageTrait } from '../traits';
 import { proxy } from '@use-gpu/core';
 import { use, yeet, memo, useContext, useMemo, useNoContext } from '@use-gpu/live';
 import { LayoutContext, getAlignmentAnchor, UI_SCHEMA } from '@use-gpu/workbench';
@@ -14,7 +16,7 @@ import { getOriginProjection } from '../lib/util';
 const UV_SQUARE = [0, 0, 1, 1] as Rectangle;
 const NO_RECTANGLE = [0, 0, 0, 0] as Rectangle;
 
-const REPEAT_FLAG = {
+const REPEAT_FLAG: Record<string, number> = {
   'none': 0,
   'x':    1,
   'y':    2,
@@ -27,7 +29,7 @@ export type SDFRectangleProps = {
   zIndex?: number,
 
   texture?: ShaderSource | null,
-  image?: Partial<ImageTrait>,
+  image?: Partial<TraitProps<typeof ImageTrait>>,
 
   fill?: XYZW,
   stroke?: XYZW,

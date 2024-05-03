@@ -168,11 +168,11 @@ export type TextureSource = {
 
 export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | TextureSource | ShaderModule;
 
-export type UniformFormat<T extends string = string> = T | UniformAttribute[];
+export type UniformFormat = any | UniformAttribute[];
 
 export type UniformAttribute = {
   name: string,
-  format: UniformFormat<any>,
+  format: UniformFormat,
   type?: ShaderModule,
   args?: any[] | null,
   members?: UniformAttribute[],

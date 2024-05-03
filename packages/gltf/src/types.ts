@@ -1,4 +1,4 @@
-import type { StorageSource, TextureSource, TypedArray } from '@use-gpu/core';
+import type { StorageSource, TextureSource, TypedArray, UniformType } from '@use-gpu/core';
 import { mat4, vec3, quat } from 'gl-matrix';
 
 export type GLTFRaw<T = any> = {
@@ -18,7 +18,7 @@ export type GLTFRaw<T = any> = {
 export type GLTF<T = any> = GLTFRaw<T> & {
   data: {
     arrays: TypedArray[],
-    formats: string[],
+    formats: UniformType[],
   },
   bound?: {
     storage: StorageSource[],

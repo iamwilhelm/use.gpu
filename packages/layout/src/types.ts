@@ -1,8 +1,7 @@
-import type { Tuples, XY, XYZW, Rectangle } from '@use-gpu/core';
+import type { Color, ColorLike, Tuples, XY, XYZW, Rectangle } from '@use-gpu/core';
 import type { LiveElement, Key } from '@use-gpu/live';
 import type { FontMetrics } from '@use-gpu/glyph';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
-import type { Color, ColorLike } from '@use-gpu/traits';
 import { mat4 } from 'gl-matrix';
 
 export type AutoXY = [number | null, number | null];
@@ -39,7 +38,6 @@ export type LayoutRenderer = (
 export type RenderInside = {
   sizes: XY[],
   offsets: XY[],
-  z: number,
   renders: LayoutRenderer[],
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
@@ -58,6 +56,7 @@ export type RenderInline = {
 export type RenderOutside = {
   box: Rectangle,
   origin: Rectangle,
+  z: number,
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
   transform?: ShaderModule | null,
@@ -131,7 +130,7 @@ export type InlineLine = {
 };
 
 export type UIAggregate = LayoutShaders & {
-  archetype?: number,
+  archetype: number,
   bounds?: Rectangle,
   count: number,
   zIndex?: number,

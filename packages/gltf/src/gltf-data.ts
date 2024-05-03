@@ -24,6 +24,7 @@ export type GLTFDataProps = {
   unbound?: boolean,
 
   render?: (gltf: GLTF) => LiveElement,
+  children?: (gltf: GLTF) => LiveElement,
 };
 
 type ParsedGLTF = {
@@ -204,7 +205,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
             buffer: gpuBuffer,
             arrayBuffer,
 
-            format: '',
+            format: '' as any,
             length: 0,
             size: [0],
             version: 0,

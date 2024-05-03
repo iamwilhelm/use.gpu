@@ -665,7 +665,7 @@ export const makeNumberSplitter = (to: VectorLike[], dims: number) => {
 
   const writers = to.map((t) => makeNumberWriter(t, dims));
   const emits = writers.map(({emit}) => emit);
-  const emit = (a: number, b: number, c: number, d: number) => emits[i++ % n](a, b, c, d);
+  const emit: Emit = ((a: number, b: number, c: number, d: number) => emits[i++ % n](a, b, c, d)) as any as Emit;
 
   return {
     reset: () => writers.forEach(writer => writer.reset()),

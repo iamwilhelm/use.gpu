@@ -1,5 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { TypedArray } from '@use-gpu/core';
+import type { VectorLike } from '@use-gpu/core';
 import type { GLTF } from './types';
 import { vec3, mat4, quat } from 'gl-matrix';
 
@@ -63,10 +63,10 @@ const makeComposeTransform = () => {
 
   return (
     transform: mat4,
-    position?: vec3 | TypedArray | null,
-    quaternion?: quat | TypedArray | null,
-    scale?: vec3 | TypedArray | null,
-    matrix?: mat4 | TypedArray | null,
+    position?: VectorLike | null,
+    quaternion?: VectorLike | null,
+    scale?: VectorLike | null,
+    matrix?: VectorLike | null,
   ) => {
 
     if (quaternion != null) quat.copy(q, quaternion as any);

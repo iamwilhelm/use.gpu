@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataBounds, TensorArray, VectorLike, Emitter } from '@use-gpu/core';
+import type { DataBounds, ElementType, TensorArray, VectorLike, Emitter, UniformType } from '@use-gpu/core';
 
 import { provide, yeet, memo, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
@@ -21,7 +21,7 @@ import { useRangeContext, useNoRangeContext } from '../providers/range-provider'
 import { useDataContext, DataContext } from '../providers/data-provider';
 import zipObject from 'lodash/zipObject';
 
-export type TensorProps<S extends string> = {
+export type TensorProps<S extends string | string[]> = {
   /** Input size up to [width, height, depth, layers] */
   size?: number[],
   /** Shorthand for size=[length] */
@@ -44,26 +44,19 @@ export type TensorProps<S extends string> = {
   live?: boolean,
 
   /** Inject into DataContext under this key(s) */
-  as?: string | S[],
-} & {
-  as?: string,
+  as?: S,
 
-  render?: (data: TensorArray) => LiveElement,
-  /** Element children will be provided data context. */
-  children?: LiveElement | ((data: TensorArray) => LiveElement),
-} & {
-  as: S[],
-  render?: (data: Record<S, TensorArray>) => LiveElement,
-  /** Element children will be provided data context. */
-  children?: LiveElement | ((data: Record<S, TensorArray>) => LiveElement),
+  /** Omit to provide data context instead. */
+  render?: S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement,
+  children?: S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Sample up-to-4D array of a WGSL type. Reads input `data` or samples a given `expr`. */
-export const Tensor: LiveComponent<TensorProps<unknown>> = memo(<S extends string>(props: TensorProps<S>) => {
+export const Tensor: LiveComponent<TensorProps<string>> = memo(<S extends string | string[]>(props: TensorProps<S>) => {
   const {
-    format,
+    format = 'f32',
     length: l = 0,
     size = [l],
     data,
@@ -75,7 +68,7 @@ export const Tensor: LiveComponent<TensorProps<unknown>> = memo(<S extends strin
     time = false,
   } = props;
 
-  const items = Math.max(1, Math.round(props.items) || 0);
+  const items = Math.max(1, Math.round(props.items || 0));
 
   const count = size.reduce((a, b) => a * b, 1);
   const alloc = useBufferedSize(count);
@@ -83,11 +76,12 @@ export const Tensor: LiveComponent<TensorProps<unknown>> = memo(<S extends strin
   const split = Array.isArray(as) ? as.length : 0;
 
   // Make tensor array
+  const f = format as UniformType;
   const tensors = useMemo(
     () => split
-      ? seq(items).map(i => makeTensorArray(format, alloc))
-      : [makeTensorArray(format, items * alloc)],
-    [format, alloc, items]
+      ? seq(items).map(i => makeTensorArray(f, alloc))
+      : [makeTensorArray(f, items * alloc)],
+    [f, alloc, items]
   );
   const arrays = useOne(() => tensors.map(({array}) => array), tensors);
 
@@ -124,7 +118,7 @@ export const Tensor: LiveComponent<TensorProps<unknown>> = memo(<S extends strin
     return {...tensor};
   };
 
-  let value: TensorArray;
+  let value: TensorArray | Record<string, TensorArray>;
   if (!live) {
     useNoAnimationFrame();
     value = useMemo(refresh, [tensors, data, expr, items, ...size]);
@@ -142,10 +136,10 @@ export const Tensor: LiveComponent<TensorProps<unknown>> = memo(<S extends strin
   const context = !render && children ? useMemo(
     () => split
       ? ({...dataContext, ...value})
-      : ({...dataContext, [as]: value}),
+      : ({...dataContext, [as as string]: value}),
     [dataContext, value, as]) : useNoMemo();
 
-  return render ? render(value) : children ? provide(DataContext, context, children) : yeet(value);
+  return render ? render(value as any) : children ? provide(DataContext, context, children) : yeet(value);
 }, shouldEqual({
   size: sameShallow(),
   range: sameShallow(sameShallow()),

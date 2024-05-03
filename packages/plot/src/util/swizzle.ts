@@ -20,7 +20,7 @@ export const makeSwizzleMatrix = (swizzle: string) => {
     if (c === 'z') values.push(0, 0, 1, 0);
     if (c === 'w') values.push(0, 0, 0, 1);
   }
-  return mat4.fromValues(...values);
+  return (mat4.fromValues as any)(...values);
 };
 
 const SWIZZLE_MATRICES = zipObject(SWIZZLES, SWIZZLES.map(makeSwizzleMatrix));

@@ -1,4 +1,4 @@
-import type { TypedArray } from '@use-gpu/core';
+import type { VectorLike } from '@use-gpu/core';
 import { vec3, mat4, quat } from 'gl-matrix';
 
 const π = Math.PI;
@@ -14,11 +14,11 @@ const makeComposeTransform = () => {
 
   return (
     transform: mat4,
-    position?: TypedArray | null,
-    rotation?: TypedArray | null,
-    quaternion?: TypedArray | null,
-    scale?: TypedArray | null,
-    matrix?: TypedArray | null,
+    position?: VectorLike | null,
+    rotation?: VectorLike | null,
+    quaternion?: VectorLike | null,
+    scale?: VectorLike | null,
+    matrix?: VectorLike | null,
     eulerOrder = 'xyz',
   ) => {
 

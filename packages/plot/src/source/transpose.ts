@@ -15,7 +15,9 @@ export type TransposeProps = {
   axes?: string,
   as?: string,
   tensor?: TensorArray,
+
   render?: (data: TensorArray) => LiveElement,
+  children?: (data: TensorArray) => LiveElement,
 };
 
 export const Transpose: LiveComponent<TransposeProps> = (props) => {
@@ -68,5 +70,5 @@ export const Transpose: LiveComponent<TransposeProps> = (props) => {
 
   const context = !render && children ? useMemo(() => ({...dataContext, [as]: value}), [dataContext, value, as]) : useNoMemo();
 
-  return render ? render(tensor) : children ? provide(DataContext, context, children) : yeet(tensor);
+  return render ? render(value) : children ? provide(DataContext, context, children) : yeet(value);
 };

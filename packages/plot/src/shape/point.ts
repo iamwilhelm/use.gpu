@@ -52,7 +52,7 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
   const {transform, nonlinear, matrix: refs} = context;
 
   const schema = useOne(() => adjustSchema(POINT_SCHEMA, formats), formats);
-  const attributes = schemaToAttributes(schema, parsed);
+  const attributes = schemaToAttributes(schema, parsed as any);
   const archetype = schemaToArchetype(schema, attributes, flags, refs, sources);
 
   const dims = toCPUDims(getUniformDims(schema.positions.format));

@@ -1,4 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { Lazy } from '@use-gpu/core';
 
 import { provide, useMemo, useOne } from '@use-gpu/live';
 import { ScissorContext, useShader, useShaderRefs } from '@use-gpu/workbench';
@@ -10,7 +11,7 @@ import { getScissorLevel } from '@use-gpu/wgsl/transform/scissor.wgsl';
 const NO_LOOP = [0, 0, 0, 0];
 
 export type ScissorProps = {
-  loop?: boolean,
+  loop?: boolean[] | number[],
   bias?: number,
   range?: [number, number][],
 };
@@ -28,7 +29,7 @@ export const Scissor: LC<ScissorProps> = (props: PropsWithChildren<ScissorProps>
     SCISSOR_BIAS: bias,
   }), [loop, bias]);
 
-  const bound = useShader(getScissorLevel, useShaderRefs(min, max, loop), defines);
+  const bound = useShader(getScissorLevel, useShaderRefs(min, max, loop as Lazy<number[]>), defines);
 
   return provide(ScissorContext, bound, children);
 };

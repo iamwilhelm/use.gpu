@@ -116,7 +116,7 @@ export const Polar: LiveComponent<PolarProps> = (props: PropsWithChildren<PolarP
       const order = swizzle = toBasis(on);
 
       // Apply inverse polar basis as part of view matrix (right multiply)
-      swizzleMatrix(t, invertBasis(order));
+      swizzleMatrix(composed, invertBasis(order));
       mat4.multiply(matrix, matrix, composed);
     }
 

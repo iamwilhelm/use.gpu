@@ -20,7 +20,6 @@ export const InnerFace: LiveComponent<FaceProps> = (props) => {
 
   const parsed = useTraits(props);
   const {
-      position,
       positions,
       color,
       colors,
@@ -67,7 +66,7 @@ export const InnerFace: LiveComponent<FaceProps> = (props) => {
   const archetype = schemaToArchetype(schema, attributes, flags, refs, sources);
 
   if (Number.isNaN(count)) debugger;
-  if (!count || !(position || positions)) return;
+  if (!count || !positions) return;
 
   const shapes = {
     face: {

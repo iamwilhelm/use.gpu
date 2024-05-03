@@ -1,9 +1,9 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataBounds, TensorArray, VectorLike, Emit, Emitter } from '@use-gpu/core';
+import type { DataBounds, ElementType, TensorArray, VectorLike, Emit, Emitter, UniformType } from '@use-gpu/core';
 
 import { provide, yeet, deprecated, memo, useOne, useMemo, useNoMemo, useRef } from '@use-gpu/live';
 import {
-  makeTensorArray, emitMultiArray, makeNumberWriter, updateTensor,
+  seq, makeTensorArray, emitMultiArray, makeNumberWriter, makeNumberSplitter, updateTensor,
   getBoundingBox, toDataBounds,
   toCPUDims, toGPUDims,
 } from '@use-gpu/core';
@@ -19,7 +19,7 @@ import { useRangeContext, useNoRangeContext } from '../providers/range-provider'
 import { useDataContext, DataContext } from '../providers/data-provider';
 import zipObject from 'lodash/zipObject';
 
-export type SamplerProps<S extends string> = {
+export type SamplerProps<S extends string | string[]> = {
   /** Sample count up to [width, height, depth, layers] */
   size?: number[],
   /** Shorthand for size=[length] */
@@ -55,28 +55,21 @@ export type SamplerProps<S extends string> = {
   live?: boolean,
 
   /** Inject into DataContext under this key(s) */
-  as?: string | S[],
-} & {
-  as?: string,
+  as?: S,
 
   /** Omit to provide data context instead. */
-  render?: (data: TensorArray) => LiveElement,
-  children?: (data: TensorArray) => LiveElement,
-} & {
-  as: S,
-  /** Omit to provide data context instead. */
-  render?: (data: Record<keyof S, TensorArray>) => LiveElement,
-  children?: (data: Record<keyof S, TensorArray>) => LiveElement,
+  render?: S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement,
+  children?: S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement,
 };
 
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Up-to-4D array of a WGSL type. Samples a given `expr` on the given `range`. */
-export const Sampler: LiveComponent<SamplerProps<unknown>> = memo(<S extends string>(props: SamplerProps<S>) => {
+export const Sampler: LiveComponent<SamplerProps<string | string[]>> = memo(<S extends string | string[]>(props: SamplerProps<S>) => {
   const {
     axis,
     axes = 'xyzw',
-    format,
+    format = 'f32',
     length: l = 0,
     size = [l],
     expr,
@@ -91,7 +84,7 @@ export const Sampler: LiveComponent<SamplerProps<unknown>> = memo(<S extends str
   } = props;
 
   const parentRange = props.range ? (useNoRangeContext(), props.range) : useRangeContext();
-  const items = Math.max(1, Math.round(props.items) || 0);
+  const items = Math.max(1, Math.round(props.items || 0));
   const origin = useProp(props.origin, optional(parseVec4));
 
   const a = axis ?? axes;
@@ -109,11 +102,12 @@ export const Sampler: LiveComponent<SamplerProps<unknown>> = memo(<S extends str
   const split = Array.isArray(as) ? as.length : 0;
 
   // Make tensor array
+  const f = format as UniformType;
   const tensors = useMemo(
     () => split
-      ? seq(items).map(i => makeTensorArray(format, alloc))
-      : [makeTensorArray(format, items * alloc)],
-    [format, alloc, items]
+      ? seq(items).map(i => makeTensorArray(f, alloc))
+      : [makeTensorArray(f, items * alloc)],
+    [f, alloc, items]
   );
   const arrays = useOne(() => tensors.map(({array}) => array), tensors);
   const {dims} = tensors[0];
@@ -281,7 +275,7 @@ export const Sampler: LiveComponent<SamplerProps<unknown>> = memo(<S extends str
   const refresh = () => {
     const [tensor] = tensors;
 
-    emit.reset();
+    emit?.reset();
     const emitted = sampled ? emitMultiArray(sampled, emit, count, padded, clock!) : 0;
 
     const l = !sparse ? length : emitted;
@@ -298,7 +292,7 @@ export const Sampler: LiveComponent<SamplerProps<unknown>> = memo(<S extends str
     return {...tensor};
   };
 
-  let value: TensorArray;
+  let value: TensorArray | Record<string, TensorArray>;
   if (!live) {
     useNoAnimationFrame();
     value = useMemo(refresh, [tensors, expr, centered, border, origin, range, items, ...size]);
@@ -315,10 +309,10 @@ export const Sampler: LiveComponent<SamplerProps<unknown>> = memo(<S extends str
   const context = !render && children ? useMemo(
     () => split
       ? ({...dataContext, ...value})
-      : ({...dataContext, [as]: value}),
+      : ({...dataContext, [as as string]: value}),
     [dataContext, value, as]) : useNoMemo();
 
-  return render ? render(value) : children ? provide(DataContext, context, children) : yeet(value);
+  return render ? render(value as any) : children ? provide(DataContext, context, children) : yeet(value);
 }, shouldEqual({
   size: sameShallow(),
   range: sameShallow(sameShallow()),

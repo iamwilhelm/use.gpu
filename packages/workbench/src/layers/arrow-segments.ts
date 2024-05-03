@@ -21,7 +21,7 @@ export const getArrowSegments = ({
   chunks, groups, loops, starts, ends,
 }: {
   chunks: VectorLike,
-  groups: VectorLike | null,
+  groups?: VectorLike | null,
   loops?: boolean[] | boolean | null,
   starts?: boolean[] | boolean | null,
   ends?: boolean[] | boolean | null,
@@ -51,7 +51,7 @@ export const getArrowSegments = ({
 
 export const useArrowSegmentsSource = (
   chunks: VectorLike,
-  groups: VectorLike | null,
+  groups?: VectorLike | null,
   loops?: boolean[] | boolean | null,
   starts?: boolean[] | boolean | null,
   ends?: boolean[] | boolean | null,

@@ -42,7 +42,7 @@ export type PolygonProps = TraitProps<typeof Traits> &
 
 export const Polygon: LiveComponent<PolygonProps> = memo((props) => {
   const {width, widths, fill, fills, stroke, strokes, zBiasStroke = 0} = props;
-  const zBias = (props.zBias || 0) + zBiasStroke;
+  const zBias = ((props.zBias as number) || 0) + zBiasStroke;
   return [
     fill ?? fills ? use(InnerFace, {...props, color: fill, colors: fills, concave: true}) : null,
     stroke ?? strokes ? use(InnerLine, {...props, color: stroke, colors: strokes, loop: true, width, widths, zBias}) : null,

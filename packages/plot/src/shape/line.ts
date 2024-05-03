@@ -67,7 +67,7 @@ export const InnerLine: LiveComponent<LineProps> = (props) => {
   const archetype = schemaToArchetype(schema, attributes, flags, refs, sources);
 
   if (Number.isNaN(count)) debugger;
-  if (!count || !(position || positions)) return;
+  if (!count || !positions) return;
 
   const shapes = {
     line: {

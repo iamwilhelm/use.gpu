@@ -45,6 +45,8 @@ export type TypedArrayConstructor =
   Float32ArrayConstructor |
   Float64ArrayConstructor;
 
+export type ElementType<T> = T extends Array<infer E> ? E : never;
+
 export type DeepPartial<T> = T | {
   [P in keyof T]?: DeepPartial<T[P]>;
 };

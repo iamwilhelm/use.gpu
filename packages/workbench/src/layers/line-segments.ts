@@ -18,7 +18,7 @@ export const getLineSegments = ({
   chunks, groups, loops, starts, ends,
 }: {
   chunks: VectorLike,
-  groups: VectorLike | null,
+  groups?: VectorLike | null,
   loops?: boolean[] | boolean | null,
   starts?: boolean[] | boolean | null,
   ends?: boolean[] | boolean | null,
@@ -38,7 +38,7 @@ export const useLineSegmentsSource = ({
   chunks, groups, loops, starts, ends,
 }: {
   chunks: VectorLike,
-  groups: VectorLike | null,
+  groups?: VectorLike | null,
   loops?: boolean[] | boolean | null,
   starts?: boolean[] | boolean | null,
   ends?: boolean[] | boolean | null,

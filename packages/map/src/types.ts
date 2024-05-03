@@ -1,19 +1,5 @@
-import type { VectorLike, ColorLike, Placement, Blending, Domain, Join } from '@use-gpu/traits';
-import type { PointShape } from '@use-gpu/workbench';
-
-export type GeographicTrait = {
-  long: number,
-  lat: number,
-  zoom: number,
-};
-
-export type ObjectTrait = {
-  position: VectorLike,
-  scale: VectorLike,
-  quaternion: VectorLike,
-  rotation: VectorLike,
-  matrix: VectorLike,
-};
+import type { VectorLike, ColorLike, Blending } from '@use-gpu/core';
+import type { Placement, Domain, Join, PointShape } from '@use-gpu/parse';
 
 export type MVTStyleSheet = Record<string, MVTStyleProperties>;
 

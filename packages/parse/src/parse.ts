@@ -170,8 +170,9 @@ export const makeParseMultiMultiVectorArray = <T extends TypedArrayConstructor>(
 
 export const makeParseBasis = (defaults: string | number[], min: number = defaults.length) => {
   const parseLetters = (s: string) => s.split('').map(letter => AXIS_NUMBERS[letter]);
+  const defs = typeof defaults === 'string' ? defaults : defaults.map(i => AXIS_LETTERS[i]).join('');
 
-  const getOrder = (basis: number[]) => {
+  const getOrder = (basis: number[]): string => {
     // Fill out incomplete basis, e.g. 'yx' -> 'yxzw'
     const max = Math.max(min, basis.reduce((a, b) => Math.max(a, b), 0));
     const rest = [];
@@ -181,12 +182,12 @@ export const makeParseBasis = (defaults: string | number[], min: number = defaul
     return [...basis, ...rest].map(i => AXIS_LETTERS[i]).join('');
   };
 
-  return (s?: string | number[]) => {
+  return (s?: string | number[]): string => {
     if (s != null) {
       if (typeof s === 'string') return getOrder(s.split('').map(letter => AXIS_NUMBERS[letter]).filter(n => n != null));
       return getOrder(s);
     }
-    return defaults;
+    return defs;
   };
 };
 

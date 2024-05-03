@@ -5,12 +5,18 @@ export const getConcurrency = () => (
   Math.max(1, Math.min(navigator.hardwareConcurrency * 0.8, navigator.hardwareConcurrency - 2))
 );
 
-export const makeDispatch = (make: () => any, n: number = 4) => {
+type Dispatcher = {
+  terminate: () => void,
+  call: <T>(method: string, args: any[]) => T,
+};
+type Call = { method: string, args: any[], resolve: (t: any) => void};
+
+export const makeDispatch = <T>(make: () => Worker, n: number = 4): T & Dispatcher => {
   const workers = seq(n | 0).map(make);
   const comlinks = workers.map((worker) => wrap(worker));
 
   const order = comlinks;
-  const queue = [];
+  const queue: Call[] = [];
   const enqueue = setTimeout;
 
   let terminated = false;
@@ -22,7 +28,7 @@ export const makeDispatch = (make: () => any, n: number = 4) => {
     terminated = true;
   };
 
-  const call = (method: string, args: any[]) => {
+  const call = (method: string, args: any[]): any => {
     if (terminated) throw new Error("Calling terminated worker");
 
     const promise = new Promise(resolve => {
@@ -39,7 +45,7 @@ export const makeDispatch = (make: () => any, n: number = 4) => {
     const worker = order.shift();
     if (!worker) return;
 
-    const call = queue.shift();
+    const call = queue.shift()!;
     if (terminated) {
       order.push(worker);
       call.resolve(null);
@@ -48,7 +54,7 @@ export const makeDispatch = (make: () => any, n: number = 4) => {
       return;
     }
 
-    const result = await worker[call.method](...call.args);
+    const result = await (worker as any)[call.method](...call.args);
     if (terminated) return;
 
     order.push(worker);
@@ -57,12 +63,14 @@ export const makeDispatch = (make: () => any, n: number = 4) => {
     enqueue(pop);
   };
 
-  const self = new Proxy({}, {
+  const self = new Proxy({terminate, call}, {
     get: (target, s) => {
       if (s === 'terminate') return terminate;
-      return (...args: any[]) => call(s, args);
+      if (s === 'call') return call;
+      if (typeof s === 'string') return (...args: any[]) => call(s, args);
+      return null;
     },
   });
 
-  return self;
+  return self as any as T & Dispatcher;
 };

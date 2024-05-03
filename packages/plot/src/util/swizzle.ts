@@ -26,7 +26,7 @@ export const makeSwizzleMatrix = (swizzle: string) => {
 const SWIZZLE_MATRICES = zipObject(SWIZZLES, SWIZZLES.map(makeSwizzleMatrix));
 export const swizzleMatrix = (m: mat4, swizzle: string) => mat4.copy(m, SWIZZLE_MATRICES[swizzle]);
 
-export const toBasis = (axes: string) => {
+export const toBasis = (axes: string): string => {
   return parseAxes(axes);
 };
 

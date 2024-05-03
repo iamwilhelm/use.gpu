@@ -1,5 +1,6 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { Swizzle } from '@use-gpu/plot';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { use, provide, useContext, useDouble, useOne, useMemo } from '@use-gpu/live';

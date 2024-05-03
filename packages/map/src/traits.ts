@@ -1,30 +1,6 @@
 import { useOne } from '@use-gpu/live';
 import {
   parseNumber,
-  parseInteger,
-  parseBoolean,
-  parseString,
-  parseStringArray,
-  parseStringFormatter,
-  parseVector,
-  parseVec4,
-  parsePosition,
-  parseRotation,
-  parseQuaternion,
-  parseColor,
-  parseScale,
-  parseMatrix,
-  parseJoin,
-  parseBlending,
-  parsePlacement,
-  parseWeight,
-  parseRange,
-  parseRanges,
-  parseAxes,
-  parseAxis,
-  parseIntegerPositive,
-  parseDomain,
-  parsePointShape,
 } from '@use-gpu/parse';
 import {
   optional, trait, makeUseTrait,
@@ -37,7 +13,6 @@ export const GeographicTrait = trait({
   lat: parseNumber,
   zoom: parseNumber,
 }, {
-  origin: [0, 0, 0],
   zoom: 1,
 });
 

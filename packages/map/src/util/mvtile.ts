@@ -1,4 +1,4 @@
-import type { ArchetypeSchema, AggregateValue, ColorLike, FieldArray, TypedArray, VectorEmitter, VectorLike, XY, XYZW } from '@use-gpu/core';
+import type { ArchetypeSchema, AggregateItem, AggregateValue, ColorLike, FieldArray, TypedArray, VectorEmitter, VectorLike, XY, XYZW } from '@use-gpu/core';
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { SegmentDecorator } from '@use-gpu/workbench';
 import type { MVTStyleSheet, MVTStyleProperties } from '../types';
@@ -46,21 +46,23 @@ export type MVTAggregates = {
   face?: MVTAggregate,
 };
 
-export type MVTAggregate = Record<string, TypedArray>;
+export type MVTAggregate = AggregateItem;
 
 export type MVTShape = {
+  positions: any,
   color: ColorLike[],
-  width: number[],
   depth: number[],
   zBias: number[],
 };
 
 export type MVTPoint = MVTShape & {
   positions: XY[][],
+  size: number[],
 };
 
 export type MVTLine = MVTShape & {
   positions: XY[][],
+  width: number[],
 };
 
 export type MVTFace = MVTShape & {
@@ -82,7 +84,7 @@ export const getMVTShapes = (
 
   const {layers} = mvt;
 
-  const shapes: MVTShapes = {
+  const shapes: Required<MVTShapes> = {
     point: {
       positions: [],
       color: [],
@@ -281,12 +283,13 @@ export const getMVTShapes = (
     }
   }
 
-  if (!shapes.point.positions.length) delete shapes.point;
-  if (!shapes.line.positions.length)  delete shapes.line;
-  if (!shapes.ring.positions.length)  delete shapes.ring;
-  if (!shapes.face.positions.length)  delete shapes.face;
+  const s = shapes as MVTShapes;
+  if (!shapes.point.positions.length) delete s.point;
+  if (!shapes.line.positions.length)  delete s.line;
+  if (!shapes.ring.positions.length)  delete s.ring;
+  if (!shapes.face.positions.length)  delete s.face;
 
-  return shapes;
+  return s;
 };
 
 export const aggregateMVTShapes = (shapes: MVTShapes): MVTAggregates => {
@@ -312,7 +315,7 @@ const aggregateMVTShape = (
   const [chunks, groups] = toChunkCounts(positions, 2);
 
   const itemCount = positions.length;
-  const dataCount = chunks.reduce((a, b) => a + b, 0);
+  const dataCount = (chunks as number[]).reduce((a, b) => a + b, 0);
 
   // Make arrays for merged attributes
   const {fields, attributes, archetype} = allocateSchema(
@@ -321,14 +324,14 @@ const aggregateMVTShape = (
     dataCount,
     0,
     true,
-    (key: string) => !!shape[key],
+    (key: string) => !!(shape as any)[key],
   );
 
   const slices = [];
 
   // Blit all data into merged arrays
   for (const k in fields) {
-    const {array, dims, depth, prop} = fields[k];
+    const {array, dims, depth = 0, prop = k} = fields[k];
     const slice = k === 'positions';
 
     const dimsIn = toCPUDims(dims);
@@ -338,21 +341,21 @@ const aggregateMVTShape = (
     
     if (slice) {
       for (let i = 0; i < itemCount; ++i) {
-        const from = shape[prop][i];
+        const from = (shape as any)[prop][i];
         o += copyRecursiveNumberArray(from, array, dimsIn, dimsIn, depth - 1, o, 1);
         if (slice) slices.push((o - b) / dimsIn + ((loop === true) ? 3 : 0));
         b = o;
       }
     }
     else {
-      copyRecursiveNumberArray(shape[prop], array, dimsIn, dimsIn, 1, 0, 1);
+      copyRecursiveNumberArray((shape as any)[prop], array, dimsIn, dimsIn, 1, 0, 1);
     }
   }
 
   // Get emitters for data + segment data
   const [mergedSchema, emitted, count, indexed, sparse] = decorateMVTSegments(
     fields.positions,
-    {...attributes, slices},
+    {...attributes, slices: slices as any},
     schema,
     dataCount,
     chunks,

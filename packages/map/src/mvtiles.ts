@@ -1,4 +1,6 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { StorageSource, LambdaSource } from '@use-gpu/core';
+import type { MVTStyleSheet } from './types';
 
 import { clamp, adjustSchema } from '@use-gpu/core';
 import { gather, use, keyed, yeet, memo, useAwait, useCallback, useOne, useMemo, useResource } from '@use-gpu/live';
@@ -30,7 +32,15 @@ const getDownKey = (x: number, y: number, zoom: number, dx: number, dy: number) 
 //const URLS = new Set();
 
 type TileWorker = {
-  fetchMVT: (url: string) => Promise<MVTAggregates>,
+  loadMVT: (
+    x: number,
+    y: number,
+    zoom: number,
+    url: string,
+    styles: MVTStyleSheet,
+    flipY: boolean,
+    tesselate?: number,
+  ) => Promise<MVTAggregates>,
 };
 
 export type MVTilesProps = {
@@ -68,7 +78,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
   let [[minX, maxX], [minY, maxY]] = useRangeContext();
   
   const worker = useResource((dispose) => {
-    const worker = makeDispatch(
+    const worker = makeDispatch<TileWorker>(
       () => new Worker(new URL('./worker/worker.js', import.meta.url)),
       getConcurrency(),
     );
@@ -79,7 +89,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
   const flipY = layout[1] > layout[3];
   if (flipY) [minY, maxY] = [-maxY, -minY];
 
-  const cache = useOne(() => new LRU({ max: 200 }), styles);
+  const cache = useOne(() => new LRU<number, LiveElement[]>({ max: 200 }), styles);
   const loaded = useOne(() => new Map<number, number>(), styles);
   const tiles = useMemo(() => ({cache, loaded, flipY, styles, forceUpdate}), [flipY, styles]);
   const seen = useOne(() => new Set<number>());
@@ -188,7 +198,7 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
           immutable: true,
           data: aggregate.point.attributes,
           schema: SCHEMAS.point,
-          render: (props) => use(PointLayer, props),
+          render: (props: Record<string, StorageSource | LambdaSource>) => use(PointLayer, props),
         }));
       }
       if (aggregate.line) {
@@ -196,7 +206,7 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
           immutable: true,
           data: aggregate.line.attributes,
           schema: SCHEMAS.line,
-          render: (props) => use(LineLayer, props),
+          render: (props: Record<string, StorageSource | LambdaSource>) => use(LineLayer, props),
         }));
       }
       if (aggregate.ring) {
@@ -204,7 +214,7 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
           immutable: true,
           data: aggregate.ring.attributes,
           schema: SCHEMAS.line,
-          render: (props) => use(LineLayer, props),
+          render: (props: Record<string, StorageSource | LambdaSource>) => use(LineLayer, props),
         }));
       }
       if (aggregate.face) {
@@ -212,7 +222,7 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
           immutable: true,
           data: aggregate.face.attributes,
           schema: SCHEMAS.face,
-          render: (props) => use(FaceLayer, props),
+          render: (props: Record<string, StorageSource | LambdaSource>) => use(FaceLayer, props),
         }));
       }
 
@@ -228,8 +238,8 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
     }
   }, [key, styles, flipY]);
 
-  let e: LiveElement[];
-  let [elements] = useAwait(run);
+  let e: LiveElement[] | undefined;
+  let [elements] = useAwait(run, [key, worker]);
   if (!elements && (e = cache.get(key))) elements = e;
 
   return !hide ? elements : null;

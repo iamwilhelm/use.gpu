@@ -1,5 +1,5 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { ColorLike } from '@use-gpu/core';
+import type { DeepPartial, ColorLike } from '@use-gpu/core';
 import type { MVTStyleProperties } from '../types';
 
 import { patch } from '@use-gpu/state';
@@ -28,6 +28,7 @@ const DEFAULT_STYLE: MVTStyleProperties = {
     size: 5,
     depth: 0.5,
     zBias: 5,
+    hollow: false,
   },
   font: {
     family: 'sans-serif',

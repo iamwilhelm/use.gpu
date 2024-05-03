@@ -1,14 +1,15 @@
 0.11.0
+- `@use-gpu/*`: support `render` prop as `children`
 - `@use-gpu/core`: refactor data ingestion pipe
-- `@use-gpu/core`: add per-spread policy struct data aggregator
+- `@use-gpu/core`: add spread-aware struct data aggregator
 - `@use-gpu/inspect`: improved tree view and value formatting
 - `@use-gpu/layout`: allow JSX text children on &lt;Text&gt;
 - `@use-gpu/live`: change `reconcile` and `quote` to be targeted to a context
 - `@use-gpu/live`: `useYolo` is now `useHooks`
 - `@use-gpu/map`: offload tile loading/tesselation to web workers
-- `@use-gpu/plot`: new "declarative mode" drawing primitives
+- `@use-gpu/plot`: new declarative drawing API with point/line/etc
 - `@use-gpu/plot`: aggregated matrix transforms
-- `@use-gpu/plot`: make DataContext a CPU-side concept
+- `@use-gpu/plot`: make `DataContext` a CPU-side concept with `TensorArray`
 - `@use-gpu/traits`: split off value parsers into `@use-gpu/parse`
 - `@use-gpu/traits`: make hooks React/Live-polymorphic
 - `@use-gpu/shader`: add struct types and instancing operators
@@ -16,11 +17,10 @@
 - `@use-gpu/workbench`: add explicit `LayerReconciler`, `PassReconciler`, `QueueReconciler`
 - `@use-gpu/workbench`: refactor `<VirtualLayers>`
 - `@use-gpu/workbench`: refactor attribute instancing
-- `@use-gpu/workbench`: add instancing to Line/Arrow/Point layers
+- `@use-gpu/workbench`: add instancing to Line/Arrow/Point/Label layers
 - `@use-gpu/workbench`: use new aggregator schema in data components
 - `@use-gpu/workbench`: move `expr` based samplers to plot package
 - `@use-gpu/workbench`: merge `<CompositeData>` into `<Data>`
-- `@use-gpu/*`: support `render` prop as `children`
 
 0.10.2
 - `@use-gpu/live`: allow `detach()` to work on fragments, allow immediate render

@@ -1,5 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
+import type { TensorArray } from '@use-gpu/core';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { memo, use, useOne } from '@use-gpu/live';
 import { makeUseTrait, combine, trait, optional, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
@@ -24,7 +26,6 @@ export const ImplicitSurface: LiveComponent<ImplicitSurfaceProps> = memo((props:
     range,
     size,
 
-    schema: _,
     formats,
     tensor,
 
@@ -47,7 +48,7 @@ export const ImplicitSurface: LiveComponent<ImplicitSurfaceProps> = memo((props:
   return use(Data, {
     schema,
     data: {values, normals},
-    tensor: size ?? tensor ?? props.values?.size,
+    tensor: size ?? tensor ?? (props.values as TensorArray)?.size,
     render: (sources: Record<string, ShaderSource>) => use(DualContourLayer, {
       range: r,
       zBias: z,

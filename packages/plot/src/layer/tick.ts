@@ -1,6 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { UniformAttribute } from '@use-gpu/core';
-import type { VectorLike } from '@use-gpu/traits';
+import type { TensorArray, VectorLike, UniformAttribute } from '@use-gpu/core';
+import type { TraitProps } from '@use-gpu/traits';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { makeUseTrait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { parseNumber, parseVec4, parseIntegerPositive } from '@use-gpu/parse';
@@ -9,8 +10,6 @@ import { adjustSchema } from '@use-gpu/core';
 import { diffBy } from '@use-gpu/shader/wgsl';
 import { Data, TickLayer, TICK_SCHEMA, useSource } from '@use-gpu/workbench';
 
-import { useDataContext, useNoDataContext } from '../providers/data-provider';
-import { RangeContext } from '../providers/range-provider';
 import { vec4 } from 'gl-matrix';
 
 import { TickTraits } from '../traits';
@@ -75,7 +74,7 @@ export const Tick: LiveComponent<TickProps> = (props) => {
   return use(Data, {
     schema,
     data: {...parsed},
-    tensor: tensor ?? props.positions?.size,
+    tensor: tensor ?? (props.positions as TensorArray)?.size,
     render: (sources: Record<string, ShaderSource>) => {
       const {positions, tangents} = sources;
       const count = useCallback(() => (positions as any)?.length, [positions]);

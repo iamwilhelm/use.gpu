@@ -143,7 +143,7 @@ export const allocateSchema = (
 /** Extract attributes from props using schema */
 export const schemaToAttributes = (
   schema: ArchetypeSchema,
-  props: Record<string, any>,
+  props: Record<string, number | TypedArray | undefined>,
 ): Record<string, any> => {
   const attributes: Record<string, any> = {};
   for (const key in schema) {
@@ -161,7 +161,7 @@ export const schemaToAttributes = (
 /** Extract emitters from props/refs using schema */
 export const schemaToEmitters = (
   schema: ArchetypeSchema,
-  props: Record<string, number | TypedArray>,
+  props: Record<string, number | TypedArray | undefined>,
   refs?: Record<string, RefObject<any>>,
 ): Record<string, TypedArray | VectorEmitter> => {
   const attributes: Record<string, any> = {};
@@ -249,9 +249,9 @@ export const emitAttributes = (
 export const schemaToArchetype = (
   schema: ArchetypeSchema,
   attributes: Record<string, AggregateValue | undefined>,
-  flags?: Record<string, any>,
-  refs?: Record<string, any>,
-  sources?: Record<string, any>,
+  flags?: Record<string, any> | null,
+  refs?: Record<string, any> | null,
+  sources?: Record<string, any> | null,
 ) => {
   const tokens = [];
   for (const key in schema) {
@@ -266,7 +266,7 @@ export const schemaToArchetype = (
       tokens.push(isSpread ? spread : key, format);
     }
   }
-  tokens.push(flags);
+  tokens.push(flags ?? null);
   if (refs) for (const key in refs) tokens.push(key);
   if (sources) for (const key in sources) tokens.push(key, getObjectKey(sources[key]));
 

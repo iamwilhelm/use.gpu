@@ -1,8 +1,8 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VectorLike } from '@use-gpu/traits';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
-import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
+import { adjustSchema, schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
@@ -20,7 +20,6 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
 
   const parsed = useTraits(props);
   const {
-      position,
       positions,
       color,
       colors,
@@ -63,6 +62,7 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       sources,
       ...flags
   } = parsed;
+  console.log('parsed.schema', parsed.schema)
 
   if (zIndex && zBias == null) parsed.zBias = zIndex;
 
@@ -73,11 +73,12 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
   const context = useTransformContext();
   const {transform, nonlinear, matrix: refs} = context;
 
-  const attributes = schemaToEmitters(ARROW_SCHEMA, parsed);
-  const archetype = schemaToArchetype(ARROW_SCHEMA, attributes, flags, refs, sources);
+  const schema = useOne(() => adjustSchema(ARROW_SCHEMA, formats), formats);
+  const attributes = schemaToEmitters(schema, parsed as any);
+  const archetype = schemaToArchetype(schema, attributes, flags, refs, sources);
 
   if (Number.isNaN(count)) debugger;
-  if (!count || !(position || positions)) return;
+  if (!count || !positions) return;
 
   const shapes = {
     arrow: {
@@ -86,6 +87,7 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       attributes,
       flags,
       refs,
+      schema,
       scissor,
       sources,
       transform: nonlinear ?? context,

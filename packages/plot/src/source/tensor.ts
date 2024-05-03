@@ -4,7 +4,7 @@ import type { DataBounds, TensorArray, VectorLike, Emitter } from '@use-gpu/core
 import { provide, yeet, memo, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   seq,
-  makeTensorArray, emitIntoMultiNumberArray,
+  makeTensorArray,
   makeNumberReader, makeNumberWriter, makeNumberSplitter,
   emitArray, emitMultiArray,
   toCPUDims,
@@ -124,7 +124,7 @@ export const Tensor: LiveComponent<TensorProps<unknown>> = memo(<S extends strin
     return {...tensor};
   };
 
-  let value;
+  let value: TensorArray;
   if (!live) {
     useNoAnimationFrame();
     value = useMemo(refresh, [tensors, data, expr, items, ...size]);

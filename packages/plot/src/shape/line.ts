@@ -14,12 +14,11 @@ const {quote} = LayerReconciler;
 
 const useTraits = makeUseTrait(LineTraits);
 
-export type LineProps = TraitProps<typeof Traits>;
+export type LineProps = TraitProps<typeof LineTraits>;
 
-export const RawLine: LiveComponent<LineProps> = (props) => {
+export const InnerLine: LiveComponent<LineProps> = (props) => {
   const parsed = useTraits(props);
   const {
-      position,
       positions,
       color,
       colors,
@@ -64,7 +63,7 @@ export const RawLine: LiveComponent<LineProps> = (props) => {
   const {transform, nonlinear, matrix: refs} = context;
 
   const schema = useOne(() => adjustSchema(LINE_SCHEMA, formats), formats);
-  const attributes = schemaToEmitters(schema, parsed);
+  const attributes = schemaToEmitters(schema, parsed as any);
   const archetype = schemaToArchetype(schema, attributes, flags, refs, sources);
 
   if (Number.isNaN(count)) debugger;
@@ -87,7 +86,7 @@ export const RawLine: LiveComponent<LineProps> = (props) => {
   return quote(yeet(shapes));
 };
 
-export const Line = memo(RawLine, shouldEqual({
+export const Line = memo(InnerLine, shouldEqual({
   position: sameShallow(sameShallow()),
   color: sameShallow(),
 }), 'Line');

@@ -1,7 +1,8 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VectorLike } from '@use-gpu/traits';
+import type { VectorLike } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { XYZW } from '@use-gpu/core';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { makeUseTrait, optional, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { parseBoolean, parseIntegerPositive, parseAxis, parseVec4 } from '@use-gpu/parse';
@@ -49,18 +50,22 @@ const useTraits = makeUseTrait(Traits);
 
 const NO_POINT4: XYZW = [0, 0, 0, 0];
 
+type ScaleProps = TraitProps<typeof ScaleTrait>;
+
 export type GridProps =
   TraitProps<typeof Traits>
 & {
-  first?: Partial<ScaleTrait> & { detail?: number },
-  second?: Partial<ScaleTrait> & { detail?: number },
+  //loop?: boolean,
+  first?: Partial<ScaleProps> & { detail?: number },
+  second?: Partial<ScaleProps> & { detail?: number },
 };
 
-const NO_SCALE_PROPS: Partial<ScaleTrait> = {};
+const NO_SCALE_PROPS: Partial<ScaleProps> = {};
 
 export const Grid: LiveComponent<GridProps> = memo((props) => {
+  //const {loop} = props;
   const {
-    axes, range, loop,
+    axes, range,
     origin, auto,
     ...flags
   } = useTraits(props);
@@ -74,7 +79,7 @@ export const Grid: LiveComponent<GridProps> = memo((props) => {
   const parentRange = useRangeContext();
   const transform = auto ? useTransformContext() : useNoTransformContext();
 
-  const getGrid = (options: ScaleTrait, detail: number, index: number, other: number) => {
+  const getGrid = (options: ScaleProps, detail: number, index: number, other: number) => {
     const main  = parseAxis(axes[index]);
     const cross = parseAxis(axes[other]);
 
@@ -107,7 +112,7 @@ export const Grid: LiveComponent<GridProps> = memo((props) => {
         }
       });
 
-      autoBound = useShader(getGridAutoState, [transform.transform]);
+      autoBound = useShader(getGridAutoState, [transform?.transform]);
     }
     else {
       useNoShader();

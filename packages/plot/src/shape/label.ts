@@ -1,5 +1,6 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VectorLike } from '@use-gpu/traits';
+import type { VectorLike } from '@use-gpu/core';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { adjustSchema, schemaToArchetype, schemaToAttributes, toCPUDims, getUniformDims } from '@use-gpu/core';
@@ -49,7 +50,7 @@ export const Label: LiveComponent<LabelProps> = memo((props) => {
     lookup,
     lookups,
 
-    tensor = props.positions?.size,
+    tensor,
     formats,
 
     sources,
@@ -63,10 +64,10 @@ export const Label: LiveComponent<LabelProps> = memo((props) => {
   const flip = [1, 1];
   if (layout[2] < layout[0]) flip[0] = -1;
   if (layout[3] < layout[1]) flip[1] = -1;
-  flags.flip = flip;
+  (flags as any).flip = flip;
 
   // Resolve label strings
-  const resolvedFormatter = useMemo(() => formatter ?? (x => formatNumber(x, precision)), [formatter, precision]);
+  const resolvedFormatter = useMemo(() => formatter ?? ((x: number) => formatNumber(x, precision)), [formatter, precision]);
   const resolvedLabels = labels != null ? (
     useMemo(() => labels ?? [label], [labels, label])
   ) : (
@@ -81,7 +82,7 @@ export const Label: LiveComponent<LabelProps> = memo((props) => {
   const {transform, nonlinear, matrix: refs} = context;
 
   const schema = useOne(() => adjustSchema(LABEL_SCHEMA, formats), formats);
-  const attributes = schemaToAttributes(schema, parsed);
+  const attributes = schemaToAttributes(schema, parsed as any);
   const archetype = schemaToArchetype(schema, attributes, flags, refs, sources);
 
   const dims = toCPUDims(getUniformDims(schema.positions.format));

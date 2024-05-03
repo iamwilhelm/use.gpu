@@ -9,9 +9,10 @@ import { parseAxes } from '@use-gpu/parse';
 import { useDataContext, DataContext } from '../providers/data-provider';
 import { toOrder } from '../util/swizzle';
 
-const toModulus = (size: number) => size.reduce((a, b) => (a.push(a.at(-1)! * b), a), [1]);
+const toModulus = (size: number[]) => size.reduce((a, b) => (a.push(a.at(-1)! * b), a), [1]);
 
 export type TransposeProps = {
+  axes?: string,
   as?: string,
   tensor?: TensorArray,
   render?: (data: TensorArray) => LiveElement,
@@ -35,7 +36,7 @@ export const Transpose: LiveComponent<TransposeProps> = (props) => {
   const value = useMemo(() => {
     const order = toOrder(swizzle);
 
-    const sizeIn = size.slice();
+    const sizeIn = [...size];
     while (sizeIn.length < order.length) sizeIn.push(1);
     const sizeOut = order.map(i => sizeIn[i]);
 

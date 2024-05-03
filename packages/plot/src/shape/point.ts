@@ -36,7 +36,6 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
       lookup,
       lookups,
 
-      schema: _,
       formats,
       tensor,
 

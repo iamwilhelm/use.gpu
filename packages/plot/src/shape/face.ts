@@ -1,8 +1,8 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VectorLike } from '@use-gpu/traits';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
-import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
+import { adjustSchema, schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
@@ -16,7 +16,7 @@ const useTraits = makeUseTrait(FaceTraits);
 
 export type FaceProps = TraitProps<typeof FaceTraits>;
 
-export const RawFace: LiveComponent<FaceProps> = (props) => {
+export const InnerFace: LiveComponent<FaceProps> = (props) => {
 
   const parsed = useTraits(props);
   const {
@@ -24,8 +24,6 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
       positions,
       color,
       colors,
-      width,
-      widths,
       depth,
       depths,
       zIndex,
@@ -64,8 +62,9 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
   const context = useTransformContext();
   const {transform, nonlinear, matrix: refs} = context;
 
-  const attributes = schemaToEmitters(FACE_SCHEMA, parsed);
-  const archetype = schemaToArchetype(FACE_SCHEMA, attributes, flags, refs, sources);
+  const schema = useOne(() => adjustSchema(FACE_SCHEMA, formats), formats);
+  const attributes = schemaToEmitters(schema, parsed as any);
+  const archetype = schemaToArchetype(schema, attributes, flags, refs, sources);
 
   if (Number.isNaN(count)) debugger;
   if (!count || !(position || positions)) return;
@@ -78,7 +77,7 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
       attributes,
       flags,
       refs,
-      schema: formats ? schema : undefined,
+      schema,
       scissor,
       sources,
       transform: nonlinear ?? context,
@@ -89,7 +88,7 @@ export const RawFace: LiveComponent<FaceProps> = (props) => {
   return quote(yeet(shapes));
 };
 
-export const Face = memo(RawFace, shouldEqual({
+export const Face = memo(InnerFace, shouldEqual({
   position: sameShallow(sameShallow()),
   color: sameShallow(),
 }), 'Face');

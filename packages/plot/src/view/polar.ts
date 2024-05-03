@@ -3,7 +3,7 @@ import type { Axis4, Swizzle } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
-import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
+import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
 import { use, provide, useContext, useDouble, useOne, useMemo } from '@use-gpu/live';
 import { swizzleTo, chainTo } from '@use-gpu/shader/wgsl';
 import {

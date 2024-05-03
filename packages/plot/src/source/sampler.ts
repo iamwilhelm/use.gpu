@@ -298,7 +298,7 @@ export const Sampler: LiveComponent<SamplerProps<unknown>> = memo(<S extends str
     return {...tensor};
   };
 
-  let value;
+  let value: TensorArray;
   if (!live) {
     useNoAnimationFrame();
     value = useMemo(refresh, [tensors, expr, centered, border, origin, range, items, ...size]);

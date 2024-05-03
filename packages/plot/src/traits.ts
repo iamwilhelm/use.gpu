@@ -1,4 +1,4 @@
-import type { ColorLike, Ragged, VectorLike, VectorLikes } from '@use-gpu/core';
+import type { ArchetypeSchema, ColorLike, Ragged, TypedArray, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { useMemo, useOne } from '@use-gpu/live';
@@ -311,16 +311,17 @@ export const DataTrait = (keys: string[], canonical: string = 'positions') => {
     props: {},
     parsed: {
       formats: Record<string, string>,
+      sources: Record<string, any>,
       tensor: number[],
       ragged: Ragged,
     },
   ) => {
     const dataContext = useDataContext();
 
-    const [data, formats, sources, version] = useMemo(() => {
-      const data = {};
-      const formats = {};
-      const sources = {};
+    const [data, formats, sources] = useMemo(() => {
+      const data: Record<string, TypedArray> = {};
+      const formats: Record<string, UniformType> = {};
+      const sources: Record<string, any> = {};
 
       let d = 0;
       let f = 0;
@@ -428,6 +429,7 @@ export const SegmentsTrait = combine(
       chunks?: TypedArray,
       groups?: TypedArray,
       formats: Record<string, string>,
+      schema: ArchetypeSchema,
     },
   ) => {
     const [chunks, groups] = useProp(
@@ -466,6 +468,7 @@ export const FacetedTrait = combine(
       chunks?: TypedArray,
       groups?: TypedArray,
       formats: Record<string, string>,
+      schema: ArchetypeSchema,
     },
   ) => {
     const [chunks, groups] = useProp(
@@ -502,6 +505,7 @@ export const LineSegmentsTrait = combine(
     props: {},
     parsed: {
       chunks?: TypedArray,
+      groups?: TypedArray | null,
       loop?: boolean | TypedArray,
       loops?: TypedArray,
 
@@ -515,8 +519,7 @@ export const LineSegmentsTrait = combine(
     const {chunks, groups, loop, loops} = parsed;
     if (!chunks) return;
 
-    const l = loop || loops;
-
+    const l = (loop || loops) as any;
     const line = useMemo(() => getLineSegments({chunks, groups, loops: l}), [chunks, l]);
     for (const k in line) parsed[k] = line[k];
   },
@@ -530,6 +533,7 @@ export const ArrowSegmentsTrait = combine(
     props: {},
     parsed: {
       chunks?: TypedArray,
+      groups?: TypedArray | null,
       loop?: boolean | TypedArray,
       loops?: TypedArray,
       start?: boolean | TypedArray,
@@ -543,14 +547,15 @@ export const ArrowSegmentsTrait = combine(
       anchors?: TypedArray,
       trims?: TypedArray,
       unwelds?: TypedArray,
+      slices?: TypedArray,
     },
   ) => {
     const {chunks, groups, loop, loops, start, starts, end, ends} = parsed;
     if (!chunks) return;
 
-    const l = loop || loops;
-    const s = start || starts;
-    const e = end || ends;
+    const l = (loop || loops) as any;
+    const s = (start || starts) as any;
+    const e = (end || ends) as any;
 
     const arrow = useMemo(() => getArrowSegments({chunks, groups, loops: l, starts: s, ends: e}), [chunks, l, s, e]);
     for (const k in arrow) parsed[k] = arrow[k];
@@ -574,6 +579,7 @@ export const FaceSegmentsTrait = combine(
       indexed?: number,
       segments?: TypedArray,
       indices?: TypedArray,
+      slices?: TypedArray,
     },
   ) => {
     const {chunks, groups, concave, position, positions} = parsed;
@@ -712,15 +718,20 @@ export const LabelTraits = combine(
 );
 
 export const TickTraits = combine(
-  ColorTrait,
-  LineTrait,
-  ROPTrait,
-  VerticesTrait,
+  ColorsTrait(),
   trait({
+    width: optional(parseScalarArrayLike),
+    widths: bindable(optional(parseMultiScalarArray)),
+
     tangent: optional(parsePosition),
     tangents: optional(parsePositionArray),
   }),
+  VerticesTrait,
   DataTrait(['positions', 'colors', 'depths', 'zBiases', 'ids', 'lookups', 'widths', 'tangents']),
+
+  LineTrait,
+  ROPTrait,
+  ZIndexTrait,
 );
 
 export const SurfaceTraits = combine(

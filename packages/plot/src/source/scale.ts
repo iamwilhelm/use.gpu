@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { TensorArray } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { VectorLike } from '@use-gpu/traits';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { makeUseTrait, optional, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { parseVec4 } from '@use-gpu/parse';
@@ -75,7 +75,7 @@ export const Scale: LiveComponent<ScaleProps> = memo((props: PropsWithChildren<S
     ...tensors,
   }), [dataContext, tensors]) : useNoMemo();
 
-  return render ? render(tensor) : children ? provide(DataContext, context, children) : yeet(tensor);
+  return render ? render(tensors) : children ? provide(DataContext, context, children) : yeet(tensors);
 }, shouldEqual({
   origin: sameShallow(),
   range: sameShallow(sameShallow()),

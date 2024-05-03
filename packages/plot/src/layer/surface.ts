@@ -1,5 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
+import type { TensorArray } from '@use-gpu/core';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { memo, use, useOne, useMemo } from '@use-gpu/live';
 import { makeUseTrait, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
@@ -15,7 +17,6 @@ export type SurfaceProps = TraitProps<typeof SurfaceTraits>;
 export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
   const parsed = useTraits(props);
   const {
-    position,
     positions,
     color,
     colors,
@@ -43,7 +44,7 @@ export const Surface: LiveComponent<SurfaceProps> = memo((props) => {
   return use(Data, {
     schema,
     data: {...parsed},
-    tensor: size ?? tensor ?? props.positions?.size,
+    tensor: size ?? tensor ?? (props.positions as TensorArray)?.size,
     render: (sources: Record<string, ShaderSource>) => useMemo(() => use(SurfaceLayer, {
       color,
       zBias: z,

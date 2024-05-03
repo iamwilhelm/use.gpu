@@ -1,11 +1,12 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VectorLike } from '@use-gpu/traits';
+import type { ColorLike, ColorLikes, VectorLike } from '@use-gpu/core';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { memo, use, useOne, useMemo } from '@use-gpu/live';
 
-import { RawFace } from './face';
-import { RawLine } from './line';
+import { InnerFace, FaceProps } from './face';
+import { InnerLine, LineProps } from './line';
 
 import {
   FaceTrait,
@@ -22,28 +23,28 @@ const Traits = combine(
 );
 
 export type PolygonProps = TraitProps<typeof Traits> &
-  Pick<Face,
+  Pick<FaceProps,
     'position' | 'positions' |
     'depth' | 'depths' |
     'zBias' | 'zBiases' |
     'id' | 'ids' |
     'lookup' | 'lookups'
   > &
-  Pick<Line,
+  Pick<LineProps,
     'width' | 'widths'
   > & {
     fill?: ColorLike | ColorLikes,
     fills?: ColorLikes,
     stroke?: ColorLike | ColorLikes,
     strokes?: ColorLikes,
-    zBiasShift?: number,
+    zBiasStroke?: number,
   };
 
 export const Polygon: LiveComponent<PolygonProps> = memo((props) => {
-  const {fill, fills, stroke, strokes, zBiasStroke = 0} = props;
+  const {width, widths, fill, fills, stroke, strokes, zBiasStroke = 0} = props;
   const zBias = (props.zBias || 0) + zBiasStroke;
   return [
-    fill ?? fills ? use(RawFace, {...props, color: fill, colors: fills, concave: true}) : null,
-    stroke ?? strokes ? use(RawLine, {...props, color: stroke, colors: strokes, loop: true, zBias}) : null,
+    fill ?? fills ? use(InnerFace, {...props, color: fill, colors: fills, concave: true}) : null,
+    stroke ?? strokes ? use(InnerLine, {...props, color: stroke, colors: strokes, loop: true, width, widths, zBias}) : null,
   ];
 }, 'Polygon');

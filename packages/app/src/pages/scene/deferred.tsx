@@ -1,5 +1,6 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { StorageSource, TextureSource, UniformType } from '@use-gpu/core';
+import type { DataSchema, TextureSource, GPUGeometry, UniformType } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
@@ -45,10 +46,10 @@ const boxGeometry = makeBoxGeometry({ width: 2 });
 const planeGeometry = makePlaneGeometry({ width: 100, height: 100, axes: 'xz' });
 const sphereGeometry = makeSphereGeometry({ width: 2, tile: [6, 3] });
 
-const lightFields = [
-  ['vec4<f32>', 'position'],
-  ['vec4<f32>', 'color'],
-] as [UniformType, string][];
+const lightSchema: DataSchema = {
+  positions: {format: 'vec4<f32>', prop: 'position'},
+  colors: {format: 'vec4<f32>', prop: 'color'},
+};
 
 const lightData = [
   {
@@ -82,9 +83,9 @@ export const SceneDeferredPage: LC = (props) => {
         sphereMesh,
         texture,
       ]: [
-        Record<string, StorageSource>,
-        Record<string, StorageSource>,
-        Record<string, StorageSource>,
+        GPUGeometry,
+        GPUGeometry,
+        GPUGeometry,
         TextureSource,
       ]) => (
         <Loop>
@@ -147,9 +148,9 @@ export const SceneDeferredPage: LC = (props) => {
                 </Environment>
 
                 <Data
-                  fields={lightFields}
+                  schema={lightSchema}
                   data={lightData}
-                  render={(positions: StorageSource, colors: StorageSource) => (
+                  render={({positions, colors}: Record<string, ShaderSource>) => (
                     <PointLayer positions={positions} colors={colors} size={50} depth={0.5} mode="transparent" />
                   )}
                 />

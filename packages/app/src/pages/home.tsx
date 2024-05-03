@@ -1,4 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
+import { FC, PropsWithChildren } from 'react';
 
 import { use } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
@@ -9,7 +10,7 @@ import { styled } from '@stitches/react';
 
 import { makePages } from '../routes';
 
-export const Title = styled('h1', {
+export const Title: FC<any> = styled('h1', {
   margin: 0,
   padding: '10px 20px',
   textAlign: 'center',

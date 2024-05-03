@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { StorageSource, TextureSource, UniformType } from '@use-gpu/core';
+import type { GPUGeometry, LambdaSource, UniformType } from '@use-gpu/core';
 
 import React, { Gather } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
@@ -38,7 +38,7 @@ export const MeshInterleavedPage: LC = (props) => {
         {positions, normals, colors, uvs},
         texture,
       ]: [
-        Record<string, StorageSource>,
+        Record<string, LambdaSource>,
         TextureSource,
       ]) => (
         <>

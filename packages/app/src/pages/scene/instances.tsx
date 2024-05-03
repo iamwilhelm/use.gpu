@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { StorageSource, TextureSource } from '@use-gpu/core';
+import type { GPUGeometry, StorageSource, TextureSource } from '@use-gpu/core';
 import type { Keyframe } from '@use-gpu/workbench';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
@@ -60,7 +60,7 @@ export const SceneInstancesPage: LC = (props) => {
         mesh,
         texture,
       ]: [
-        Record<string, StorageSource>,
+        GPUGeometry,
         TextureSource,
       ]) => (
         <LinearRGB tonemap="aces">

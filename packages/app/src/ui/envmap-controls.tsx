@@ -22,7 +22,7 @@ const STYLE = {
 type EnvMapControlsProps = {
   hasDebug?: boolean,
   container?: Element | null,
-  render?: (mode: string, map: any) => LiveElement,
+  render?: (mode: string, map: any, seamFix: boolean, debugGrid: boolean) => LiveElement,
 };
 
 export const ENVIRONMENTS = {
@@ -57,7 +57,7 @@ export const ENVIRONMENTS = {
       url='/textures/equi/rural_asphalt_road_1k.hdr'
       format='hdr'
     >{
-      (texture: TextureSource) => <PanoramaMap texture={texture} gain={0.5} />
+      (texture: TextureSource | null) => <PanoramaMap texture={texture} gain={0.5} />
     }</ImageTexture>,
 
   field:
@@ -65,7 +65,7 @@ export const ENVIRONMENTS = {
       url='/textures/equi/graveyard_pathways_1k.hdr'
       format='hdr'
     >{
-      (texture: TextureSource) => <PanoramaMap texture={texture} />
+      (texture: TextureSource | null) => <PanoramaMap texture={texture} />
     }</ImageTexture>,
 } as Record<string, any>;
 

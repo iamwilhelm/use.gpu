@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { StorageSource, TextureSource, UniformType } from '@use-gpu/core';
+import type { GPUGeometry, StorageSource, TextureSource, UniformType } from '@use-gpu/core';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
@@ -77,9 +77,9 @@ export const SceneShadowPage: LC = (props) => {
         sphereMesh,
         texture,
       ]: [
-        Record<string, StorageSource>,
-        Record<string, StorageSource>,
-        Record<string, StorageSource>,
+        GPUGeometry,
+        GPUGeometry,
+        GPUGeometry,
         TextureSource,
       ]) => (
         <Loop>

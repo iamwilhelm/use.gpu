@@ -12,7 +12,8 @@ const makeObject = () => ({});
 const TRAIT = Symbol('trait');
 
 // Make parsed value optional
-export const optional = <A, B>(parse: (t: A) => B) => (t?: A): B | undefined | void => t !== undefined ? parse(t) : undefined;
+export const optional = <A, B>(parse: (t: A) => B) => (t?: A): B | undefined => t !== undefined ? parse(t) : undefined;
+export const nullable = <A, B>(parse: (t: A) => B) => (t: A | null): B | null => t != null ? parse(t) : null;
 
 // Make derived trait from prop definition + defaults
 export const trait = <

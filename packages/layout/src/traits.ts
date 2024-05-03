@@ -2,6 +2,7 @@ import {
   makeUseTrait,
   makeParseTrait,
   optional,
+  nullable,
   trait,
 } from '@use-gpu/traits/live';
 import {
@@ -32,7 +33,7 @@ export const BoxTrait = trait({
 });
 
 export const ImageTrait = trait({
-  texture: optional(parseTexture), // deprecated
+  texture: optional(nullable(parseTexture)), // deprecated
   width: optional(parseDimension),
   height: optional(parseDimension),
   fit: parseFit,
@@ -50,7 +51,7 @@ export const ElementTrait = trait({
   stroke: optional(parseColor),
   fill: optional(parseColor),
 
-  texture: optional(parseTexture),
+  texture: optional(nullable(parseTexture)), // deprecated
   image: optional(makeParseTrait(ImageTrait)),
   zIndex: parseInteger,
 });

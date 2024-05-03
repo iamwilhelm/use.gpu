@@ -38,7 +38,7 @@ export type InputTypes<T extends TraitDefinition> = {
 };
 
 export type OutputTypes<T extends TraitDefinition> = {
-  [P in keyof T]: Exclude<ReturnType<T[P]>, void>;
+  [P in keyof T]: ReturnType<T[P]>;
 };
 
 /*

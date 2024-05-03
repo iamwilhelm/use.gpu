@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { DataSchema, StorageSource } from '@use-gpu/core';
 
-import React, { Gather, yeet, use, useMemo } from '@use-gpu/live';
+import React, { Gather, yeet, use, useOne, useMemo } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 import { clamp } from '@use-gpu/core';
 
@@ -186,7 +186,7 @@ export const GeometryBinaryPage: LC = () => {
         const data = useMemo(() => buffer ? arrayBufferToXYZ(buffer) : null, [buffer]);
 
         const grey = Math.pow(0.25, gamma);
-        const gridColor = useMemo(() => [grey, grey, grey, 1], grey);
+        const gridColor = useOne(() => [grey, grey, grey, 1], grey);
 
         const viz = useMemo(() => data ? (
           <Data {...data.values}>{

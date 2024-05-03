@@ -30,6 +30,8 @@ export type TraitCombinator = {
 
 type IfUndefined<A, B> = undefined extends A ? B : never;
 type IfDefined<A, B> = undefined extends A ? never : B;
+type IsKeyOf<K, D, T> = K extends keyof D ? T : never;
+type IsNotKeyOf<K, D, T> = K extends keyof D ? T : never;
 
 export type InputTypes<T extends TraitDefinition> = {
   [P in keyof T as IfUndefined<Parameters<T[P]>[0], P>]?: Parameters<T[P]>[0];
@@ -39,6 +41,12 @@ export type InputTypes<T extends TraitDefinition> = {
 
 export type OutputTypes<T extends TraitDefinition> = {
   [P in keyof T]: ReturnType<T[P]>;
+};
+
+export type Defaulted<T extends TraitDefinition, D extends Record<string, any>> = {
+  [P in keyof T as IsNotKeyOf<P, D, IfUndefined<T[P], P>>]?: Parameters<T[P]>[0];
+} & {
+  [P in keyof T as IsKeyOf<P, D, P> | IfDefined<T[P], P>]: Parameters<T[P]>[0];
 };
 
 /*

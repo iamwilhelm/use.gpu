@@ -13,6 +13,7 @@ export type MeshProps = {
   mesh: GPUGeometry,
   shaded?: boolean,
   side?: 'front' | 'back' | 'both',
+  mode?: string,
 };
 
 export const Mesh: LiveComponent<MeshProps> = memo((props: PropsWithChildren<MeshProps>) => {

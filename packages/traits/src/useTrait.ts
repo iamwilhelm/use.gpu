@@ -3,7 +3,7 @@ import { getProp } from './useProp';
 import {
   ArrowFunction,
   TraitDefinition, Trait, TraitCombinator,
-  InputTypes, OutputTypes,
+  InputTypes, OutputTypes, Defaulted,
   UseHooks, UseMemo, UseOne, UseProp, UseTrait,
 } from './types';
 
@@ -18,17 +18,18 @@ export const nullable = <A, B>(parse: (t: A) => B) => (t: A | null): B | null =>
 // Make derived trait from prop definition + defaults
 export const trait = <
   P extends TraitDefinition,
+  D extends Partial<InputTypes<P>>,
 >(
   propDef: P,
-  defaultValues?: Partial<InputTypes<P>>,
-): Trait<InputTypes<P>, OutputTypes<P>> => {
+  defaultValues?: D,
+): Trait<Defaulted<InputTypes<P>, D>, OutputTypes<P>> => {
   // Parse default inputs to default outputs
   const defaults: Record<string, any> = {};
   if (defaultValues) for (const k in propDef) defaults[k] = (propDef as any)[k]((defaultValues as any)[k]);
 
   // Parse input and save to output
   return (
-    input: InputTypes<P>,
+    input: Defaulted<InputTypes<P>, D>,
     output: OutputTypes<P>,
     {useProp}: UseHooks,
   ) => {

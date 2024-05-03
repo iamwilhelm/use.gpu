@@ -3,7 +3,7 @@
 - `@use-gpu/core`: refactor data ingestion pipe
 - `@use-gpu/core`: add spread-aware struct data aggregator
 - `@use-gpu/inspect`: improved tree view and value formatting
-- `@use-gpu/layout`: allow JSX text children on &lt;Text&gt;
+- `@use-gpu/layout`: allow JSX text children on `<Text>`
 - `@use-gpu/live`: change `reconcile` and `quote` to be targeted to a context
 - `@use-gpu/live`: `useYolo` is now `useHooks`
 - `@use-gpu/map`: offload tile loading/tesselation to web workers

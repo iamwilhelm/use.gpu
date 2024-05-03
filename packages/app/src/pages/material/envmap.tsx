@@ -34,6 +34,8 @@ import { EnvMapControls } from '../../ui/envmap-controls';
 const π = Math.PI;
 const τ = π * 2;
 
+const IMAGE_FIT = {fit: 'scale'};
+
 const keyframes = [
   [0, 0],
   [5, 1.0],
@@ -105,7 +107,7 @@ export const MaterialEnvMapPage: LC = (props) => {
                     scroll={zooming}
                   >{
                     (x: number, y: number, zoom: number) =>
-                      texture ? (
+                      textureMap ? (
                         <FlatCamera x={x} y={y} zoom={zoom}>
                           <Pass overlay>
                             <UI>
@@ -114,9 +116,10 @@ export const MaterialEnvMapPage: LC = (props) => {
                                   <Absolute left={0} top={0}>
                                     <Block
                                       width={512}
-                                      height={texture.size[1] / texture.size[0] * 512}
+                                      height={textureMap.size[1] / textureMap.size[0] * 512}
                                       fill={[0, 0, 0, .25]}
-                                      image={{texture, fit: 'scale'}}
+                                      texture={textureMap}
+                                      image={IMAGE_FIT}
                                     />
                                   </Absolute>
                                 </Block>

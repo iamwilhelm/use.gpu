@@ -128,8 +128,6 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
       radius[3] = bl;
     }
 
-    console.log({image, texture, tex})
-
     let render;
     if (image && tex) {
       const {

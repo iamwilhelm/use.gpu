@@ -1,6 +1,6 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { Emit, StorageSource, TextureSource, Time } from '@use-gpu/core';
-import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
+import type { Emit, StorageSource, TextureSource, LambdaSource, TensorArray, Time } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import React, { Gather, Provide } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
@@ -144,7 +144,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                   <Environment map={envMap} preset={env} gain={0.5}>
                     <DirectionalLight position={[1, 3, 2]} color={[1, 1, 1]} intensity={1} shadowMap={SHADOW_MAP_DIRECTIONAL} />
                     <Plot>
-                      <Animate prop='bend' keyframes={keyframes} pause={1} mirror>
+                      <Animate prop='bend' keyframes={keyframes} delay={1} mirror>
                         <Polar
                           bend={0}
                           range={[[-π, π], [1, 5], [-π, π]]}
@@ -234,7 +234,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                                     shader={colorizeShader}
                                     data={values}
                                   >{
-                                    (colorizedValues: ShaderModule) => (
+                                    (colorizedValues: LambdaSource) => (
                                       <Point
                                         positions={positions}
                                         colors={mode === 'normal' ? normals : colorizedValues}

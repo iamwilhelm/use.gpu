@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { DataField } from '@use-gpu/core';
+import type { DataField, GPUAttributes } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
@@ -46,7 +46,7 @@ export const GeometryLinesPage: LC = () => {
           loop={isLineLoop}
           segments={getLineSegments}
         >{
-          (props) => <LineLayer {...props} depth={0.5} />
+          (props: GPUAttributes) => <LineLayer {...props} depth={0.5} />
         }</Data>
 
         <Data
@@ -54,7 +54,7 @@ export const GeometryLinesPage: LC = () => {
           data={zigzagData}
           segments={getLineSegments}
         >{
-          (props) => <LineLayer {...props} depth={0.5} join='round' />
+          (props: GPUAttributes) => <LineLayer {...props} depth={0.5} join='round' />
         }</Data>
 
         <Data
@@ -65,7 +65,7 @@ export const GeometryLinesPage: LC = () => {
           end={isEnd}
           segments={getArrowSegments}
         >{
-          (props) =>
+          (props: GPUAttributes) =>
             <ArrowLayer
               {...props}
               depth={0.5}

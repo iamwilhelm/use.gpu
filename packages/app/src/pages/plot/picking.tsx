@@ -2,11 +2,12 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 
 import React, { use } from '@use-gpu/live';
 import { seq, lerp } from '@use-gpu/core';
+import { vec3 } from 'gl-matrix';
 
 import { PickingOverlay } from '../../ui/picking-overlay';
 
 import {
-  Pass, Cursor, Pick, FlatCamera,
+  Pass, Cursor, Pick, PickState, FlatCamera,
   OrbitCamera, OrbitControls,
 } from '@use-gpu/workbench';
 
@@ -77,7 +78,7 @@ export const PlotPickingPage: LC = () => {
           <Pick
             onMouseOver={(mouse, index) => console.log('Round shape #' + index, mouse)}
           >{
-            ({id, hovered, index}) => [
+            ({id, hovered, index}: PickState) => [
               hovered ? <Cursor cursor="default" /> : null,
               roundPolygons.map((props, i) => (
                 <Polygon
@@ -97,7 +98,7 @@ export const PlotPickingPage: LC = () => {
           <Pick
             onMouseOver={(mouse, index) => console.log('Spiky shape #' + index, mouse)}
           >{
-            ({id, hovered, index}) => [
+            ({id, hovered, index}: PickState) => [
               hovered ? <Cursor cursor="default" /> : null,
               spikyPolygons.map((props, i) => (
                 <Polygon

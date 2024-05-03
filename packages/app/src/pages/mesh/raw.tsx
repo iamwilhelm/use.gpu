@@ -6,7 +6,7 @@ import { vec3 } from 'gl-matrix';
 import {
   Pass,
   OrbitCamera, OrbitControls,
-  Pick, Cursor,
+  Pick, PickState, Cursor,
 } from '@use-gpu/workbench';
 
 import { InfoBox } from '../../ui/info-box';
@@ -24,7 +24,7 @@ export const MeshRawPage: LC = (props) => {
     <Camera>
       <Pass picking>
         <Pick>{
-          ({id, hovered, presses}) => [
+          ({id, hovered, presses}: PickState) => [
             // <RawMesh> is a fully hand-coded component, intended as an anti-example
             // of how to integrate fully custom rendering code with classic GL-style vertex attributes.
             <RawMesh texture={texture} mesh={mesh} blink={presses.left} />,

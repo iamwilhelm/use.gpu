@@ -306,12 +306,11 @@ export const parseColor = (color?: ColorLike) => parseColorOpacity(color);
 
 export const parseStringArray = makeParseArray(NO_STRINGS, parseString);
 
-export const parseBooleanArray = (vec: VectorLike): Uint8Array =>
-  vec ? toScalarArray(vec, Uint8Array) as any as Uint8Array : new Uint8Array();
+export const parseBooleanArray = (vec: VectorLike | boolean[]): Uint8Array =>
+  vec ? toScalarArray(vec as VectorLike, Uint8Array) as any as Uint8Array : new Uint8Array();
 
-export const parseBooleanArrayLike = (vec: VectorLike): Uint8Array =>
-typeof
-  vec ? toScalarArray(vec, Uint8Array) as any as Uint8Array : new Uint8Array();
+export const parseBooleanArrayLike = (vec: VectorLike | boolean | boolean[]): Uint8Array | boolean =>
+  typeof vec === 'boolean' ? vec : vec ? toScalarArray(vec as VectorLike, Uint8Array) as any as Uint8Array : new Uint8Array();
 
 export const parseColorArray = (colors: ColorLikes | TensorArray): Float32Array => {
   const cs = colors as any;
@@ -321,7 +320,7 @@ export const parseColorArray = (colors: ColorLikes | TensorArray): Float32Array 
   return parseVec4Array(parsed);
 };
 
-export const parseColorArrayLike = (colors: ColorLikes | TensorArray): Float32Array => {
+export const parseColorArrayLike = (colors: ColorLikes | TensorArray | string): Float32Array => {
   const cs = colors as any;
   if (isTypedArray(cs)) return cs as Float32Array;
   if (isTypedArray(cs?.array)) return cs.array;

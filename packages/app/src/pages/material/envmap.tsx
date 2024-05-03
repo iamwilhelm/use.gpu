@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { TextureSource } from '@use-gpu/core';
+import type { GPUGeometry, TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import React, { Gather, memo, useContext, useOne } from '@use-gpu/live';
@@ -63,7 +63,7 @@ export const MaterialEnvMapPage: LC = (props) => {
           mesh,
           texture,
         ]: [
-          Record<string, ShaderSource>,
+          GPUGeometry,
           TextureSource,
         ]) => (
           <Camera active={!zooming && !panning}>
@@ -73,7 +73,7 @@ export const MaterialEnvMapPage: LC = (props) => {
               seamFix={seamFix}
               debugGrid={debugGrid}
             >{
-              (cubeMap, texture) =>
+              (cubeMap: ShaderSource | null, textureMap: TextureSource | null) =>
                 <LinearRGB tonemap="aces" gain={3}>
                   <Cursor cursor='move' />
                   <Pass lights>
@@ -104,7 +104,7 @@ export const MaterialEnvMapPage: LC = (props) => {
                     active={panning || zooming}
                     scroll={zooming}
                   >{
-                    (x, y, zoom) =>
+                    (x: number, y: number, zoom: number) =>
                       texture ? (
                         <FlatCamera x={x} y={y} zoom={zoom}>
                           <Pass overlay>

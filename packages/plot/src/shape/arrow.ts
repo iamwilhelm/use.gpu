@@ -62,7 +62,6 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       sources,
       ...flags
   } = parsed;
-  console.log('parsed.schema', parsed.schema)
 
   if (zIndex && zBias == null) parsed.zBias = zIndex;
 

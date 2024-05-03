@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { GPUGeometry, LambdaSource, UniformType } from '@use-gpu/core';
+import type { GPUGeometry, LambdaSource, TextureSource, UniformType } from '@use-gpu/core';
 
 import React, { Gather } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
@@ -7,7 +7,7 @@ import { vec3 } from 'gl-matrix';
 import {
   Pass, FlatCamera, InterleavedData, PBRMaterial, RawTexture,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, FaceLayer,
+  Pick, PickState, Cursor, FaceLayer,
   PointLight,
 } from '@use-gpu/workbench';
 
@@ -48,7 +48,7 @@ export const MeshInterleavedPage: LC = (props) => {
               <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 
               <Pick>{
-                ({id, hovered, presses}) =>
+                ({id, hovered, presses}: PickState) =>
                   <PBRMaterial albedoMap={texture} albedo={presses.left % 2 ? COLOR_ON : COLOR_OFF}>
                     <FaceLayer
                       id={id}

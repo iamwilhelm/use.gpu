@@ -14,7 +14,7 @@ import { useRenderProp } from '../hooks/useRenderProp';
 
 export type DataShaderProps = {
   data?: TensorArray,
-  source?: StorageSource,
+  source?: StorageSource | LambdaSource,
   shader: ShaderModule,
 
   sources?: ShaderSource[],

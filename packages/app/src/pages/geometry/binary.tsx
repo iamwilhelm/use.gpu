@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { DataSchema, StorageSource } from '@use-gpu/core';
+import type { DataSchema, GPUAttributes, LambdaSource, StorageSource } from '@use-gpu/core';
 
 import React, { Gather, yeet, use, useOne, useMemo } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
@@ -190,7 +190,7 @@ export const GeometryBinaryPage: LC = () => {
 
         const viz = useMemo(() => data ? (
           <Data {...data.values}>{
-            ({positions, counts}) => (
+            ({positions, counts}: GPUAttributes) => (
               <Gather
                 children={[
                   <DataShader
@@ -203,7 +203,7 @@ export const GeometryBinaryPage: LC = () => {
                     args={[mode, transparent, data.range, data.level]}
                   />,
                 ]}
-                then={([positions, colors]: StorageSource[]) => (
+                then={([positions, colors]: LambdaSource[]) => (
                   <PointLayer
                     count={data.count}
                     positions={positions}

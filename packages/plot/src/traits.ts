@@ -267,25 +267,28 @@ export const ColorTrait = (
 export const ColorsTrait = () => {
   const parseColorProp = optional(parseColor);
   const parseColorsProp = bindable(optional(parseColorArray));
-  return GenericColorsTrait<ColorLike, VectorLike>(parseColorProp, parseColorsProp);
+  return GenericColorsTrait(parseColorProp, parseColorsProp);
 };
 
 export const CompositeColorsTrait = () => {
   const parseColorProp = optional(parseColorArrayLike);
   const parseColorsProp = bindable(optional(parseColorMultiArray));
-  return GenericColorsTrait<ColorLike | ColorLikes, VectorLike | VectorLikes>(parseColorProp, parseColorsProp);
+  return GenericColorsTrait(parseColorProp, parseColorsProp);
 };
 
-export const GenericColorsTrait = <A, B>(parseColorProp: Parser<any, any>, parseColorsProp: Parser<any, any>) => {
+export const GenericColorsTrait = <
+  P1 extends Parser<any, any>,
+  P2 extends Parser<any, any>
+>(parseColorProp: P1, parseColorsProp: P2) => {
   return (
     props: {
-      color?: A,
-      colors?: ColorLikes,
+      color?: Parameters<P1>[0],
+      colors?: Parameters<P2>[0],
       opacity?: number,
     },
     parsed: {
-      color?: B,
-      colors?: VectorLike,
+      color?: ReturnType<P1>,
+      colors?: ReturnType<P2>,
     },
   ) => {
     const {color, colors, opacity = 1} = props;
@@ -430,7 +433,6 @@ export const SegmentsTrait = combine(
   }),
   (
     props: {
-      position?: VectorLike | VectorLikes,
       positions?: VectorLikes | VectorLikes[],
       segments?: VectorLikes,
     },
@@ -446,7 +448,7 @@ export const SegmentsTrait = combine(
     },
   ) => {
     const [chunks, groups] = useProp(
-      props.positions ?? props.position ?? parsed.positions,
+      props.positions ?? parsed.positions,
       (pos) => {
         if (parsed.ragged) return parsed.ragged;
         if (parsed.tensor) {
@@ -471,7 +473,6 @@ export const FacetedTrait = combine(
   }),
   (
     props: {
-      position?: VectorLike | VectorLikes,
       positions?: VectorLikes | VectorLikes[],
       segments?: VectorLikes,
       indices?: VectorLikes,
@@ -488,7 +489,7 @@ export const FacetedTrait = combine(
     },
   ) => {
     const [chunks, groups] = useProp(
-      props.positions ?? props.position,
+      props.positions ?? parsed.positions,
       (pos) => {
         if (parsed.ragged) return parsed.ragged;
         if (parsed.tensor) {
@@ -588,7 +589,6 @@ export const FaceSegmentsTrait = combine(
       groups?: VectorLike | null,
       concave?: boolean,
 
-      position?: TypedArray,
       positions?: TypedArray,
 
       count?: number,
@@ -598,7 +598,7 @@ export const FaceSegmentsTrait = combine(
       slices?: TypedArray,
     },
   ) => {
-    const {chunks, groups, concave, position, positions} = parsed;
+    const {chunks, groups, concave, positions} = parsed;
     if (!chunks) return;
 
     if (concave && positions) {

@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { ColorLike, ColorLikes, VectorLike } from '@use-gpu/core';
+import type { ColorLike, ColorLikes, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
@@ -22,9 +22,9 @@ const Traits = combine(
   ZIndexTrait,
 );
 
-export type PolygonProps = TraitProps<typeof Traits> &
-  Pick<FaceProps,
-    'position' | 'positions' |
+export type PolygonProps = TraitProps<typeof Traits> & {
+  positions: VectorLike | VectorLikes | VectorLikes[] | VectorLikes[][],
+} & Pick<FaceProps,
     'depth' | 'depths' |
     'zBias' | 'zBiases' |
     'id' | 'ids' |

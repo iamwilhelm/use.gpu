@@ -81,22 +81,25 @@ export type OffscreenTarget = UseGPURenderContext & {
 };
 
 // Simple backing-agnostic mesh geometry
+export type CPUAttributes = Record<string, TypedArray>;
 export type CPUGeometry = {
   archetype?: number,
   topology?: GPUPrimitiveTopology,
   bounds?: DataBounds,
   count: number,
-  attributes: Record<string, TypedArray>,
+  attributes: CPUAttributes,
   formats: Record<string, UniformType>,
   unwelded?: Record<string, boolean>,
 };
+
+export type GPUAttributes = Record<string, StorageSource | LambdaSource>;
 
 export type GPUGeometry = {
   archetype?: number,
   topology?: GPUPrimitiveTopology,
   bounds?: DataBounds,
   count?: number,
-  attributes: Record<string, StorageSource | LambdaSource>,
+  attributes: GPUAttributes,
   unwelded?: Record<string, boolean>,
 };
 

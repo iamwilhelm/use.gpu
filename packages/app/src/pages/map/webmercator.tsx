@@ -163,7 +163,7 @@ export const MapWebMercatorPage: LC = () => {
                   )}
                 </MVTStyles>
               </WebMercator>
-              {false && <WebMercator
+              <WebMercator
                 bend={0}
                 range={[[-1, 1], [-2/3, 2/3]]}
                 long={90}
@@ -231,7 +231,7 @@ export const MapWebMercatorPage: LC = () => {
                   />
                 </Scale>
 
-              </WebMercator>}
+              </WebMercator>
             </Animate>
           </Plot>
         </Pass>

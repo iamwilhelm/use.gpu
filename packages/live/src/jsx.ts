@@ -4,7 +4,7 @@ import {
   CAPTURE, FENCE, GATHER, MULTI_GATHER, MAP_REDUCE, MORPH, PROVIDE, YEET, FRAGMENT, QUOTE, UNQUOTE, RECONCILE, SUSPEND, SIGNAL,
 } from './builtin';
 import { getCurrentFiberBy } from './current';
-import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
+import { DeferredCall, ArrowFunction, RawLiveComponent, LiveElement, ReactElementInterop } from './types';
 
 const NO_PROPS: any = {};
 
@@ -34,13 +34,16 @@ export const Reconcile = RECONCILE as AnyF;
 export const Quote = QUOTE as AnyF;
 export const Unquote = UNQUOTE as AnyF;
 
-export const createElement = (type: ArrowFunction | string, props: any, ...children: any[]) => {
+type ChildProp<F extends RawLiveComponent<any>> = Parameters<F>[0]['children'];
+type Children<F extends RawLiveComponent<any>> = ChildProp<F>[];
+
+export const createElement = <F extends RawLiveComponent<any>>(type: F | string, props: any, ...children: Children<F>) => {
   const by = getCurrentFiberBy();
 
   if (typeof type === 'string') throw new Error(`Can't use Live-flavored JSX to render HTML.'`);
 
   if ((type as any)?.isLiveBuiltin) {
-    switch (type) {
+    switch (type as any) {
       case FRAGMENT:
         return props?.children ?? children;
 

@@ -1,4 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { Keyframe } from '@use-gpu/workbench';
 
 import React, { use } from '@use-gpu/live';
 
@@ -7,7 +8,7 @@ import {
   Cursor, Animate,
 } from '@use-gpu/workbench';
 import {
-  Plot, Layer, Cartesian, Axis, Grid, Point, Line, Arrow, Face, Transform, Polygon,
+  Plot, Cartesian, Axis, Grid, Point, Line, Arrow, Face, Transform, Polygon,
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
@@ -312,7 +313,7 @@ const Camera = ({children}: PropsWithChildren<object>) => (
   <PanControls
     active={true}
     render={(x, y, zoom) =>
-      <FlatCamera x={x} y={y} zoom={zoom} centered>
+      <FlatCamera x={x} y={y} zoom={zoom}>
         {children}
       </FlatCamera>
     }

@@ -17,7 +17,7 @@ export type TransposeProps = {
   tensor?: TensorArray,
 
   render?: (data: TensorArray) => LiveElement,
-  children?: (data: TensorArray) => LiveElement,
+  children?: LiveElement | ((data: TensorArray) => LiveElement),
 };
 
 export const Transpose: LiveComponent<TransposeProps> = (props) => {

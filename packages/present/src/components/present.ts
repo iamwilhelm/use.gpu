@@ -37,7 +37,7 @@ type State = {
   length: number,
 };
 
-const DEFAULT_BG = parseColor('#000000');
+const DEFAULT_BG = parseColor('#00000000');
 
 export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>) => {
   const {

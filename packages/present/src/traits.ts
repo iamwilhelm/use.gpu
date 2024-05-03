@@ -58,10 +58,10 @@ const EFFECT_DEFAULTS = {
 
 const PARTIAL_EFFECT_TRAIT = mapValues(EFFECT_TRAIT, (t: any) => optional(t));
 
-const EffectTrait = trait(EFFECT_TRAIT, EFFECT_DEFAULTS);
-const PartialEffectTrait = trait(PARTIAL_EFFECT_TRAIT, {});
+export const EffectTrait = trait(EFFECT_TRAIT, EFFECT_DEFAULTS);
+export const PartialEffectTrait = trait(PARTIAL_EFFECT_TRAIT, {});
 
-const SlideTrait = trait({
+export const SlideTrait = trait({
   order: optional(parseInteger),
   stay: optional(parseInteger),
 });
@@ -79,7 +79,7 @@ const TRANSITION_DEFAULTS = {
   effect: {},
 };
 
-const TransitionTrait = trait(TRANSITION_TRAIT, TRANSITION_DEFAULTS);
+export const TransitionTrait = trait(TRANSITION_TRAIT, TRANSITION_DEFAULTS);
 
 export const useEffectTrait = makeUseTrait(EffectTrait);
 export const useSlideTrait = makeUseTrait(SlideTrait);

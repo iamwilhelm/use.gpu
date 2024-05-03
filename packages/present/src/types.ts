@@ -5,20 +5,6 @@ export type SlideEase = 'cosine' | 'linear';
 
 export type SlideDirection = 'left' | 'right' | 'up' | 'down' | 'forward' | 'back' | 'none';
 
-export type EffectTrait = {
-  type: SlideEffect,
-  direction: string,
-  delay: number,
-  duration: number,
-  ease: 'cosine' | 'linear',
-};
-
-export type TransitionTrait = {
-  effect?: EffectTrait,
-  enter?: Partial<EffectTrait>,
-  exit?: Partial<EffectTrait>,
-};
-
 export type ParsedEffect = {
   type: SlideEffect,
   direction: XYZW,
@@ -27,12 +13,12 @@ export type ParsedEffect = {
   ease: 'cosine' | 'linear',
 };
 
-export type SlideTrait = {
+export type SlideTraitProps = {
   order?: number,
   stay?: number,
 };
 
-export type SlideInfo = SlideTrait & {
+export type SlideInfo = SlideTraitProps & {
   id: number,
   steps?: number,
   slides?: ResolvedSlide[],

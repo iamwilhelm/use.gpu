@@ -1,6 +1,6 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ColorLike, Rectangle, XYZW } from '@use-gpu/core';
-import type { ParsedEffect, SlideInfo, SlideEase, ResolvedSlide } from './types';
+import type { ParsedEffect, SlideInfo, SlideEase, ResolvedSlide } from '../types';
 
 import { clamp } from '@use-gpu/core';
 import { gather, provide, use, keyed, useMemo, useOne, useRef, useState } from '@use-gpu/live';
@@ -11,7 +11,7 @@ import {
   Pass, RawFullScreen, RenderTarget,
 } from '@use-gpu/workbench';
 import { UI, UILayers } from '@use-gpu/layout';
-import { makeParseColor, parseColor } from '@use-gpu/parse';
+import { parseColor } from '@use-gpu/parse';
 import { useProp } from '@use-gpu/traits/live';
 
 import { resolveSlides } from '../lib/slides';
@@ -37,6 +37,8 @@ type State = {
   length: number,
 };
 
+const DEFAULT_BG = parseColor('#000000');
+
 export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>) => {
   const {
     step: initialStep = 0,
@@ -44,7 +46,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
     children,
   } = props;
 
-  const backgroundColor = useProp(props.backgroundColor, parseColor, '#000000');
+  const backgroundColor = useProp(props.backgroundColor, parseColor, DEFAULT_BG);
 
   // Presentation state starts out empty
   const [state, setState] = useState(() => ({

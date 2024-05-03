@@ -1,6 +1,6 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { ParsedEffect, ResolvedLayer } from './types';
-import type { ColorLike } from '@use-gpu/traits';
+import type { ColorLike } from '@use-gpu/core';
+import type { ParsedEffect, ResolvedLayer } from '../types';
 
 import { gather, use, wrap, keyed, memo, useMemo, useRef } from '@use-gpu/live';
 import {
@@ -9,7 +9,7 @@ import {
 } from '@use-gpu/workbench';
 import { UILayers } from '@use-gpu/layout';
 
-import { PresentAPI } from './providers/present-provider';
+import { PresentAPI } from '../providers/present-provider';
 import { Screen } from './screen';
 
 export type StageProps = {

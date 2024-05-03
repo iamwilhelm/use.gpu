@@ -1,7 +1,6 @@
 import type { LC } from '@use-gpu/live';
-import type { TextureSource } from '@use-gpu/core';
-import type { ParsedEffect } from './types';
-import type { ColorLike } from '@use-gpu/traits';
+import type { ColorLike, TextureSource } from '@use-gpu/core';
+import type { ParsedEffect } from '../types';
 
 import { memo, use, useOne, useMemo } from '@use-gpu/live';
 import { useDraw, useShader, useCombinedTransform, useLayoutContext, usePipelineOptions, useShaderRef } from '@use-gpu/workbench';

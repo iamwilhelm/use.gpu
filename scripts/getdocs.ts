@@ -24,6 +24,7 @@ let packages = [
   'layout',
   'live',
   'map',
+  'parse',
   'present',
   'plot',
   'react',

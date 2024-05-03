@@ -5,7 +5,7 @@ import {
   getEffectiveConstraintOfTypeParameter,
   getLineAndCharacterOfPosition, isWhiteSpaceLike, isLineBreak,
   isClassLike, isInterfaceDeclaration,
-  TypeChecker,
+  TypeChecker, TypeFormatFlags,
   Symbol, SymbolFlags, ModifierFlags,
   Type, TypeFlags, ObjectType, TypeReference, ObjectFlags, LiteralType, UnionOrIntersectionType, ConditionalType,
   Signature, IndexType, IndexedAccessType, TypeElement,
@@ -38,6 +38,7 @@ export type BindingType = {
   typeParamSource?: string,
   properties?: {[name: string]: Item},
   instanceProperties?: {[name: string]: Item},
+  typeLiteral?: string,
   typeArgs?: readonly BindingType[],
   typeParams?: readonly Param[],
   // Used by mapped types
@@ -71,12 +72,29 @@ export type Item = Binding & BindingType
 // Used for recursion check in getObjectType
 const gettingObjectTypes: Type[] = []
 
+let DEBUG = false;
+
 class Context {
   constructor(readonly tc: TypeChecker,
               readonly exports: readonly Symbol[],
               readonly basedir: string,
               readonly id: string,
               readonly typeParams: Param[]) {}
+
+  print(node: any) {
+    console.log(this.format(node));
+  }
+
+  format(node: any) {
+    const out: any = {};
+    if (typeof node === 'string') out.string = node;
+    else if (typeof node === 'object' && node) {
+      if ('name' in node) out.name = this.format(node.name);
+      if ('escapedName' in node) out.escapedName = node.escapedName;
+      if ('symbol' in node && node.symbol) out.symbol = this.symbolName(node.symbol);
+    }
+    return out;
+  }
 
   extend(symbol: Symbol | string, sep = "^") {
     let nm = typeof symbol == "string" ? symbol : symbol.name
@@ -92,7 +110,9 @@ class Context {
     let gathered = 0
     for (const symbol of symbols.filter(s => maybeDecl(s)).sort(compareSymbols)) {
       let name = this.symbolName(symbol)
+      //if (name === 'Point') DEBUG = true;
       let item = this.extend(name, sep).itemForSymbol(symbol)
+      //if (name === 'Point') DEBUG = false;
       if (item && (!filter || filter(name, item))) {
         target[name] = item
         gathered++
@@ -108,10 +128,17 @@ class Context {
   }
 
   itemForSymbol(symbol: Symbol, kind?: BindingKind): Item | null {
+    DEBUG && console.log('itemForSymbol', this.symbolName(symbol), kind);
+    DEBUG && symbol?.declarations?.map(s => this.print(s));
+
     if (kind) {
       // Kind given
     } else if (symbol.flags & SymbolFlags.Alias) {
       let aliased = this.tc.getAliasedSymbol(symbol)
+      
+      const a = this.symbolName(symbol);
+      const b = this.symbolName(aliased);
+      DEBUG && a !== b && console.log('alias', a, '->', b);
       //if (this.isExternal(aliased)) kind = "reexport"
       /*else*/ return this.itemForSymbol(aliased)
     }
@@ -172,6 +199,7 @@ class Context {
   }
 
   getType(type: Type, forSymbol?: Symbol): BindingType {
+    DEBUG && console.log('getType', this.format(type), this.format(forSymbol));
     if (type.aliasSymbol && !(forSymbol && (forSymbol.flags & SymbolFlags.TypeAlias)) && this.isAvailable(type.aliasSymbol))
       return this.getReferenceType(type.aliasSymbol, type.aliasTypeArguments)
 
@@ -269,9 +297,13 @@ class Context {
         let cx = typeParam ? this.addParams([typeParam]) : this
         let result: BindingType = {
           type: typeParam ? "mapped" : "Object",
-          typeArgs: [innerType ? cx.getType(this.tc.getTypeAtLocation(innerType)) : {type: "any"}]
+          typeLiteral: this.tc.typeToString(type, undefined,
+            TypeFormatFlags.NoTruncation
+          ),
+          //[innerType ? cx.getType(this.tc.getTypeAtLocation(innerType)) : {type: "any"}]
         }
         if (typeParam) result.key = typeParam
+
         return result
       }
 
@@ -725,7 +757,14 @@ export function gatherMany(specs: readonly GatherSpec[]): readonly {[name: strin
       if (alias && !closedExports.includes(alias)) closedExports.push(alias)
     }
 
-    new Context(tc, closedExports, resolve(basedir || dirname(configPath || filename)), "", []).gatherSymbols(exports, items, "")
-    return items
+    new Context(
+      tc,
+      closedExports,
+      resolve(basedir || dirname(configPath || filename)),
+      "",
+      []
+    ).gatherSymbols(exports, items, "");
+
+    return items;
   })
 }

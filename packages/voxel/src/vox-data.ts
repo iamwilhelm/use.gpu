@@ -1,5 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { Point, TextureSource } from '@use-gpu/core';
+import type { XY, TextureSource } from '@use-gpu/core';
 import type { Vox, VoxShape } from './types';
 
 import { gather, use, yeet, useMemo, useHooks } from '@use-gpu/live';
@@ -87,7 +87,7 @@ export const VoxData: LC<VoxDataProps> = (props) => {
 
       const data = p;
       const texture = makeTexture(device, 256, 1, 1, format, usage, 1, 1, '1d');
-      const upload = {data, size: [256, 1] as Point, format};
+      const upload = {data, size: [256, 1] as XY, format};
       uploadDataTexture(device, texture, upload);
 
       const source = {

@@ -4,7 +4,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { PipelineOptions } from '@use-gpu/workbench';
 
 import { seq, clamp } from '@use-gpu/core';
-import { gather, use, quote, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
+import { gather, use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import {
   useMatrixContext,
   useShader, useNoShader, useLambdaSource, useDebugContext, useShaderRef,

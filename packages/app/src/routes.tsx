@@ -32,6 +32,7 @@ import { RTTFeedbackPage } from './pages/rtt/feedback';
 import { RTTMultiscalePage } from './pages/rtt/multiscale';
 import { RTTCFDComputePage } from './pages/rtt/cfd-compute';
 import { RTTCFDTexturePage } from './pages/rtt/cfd-texture';
+import { FPSControlsPage } from './pages/controls/fps';
 
 import { HomePage } from './pages/home';
 import { EmptyPage } from './pages/empty';
@@ -66,6 +67,7 @@ export const makePages = () => [
   {path: "/rtt/cfd-texture",       title: "RTT - Fluid Dynamics (Compute II)", element: <RTTCFDTexturePage />},
   {path: "/mesh/raw",              title: "Raw Mesh - DIY Rendering",          element: <MeshRawPage />},
   {path: "/mesh/interleaved",      title: "Raw Mesh - Native Components",      element: <MeshInterleavedPage />},
+  {path: "/controls/fps",          title: "Controls - FPS",                    element: <FPSControlsPage />},
   {path: "/debug/atlas",           title: "Debug - Text Atlas",                element: <DebugAtlasPage />},
   {path: "/debug/axes",            title: "Debug - Axes",                      element: <DebugAxesPage />},
   {path: "/debug/wireframe",       title: "Debug - Wireframe",                 element: <DebugWireframePage />},

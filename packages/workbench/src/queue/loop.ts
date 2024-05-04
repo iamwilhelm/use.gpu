@@ -71,7 +71,9 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
   const isSync = !!parent.buffered;
 
   // Bump the frame version to tell the dispatcher an animation frame is in progress
-  const requestImmediateRender = useCallback(() => ref.version.frame = incrementVersion(ref.version.rendered));
+  const requestImmediateRender = useCallback(() => {
+    ref.version.frame = incrementVersion(ref.version.frame);
+  });
 
   // Request animation frame wrapper
   // for looped component re-rendering.
@@ -171,6 +173,8 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
   // and ensure steady rendering
   // when children change.
   const Resume = (ts: ArrowFunction[]) => {
+    DEBUG && console.log('Resume(Loop) rendered');
+
     const [dispatches, setDispatches] = useState(0);
     const {version} = ref;
 

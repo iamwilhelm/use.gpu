@@ -82,9 +82,9 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
   const [keyboard, setKeyboard] = useState<KeyboardState>(makeKeyboardState);
 
   const pointerLock = useMemo(() => ({
-    locked: document.pointerLockElement === element,
-    lock: () => element.requestPointerLock(),
-    unlock: () => document.exitPointerLock(),
+    hasLock: document.pointerLockElement === element,
+    beginLock: () => element.requestPointerLock(),
+    endLock: () => document.exitPointerLock(),
   }), [element, document.pointerLockElement]);
 
   useResource((dispose) => {

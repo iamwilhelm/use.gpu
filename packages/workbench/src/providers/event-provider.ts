@@ -270,5 +270,4 @@ export const useKeyboard = (id: number | null = null) => useContext(KeyboardCont
 export const useMouse = (id: number | null = null) => useContext(MouseContext).useMouse(id);
 export const useWheel = (id: number | null = null) => useContext(WheelContext).useWheel(id);
 
-export const useMouseLock = (id: number | null = null) => useContext(MouseContext);
-
+export const useMouseLock = () => useContext(MouseContext);

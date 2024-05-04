@@ -15,6 +15,7 @@ import {
   getUniformDims,
 
   copyRecursiveNumberArray,
+  offsetNumberArray,
   getBoundingBox,
   toDataBounds,
 
@@ -176,26 +177,50 @@ export const Data: LiveComponent<DataProps<DataSchema>> = <S extends DataSchema>
 
   // Blit all data into merged arrays if stale
   const slices = useMemo(() => {
+    const offsets: number[] = [0];
     const slices = [];
     const sliceKey = indexedKey ?? countKey;
 
+    // Get index offsets for chunks
+    if (isIndexed) {
+      const {array, dims, depth, prop = countKey} = fields[countKey];
+      const dimsIn = toCPUDims(dims);
+
+      let last = 0;
+
+      const accessor = virtual?.[countKey];
+      if (accessor || data) {
+        for (let i = 0; i < itemCount; ++i) {
+          const from = accessor ? accessor(i + skip) : data ? data[i + skip][prop] : 0;
+          const length = from.length / dimsIn;
+          last += length;
+          offsets.push(last);
+        }
+      }
+    }
+
+    // Blit data
     for (const k in fields) {
       const accessor = virtual?.[k];
       if (!accessor && !data) continue;
 
       const {array, dims, depth, prop = k} = fields[k];
       const slice = k === sliceKey;
+      const indexed = schema[k].index;
 
       // Keep CPU-only layout, as useAggregator will widen for us
       const dimsIn = toCPUDims(dims);
 
-      let b = 0;
-      let o = 0;
+      let base = 0;
+      let offset = 0;
+ 
       for (let i = 0; i < itemCount; ++i) {
         const from = accessor ? accessor(i + skip) : data ? data[i + skip][prop] : 0;
-        o += copyRecursiveNumberArray(from, array, dimsIn, dimsIn, depth, o, 1);
-        if (slice) slices.push((o - b) / dimsIn + ((loops === true || (loops as boolean[])?.[i]) ? 3 : 0));
-        b = o;
+        offset += copyRecursiveNumberArray(from, array, dimsIn, dimsIn, depth, offset, 1);
+
+        if (indexed) offsetNumberArray(array, array, offsets[i] || 0, dimsIn, dimsIn, base, base, offset - base);
+        if (slice) slices.push((offset - base) / dimsIn + ((loops === true || (loops as boolean[])?.[i]) ? 3 : 0));
+        base = offset;
       }
     }
 

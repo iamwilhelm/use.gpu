@@ -20,6 +20,8 @@ echo '▶︎▶︎ @use-gpu/live';
 yarn publish --ignore-scripts --access public build/packages/live
 echo '▶︎▶︎ @use-gpu/map';
 yarn publish --ignore-scripts --access public build/packages/map
+echo '▶︎▶︎ @use-gpu/parse';
+yarn publish --ignore-scripts --access public build/packages/parse
 echo '▶︎▶︎ @use-gpu/plot';
 yarn publish --ignore-scripts --access public build/packages/plot
 echo '▶︎▶︎ @use-gpu/present';

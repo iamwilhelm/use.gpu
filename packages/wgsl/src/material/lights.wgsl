@@ -24,10 +24,8 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
   let n = min(lightCount, 1024u);
   for (var i = 0u; i < lightCount; i++) {
     let light = getLight(i);
-    var f = vec3<f32>(1.0);
-
     let r = applyLight(N, V, light, surface);
-    radiance += r * f;
+    radiance += r;
   }
 
   return radiance;

@@ -385,7 +385,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
         DEBUG_STEPS,
         MIP_LEVELS: mips,
         SDF_LEVEL: sdf ? mips - 1 : -1,
-      }), [DEBUG_STEPS, shape.length]);
+      }), [DEBUG_STEPS, mips, sdf]);
 
       // Get bounding box / ray transform
       const parent = useMatrixContext();

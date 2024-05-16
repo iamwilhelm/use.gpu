@@ -23,7 +23,7 @@ const lineSchema = {
   positions: {format: 'array<vec3<f32>>', prop: 'path'},
   // Use data[n].color as color
   colors: {format: 'vec4<f32>', prop: 'color'},
-  // Use data[n].width as color
+  // Use data[n].width as width
   widths: {format: 'f32', prop: 'width'},
 };
 

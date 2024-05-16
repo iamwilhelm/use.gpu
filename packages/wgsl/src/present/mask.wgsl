@@ -1,4 +1,4 @@
-@optional @link fn getEffect() -> u32 { return 0.0; };
+@optional @link fn getEffect() -> u32 { return 0u; };
 @optional @link fn getDirection() -> vec4<f32> { return vec4<f32>(0.0); };
 @optional @link fn getValue() -> f32 { return 0.0; };
 
@@ -13,11 +13,11 @@ fn ramp(x: f32, t: f32, s: f32) -> f32 {
 
   var m = 1.0;
   // Fade
-  if (e == 1.0) {
+  if (e == 1u) {
     m = 1.0 - abs(v);
   }
   // Wipe
-  else if (e == 2.0) {
+  else if (e == 2u) {
     let direction = getDirection();
     let l = length(direction);
 
@@ -27,7 +27,7 @@ fn ramp(x: f32, t: f32, s: f32) -> f32 {
     m = ramp(line, 1.0 - abs(v), 8.0);
   }
   // Move
-  else if (e == 3.0) {
+  else if (e == 3u) {
     m = select(0.0, 1.0, abs(v) < 1.0);
   }
   // Avg visibility

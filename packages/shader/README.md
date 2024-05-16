@@ -81,7 +81,7 @@ The `bound` module can be passed around, and used as a new link to bind to anoth
 Use `wgsl` or `glsl` template literals to embed shaders inline:
 
 ```tsx
-import { wgsl } from '@use-gpu/shader/wgsl`;
+import { wgsl } from '@use-gpu/shader/wgsl';
 
 const wgslModule = wgsl`
   fn main() {}
@@ -89,7 +89,7 @@ const wgslModule = wgsl`
 ```
 
 ```tsx
-import { glsl } from '@use-gpu/shader/glsl`;
+import { glsl } from '@use-gpu/shader/glsl';
 
 const glslModule = glsl`
   void main() {}

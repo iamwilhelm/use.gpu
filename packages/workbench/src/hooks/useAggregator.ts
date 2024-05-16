@@ -3,7 +3,7 @@ import type { ArchetypeSchema, AggregateItem, AggregateValue, ArrayAggregateBuff
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { useDeviceContext } from '../providers/device-provider';
-import { useLog, useMemo, useOne } from '@use-gpu/live';
+import { useMemo, useOne } from '@use-gpu/live';
 import {
   schemaToAggregate,
   toGPUAggregate,

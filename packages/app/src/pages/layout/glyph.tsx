@@ -31,6 +31,7 @@ const BACKGROUND = [0, 0, 0.09, 1];
 const WHITE = [1, 1, 1, 1];
 const WHITE_TRANSPARENT = [1, 1, 1, 0.75];
 const MARGIN_TOP = [0, 3, 0, 0];
+const NO_REPEAT = {repeat: 'none'};
 
 export const LayoutGlyphPage: LC = () => {
 
@@ -447,10 +448,12 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
 
                     <RawTexture data={sdfTexture} render={(texture) =>
                       <Block>
-                        <Element width={paddedWidth} height={paddedHeight} fill={[0.0, 0.0, 0.0, 1.0]} image={{
-                          texture,
-                          repeat: 'none',
-                        }} />
+                        <Element
+                          width={paddedWidth}
+                          height={paddedHeight}
+                          fill={[0.0, 0.0, 0.0, 1.0]}
+                          texture={texture}
+                          image={NO_REPEAT} />
                         <Label>SDF</Label>
                       </Block>
                     }/>

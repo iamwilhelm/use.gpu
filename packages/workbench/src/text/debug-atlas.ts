@@ -46,7 +46,6 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = m
   else useNoSDFFontContext();
 
   useFontDebug();
-  useLog({sdfFont})
 
   if (!atlas) return;
 
@@ -100,7 +99,6 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
     dpi = 1,
     compact,
   } = props;
-  console.log('DebugAtlasShape')
 
   const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate, debugUploads} = atlas as any;
   const {id} = useFiber();

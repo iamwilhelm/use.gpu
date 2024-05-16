@@ -5,7 +5,7 @@ import type { TransformContextProps } from '@use-gpu/workbench';
 
 import { useDraw } from '../hooks/useDraw';
 
-import { use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
+import { use, memo, useCallback, useMemo, useOne, useFiber } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';

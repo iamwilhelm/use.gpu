@@ -1,4 +1,4 @@
-import type { UniformAttribute, UniformType } from './types';
+import type { UniformAttribute } from './types';
 
 import { mat4, vec3, vec4 } from 'gl-matrix';
 
@@ -75,8 +75,6 @@ export const makeOrthogonalMatrix = (
 
   return matrix;
 }
-
-let t = 0;
 
 export const makeProjectionMatrix = (
   width: number,

@@ -1,12 +1,10 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { UniformAttribute, DataBounds } from '@use-gpu/core';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { toUnweldedArray } from '@use-gpu/core';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { use, provide, useCallback, useOne, useNoOne, useMemo, useNoMemo, useVersion, useNoCallback, useNoVersion } from '@use-gpu/live';
+import { use, provide, useMemo, useNoMemo } from '@use-gpu/live';
 import { generateTangents } from 'mikktspace';
-import { vec3, mat3, mat4 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 
 import {
   FaceLayer, FaceLayerProps,
@@ -15,8 +13,6 @@ import {
   useCombinedMatrixTransform, useNoCombinedMatrixTransform,
   useRawSource, useNoRawSource,
 } from '@use-gpu/workbench';
-import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl'
-import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl'
 import { useGLTFMaterial } from './gltf-material';
 
 export type GLTFPrimitiveProps = {
@@ -39,7 +35,6 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     attributes: {POSITION, NORMAL, TANGENT, TEXCOORD_0},
     indices,
     material,
-    mode,
   } = primitive;
 
   const pbrMaterial = useGLTFMaterial(gltf, material);

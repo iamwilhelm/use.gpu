@@ -26,7 +26,6 @@ export const getBlockMinMax = (
   let i = 0;
   let m = 0;
 
-  const n = els.length;
   if (isX) for (const {sizing, margin, absolute} of els) {
     if (!absolute) {
       const [minX, minY, maxX, maxY] = sizing;
@@ -204,7 +203,7 @@ export const fitBlock = (
   }
 
   for (const el of els) if (el.stretch) {
-    const {margin, fit, under} = el;
+    const {margin, fit} = el;
     const [ml, mt, mr, mb] = margin;
 
     const size = [...resolved, resolved[0] ?? into[2], resolved[1] ?? into[3]] as FitInto;
@@ -237,6 +236,7 @@ export const fitBlock = (
     const {margin, fit, under} = el;
     const [ml, mt, mr, mb] = margin;
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const size = [resolved[0]!, resolved[1]!, 0, 0] as XYZW;
     size[0] -= ml + mr;
     size[1] -= mt + mb;

@@ -67,7 +67,7 @@ export const makeAggregator = (
 
   let itemCount = initialItems.length;
   const uploadRefs = byRefs ? () => {
-    uploadAggregateFromSchemaRefs(device, schema, aggregate, itemCount);
+    uploadAggregateFromSchemaRefs(device, schema, aggregate);
   } : null;
 
   DEBUG && console.log('useAggregator', {initialItems, aggregate, allocInstances, allocVertices, allocIndices});

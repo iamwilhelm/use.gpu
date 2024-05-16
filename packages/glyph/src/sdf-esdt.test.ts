@@ -1,22 +1,4 @@
-import { esdt, esdt1d, resolveSDF, glyphToESDT } from './sdf-esdt';
-import { makeSDFStage } from './sdf';
-
-const INF = 1e10;
-
-const fmt = (d: number[], w: number, h: number) => {
-  const m: any[][] = [];
-  for (let y = 0; y < h; y++) {
-    const r: any[] = [];
-    for (let x = 0; x < w; x++) {
-      const v = +d[x + y * w];
-      r.push(v > 1000 ? 'I' : v.toFixed(2));
-    }
-    m.push(r);
-  }
-  return m;
-}
-
-const sqr = (x: number) => x * x;
+import { esdt1d, resolveSDF, glyphToESDT } from './sdf-esdt';
 
 describe('edt', () => {
   it('edt1d pixel aligned', () => {
@@ -227,7 +209,6 @@ describe('edt', () => {
 
   it('edt2d transverse pixel aligned', () => {
 
-    const I = 1e10;
     const mask = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as any;
     const xs   = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as any;
     const ys   = [0, 0, 0,-1.1,-2,-2,-2,-2,-1.1, 0, 0, 0] as any;

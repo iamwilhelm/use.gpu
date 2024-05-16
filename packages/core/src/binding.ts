@@ -1,9 +1,8 @@
 import type {
-  UniformType, UniformAttribute, UniformAttributeValue,
-  ShaderModule, ShaderModuleDescriptor, StorageSource, DataBinding, TextureSource, LambdaSource,
+  UniformAttribute, UniformAttributeValue,
+  ShaderModule, StorageSource, DataBinding, TextureSource, LambdaSource,
 } from './types';
-import { checkStorageTypes, checkStorageType } from './storage';
-import partition from 'lodash/partition';
+import { checkStorageType } from './storage';
 
 /**
  * Parse a set of shader sources for use with a given set of uniforms/attributes.

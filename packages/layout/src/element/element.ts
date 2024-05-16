@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { ColorLike, TextureSource, XYZW, Rectangle } from '@use-gpu/core';
+import type { ColorLike, XYZW, Rectangle } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { MarginLike, AutoXY } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
@@ -32,8 +32,6 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
     snap = false,
     absolute = false,
     under = false,
-
-    children,
   } = props;
 
   const { width, height, radius, border, stroke, fill, texture, image, zIndex } = useElementTrait(props);
@@ -53,7 +51,7 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
     const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
     const size = [w ?? 0, h ?? 0];
 
-    let render = memoLayout((
+    const render = memoLayout((
       layout: Rectangle,
       origin: Rectangle,
       z: number,

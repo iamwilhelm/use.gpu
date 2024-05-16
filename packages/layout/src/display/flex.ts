@@ -1,21 +1,19 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Rectangle } from '@use-gpu/core';
-import type { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, FitInto } from '../types';
+import type { LayoutElement, Margin, Direction, AlignmentLike, GapLike, Anchor, FitInto } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
-import { useProp, shouldEqual, sameArray, sameShallow } from '@use-gpu/traits/live';
+import { useProp, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { keyed, yeet, memo, gather, useFiber, useMemo } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
 import { makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
 import { BoxTrait, ElementTrait, useBoxTrait, useElementTrait } from '../traits';
-import { evaluateDimension, parseAlignmentXY, parseAnchor, parseDirectionX, parseGapXY, parseMargin } from '../parse';
+import { evaluateDimension, parseAlignmentXY, parseAnchor, parseDirectionX, parseGapXY } from '../parse';
 import { useImplicitElement } from '../element/element';
 import { BoxLayout } from '../render';
-
-const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
 export type FlexProps =
   TraitProps<typeof BoxTrait> &

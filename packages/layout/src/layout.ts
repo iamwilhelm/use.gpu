@@ -1,18 +1,18 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { XY, XYZW, Rectangle } from '@use-gpu/core';
 import type { Placement } from '@use-gpu/parse';
-import type { FitInto, LayoutElement, LayoutPicker } from './types';
+import type { LayoutElement } from './types';
 
 import { parsePlacement } from '@use-gpu/parse';
 import { useProp } from '@use-gpu/traits/live';
-import { memo, provide, gather, yeet, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
+import { memo, provide, gather, yeet, keyed, fragment, useContext, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 import { schemaToArchetype } from '@use-gpu/core';
 
 import {
   DebugContext, MouseContext, WheelContext, ViewContext,
   LayoutContext, useTransformContext,
   useInspectable, useInspectHoverable, useInspectorSelect, Inspector,
-  useShader, useNoShader,
+  useShader,
   QueueReconciler, LayerReconciler,
   UI_SCHEMA,
 } from '@use-gpu/workbench';
@@ -20,8 +20,7 @@ import {
 import { chainTo } from '@use-gpu/shader/wgsl';
 import { getLayoutPosition } from '@use-gpu/wgsl/layout/layout.wgsl';
 
-import { SDFRectangle } from './shape/sdf-rectangle';
-import { INSPECT_STYLE, ARCHETYPES } from './lib/constants';
+import { INSPECT_STYLE } from './lib/constants';
 
 import { mat4, vec2, vec3 } from 'gl-matrix';
 
@@ -45,8 +44,8 @@ export const Layout: LiveComponent<LayoutProps> = memo((props: PropsWithChildren
   // Remove X/Y flip from layout
   const layout = useContext(LayoutContext);
   const [l, t, r, b] = layout;
-  let left = Math.min(l, r);
-  let top = Math.min(t, b);
+  const left = Math.min(l, r);
+  const top = Math.min(t, b);
   let right = Math.max(l, r);
   let bottom = Math.max(t, b);
   if (width != null) right = left + width;
@@ -70,7 +69,6 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
   const h = Math.abs(b - t);
   const into = [w, h, w, h] as XYZW;
 
-  const {id} = useFiber();
   const pickers: any[] = [];
   const sizes: XY[] = [];
   const offsets: XY[] = [];
@@ -189,7 +187,7 @@ export const Scroller = (pickers: any[], flip: [number, number], shift: [number,
     for (const picker of pickers) {
       const picked = picker(x, y, true);
       if (picked) {
-        const [id, rectangle, onScroll] = picked;
+        const [,, onScroll] = picked;
         if (onScroll) onScroll(moveX, moveY);
         version = versionRef.current = incrementVersion(versionRef.current);
         return;
@@ -202,7 +200,6 @@ export const Scroller = (pickers: any[], flip: [number, number], shift: [number,
 }
 
 export const Inspect = (pickers: any[], flip: [number, number], shift: [number, number]) => {
-  const { id } = useFiber();
   const { useMouse } = useContext(MouseContext);
   const { uniforms: viewUniforms } = useContext(ViewContext);
   const {
@@ -229,7 +226,7 @@ export const Inspect = (pickers: any[], flip: [number, number], shift: [number, 
 
   if (!picked) return null;
 
-  const [pickedId, rectangle] = picked;
+  const [pickedId] = picked;
   useOne(() => setHighlight(pickedId ?? null), pickedId);
   useOne(() => pressed.left && setHighlight(pickedId ?? null, true), pressed.left);
 

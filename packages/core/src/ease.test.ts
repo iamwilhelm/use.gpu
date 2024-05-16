@@ -1,5 +1,5 @@
 import type { XY } from './types';
-import { cubicBezier, cubicBezierDt, cubicBezierInverse, makeDistanceMap, queryDistanceMap } from './ease';
+import { cubicBezier, cubicBezierInverse, makeDistanceMap, queryDistanceMap } from './ease';
 
 describe('ease', () => {
 

@@ -1,18 +1,17 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { Rectangle, XY, XYZW } from '@use-gpu/core';
+import type { Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { FitInto, LayoutElement, Dimension, Margin } from '../types';
+import type { FitInto, Dimension } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { useProp } from '@use-gpu/traits/live';
-import { use, memo, gather, provide, yeet, useContext, useFiber } from '@use-gpu/live';
+import { memo, provide, yeet, useFiber } from '@use-gpu/live';
 import { LayoutContext, TransformContext, LayerReconciler } from '@use-gpu/workbench';
-import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { memoFit, memoLayout } from '../lib/util';
 import { evaluateDimension } from '../parse';
 
 import { BoxTrait, useBoxTrait } from '../traits';
-import { parseDimension, parseMargin } from '../parse';
+import { parseDimension } from '../parse';
 
 const {quote} = LayerReconciler;
 
@@ -49,8 +48,6 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: PropsWithChildren<E
 
   const w = width != null && width === +width ? width : null;
   const h = height != null && height === +height ? height : null;
-
-  const fixed = [w, h] as [number | null, number | null];
 
   const sizing = [w ?? 0, h ?? 0, w ?? 1e5, h ?? 1e5];
 

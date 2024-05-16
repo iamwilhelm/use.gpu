@@ -12,7 +12,6 @@ type Bin = Set<Slot>;
 type Bins = Map<number, Set<Slot>>;
 
 const EMPTY: any[] = [];
-const sqr = (x: number) => x * x;
 
 export const makeAtlasSource = (
   device: GPUDevice,
@@ -119,6 +118,7 @@ export const makeAtlas = (
 
     for (const s of expand) removeSlot(s);
     for (const s of expand) {
+      // eslint-disable-next-line prefer-const
       let [l, t, r, b, nearX, nearY, farX, farY, corner] = s;
       if (r === width) r = w;
       if (b === height) b = h;
@@ -135,6 +135,7 @@ export const makeAtlas = (
     let h = 0;
 
     for (const k of map.keys()) {
+      // eslint-disable-next-line prefer-const @typescript-eslint/no-non-null-assertion
       const [,, r, b] = map.get(k)!;
       w = Math.max(r, w);
       h = Math.max(b, h);
@@ -259,7 +260,7 @@ export const makeAtlas = (
   };
 
   // Get highest scoring slot of at least given size
-  const getNextAvailable = (w: number, h: number, debug: boolean = false) => {
+  const getNextAvailable = (w: number, h: number) => {
     let slot: Slot | null = null;
     let max = 0;
 
@@ -303,10 +304,6 @@ export const makeAtlas = (
     const add = [] as Slot[];
     const remove = [] as Slot[];
 
-    const [l, t, r, b] = other;
-    const w = r - l;
-    const h = b - t;
-
     for (const slot of slots.values()) {
       stats.checks++;
       if (intersectRectangle(slot, other)) {
@@ -323,12 +320,13 @@ export const makeAtlas = (
     for (const s of add) addSlot(s);
   };
 
+  // eslint-disable-next-line prefer-const @typescript-eslint/no-non-null-assertion
   const debugPlacements = () => Array.from(map.keys()).map(k => map.get(k)!);
   const debugSlots = () => Array.from(slots.values()).map(s => s);
 
   const debugValidate = () => {
     const rects = debugPlacements();
-    let n = rects.length;
+    const n = rects.length;
 
     const out: any[] = [];
 
@@ -393,7 +391,6 @@ export const uploadAtlasMapping = (
 const intersectRange = (minA: number, maxA: number, minB: number, maxB: number) => !(minA >= maxB || minB >= maxA);
 const intersectRangeEnds = (minA: number, maxA: number, minB: number, maxB: number) => !(minA > maxB || minB > maxA);
 const containsRange = (minA: number, maxA: number, minB: number, maxB: number) => (minA <= minB && maxA >= maxB);
-const getOverlap = (minA: number, maxA: number, minB: number, maxB: number) => Math.max(0, Math.min(maxA, maxB) - Math.max(minA, minB));
 
 type RectLike = Rectangle | Slot;
 
@@ -404,13 +401,6 @@ const containsRectangle = (a: RectLike, b: RectLike): boolean => {
   return containsRange(al, ar, bl, br) && containsRange(at, ab, bt, bb);
 };
 
-const touchRectangle = (a: RectLike, b: RectLike): boolean => {
-  const [al, at, ar, ab] = a;
-  const [bl, bt, br, bb] = b;
-
-  return intersectRangeEnds(al, ar, bl, br) && intersectRangeEnds(at, ab, bt, bb);
-};
-
 const intersectRectangle = (a: RectLike, b: RectLike): boolean => {
   const [al, at, ar, ab] = a;
   const [bl, bt, br, bb] = b;
@@ -419,7 +409,7 @@ const intersectRectangle = (a: RectLike, b: RectLike): boolean => {
 };
 
 const subtractSlot = (a: Slot, b: RectLike): Slot[] => {
-  const [al, at, ar, ab, nearX, nearY, farX, farY, corner] = a;
+  const [al, at, ar, ab, nearX, nearY, farX, farY] = a;
   const [bl, bt, br, bb] = b;
 
   const out: Slot[] = [];

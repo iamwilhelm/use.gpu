@@ -2,17 +2,15 @@ import type { LC, LiveElement } from '@use-gpu/live';
 import type { XY, StorageSource, TextureSource, TypedArray, UniformType } from '@use-gpu/core';
 import type { GLTF, GLTFAccessorData, GLTFBufferData, GLTFBufferViewData, GLTFImageData, GLTFNodeData, GLTFMeshData, GLTFMaterialData, GLTFSceneData, GLTFTextureData } from './types';
 
-import { use, gather, fence, suspend, yeet, useCallback, useContext, useOne, useMemo, useState } from '@use-gpu/live';
+import { use, gather, fence, suspend, yeet, useContext, useOne, useMemo, useState } from '@use-gpu/live';
 
-import { DeviceContext, Fetch, getShader, useRenderProp } from '@use-gpu/workbench';
+import { DeviceContext, Fetch, useRenderProp } from '@use-gpu/workbench';
 import { makeDynamicTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, toDataBounds, UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
 
 import { parseBinaryGLTF, parseTextGLTF, toScene, toNode, toMesh, toMaterial } from './parse';
-import { generateTangents } from 'mikktspace';
 
 const STORAGE_ALIGNMENT = 256;
 const SIZE_ALIGNMENT = 16;
-const NO_BINDINGS: any[] = [];
 const NO_SAMPLER: any = {};
 
 type GLTFStorageSource = StorageSource & { arrayBuffer: ArrayBuffer | null };
@@ -125,14 +123,14 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
       // Expose native typed arrays for further processing before upload
       const typedFormats = useMap<GLTFAccessorData, string>(accessors,
-        ({type, componentType}, index) => {
+        ({type, componentType}) => {
           return accessorToType(type, componentType);
         },
         (accessor) => accessor,
         [accessors]);
 
       const typedArrays = useMap<GLTFAccessorData, TypedArray | null>(accessors,
-        ({bufferView, componentType, count, min, max, type, sparse}, index) => {
+        ({bufferView, componentType, count, type, sparse}) => {
           if (sparse) throw new Error("sparse GLTF accessors not implemented");
 
           const format = accessorToType(type, componentType);
@@ -175,7 +173,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
       // Convert bufferviews to storage source templates
       const bufferSources = useMap<GLTFBufferViewData, GLTFStorageSource | null>(bufferViews,
-        ({buffer, byteOffset, byteLength, byteStride}, index) => {
+        ({buffer, byteOffset, byteLength, byteStride}) => {
           if (byteStride != null && byteStride !== 1) throw new Error("byteStride != 1 not implemented");
 
           let gpuBuffer = gpuBuffers[buffer];
@@ -219,11 +217,10 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
       // Convert accessors to storage sources
       const storageSources = useMap<GLTFAccessorData, GLTFStorageSource | null>(accessors,
-        ({bufferView, componentType, count, min, max, type}, index) => {
+        ({bufferView, componentType, count, min, max, type}) => {
           const bufferSource = bufferSources[bufferView ?? -1];
           if (!bufferSource) return null;
 
-          const {byteLength, byteOffset} = bufferSource;
           const format = accessorToType(type, componentType);
 
           return {
@@ -271,7 +268,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
       // Convert textures to texture sources
       const textureSources = useMap<GLTFTextureData, TextureSource | null>(textures,
-        ({sampler, source}, index) => {
+        ({sampler, source}) => {
           const imageSource = imageSources[source as any];
           if (!imageSource) return null;
 
@@ -281,7 +278,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
             version: 1,
           };
         },
-        ({source}, index) => imageSources[source as any],
+        ({source}) => imageSources[source as any],
         [textures]);
 
       const data = {
@@ -332,7 +329,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
   };
 
   // Load GLTF or use inline data
-  if (props.data) return use(Resume, [props.data]);
+  if (data) return use(Resume, [data]);
   else return gather(use(Fetch, {
     url,
     type: 'arrayBuffer',

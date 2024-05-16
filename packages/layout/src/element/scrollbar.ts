@@ -1,19 +1,17 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ColorLike, TextureSource, XY, XYZW, Rectangle, TypedArray } from '@use-gpu/core';
+import type { LiveComponent } from '@use-gpu/live';
+import type { ColorLike, XY, XYZW, Rectangle, TypedArray } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Direction, OverflowMode, FitInto, UIAggregate } from '../types';
 
 import { useProp } from '@use-gpu/traits/live';
 import { parseColor } from '@use-gpu/parse';
-import { keyed, yeet, use, useFiber, useMemo } from '@use-gpu/live';
+import { yeet, use, useMemo } from '@use-gpu/live';
 import { schemaToArchetype } from '@use-gpu/core';
 import { useInspectHoverable, UI_SCHEMA } from '@use-gpu/workbench';
 
-import { evaluateDimension } from '../parse';
 import { isHorizontal, memoFit } from '../lib/util';
 import { INSPECT_STYLE } from '../lib/constants';
 
-import { SDFRectangle } from '../shape/sdf-rectangle';
 import { chainTo } from '@use-gpu/shader/wgsl';
 import { useShader, LayerReconciler } from '@use-gpu/workbench';
 

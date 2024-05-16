@@ -1,5 +1,5 @@
-import type { XY, XYZW, Rectangle } from '@use-gpu/core';
-import type { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, FitInto, Margin, Alignment, Anchor, Baseline } from '../types';
+import type { XY, XYZW } from '@use-gpu/core';
+import type { InlineElement, LayoutElement, InlineRenderer, LayoutPicker, Direction, FitInto, Alignment, Anchor, Baseline } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
 import { makeInlineCursor } from './cursor';
@@ -19,7 +19,6 @@ export const resolveInlineBlockElements = (els: (InlineElement | LayoutElement)[
     if ('spans' in el) out.push(el);
     else {
       const {fit, absolute, margin, inline = 'center'} = el;
-      const [ml, mt, mr, mb] = margin;
 
       const block = fit(into);
       const {size} = block;
@@ -71,7 +70,6 @@ export const getInlineMinMax = (
     }
   };
 
-  const n = els.length;
   for (const {spans, height, margin, absolute} of els) {
     const [ml, mt, mr, mb] = margin ?? NO_MARGIN;
     if (!absolute) {
@@ -80,8 +78,6 @@ export const getInlineMinMax = (
       caretMain += isX ? ml : mt;
       spans.iterate(perSpan);
       caretMain += isX ? mr : mb;
-
-      ++i;
     }
   }
 
@@ -121,8 +117,6 @@ export const fitInline = (
   let caretCross = 0;
   let maxMain = 0;
 
-  const n = els.length;
-
   const ranges  = [] as XY[];
   const sizes   = [] as XY[];
   const offsets = [] as [number, number, number][];
@@ -137,7 +131,7 @@ export const fitInline = (
   const cursor = makeInlineCursor(wrap ? spaceMain || 0 : 0, align, isSnap);
 
   for (const el of els) {
-    const {spans, block, margin, absolute, height: {lineHeight, ascent, descent, xHeight}} = el;
+    const {spans, margin, height: {lineHeight, ascent, descent, xHeight}} = el;
     const [ml, mt, mr, mb] = margin ?? NO_MARGIN;
 
     const n = spans.length;
@@ -162,7 +156,7 @@ export const fitInline = (
   // Process produced spans
   let i = 0;
   let span = 0;
-  const layouts = cursor.gather((start, end, gap, lead, count, lineHeight, ascent, descent, xHeight, index) => {
+  cursor.gather((start, end, gap, lead, count, lineHeight, ascent, descent, xHeight) => {
     let n = end - start;
     let mainPos = isSnap ? Math.round(lead) : lead;
 
@@ -179,7 +173,7 @@ export const fitInline = (
     while (n > 0 && i < els.length) {
       const el = els[i];
       const {spans, height, margin, inline, block, render, pick} = el;
-      const {ascent: a, descent: d, lineHeight: lh} = height;
+      const {ascent: a, lineHeight: lh} = height;
       const [ml, mt, mr, mb] = margin ?? NO_MARGIN;
 
       const last = spans.length - span;

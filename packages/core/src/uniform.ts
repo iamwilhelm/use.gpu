@@ -1,19 +1,16 @@
 import type {
-  UniformAllocation, VirtualAllocation, VolatileAllocation, GlobalAllocation, SharedAllocation,
+  UniformAllocation, VirtualAllocation, VolatileAllocation, GlobalAllocation,
   UniformAttribute, UniformAttributeDescriptor,
   UniformLayout, UniformType,
   UniformPipe, UniformByteSetter, UniformFiller, UniformDataSetter, UniformValueSetter,
   TypedArrayConstructor,
   DataBinding,
-  StorageSource,
-  TextureSource,
-  Lazy,
 } from './types';
 import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS, UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 
 import { getObjectKey, toMurmur53, mixBits53 } from '@use-gpu/state';
-import { makeBindGroupLayout, makeBindGroupLayoutEntries } from './bindgroup';
+import { makeBindGroupLayout } from './bindgroup';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler } from './texture';
 import { alignSizeTo } from './data';
@@ -171,12 +168,12 @@ export const makeVolatileUniforms = <T>(
   const hasBindings = !!bindings.length;
   if (!hasBindings) return NO_BINDINGS;
 
-  let depths = [];
+  const depths = [];
   for (const b of bindings) {
     if (b.storage?.volatile) depths.push(+b.storage.volatile);
     else if (b.texture?.volatile) depths.push(+b.texture.volatile);
   }
-  let depth = depths.length > 1 ? lcm(depths) : depths[0];
+  const depth = depths.length > 1 ? lcm(depths) : depths[0];
 
   if (depth === 1) {
     let lastKey = -1;
@@ -437,7 +434,7 @@ export const makeLayoutFiller = (
 
   const setData = (index: number, item: any) => {
     const base = index * length;
-    for (let k in item) {
+    for (const k in item) {
       const attr = map.get(k);
       if (!attr) continue;
 
@@ -491,7 +488,7 @@ const gcd = (a: number, b: number) => {
   let max = Math.max(a, b);
   let min = Math.min(a, b);
   while (min) {
-    let mod = max % min;
+    const mod = max % min;
     max = min;
     min = mod;
   }

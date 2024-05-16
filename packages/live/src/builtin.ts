@@ -1,12 +1,9 @@
 import type {
-  Initial, Setter, Reducer, Key, Task,
-  LiveFunction, LiveComponent, LiveFiber, LiveCapture, LiveContext, LiveReconciler, LiveElement, LiveNode,
-  FunctionCall, DeferredCall, HostInterface, ArrowFunction,
-  ReactElementInterop,
+  Key, LiveFunction, LiveFiber, LiveCapture, LiveContext, LiveReconciler, LiveElement, LiveNode,
+  DeferredCall, ArrowFunction,
 } from './types';
 
-import { compareFibers, tagFunction } from './util';
-import { bustFiberMemo } from './fiber';
+import { tagFunction } from './util';
 import { getCurrentFiberID } from './current';
 
 /** @hidden */
@@ -165,6 +162,7 @@ export const fragment = (
   calls: LiveNode<any>,
   key?: Key,
 ): DeferredCall<() => void> => {
+  if (key !== null) return {f: FRAGMENT, args: calls, key};
   if (Array.isArray(calls)) return calls as any;
   return [calls] as any;
 }
@@ -252,7 +250,7 @@ export const quoteTo = <T>(
 };
 
 /** Escape from quote. */
-export const unquote = <T>(
+export const unquote = (
   calls?: LiveNode<any>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: UNQUOTE, args: calls, key, by: getCurrentFiberID()} as any);
@@ -294,9 +292,9 @@ export const deprecated = <F extends ArrowFunction>(
 };
 
 export interface MakeContext<T> {
-  <T>(initialValue: T, displayName?: string): LiveContext<T>;
-  <T>(initialValue: undefined, displayName?: string): LiveContext<T>;
-  <T>(initialValue: null, displayName?: string): LiveContext<T | null>;
+  (initialValue: T, displayName?: string): LiveContext<T>;
+  (initialValue: undefined, displayName?: string): LiveContext<T>;
+  (initialValue: null, displayName?: string): LiveContext<T | null>;
 };
 
 /** Make Live context for holding shared value for child nodes (defaulted, required or optional). */

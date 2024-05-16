@@ -1,8 +1,7 @@
-import type { Color, ColorLike, Tuples, XY, XYZW, Rectangle } from '@use-gpu/core';
-import type { LiveElement, Key } from '@use-gpu/live';
+import type { Tuples, XY, XYZW, Rectangle } from '@use-gpu/core';
+import type { LiveElement } from '@use-gpu/live';
 import type { FontMetrics } from '@use-gpu/glyph';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
-import { mat4 } from 'gl-matrix';
 
 export type AutoXY = [number | null, number | null];
 export type AutoRectangle = [number | null, number | null, number | null, number | null];

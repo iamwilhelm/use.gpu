@@ -30,7 +30,7 @@ export const LOGGING = {
 - `fiber`: All updates to individual fibers.
 */
 export const setLogging = (options: LoggingOptions) => {
-  for (let k in options) LOGGING[k] = (options as any)[k];
+  for (const k in options) LOGGING[k] = (options as any)[k];
 };
 
 export const formatSnapshot = (arg: any, depth: number = 0): string => {
@@ -59,7 +59,7 @@ export const formatSnapshotArg = (arg: any, depth: number = 0): string => {
 
 export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
   const {mount, mounts, order, next} = root;
-  let out = [];
+  const out = [];
 
   const prefix = '  '.repeat(depth);
 
@@ -87,7 +87,7 @@ export const formatNodeName = <F extends Function>(_node: LiveElement<F>): strin
   const node = reactInterop(_node) as DeferredCall<F> | null;
   if (!node) return 'null';
 
-  const {f, arg, args} = node;
+  const {f, args} = node;
 
   // @ts-ignore
   let name = (f?.displayName ?? f?.name) || 'Fiber';
@@ -163,7 +163,7 @@ export const formatNode = <F extends Function>(_node: LiveElement<F>): string =>
         args.push(formatValue({reduce, initial}));
       }
       else if (node.f.name === 'PROVIDE') {
-        const [context,,, isMemo] = node.args;
+        const [context] = node.args;
         args.push(formatValue(context));
       }
       else if (node.f.name === 'MORPH') {

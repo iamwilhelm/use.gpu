@@ -1,13 +1,12 @@
 import type {
   HostInterface, LiveFiber, LiveFunction, LiveContext, LiveElement, LiveReconciler,
   FiberYeet, FiberQuote, FiberQuotes, FiberGather, FiberContext, ContextValues, ContextRoots,
-  OnFiber, DeferredCall, DeferredCallInterop, Key, ArrowFunction,
+  DeferredCall, Key, ArrowFunction,
 } from './types';
 
 import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CAPTURE, SUSPEND, RECONCILE, QUOTE, UNQUOTE, SIGNAL, EMPTY_FRAGMENT } from './builtin';
 import { discardState, useOne } from './hooks';
-import { renderFibers } from './tree';
-import { isSameDependencies, incrementVersion, compareFibers } from './util';
+import { incrementVersion, compareFibers } from './util';
 import { formatNode, formatNodeName, LOGGING } from './debug';
 import { createElement } from './jsx';
 
@@ -15,7 +14,6 @@ import { setCurrentFiber, setCurrentFiberBy } from './current';
 
 let ID = 0;
 
-const NO_FIBER = () => () => {};
 const NOP = () => {};
 const EMPTY_ARRAY = [] as any[];
 const ROOT_PATH = [0] as Key[];
@@ -26,44 +24,44 @@ const NO_CONTEXT = {
 };
 
 // Prepare to call a live function with optional given persistent fiber
-export const bind = <F extends ArrowFunction>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
-  fiber = fiber ?? makeFiber(f, null);
+export const bind = <F extends ArrowFunction>(f: LiveFunction<F>, maybeFiber?: LiveFiber<F> | null, base: number = 0) => {
+  const fiber = maybeFiber ?? makeFiber(f, null);
 
   const length = getArgCount(f);
   if (length === 0) {
     return () => {
-      enterFiber(fiber!, base);
+      enterFiber(fiber, base);
       const value = f();
-      exitFiber(fiber!);
+      exitFiber(fiber);
       return value;
     }
   }
   if (length === 1) {
     return (arg: any) => {
-      enterFiber(fiber!, base);
+      enterFiber(fiber, base);
       const value = f(arg);
-      exitFiber(fiber!);
+      exitFiber(fiber);
       return value;
     }
   }
   if (length === 2) {
     return (arg1: any, arg2: any) => {
-      enterFiber(fiber!, base);
+      enterFiber(fiber, base);
       const value = f(arg1, arg2);
-      exitFiber(fiber!);
+      exitFiber(fiber);
       return value;
     }
   }
   return (...args: any[]) => {
-    enterFiber(fiber!, base);
+    enterFiber(fiber, base);
+    // eslint-disable-next-line prefer-spread
     const value = f.apply(null, args);
-    exitFiber(fiber!);
+    exitFiber(fiber);
     return value;
   }
 };
 
 // Enter/exit a fiber call
-let enter = 0; let exit = 0;
 export const enterFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>, base: number) => {
   setCurrentFiber(fiber);
 
@@ -173,7 +171,9 @@ export const makeYeetState = <F extends ArrowFunction, A, B, C>(
 ): FiberYeet<any, C> => ({
   id: fiber.id,
   emit: map
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     ? (fiber: LiveFiber<any>, v: A) => fiber.yeeted!.reduced = map(fiber.yeeted!.value = v)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     : (fiber: LiveFiber<any>, v: B) => fiber.yeeted!.value = fiber.yeeted!.reduced = v,
   gather,
   value: undefined,
@@ -229,7 +229,7 @@ export const renderFiber = <F extends ArrowFunction>(
   const LOG = LOGGING.render;
   LOG && console.log('Rendering', formatNode(fiber));
 
-  const {bound, args, yeeted} = fiber;
+  const {bound, args} = fiber;
   let element: LiveElement;
 
   // Disposed fiber, ignore
@@ -243,6 +243,7 @@ export const renderFiber = <F extends ArrowFunction>(
     bound();
   }
   // Render live function
+  // eslint-disable-next-line prefer-spread
   else element = bound.apply(null, args ?? EMPTY_ARRAY);
   if (typeof element === 'string') throw new Error(`Component may not return a string (${element})`);
 
@@ -279,6 +280,7 @@ export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
   if (typeof element === 'string') throw new Error(`String "${element}" is not a valid JSX element`);
   let call = element as DeferredCall<any> | DeferredCall<any>[] | null;
   if (element && ('props' in element)) {
+    // eslint-disable-next-line prefer-const
     let {type, key} = element;
     const by = BY_MAP.get(element) ?? fiber?.id;
     const props = {...element.props, key};
@@ -309,17 +311,18 @@ export const updateFiber = <F extends ArrowFunction>(
 ) => {
   if (element === undefined) return;
 
-  const {f, args, yeeted} = fiber;
+  const {f, yeeted} = fiber;
 
   // Handle call and call[]
   element = reactInterop(element, fiber);
-  let call = element as DeferredCall<any> | null;
+  const call = element as DeferredCall<any> | null;
 
   const isArray = !!element && Array.isArray(element);
   const fiberType = isArray ? Array : call?.f;
 
   // If morphing, do before noticing type change
   if (fiberType === MORPH) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     let e = call!.args;
     e = reactInterop(e, fiber) as any;
 
@@ -394,7 +397,8 @@ export const updateFiber = <F extends ArrowFunction>(
   else if (fiberType === YEET) {
     if (!yeeted) throw new Error("Yeet without aggregator in " + formatNode(fiber));
 
-    const value = call?.arg !== undefined ? call!.arg : call!.args?.[0];
+    const value = call ? (call.arg !== undefined ? call.arg : call.args?.[0]) : undefined;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (value === undefined || (fiber.yeeted!.value !== value)) {
       bustFiberYeet(fiber);
       visitYeetRoot(fiber);
@@ -455,7 +459,7 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
   keys?: (number | Map<Key, number>)[],
   depth?: number,
 ) => {
-  let {mounts, order, lookup, host, next} = fiber;
+  const {mounts, order, lookup, host, next} = fiber;
   if (!mounts || !order || !lookup || !next) throw new Error('Cannot reconcile incrementally on uninitialized mounts');
 
   call = reactInterop(call, fiber) as DeferredCall<any> | null;
@@ -488,7 +492,7 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
     else {
       if (nextMount !== mount) {
         mounts.delete(key);
-        order.splice(order!.indexOf(key), 1);
+        order.splice(order.indexOf(key), 1);
       }
     }
 
@@ -505,6 +509,7 @@ export const reconcileFiberCalls = (() => {
     calls: LiveElement[],
     fenced?: boolean,
   ) => {
+    // eslint-disable-next-line prefer-const
     let {mount, mounts, order, lookup, runs} = fiber;
     if (mount) disposeFiberMounts(fiber);
 
@@ -664,11 +669,11 @@ export const mapReduceFiberCalls = <F extends ArrowFunction, R, T>(
   fallback?: R | typeof SUSPEND,
 ) => {
   const gather = reduceFiberValues(reducer);
-  return mountFiberReduction(fiber, calls, mapper, gather, next);
+  return mountFiberReduction(fiber, calls, mapper, gather, next, fallback);
 }
 
 // Gather-reduce a fiber
-export const gatherFiberCalls = <F extends ArrowFunction, R, T>(
+export const gatherFiberCalls = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   calls: LiveElement,
   next?: LiveFunction<any>,
@@ -703,14 +708,14 @@ export const fenceFiberCalls = <F extends ArrowFunction, T>(
 export const reduceFiberValues = <R>(
   reducer: (a: R, b: R) => R,
 ) => {
-  const reduce = <F extends ArrowFunction, T>(
+  const reduce = <F extends ArrowFunction>(
     fiber: LiveFiber<F>,
     self: boolean = false,
   ): R | typeof SUSPEND | undefined => {
     const {yeeted, mount, mounts, order} = fiber;
     if (!yeeted) throw new Error("Reduce without aggregator");
 
-    let isFork = fiber.fork;
+    const isFork = fiber.fork;
     if (!self) {
       if (fiber.next && !isFork) return reduce(fiber.next);
     }
@@ -719,8 +724,9 @@ export const reduceFiberValues = <R>(
     if (mounts && order) {
       if (mounts.size) {
         const n = mounts.size;
-        const first = mounts.get(order[0]);
-        let value = reduce(first!);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const first = mounts.get(order[0])!;
+        let value = reduce(first);
         if (value === SUSPEND) return yeeted.reduced = SUSPEND;
 
         if (n > 1) for (let i = 1; i < n; ++i) {
@@ -729,12 +735,14 @@ export const reduceFiberValues = <R>(
 
           const v = reduce(m);
           if (v === SUSPEND) return yeeted.reduced = SUSPEND;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           value = reducer((value as R), (v as R)!);
         }
 
         let reduced = value as any;
         if (isFork) {
-          let fork = reduce(fiber.next!);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const fork = reduce(fiber.next!);
           if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
 
           reduced = (reduced && fork) ? reducer(reduced, fork as any) : (reduced ?? fork);
@@ -748,7 +756,8 @@ export const reduceFiberValues = <R>(
 
       let reduced = value as any;
       if (isFork) {
-        let fork = reduce(fiber.next!);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const fork = reduce(fiber.next!);
         if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
 
         reduced = reduced && fork ? reducer(reduced, fork as any) : (reduced ?? fork);
@@ -773,7 +782,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
-  let isFork = fiber.fork;
+  const isFork = fiber.fork;
   if (!self) {
     if (fiber.next && !isFork) return gatherFiberValues(fiber.next);
   }
@@ -797,7 +806,8 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
       }
 
       if (isFork) {
-        let fork = gatherFiberValues(fiber.next!);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const fork = gatherFiberValues(fiber.next!);
         if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
 
         if (fork) items.push(...toArray<T>(fork as any));
@@ -810,8 +820,9 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
     if (value === SUSPEND) return yeeted.reduced = SUSPEND;
 
     if (isFork) {
-      let reduced = value ? toArray<T>(value as T | T[]).slice() : [];
-      let fork = gatherFiberValues(fiber.next!);
+      const reduced = value ? toArray<T>(value as T | T[]).slice() : [];
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const fork = gatherFiberValues(fiber.next!);
       if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
 
       reduced.push(...toArray<T>(fork as any));
@@ -822,6 +833,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
     return yeeted.reduced = value as T | T[];
   }
   else if (isFork) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return yeeted.reduced = gatherFiberValues(fiber.next!);
   }
   return [];
@@ -837,7 +849,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
-  let isFork = fiber.fork;
+  const isFork = fiber.fork;
   if (!self) {
     if (fiber.next && !isFork) return multiGatherFiberValues(fiber.next) as any;
   }
@@ -858,6 +870,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
       }
 
       if (isFork) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const fork = multiGatherFiberValues(fiber.next!);
         if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
 
@@ -874,6 +887,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
 
     if (isFork) {
       out = {...out};
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const fork = multiGatherFiberValues(fiber.next!);
       if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
 
@@ -883,6 +897,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
     return yeeted.reduced = out as any;
   }
   else if (isFork) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return multiGatherFiberValues(fiber.next!);
   }
   return {} as Record<string, T | T[]>;

@@ -158,11 +158,13 @@ export const updateMipTextureChain = (
     cache.set(key, pipeline);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const bindGroups = seq(mips).map((mip: number) => makeTextureBinding(device, pipeline!, views[mip], sampler));
 
   const commandEncoder = device.createCommandEncoder();
   for (let i = 1; i < mips; ++i) {
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptors[i]);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     passEncoder.setPipeline(pipeline!);
     passEncoder.setBindGroup(0, bindGroups[i - 1]);
     passEncoder.setVertexBuffer(0, vertexBuffer);

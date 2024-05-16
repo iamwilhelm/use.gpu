@@ -1,24 +1,22 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { UniformType, Rectangle, XY, XYZW } from '@use-gpu/core';
-import type { FitInto, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
+import type { FitInto, Direction, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
 
 import { useProp } from '@use-gpu/traits/live';
 import { memo, use, gather, yeet, extend, useFiber, useOne, useMemo } from '@use-gpu/live';
-import { bindBundle, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
+import { bindBundle, bundleToAttribute, chainTo } from '@use-gpu/shader/wgsl';
 import { useForceUpdate, useInspectable, getSource } from '@use-gpu/workbench';
 
 import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
 import { getShiftedRectangle } from '@use-gpu/wgsl/layout/shift.wgsl';
 
-import { fitAbsoluteBox } from '../lib/absolute';
 import { getBlockMinMax } from '../lib/block';
 import { makeBoxPicker, memoFit, memoLayout, isHorizontal } from '../lib/util';
 import { parseOverflow } from '../parse';
 import { BoxLayout } from '../render';
 import { ScrollBar } from '../element/scrollbar';
 import { Block } from './block';
-import { mat4 } from 'gl-matrix';
 
 const NO_FIXED: [null, null] = [null, null];
 const NO_POINT4: XYZW = [0, 0, 0, 0];
@@ -147,9 +145,9 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
-      const sizing = getBlockMinMax(els, NO_FIXED, [0, 0, 0, 0], direction);
+      const sizing = getBlockMinMax(els, NO_FIXED, [0, 0, 0, 0] direction);
       const [{margin, fit: fitBlock}, ...scrollBars] = els;
-      const [ml, mt, mr, mb] = margin;
+      const [ml, mt] = margin;
 
       const scrollBarWidth  = hasScrollY ? scrollBars[hasScrollX ? 1 : 0].sizing[2] : 0;
       const scrollBarHeight = hasScrollX ? scrollBars[0].sizing[3] : 0;
@@ -183,7 +181,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
           pickers.push(pick);
 
           for (const {fit} of scrollBars) {
-            const {render, pick, size} = fit(into);
+            const {render, size} = fit(into);
             sizes.push(size);
             offsets.push([0, 0]);
             renders.push(render);

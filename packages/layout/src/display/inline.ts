@@ -5,7 +5,7 @@ import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, A
 import type { TraitProps } from '@use-gpu/traits';
 
 import { useProp } from '@use-gpu/traits/live';
-import { keyed, fragment, use, memo, gather, yeet, useFiber, useOne, useMemo } from '@use-gpu/live';
+import { keyed, fragment, use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { getInlineMinMax, fitInline, resolveInlineBlockElements } from '../lib/inline';
 import { makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
@@ -13,7 +13,7 @@ import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 import { BoxLayout, InlineLayout } from '../render';
 
 import { BoxTrait, useBoxTrait } from '../traits';
-import { parseAlignment, parseBaseline, parseDirectionX, parseMargin } from '../parse';
+import { parseAlignment, parseBaseline, parseDirectionX } from '../parse';
 
 export type InlineProps =
   TraitProps<typeof BoxTrait> &
@@ -22,7 +22,6 @@ export type InlineProps =
 
   align?: Alignment,
   anchor?: Baseline,
-  padding?: MarginLike,
 
   wrap?: boolean,
   snap?: boolean,
@@ -38,7 +37,6 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
   const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionX);
-  const padding = useProp(props.padding, parseMargin);
   const anchor = useProp(props.anchor, parseBaseline, 'base');
   const align = useProp(props.align, parseAlignment);
 
@@ -65,6 +63,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
           let i = 0;
           for (const el of blockEls) {
             const {block} = el;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const {size, render, pick} = block!;
 
             blockSizes.push(size);

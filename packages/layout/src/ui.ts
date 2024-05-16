@@ -1,21 +1,19 @@
 import type { LC, LiveFunction, LiveElement } from '@use-gpu/live';
-import type { Atlas, Rectangle, TextureSource, UniformType, TypedArray, StorageSource } from '@use-gpu/core';
+import type { Rectangle } from '@use-gpu/core';
 import type { UIAggregate } from './types';
 
 import {
-  useDeviceContext, useDebugContext,
-  useAggregator, useBufferedSize,
+  useDebugContext,
+  useAggregator,
   SDFFontProvider,
   SDFRectangles,
   QueueReconciler, LayerReconciler,
   UI_SCHEMA,
 } from '@use-gpu/workbench';
-import { use, keyed, wrap, fragment, yeet, gather, unquote, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, wrap, fragment, gather, unquote, useMemo } from '@use-gpu/live';
 import { mixBits53, hashBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 import { overlapBounds, joinBounds } from './lib/util';
-
-const {signal} = QueueReconciler;
 
 const DEBUG = false;
 
@@ -55,12 +53,12 @@ export const UILayers: LC<UILayersProps> = ({
   const partitioner = makePartitioner();
 
   items.sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
-  for (let item of items) if (item) {
+  for (const item of items) if (item) {
     partitioner.push(item);
   }
   const layers = partitioner.resolve();
 
-  const els = layers.flatMap((layer, i): LiveElement => {
+  const els = layers.flatMap((layer): LiveElement => {
     if ((layer.items[0] as any)?.f) return (layer.items as any);
     return keyed(Layer, layer.key, layer.items);
   });
@@ -117,7 +115,7 @@ const makePartitioner = () => {
     const key = getItemTypeKey(item);
     const {bounds} = item;
 
-    const i = last.get(key)!;
+    const i = last.get(key);
     const n = layers.length;
     const layer = layers[i];
 

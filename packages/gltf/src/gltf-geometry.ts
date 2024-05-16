@@ -1,5 +1,4 @@
-import type { LC, LiveElement } from '@use-gpu/live';
-import type { TypedArray, UniformAttribute, UniformType } from '@use-gpu/core';
+import type { TypedArray, UniformType } from '@use-gpu/core';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { toUnweldedArray, formatToArchetype, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
@@ -7,7 +6,7 @@ import { useMemo } from '@use-gpu/live';
 import { patch, $nop } from '@use-gpu/state';
 import { transformPositions, transformNormals } from '@use-gpu/workbench';
 import { generateTangents } from 'mikktspace';
-import { vec3, mat3, mat4 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 
 export const useGLTFGeometry = (
   gltf: GLTF,
@@ -20,10 +19,10 @@ export const useGLTFGeometry = (
     attributes: {POSITION, NORMAL, TANGENT, TEXCOORD_0},
     indices,
     material,
-    mode,
   } = primitive;
 
-  const side = !!materials?.[material!]?.doubleSided ? 'both' : 'front';
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const side = materials?.[material!]?.doubleSided ? 'both' : 'front';
 
   const geometry = useMemo(() => {
     const attributes: Record<string, TypedArray> = {};

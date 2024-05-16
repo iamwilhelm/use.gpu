@@ -1,11 +1,9 @@
 import type { LiveElement } from '@use-gpu/live';
-import type { ShaderModule } from '@use-gpu/shader';
-import type { XY, XYZW, Rectangle } from '@use-gpu/core';
-import type { LayoutRenderer, RenderInside, RenderOutside, RenderInline, InlineRenderer, InlineLine, UIAggregate } from './types';
+import type { Rectangle } from '@use-gpu/core';
+import type { RenderInside, RenderOutside, RenderInline, InlineRenderer, InlineLine, UIAggregate } from './types';
 
-import { memoArgs, yeet, fragment, use, useFiber, useMemo, useNoMemo, QUOTE } from '@use-gpu/live';
+import { memoArgs, yeet, useMemo, useNoMemo } from '@use-gpu/live';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
-import { toMurmur53 } from '@use-gpu/state';
 import { schemaToArchetype } from '@use-gpu/core';
 import { UI_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
@@ -13,8 +11,6 @@ import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.w
 import { INSPECT_STYLE } from './lib/constants';
 
 const {quote} = LayerReconciler;
-
-const NO_OBJECT: any = {};
 
 const sameBox = (a: [any, any, any, any], b: [any, any, any, any]) => {
   return (a[0] === b[0]) && (a[1] === b[1]) && (a[2] === b[2]) && (a[3] === b[3]);
@@ -49,7 +45,7 @@ export const BoxLayout = memoRender((
   const {sizes, offsets, renders, clip, mask, transform, inverse} = inside;
   const {box, origin, z, clip: parentClip, mask: parentMask, transform: parentTransform, ref} = outside;
 
-  const [left, top, right, bottom] = box;
+  const [left, top] = box;
   const out = [] as LiveElement[];
   const n = sizes.length;
 
@@ -103,7 +99,6 @@ export const BoxLayout = memoRender((
   }
 
   if (inspect) {
-    let i = 0;
     const yeets = [] as UIAggregate[];
 
     const attributes = {
@@ -165,10 +160,10 @@ export const InlineLayout = (
   outside: RenderOutside,
   inspect?: boolean,
 ) => {
-  let {ranges, sizes, offsets, renders, key} = inline;
+  const {ranges, sizes, offsets, renders, key} = inline;
   const {box, origin, z, clip, mask, transform, ref} = outside;
 
-  let [left, top, right, bottom] = box;
+  const [left, top] = box;
 
   const n = ranges.length;
 
@@ -179,6 +174,7 @@ export const InlineLayout = (
   const out: LiveElement[] = [];
   const els: LiveElement[] = [];
   const flush = (render: InlineRenderer) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const el = render(lines, origin, z, clip!, mask!, transform!, hash);
     if (Array.isArray(el)) els.push(...(el as any[]));
     else els.push(el);
@@ -216,7 +212,6 @@ export const InlineLayout = (
   if (els.length) out.push(quote(els));
 
   if (inspect) {
-    let i = 0;
     const yeets = [] as UIAggregate[];
 
     const attributes = {
@@ -238,11 +233,10 @@ export const InlineLayout = (
     const [left, top] = box;
     const n = ranges.length;
     for (let i = 0; i < n; ++i) {
-      const range = ranges[i];
       const size = sizes[i];
       const offset = offsets[i];
 
-      const [x, y, gap] = offset;
+      const [x, y] = offset;
       const l = left + x;
       const t = top + y;
       const r = l + size[0];

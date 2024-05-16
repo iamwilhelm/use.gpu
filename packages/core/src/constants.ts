@@ -79,8 +79,8 @@ export const VERTEX_TO_UNIFORM = {
 export const shorthands = <A extends string, B>(sizes: Record<A, B>): Record<A, B> => {
   for (const k of Object.keys(sizes) as A[]) {
     let match;
-    if (match = k.match(/^vec([0-9])<([iuf])32>$/)) (sizes as any)[`vec${match[1]}${match[2]}`] = sizes[k];
-    if (match = k.match(/^vec([0-9])<f16>$/)) (sizes as any)[`vec${match[1]}h`] = sizes[k];
+    if ((match = k.match(/^vec([0-9])<([iuf])32>$/)) != null) (sizes as any)[`vec${match[1]}${match[2]}`] = sizes[k];
+    if ((match = k.match(/^vec([0-9])<f16>$/)) != null) (sizes as any)[`vec${match[1]}h`] = sizes[k];
   }
   return sizes;
 };

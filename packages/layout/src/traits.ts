@@ -11,7 +11,6 @@ import {
   parseColor,
 } from '@use-gpu/parse';
 import {
-  parseAlignmentXY,
   parseAnchor,
   parseAnchorXY,
   parseBaseline,

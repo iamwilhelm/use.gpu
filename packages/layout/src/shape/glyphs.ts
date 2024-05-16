@@ -1,12 +1,11 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { Rectangle, TextureSource, Tuples, XYZW } from '@use-gpu/core';
+import type { Rectangle, Tuples, XYZW } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { FontMetrics } from '@use-gpu/glyph';
 import type { InlineLine } from '../types';
 
-import { use, yeet, useContext, useMemo } from '@use-gpu/live';
-import { SDFFontProvider, useSDFFontContext, UI_SCHEMA } from '@use-gpu/workbench';
-import { evaluateDimension } from '../parse';
+import { yeet, useMemo } from '@use-gpu/live';
+import { useSDFFontContext, UI_SCHEMA } from '@use-gpu/workbench';
 import { getOriginProjectionX, getOriginProjectionY } from '../lib/util';
 import { schemaToArchetype } from '@use-gpu/core';
 
@@ -80,18 +79,16 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     for (const {layout, start, end, gap} of lines) {
       const [l, t] = layout;
 
-      const {ascent, lineHeight} = height;
+      const {ascent} = height;
       let x = snap ? Math.round(l) : l;
-      let y = snap ? Math.round(t + ascent) : t + ascent;
-
-      let first = true;
+      const y = snap ? Math.round(t + ascent) : t + ascent;
 
       let sx = x;
       spans.iterate((_a, trim, _h, index) => {
         glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: number, kerning: number) => {
           const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, detail);
           const {image, layoutBounds, outlineBounds, rgba, scale: glyphScale} = glyph;
-          const [ll, lt, lr, lb] = layoutBounds;
+          const [,,lr,] = layoutBounds;
 
           const r = rgba ? -1 : 1;
           const s = scale * glyphScale;

@@ -44,7 +44,7 @@ export const setFloat64N = (n: number) => (view: DataView, offset: number, data:
 };
 
 export const setUint16Nx3 = (n: number) => (view: DataView, offset: number, data: Uint16Array): void => {
-  let nn = n / 3;
+  const nn = n / 3;
   for (let i = 0; i < nn; ++i) {
     const j = i * 3;
     setUint16(view, offset + i * 8,     data[j]);
@@ -55,7 +55,7 @@ export const setUint16Nx3 = (n: number) => (view: DataView, offset: number, data
 };
 
 export const setUint32Nx3 = (n: number) => (view: DataView, offset: number, data: Uint32Array): void => {
-  let nn = n / 3;
+  const nn = n / 3;
   for (let i = 0; i < nn; ++i) {
     const j = i * 3;
     setUint32(view, offset + i * 16,      data[j]);
@@ -66,7 +66,7 @@ export const setUint32Nx3 = (n: number) => (view: DataView, offset: number, data
 };
 
 export const setInt32Nx3 = (n: number) => (view: DataView, offset: number, data: Int32Array): void => {
-  let nn = n / 3;
+  const nn = n / 3;
   for (let i = 0; i < nn; ++i) {
     const j = i * 3;
     setInt32(view, offset + i * 16,      data[j]);
@@ -77,7 +77,7 @@ export const setInt32Nx3 = (n: number) => (view: DataView, offset: number, data:
 };
 
 export const setFloat32Nx3 = (n: number) => (view: DataView, offset: number, data: Float32Array): void => {
-  let nn = n / 3;
+  const nn = n / 3;
   for (let i = 0; i < nn; ++i) {
     const j = i * 3;
     setFloat32(view, offset + i * 16,      data[j]);
@@ -88,7 +88,7 @@ export const setFloat32Nx3 = (n: number) => (view: DataView, offset: number, dat
 };
 
 export const setFloat64Nx3 = (n: number) => (view: DataView, offset: number, data: Float64Array): void => {
-  let nn = n / 3;
+  const nn = n / 3;
   for (let i = 0; i < nn; ++i) {
     const j = i * 3;
     setFloat64(view, offset + i * 32,      data[j]);

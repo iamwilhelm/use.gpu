@@ -1,13 +1,12 @@
 import type { LiveElement } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { XY, XYZW, Rectangle } from '@use-gpu/core';
-import type { FitInto, AutoXY, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
+import type { FitInto, Direction, Alignment, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
 
-import { yeet, fragment, morph, use } from '@use-gpu/live';
+import { fragment, morph, use } from '@use-gpu/live';
 import { toMurmur53 } from '@use-gpu/state';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
-import { INSPECT_STYLE } from './constants';
 
 export const isHorizontal = (d: Direction) => d === 'x' || d === 'lr' || d === 'rl';
 export const isVertical = (d: Direction) => d === 'y' || d === 'tb' || d === 'bt';
@@ -17,14 +16,13 @@ const sameBox = (a: [any, any, any, any], b: [any, any, any, any]) => {
   return (a[0] === b[0]) && (a[1] === b[1]) && (a[2] === b[2]) && (a[3] === b[3]);
 };
 
-const NO_OBJECT: any = {};
-
 type Fitter<T> = (into: FitInto) => T;
 export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
   let last: FitInto | undefined;
   let value: T | null = null;
   return (into: FitInto) => {
     if (last && sameBox(last, into)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return value!;
     }
     value = f(into);
@@ -117,6 +115,7 @@ export const memoInline = <T>(f: Inline<T>): Inline<T> => {
       lastMask === mask &&
       lastTransform === transform
     ) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return value!;
     }
     value = f(lines, origin, z, clip, mask, transform);
@@ -157,7 +156,7 @@ export const makeBoxLayout = (
   parentMask?: ShaderModule | null,
   parentTransform?: ShaderModule | null,
 ) => {
-  const [left, top, right, bottom] = box;
+  const [left, top] = box;
   const out = [] as LiveElement[];
   const n = sizes.length;
 
@@ -217,7 +216,7 @@ export const makeInlineLayout = (
   mask?: ShaderModule | null,
   transform?: ShaderModule | null,
 ) => {
-  let [left, top, right, bottom] = box;
+  const [left, top] = box;
   const n = ranges.length;
 
   let last: InlineRenderer | null = null;
@@ -230,6 +229,7 @@ export const makeInlineLayout = (
 
   const out: LiveElement[] = [];
   const flush = (render: InlineRenderer) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const el = render(lines, origin, z, clip!, mask!, transform!, key);
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);
@@ -306,8 +306,8 @@ export const makeBoxPicker = (
       tt -= scrollPos[1];
     }
 
-    let rr = ll + w;
-    let bb = tt + h;
+    const rr = ll + w;
+    const bb = tt + h;
 
     const sub = pick && pick(x, y, ll, tt, rr, bb, scroll);
     if (sub) return sub;

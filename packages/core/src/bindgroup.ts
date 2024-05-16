@@ -1,4 +1,4 @@
-import type { DataBinding, StorageSource, ShaderStructType, UniformFormat, UniformAttribute, UniformType } from './types';
+import type { DataBinding, ShaderStructType, UniformFormat, UniformAttribute } from './types';
 import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
 import { makeUniformLayout, toTypeString } from './uniform';
 
@@ -63,7 +63,7 @@ export const makeBindGroupLayoutEntries = (
   binding: number = 0,
 ): GPUBindGroupLayoutEntry[] => {
   const out = [];
-  for (let b of bindings) {
+  for (const b of bindings) {
     const v = typeof visibilities === 'number' ? visibilities : (visibilities.get(b) || 7);
     const l = makeBindingLayoutEntry(b, v, out.length + binding);
     if (Array.isArray(l)) out.push(...l);
@@ -77,13 +77,13 @@ export const makeBindingLayoutEntry = (
   visibility: GPUShaderStageFlags,
   binding: number,
 ): GPUBindGroupLayoutEntry | GPUBindGroupLayoutEntry[] => {
-  if (b.storage) {
+  if (b.storage != null) {
     const minBindingSize = getMinBindingSize(b.storage.format, b.storage.type);
-    if (b.storage!.readWrite) return {binding, visibility, buffer: {type: 'storage', minBindingSize}};
+    if (b.storage.readWrite) return {binding, visibility, buffer: {type: 'storage', minBindingSize}};
     return {binding, visibility, buffer: {type: 'read-only-storage', minBindingSize}};
   }
-  if (b.texture) {
-    const hasSampler = !!(b.texture!.sampler && (b.uniform!.args !== null));
+  if (b.texture != null) {
+    const hasSampler = !!(b.texture.sampler && (b.uniform.args !== null));
 
     const textureType = b.uniform.args ? b.texture.layout : (b.uniform.format as string);
     const textureVariant = b.texture.variant ?? (b.uniform.args ? null : 'textureLoad');
@@ -93,7 +93,7 @@ export const makeBindingLayoutEntry = (
     const texture = {binding, visibility, ...props};
 
     if (hasSampler) {
-      const type = (b.texture!.comparison ? 'comparison' : 'filtering') as GPUSamplerBindingType;
+      const type = (b.texture.comparison ? 'comparison' : 'filtering') as GPUSamplerBindingType;
       const sampler = {binding: binding + 1, visibility, sampler: {type}};
       return [texture, sampler];
     }

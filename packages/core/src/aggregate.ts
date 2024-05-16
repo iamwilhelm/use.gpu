@@ -1,6 +1,5 @@
 import type {
   AggregateItem,
-  AggregateValue,
   ArrayAggregate,
   StructAggregate,
   ArrayAggregateBuffer,
@@ -14,26 +13,21 @@ import type {
 
 import { resolve } from './lazy';
 import { makeStorageBuffer, uploadStorage } from './buffer';
-import { incrementVersion } from './id';
 import {
-  alignSizeTo,
   castRawArray,
   makeRawArray,
   makeGPUArray,
   copyNumberArray,
-  fillNumberArray,
   offsetNumberArray,
-  unweldNumberArray,
   spreadNumberArray,
 } from './data';
 import { makeUniformLayout, toCPUDims, toGPUDims } from './uniform';
-import { toMurmur53, mixBits53 } from '@use-gpu/state';
 
 export const getAggregateSummary = (items: AggregateItem[]) => {
   const n = items.length;
   const archetype = items[0]?.archetype ?? 0;
 
-  let indexOffsets = [];
+  const indexOffsets = [];
 
   let allCount = 0;
   let allIndexed = 0;
@@ -219,7 +213,7 @@ export const uploadAggregateBuffer = (
   device: GPUDevice,
   aggregate: ArrayAggregateBuffer | StructAggregateBuffer,
 ) => {
-  const {buffer, array, raw, source, length} = aggregate as any;
+  const {array, raw, source, length} = aggregate as any;
   uploadStorage(device, source, raw ?? array.buffer, length);
   return source;
 }

@@ -12,6 +12,7 @@ export const parseBinaryGLTF = (data: ArrayBuffer) => {
 
   const magic         = getUint32(view, ptr);
   const version       = getUint32(view, ptr);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const length        = getUint32(view, ptr);
 
   if (magic !== GLTF_MAGIC) return null;
@@ -21,8 +22,8 @@ export const parseBinaryGLTF = (data: ArrayBuffer) => {
   let bin = null;
 
   let chunk;
-  while (chunk = getBinaryChunk(view, ptr)) {
-    const {length, type, data} = chunk;
+  while ((chunk = getBinaryChunk(view, ptr)) != null) {
+    const {type, data} = chunk;
 
     if (type === 0x4E4F534A) {
       ({json} = parseTextGLTF(data));

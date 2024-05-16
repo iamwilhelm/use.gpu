@@ -1,4 +1,4 @@
-import type { Lazy, Emitter, Writer, VectorEmitter, Emit, TypedArray, FieldArray, TensorArray, VectorLike, VectorLikes, UniformType, UniformAttribute } from './types';
+import type { Emitter, Writer, Emit, TypedArray, FieldArray, TensorArray, VectorLike, UniformType } from './types';
 
 import { getUniformArrayType, getUniformArrayDepth, getUniformDims, getUniformAlign, toCPUDims, toGPUDims } from './uniform';
 import { isTypedArray } from './buffer';
@@ -37,7 +37,6 @@ export const makeGPUArray = (type: UniformType, length: number): FieldArray => {
 export const makeTensorArray = (type: UniformType, size: number | number[]): TensorArray => {
   const ctor  = getUniformArrayType(type);
   const dims  = getUniformDims(type);
-  const align = getUniformAlign(type);
 
   const d = toCPUDims(dims);
   const scalar = typeof size === 'number';
@@ -49,9 +48,7 @@ export const makeTensorArray = (type: UniformType, size: number | number[]): Ten
 };
 
 export const toTensorArray = (type: UniformType, data: TypedArray, size?: VectorLike): TensorArray => {
-  const ctor  = getUniformArrayType(type);
   const dims  = getUniformDims(type);
-  const align = getUniformAlign(type);
 
   const d = toCPUDims(dims);
 
@@ -89,7 +86,7 @@ export const makeCopyPipe = ({
   const n = count ?? (((from as VectorLike).length ?? 1) / fromDims);
   const step = stride ?? toDims;
 
-  let f = fromIndex;
+  const f = fromIndex;
   let t = toIndex;
 
   if (step !== toDims || fromDims !== toDims || index != IDENTITY)  {
@@ -110,7 +107,7 @@ export const makeCopyPipe = ({
     else if (dims4 === 1) {
       for (let i = 0; i < n; ++i) {
         for (let j = 0; j < repeat; ++j) {
-          let b = f + index(i);
+          const b = f + index(i);
           to[t + j] = map(from[b]);
         }
         t += step;
@@ -118,7 +115,7 @@ export const makeCopyPipe = ({
     }
     else if (dims4 === 2) {
       for (let i = 0; i < n; ++i) {
-        let b = f + index(i) * 2;
+        const b = f + index(i) * 2;
         to[t    ] = map(from[b]);
         to[t + 1] = map(from[b + 1]);
         t += step;
@@ -126,7 +123,7 @@ export const makeCopyPipe = ({
     }
     else if (dims4 === 3) {
       for (let i = 0; i < n; ++i) {
-        let b = f + index(i) * 3;
+        const b = f + index(i) * 3;
         to[t    ] = map(from[b]);
         to[t + 1] = map(from[b + 1]);
         to[t + 2] = map(from[b + 2]);
@@ -138,10 +135,10 @@ export const makeCopyPipe = ({
         // vec3to4 extension
         if (repeat > 1) {
           for (let i = 0; i < n; ++i) {
-            let b = f + index(i) * 3 * repeat; // !
+            const b = f + index(i) * 3 * repeat; // !
             for (let j = 0; j < repeat; ++j) {
-              let bb = b + j * 3;
-              let tt = t + j * 4;
+              const bb = b + j * 3;
+              const tt = t + j * 4;
               to[tt    ] = map(from[bb]);
               to[tt + 1] = map(from[bb + 1]);
               to[tt + 2] = map(from[bb + 2]);
@@ -152,7 +149,7 @@ export const makeCopyPipe = ({
         }
         else {
           for (let i = 0; i < n; ++i) {
-            let b = f + index(i) * 3; // !
+            const b = f + index(i) * 3; // !
             to[t    ] = map(from[b]);
             to[t + 1] = map(from[b + 1]);
             to[t + 2] = map(from[b + 2]);
@@ -164,11 +161,11 @@ export const makeCopyPipe = ({
       else {
         if (repeat > 1) {
           for (let i = 0; i < n; ++i) {
-            let b = f + index(i) * 4 * repeat;
+            const b = f + index(i) * 4 * repeat;
             for (let j = 0; j < repeat; ++j) {
-              let j4 = j * 4;
-              let tt = t + j4;
-              let bb = b + j4;
+              const j4 = j * 4;
+              const tt = t + j4;
+              const bb = b + j4;
               to[tt    ] = map(from[bb]);
               to[tt + 1] = map(from[bb + 1]);
               to[tt + 2] = map(from[bb + 2]);
@@ -179,7 +176,7 @@ export const makeCopyPipe = ({
         }
         else {
           for (let i = 0; i < n; ++i) {
-            let b = f + index(i) * 4;
+            const b = f + index(i) * 4;
             to[t    ] = map(from[b]);
             to[t + 1] = map(from[b + 1]);
             to[t + 2] = map(from[b + 2]);
@@ -201,7 +198,7 @@ export const makeCopyPipe = ({
       }
     }
     else {
-      let b = t;
+      const b = t;
       for (let i = 0; i < nd; ++i) {
         to[b + i] = map(from[f + i]);
       }
@@ -218,7 +215,7 @@ export const makeCopyPipe = ({
       }
     }
     else {
-      let b = t;
+      const b = t;
       for (let i = 0; i < nd; ++i) {
         to[b + i] = from[f + i];
       }
@@ -251,7 +248,7 @@ export const copyRawNumberArray = (
     }
   }
   else {
-    let b = t;
+    const b = t;
     for (let i = 0; i < nd; ++i) {
       to[b + i] = from[f + i];
     }
@@ -318,7 +315,7 @@ export const fillNumberArray = (() => {
     if (typeof from === 'number') {
       const step = stride || toDims;
 
-      let f = fromIndex;
+      const f = fromIndex;
       let t = toIndex;
 
       if (toDims === 1) {
@@ -427,7 +424,7 @@ export const copyNestedNumberArray = (
 ): number => {
   const n = count ?? from.length;
 
-  let s = fromIndex;
+  const s = fromIndex;
   let o = toIndex;
 
   if (toDims === 1) {
@@ -541,6 +538,7 @@ export const makeSpreadEmitter = (
 ) => (
   to: TypedArray,
   toIndex: number = 0,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   count: number = 0,
   stride?: number,
 ) => spreadNumberArray(from, to, slices, fromDims, toDims, fromIndex, toIndex, stride);
@@ -710,7 +708,6 @@ export const emitMultiArray = <T>(
   const n = size.length;
   const {emit, emitted} = writer;
 
-  let nest: Emitter;
   if (n === 1) {
     for (let i = 0; i < length; i++) {
       expr(emit, i, props);
@@ -747,10 +744,10 @@ export const emitMultiArray = <T>(
     }
   }
   else {
-    const index = size.map(_ => 0);
+    const index = size.map(() => 0);
     const increment = () => {
       for (let i = 0; i < n; ++i) {
-        let c = index[i];
+        const c = index[i];
         if (c === size[i] - 1) index[i] = 0;
         else {
           index[i] = c + 1;

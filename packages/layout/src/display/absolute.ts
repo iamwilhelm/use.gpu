@@ -4,7 +4,7 @@ import type { Rectangle } from '@use-gpu/core';
 import type { LayoutElement, FitInto, Dimension, Direction } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
-import { shouldEqual, sameArray, sameShallow } from '@use-gpu/traits/live';
+import { shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { memo, gather, keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
 import { makeBoxPicker, memoFit } from '../lib/util';
@@ -39,7 +39,6 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
     direction = 'y',
     under = false,
     snap = true,
-    children,
   } = props;
 
   const { width, height, aspect, zIndex } = useElementTrait(props);

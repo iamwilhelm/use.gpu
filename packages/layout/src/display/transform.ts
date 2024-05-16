@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { Rectangle, UniformAttribute } from '@use-gpu/core';
+import type { Rectangle } from '@use-gpu/core';
 import type { LayoutRenderer, LayoutElement, FitInto } from '../types';
 
 import { use, memo, gather, yeet, useMemo } from '@use-gpu/live';

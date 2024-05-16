@@ -1,4 +1,3 @@
-import { getOptions } from 'loader-utils';
 import { validate } from 'schema-utils';
 import { transpileWGSL } from '@use-gpu/shader/wgsl';
 
@@ -23,7 +22,6 @@ function wgslLoader(this: any, source: string) {
   const minify = options.minify != null ? options.minify : false;
 
   const {resourcePath} = this;
-
   return transpileWGSL(source, resourcePath, esModule, minify);
 }
 

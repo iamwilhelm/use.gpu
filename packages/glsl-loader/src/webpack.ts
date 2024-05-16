@@ -1,4 +1,3 @@
-import { getOptions } from 'loader-utils';
 import { validate } from 'schema-utils';
 import { transpileGLSL } from '@use-gpu/shader/glsl';
 
@@ -21,8 +20,8 @@ function glslLoader(this: any, source: string) {
 
   const esModule = options.esModule != null ? options.esModule : true;
   const minify = options.minify != null ? options.minify : false;
-  const {resourcePath} = this;
 
+  const {resourcePath} = this;
   return transpileGLSL(source, resourcePath, esModule, minify);
 }
 

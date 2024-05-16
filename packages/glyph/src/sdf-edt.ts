@@ -1,5 +1,5 @@
 import type { Image } from './types';
-import { glyphToRGBA, INF, Rectangle, SDFStage, getSDFStage } from './sdf';
+import { glyphToRGBA, INF, SDFStage, getSDFStage } from './sdf';
 
 // Convert grayscale glyph to SDF using pixel-based distance transform
 export const glyphToEDT = (
@@ -58,7 +58,6 @@ export const paintIntoStage = (
   w: number,
   h: number,
   pad: number,
-  subpixel?: boolean,
 ) => {
   const wp = w + pad * 2;
   const hp = h + pad * 2;

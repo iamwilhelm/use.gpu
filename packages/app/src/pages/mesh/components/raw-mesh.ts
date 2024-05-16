@@ -1,11 +1,11 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode, DataTexture } from '@use-gpu/core';
+import type { UniformAttribute, VertexData, RenderPassMode, DataTexture } from '@use-gpu/core';
 
 import { useViewContext, useDeviceContext, useRenderContext, usePickingContext } from '@use-gpu/workbench';
-import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memo, useMemo } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeRawTexture, makeMultiUniforms,
-  makeRenderPipeline, makeShaderModuleDescriptor, makeShaderBinding, makeSampler, makeTextureBinding,
+  makeRenderPipeline, makeShaderModuleDescriptor, makeSampler, makeTextureBinding,
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
 import { linkBundle, getBundleLabel } from '@use-gpu/shader/wgsl';
@@ -68,8 +68,7 @@ export const RawMesh: LiveComponent<RawMeshProps> = memo((props: RawMeshProps) =
   const device = useDeviceContext();
   const {bind: unbind, uniforms: viewUniforms, defs: viewDefs} = useViewContext();
 
-  // Debug / Picking mode
-  const isDebug = mode === 'debug';
+  // Picking mode
   const isPicking = mode === 'picking';
 
   const renderContext = useRenderContext();

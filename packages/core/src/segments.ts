@@ -11,9 +11,9 @@ export const accumulateChunks = (
 ) => {
   const cs = chunks as any;
   const count = (
-    loops === true ? cs.reduce((a: number, b: number, i: number) => a + b + 3, 0) :
+    loops === true ? cs.reduce((a: number, b: number) => a + b + 3, 0) :
     loops ? cs.reduce((a: number, b: number, i: number) => a + b + (loops[i] ? 3 : 0), 0) :
-    cs.reduce((a: number, b: number, i: number) => a + b, 0)
+    cs.reduce((a: number, b: number) => a + b, 0)
   );
   return count;
 };
@@ -29,8 +29,9 @@ export const generateChunkSegments = (
   starts: VectorLike | boolean[] | boolean | null = false,
   ends: VectorLike | boolean[] | boolean | null = false,
 ) => {
+  const n = chunks.length;
+
   let pos = 0;
-  let n = chunks.length;
   let o = 0;
   let k = 0;
   let g = 0;
@@ -100,8 +101,9 @@ export const generateChunkFaces = (
   chunks: VectorLike,
   groups: VectorLike | null | undefined,
 ) => {
+  const n = chunks.length;
+
   let pos = 0;
-  let n = chunks.length;
   let k = 0;
   let g = 0;
 
@@ -195,8 +197,8 @@ export const generateConcaveIndices = (
   positions: VectorLike,
   dims: number,
 ) => {
-  const gs = groups ?? chunks.map(_ => 1);
-  let g = gs.length;
+  const gs = groups ?? chunks.map(() => 1);
+  const g = gs.length;
 
   // Convert XYZ to dominant 2D plane
   const scratch = [];
@@ -244,7 +246,7 @@ export const generateConcaveIndices = (
     if (axis === 0) {
       const nd = n * dims;
       for (let i = 0; i < nd; i += dims) {
-        let f = baseVertex * dims + i;
+        const f = baseVertex * dims + i;
         scratch[o]     = positions[f];
         scratch[o + 1] = positions[f + 1];
         o += 2;
@@ -253,7 +255,7 @@ export const generateConcaveIndices = (
     else if (axis === 1) {
       const nd = n * dims;
       for (let i = 0; i < nd; i += dims) {
-        let f = baseVertex * dims + i;
+        const f = baseVertex * dims + i;
         scratch[o]     = positions[f + 2];
         scratch[o + 1] = positions[f];
         o += 2;
@@ -262,7 +264,7 @@ export const generateConcaveIndices = (
     else {
       const nd = n * dims;
       for (let i = 0; i < nd; i += dims) {
-        let f = baseVertex * dims + i;
+        const f = baseVertex * dims + i;
         scratch[o]     = positions[f + 1];
         scratch[o + 1] = positions[f + 2];
         o += 2;
@@ -282,7 +284,10 @@ export const generateConcaveIndices = (
     baseVertex += n;
     baseIndex += indices.length;
   }
-  if (baseIndex === 0) debugger;
+
+  // Tesselation failed
+  // eslint-disable-next-line no-debugger
+  if (g > 0 && baseIndex === 0) debugger;
 
   return baseIndex;
 }

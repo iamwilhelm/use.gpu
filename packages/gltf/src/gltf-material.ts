@@ -1,10 +1,6 @@
-import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
 import type { GLTF } from './types';
 
-import { use, provide, useMemo } from '@use-gpu/live';
-import { mat4 } from 'gl-matrix';
-
-import { PBRMaterialProps, useShader, useNativeColorTexture } from '@use-gpu/workbench';
+import { PBRMaterialProps, useNativeColorTexture } from '@use-gpu/workbench';
 
 type Props = PBRMaterialProps & {
   doubleSided: boolean,

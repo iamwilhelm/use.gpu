@@ -12,13 +12,12 @@ import type {
   ArchetypeSchema,
   ArchetypeField,
   VectorEmitter,
-  VectorRefEmitter,
   FieldArray,
   TypedArray,
   UniformType,
   VectorLike,
 } from './types';
-import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
+import { toMurmur53, getObjectKey } from '@use-gpu/state';
 import { isTypedArray } from './buffer';
 import {
   makeArrayAggregate,
@@ -147,7 +146,7 @@ export const schemaToAttributes = (
 ): Record<string, any> => {
   const attributes: Record<string, any> = {};
   for (const key in schema) {
-    const {format, ref, unwelded} = schema[key];
+    const {ref, unwelded} = schema[key];
     if (ref) continue;
 
     if (unwelded) throw new Error("Can't make attributes from composite schema. Use schemaToEmitters.");
@@ -236,7 +235,7 @@ export const emitAttributes = (
         unwelded || index ? allocIndices :
         allocVertices
       );
-      const {array, dims} = makeCPUArray(format as any, count);
+      const {array} = makeCPUArray(format as any, count);
       values(array, 0, count);
 
       attributes[key] = array;
@@ -282,18 +281,19 @@ export const schemaToAggregate = (
   allocVertices: number = 0,
   allocIndices: number = 0,
 ): CPUAggregate => {
-  let byRef: string[] = [];
-  let byInstance: string[] = [];
+  const byRef: string[] = [];
+  const byInstance: string[] = [];
+  const byUnwelded: string[] = [];
+  const bySelf: [string, number][] = [];
+
   let byVertex: string[] = [];
   let byIndex: string[] = [];
-  let byUnwelded: string[] = [];
-  let bySelf: [string, number][] = [];
 
   const aggregateBuffers: Record<string, any> = {};
   const refBuffers: Record<string, any> = {};
 
   for (const key in schema) {
-    const {format, name, unwelded, index, ref, separate} = schema[key];
+    const {format, unwelded, index, ref, separate} = schema[key];
 
     const hasValues = attributes[key] != null;
     const hasRef = ref && refs && refs[key] != null;
@@ -307,7 +307,6 @@ export const schemaToAggregate = (
         unwelded || index ? allocIndices :
         allocVertices
       );
-      const attr = [key, alloc];
 
       // Separate emulated types like u8/u16
       const isEmulated = getUniformAlign(format as any) === 0;
@@ -346,7 +345,7 @@ export const schemaToAggregate = (
     const {format, name} = schema[k];
     const f = getUniformElementType(format) as UniformType;
     const n = name ?? k;
-    const ab = aggregateBuffers[n] = makeArrayAggregate(f, alloc);
+    aggregateBuffers[n] = makeArrayAggregate(f, alloc);
 
     bySelfs.keys.push([k, n]);
   };
@@ -388,10 +387,10 @@ export const schemaToAggregate = (
     byInstance = [];
   }
 
-  let byRefs = buildGroup(byRef, allocInstances, true);
-  let byInstances = buildGroup(byInstance, allocInstances, true);
-  let byVertices = buildGroup(byVertex, allocVertices);
-  let byIndices = buildGroup(byIndex, allocIndices);
+  const byRefs = buildGroup(byRef, allocInstances, true);
+  const byInstances = buildGroup(byInstance, allocInstances, true);
+  const byVertices = buildGroup(byVertex, allocVertices);
+  const byIndices = buildGroup(byIndex, allocIndices);
 
   // Add instances buffer for lookup per item/ref
   if (byInstances || byRefs) {
@@ -426,7 +425,7 @@ export const toGPUAggregate = (
   const buildGroup = (aggregate?: StructAggregate): StructAggregateBuffer | undefined => {
     if (!aggregate) return;
 
-    const {raw, layout, length} = aggregate;
+    const {raw, length} = aggregate;
     const buffer = makeStorageBuffer(device, raw);
     const source: StorageSource = {
       buffer,
@@ -540,7 +539,6 @@ export const uploadAggregateFromSchemaRefs = (
   device: GPUDevice,
   schema: ArchetypeSchema,
   aggregate: GPUAggregate,
-  count: number,
 ) => {
   const {aggregateBuffers, refBuffers, byRefs} = aggregate;
 

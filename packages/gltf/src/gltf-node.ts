@@ -3,7 +3,7 @@ import type { VectorLike } from '@use-gpu/core';
 import type { GLTF } from './types';
 import { vec3, mat4, quat } from 'gl-matrix';
 
-import { use, gather, memo, useMemo, useOne } from '@use-gpu/live';
+import { use, useMemo } from '@use-gpu/live';
 import { GLTFMesh } from './gltf-mesh';
 
 export type GLTFNodeProps = {
@@ -59,7 +59,6 @@ const makeComposeTransform = () => {
   const q = quat.create();
   const p = vec3.create();
   const s = vec3.create();
-  const t = mat4.create();
 
   return (
     transform: mat4,
@@ -78,6 +77,8 @@ const makeComposeTransform = () => {
     else vec3.set(s, 1, 1, 1);
 
     mat4.fromRotationTranslationScale(transform, q, p, s);
+    if (matrix != null) mat4.multiply(transform, matrix, transform);
+
     return transform;
   }
 }

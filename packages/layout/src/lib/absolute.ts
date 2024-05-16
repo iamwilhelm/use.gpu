@@ -1,5 +1,5 @@
-import type { XY, Rectangle } from '@use-gpu/core';
-import type { LayoutElement, LayoutRenderer, LayoutPicker, FitInto, AutoXY, AutoRectangle, Direction } from '../types';
+import type { Rectangle } from '@use-gpu/core';
+import type { LayoutElement, FitInto, AutoXY, AutoRectangle, Direction } from '../types';
 
 import { evaluateDimension } from '../parse';
 import { fitBlock } from './block';
@@ -22,6 +22,7 @@ export const fitAbsoluteBox = (
 ) => {
   const [iw, ih, fw, fh] = into;
   const box = resolveAbsoluteBox([0, 0, iw ?? fw, ih ?? fh], l, t, r, b, w, h, a, snap);
+  // eslint-disable-next-line prefer-const
   let [left, top, right, bottom] = box;
 
   const fixed = [
@@ -69,9 +70,13 @@ export const resolveAbsoluteBox = (
   let favorW = false;
   let favorH = false;
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (l != null) left   += evaluateDimension(l, width)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (r != null) right  -= evaluateDimension(r, width)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (t != null) top    += evaluateDimension(t, height)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (b != null) bottom -= evaluateDimension(b, height)!;
 
   if (w != null) {

@@ -7,6 +7,7 @@ export type EmptyPageProps = {
   _unused?: boolean,
 };
 
-export const EmptyPage: LiveComponent<EmptyPageProps> = (props) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const EmptyPage: LiveComponent<EmptyPageProps> = (_: EmptyPageProps) => {
   return use(Pass, {});
 };

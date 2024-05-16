@@ -1,4 +1,4 @@
-import { vec2, vec3, vec4, mat4 } from 'gl-matrix';
+import { vec2, vec4, mat4 } from 'gl-matrix';
 
 // Common vector types
 
@@ -326,7 +326,7 @@ export type PickingUniforms = {
 
 export type Tuples<N extends number, T = number> = {
   array: T[],
-  dims: number,
+  dims: N,
   length: number,
   get: (i: number, j: number) => T,
   iterate: (f: (...args: T[]) => void, start?: number, end?: number) => void;

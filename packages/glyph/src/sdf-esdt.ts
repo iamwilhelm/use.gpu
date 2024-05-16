@@ -1,5 +1,5 @@
 import type { Image } from './types';
-import { glyphToRGBA, INF, Rectangle, SDFStage, getSDFStage, isBlack, isWhite, isSolid, sqr } from './sdf';
+import { glyphToRGBA, INF, SDFStage, getSDFStage, isBlack, isWhite, isSolid, sqr } from './sdf';
 
 // Convert grayscale or color glyph to SDF using subpixel distance transform
 export const glyphToESDT = (
@@ -18,8 +18,6 @@ export const glyphToESDT = (
   const hp = h + pad * 2;
   const np = wp * hp;
   const sp = Math.max(wp, hp);
-
-  const getData = (x: number, y: number) => (data[y * w + x] ?? 0) / 255;
 
   const stage = getSDFStage(sp);
   const {outer, inner, xo, yo, xi, yi, f, z, b, t, v} = stage;
@@ -120,11 +118,9 @@ export const paintIntoDistanceField = (
   pad: number,
   radius: number,
   cutoff: number,
-  rgba: boolean,
 ) => {
   const wp = w + pad * 2;
   const hp = h + pad * 2;
-  const np = wp * hp;
 
   const getData = (x: number, y: number) => (data[y * w + x] ?? 0) / 255;
 
@@ -165,7 +161,6 @@ export const paintSubpixelOffsets = (
     (x >= 0 && x < w && y >= 0 && y < h) ? (data[y * w + x] ?? 0) / 255 : 0;
 
   // Make vector from pixel center to nearest boundary
-  let k = 0;
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const c = getData(x, y);
@@ -205,7 +200,7 @@ export const paintSubpixelOffsets = (
 
         let dx = rr - ll;
         let dy = bb - tt;
-        let dl = 1 / Math.sqrt(sqr(dx) + sqr(dy))
+        const dl = 1 / Math.sqrt(sqr(dx) + sqr(dy))
         dx *= dl;
         dy *= dl;
 
@@ -409,7 +404,6 @@ export const relaxSubpixelOffsets = (
 ) => {
   const wp = w + pad * 2;
   const hp = h + pad * 2;
-  const np = wp * hp;
 
   const {xo, yo, xi, yi} = stage;
 
@@ -519,7 +513,6 @@ export const paintIntoRGB = (
 ) => {
   const wp = w + pad * 2;
   const hp = h + pad * 2;
-  const np = wp * hp;
 
   {
     let i = 0;
@@ -572,7 +565,6 @@ export const paintIntoAlpha = (
 ) => {
   const wp = w + pad * 2;
   const hp = h + pad * 2;
-  const np = wp * hp;
 
   let i = 0;
   let o = (pad + pad * wp) * 4;
@@ -620,7 +612,6 @@ export const esdt1d = (
   b: Float32Array, // Subpixel offset parallel
   t: Float32Array, // Subpixel offset perpendicular
   v: Uint16Array,  // Array index
-  sign: number,
 ) => {
   v[0] = 0;
   b[0] = xs[offset];
@@ -671,7 +662,7 @@ export const esdt1d = (
     const dy = t[r];
 
     // Distance from integer index to subpixel location of minimum
-    let rq = rs - q;
+    const rq = rs - q;
 
     const o = offset + q * stride;
     xs[o] = rq;

@@ -1,5 +1,5 @@
-import type { DataTexture, ExternalTexture, DataBinding, VectorLike, XY, XYZ, TextureSource } from './types';
-import { TYPED_ARRAYS, TEXTURE_FORMAT_SIZES, TEXTURE_FORMAT_DIMS } from './constants';
+import type { DataTexture, ExternalTexture, VectorLike, XY, XYZ, TextureSource } from './types';
+import { TEXTURE_FORMAT_SIZES } from './constants';
 
 const NO_OFFSET = [0, 0, 0] as XYZ;
 
@@ -102,7 +102,7 @@ export const makeTextureDataLayout = (
   size: VectorLike,
   format: GPUTextureFormat,
 ) => {
-  const [w, h, d] = size as XYZ;
+  const [w, h] = size as XYZ;
 
   const s = TEXTURE_FORMAT_SIZES[format] || 1;
 

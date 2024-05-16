@@ -1,5 +1,3 @@
-import { makeTuples } from './tuple';
-
 const sqr = (x: number) => x * x;
 const cub = (x: number) => x * x * x;
 
@@ -49,25 +47,25 @@ export const catmullRom = (
   c: number,
   d: number,
 ) => {
-  let dt0 = t - t0;
+  const dt0 = t - t0;
 
-  let d10 = t1 - t0;
-  let d1t = t1 - t;
-  let d20 = t2 - t0;
-  let d21 = t2 - t1;
-  let d2t = t2 - t;
-  let d31 = t3 - t1;
-  let d32 = t3 - t2;
-  let d3t = t3 - t;
+  const d10 = t1 - t0;
+  const d1t = t1 - t;
+  const d20 = t2 - t0;
+  const d21 = t2 - t1;
+  const d2t = t2 - t;
+  const d31 = t3 - t1;
+  const d32 = t3 - t2;
+  const d3t = t3 - t;
 
-  let a1 = (d10 !== 0) ? a * (d1t / d10) + b * (dt0 / d10) : (a + b) / 2;
-  let a2 = (d21 !== 0) ? b * (d2t / d21) + c * (-d1t / d21) : (b + c) / 2;
-  let a3 = (d32 !== 0) ? c * (d3t / d32) + d * (-d2t / d32) : (c + d) / 2;
+  const a1 = (d10 !== 0) ? a * (d1t / d10) + b * (dt0 / d10) : (a + b) / 2;
+  const a2 = (d21 !== 0) ? b * (d2t / d21) + c * (-d1t / d21) : (b + c) / 2;
+  const a3 = (d32 !== 0) ? c * (d3t / d32) + d * (-d2t / d32) : (c + d) / 2;
 
-  let b1 = (d20 !== 0) ? a1 * (d2t / d20) + a2 * (dt0 / d20) : (a1 + a2) / 2;
-  let b2 = (d31 !== 0) ? a2 * (d3t / d31) + a3 * (-d1t / d31) : (a2 + a3) / 2;
+  const b1 = (d20 !== 0) ? a1 * (d2t / d20) + a2 * (dt0 / d20) : (a1 + a2) / 2;
+  const b2 = (d31 !== 0) ? a2 * (d3t / d31) + a3 * (-d1t / d31) : (a2 + a3) / 2;
 
-  let v  = (d21 !== 0) ? b1 * (d2t / d21) + b2 * (-d1t / d21) : (b1 + b2) / 2;
+  const v  = (d21 !== 0) ? b1 * (d2t / d21) + b2 * (-d1t / d21) : (b1 + b2) / 2;
 
   return v;
 }
@@ -105,7 +103,7 @@ export const makeDistanceMap = (
 
   let n = 0;
   let accum = 0;
-  let eps = Math.pow(2, Math.ceil(Math.log2(tolerance)));
+  const eps = Math.pow(2, Math.ceil(Math.log2(tolerance)));
 
   const data: number[] = [-measure(-eps, 0), -eps, 0];
   const range = (a: number, b: number, l: number, force: number) => {
@@ -156,19 +154,19 @@ export const queryDistanceMap = (dm: DistanceMap, value: number) => {
     else a = m;
   }
 
-  let a2 = a * 2;
+  const a2 = a * 2;
 
-  let d0 = map[a2 - 2];
-  let t0 = map[a2 - 1];
+  const d0 = map[a2 - 2];
+  const t0 = map[a2 - 1];
 
-  let d1 = map[a2];
-  let t1 = map[a2 + 1];
+  const d1 = map[a2];
+  const t1 = map[a2 + 1];
 
-  let d2 = map[a2 + 2];
-  let t2 = map[a2 + 3];
+  const d2 = map[a2 + 2];
+  const t2 = map[a2 + 3];
 
-  let d3 = map[a2 + 4];
-  let t3 = map[a2 + 5];
+  const d3 = map[a2 + 4];
+  const t3 = map[a2 + 5];
 
   return catmullRom(value, d0, d1, d2, d3, t0, t1, t2, t3);
 }

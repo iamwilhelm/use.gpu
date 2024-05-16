@@ -1,11 +1,10 @@
 import type { VectorLike, DataBoundingBox, DataBounds } from './types';
-import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS, UNIFORM_ATTRIBUTE_SIZES } from './constants';
 import { seq } from './tuple';
 
 export const makeBoundingBox = (dims: number): DataBoundingBox => {
   return {
-    min: seq(dims).map(_ => Infinity),
-    max: seq(dims).map(_ => -Infinity),
+    min: seq(dims).map(() => Infinity),
+    max: seq(dims).map(() => -Infinity),
   };
 };
 
@@ -103,8 +102,8 @@ export const getBoundingBox = (data: VectorLike, dims: number): DataBoundingBox 
     return {min: [minX, minY, minZ, minW], max: [maxX, maxY, maxZ, maxW]};
   }
 
-  const min = seq(dims).map(_ => Infinity);
-  const max = seq(dims).map(_ => -Infinity);
+  const min = seq(dims).map(() => Infinity);
+  const max = seq(dims).map(() => -Infinity);
   for (let i = 0, j = 0; i < n; ++i, j += dims) {
     for (let k = 0; k < dims; ++k) {
       const d = data[j];

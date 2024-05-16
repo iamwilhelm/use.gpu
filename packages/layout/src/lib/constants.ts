@@ -1,11 +1,3 @@
-export const ARCHETYPES = {
-  glyphs: 1,
-  textured: 2,
-  solid: 3,
-  scroll: 4,
-  inspect: 5,
-};
-
 export const INSPECT_STYLE = {
   parent: {
     fill: [0, 1, 1, .2],

@@ -1,4 +1,4 @@
-import type { SharedAllocation, StorageSource, UniformAttribute, DataBinding } from './types';
+import type { SharedAllocation, StorageSource, UniformAttribute } from './types';
 import { makeBindGroupLayout } from './bindgroup';
 import { toTypeString } from './uniform';
 
@@ -27,7 +27,7 @@ export const makeStorageBinding = (
   set: number = 0,
 ): GPUBindGroup => {
   const sources = [] as StorageSource[];
-  for (const k in links) if (links[k]) sources.push(links[k]!);
+  for (const k in links) if (links[k]) sources.push(links[k]);
 
   const entries = makeStorageEntries(sources);
   const bindGroup = device.createBindGroup({

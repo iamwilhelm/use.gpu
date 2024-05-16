@@ -1,8 +1,8 @@
-import type { LC, LiveElement } from '@use-gpu/live';
+import type { LC } from '@use-gpu/live';
 import type { TypedArray } from '@use-gpu/core';
 import { GLTF, GLTFNodeData } from './types';
 
-import { use, gather, memo, useMemo, useOne } from '@use-gpu/live';
+import { use, memo, useMemo } from '@use-gpu/live';
 import { GLTFNode } from './gltf-node';
 import { useMatrixContext } from '@use-gpu/workbench';
 import { seq, toArray } from '@use-gpu/core';

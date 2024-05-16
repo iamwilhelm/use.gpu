@@ -1,10 +1,10 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { Rectangle, XY, XYZW } from '@use-gpu/core';
-import type { LayoutElement, FitInto, Dimension, Direction, MarginLike, Margin } from '../types';
+import type { Rectangle } from '@use-gpu/core';
+import type { LayoutElement, FitInto, Direction, MarginLike } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
-import { useProp, shouldEqual, sameArray, sameShallow } from '@use-gpu/traits/live';
+import { useProp, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { keyed, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { isHorizontal, makeBoxPicker, memoFit } from '../lib/util';
@@ -29,7 +29,6 @@ export type BlockProps =
 export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<BlockProps>) => {
   const {
     snap = true,
-    children,
   } = props;
 
   const { width, height, aspect, zIndex } = useElementTrait(props);

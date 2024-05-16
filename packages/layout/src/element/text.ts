@@ -1,17 +1,15 @@
-import type { LiveComponent, LiveElement, LiveNode, DeferredCall, ArrowFunction } from '@use-gpu/live';
+import type { LiveComponent, LiveNode } from '@use-gpu/live';
 import type { ColorLike, XYZW, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Baseline, InlineLine } from '../types';
 
 import { useProp, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { parseColor, parseNumber } from '@use-gpu/parse';
-import { memo, use, yeet, useOne } from '@use-gpu/live';
+import { memo, use, yeet } from '@use-gpu/live';
 
 import { useFontFamily, useFontText, useFontHeight, LayerReconciler } from '@use-gpu/workbench';
 import { Glyphs } from '../shape/glyphs';
 import { memoInline } from '../lib/util';
-
-const {quote} = LayerReconciler;
 
 type TextElement = string | number | LiveNode;
 
@@ -38,8 +36,6 @@ export type TextProps = {
 type SpanProps = Omit<TextProps, 'children'> & { children?: any };
 
 const BLACK: XYZW = [0, 0, 0, 1];
-const NO_MARGIN: XYZW = [0, 0, 0, 0];
-const NO_STROKE: XYZW = [0.0, 0.0, 0.0, 0.0];
 
 const toSpan = (props: TextProps) => (child: TextElement) =>
   child != null

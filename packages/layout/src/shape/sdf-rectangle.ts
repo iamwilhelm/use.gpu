@@ -1,12 +1,11 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { TextureSource, Rectangle, XYZW } from '@use-gpu/core';
+import type { Rectangle, XYZW } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { TraitProps } from '@use-gpu/traits';
-import type { Fit, Repeat, Anchor } from '../types';
 
 import { ImageTrait } from '../traits';
 import { proxy } from '@use-gpu/core';
-import { use, yeet, memo, useContext, useMemo, useNoContext } from '@use-gpu/live';
+import { yeet, useContext, useMemo, useNoContext } from '@use-gpu/live';
 import { LayoutContext, getAlignmentAnchor, UI_SCHEMA } from '@use-gpu/workbench';
 import { schemaToArchetype } from '@use-gpu/core';
 
@@ -90,13 +89,15 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
         minFilter: 'linear',
         magFilter: 'linear',
         ...tex.sampler,
+        addressModeU,
+        addressModeV,
       } : null;
 
       return proxy(tex, {sampler});
     }, [tex, repeat]);
 
-    let boxW = layout[2] - layout[0];
-    let boxH = layout[3] - layout[1];
+    const boxW = layout[2] - layout[0];
+    const boxH = layout[3] - layout[1];
     if (radius) {
       let [tl, tr, br, bl] = radius;
 
@@ -144,29 +145,31 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
 
         if (fit !== 'scale') {
 
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           let w = (width != null ? evaluateDimension(width, size[0], false) : size[0])!;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           let h = (height != null ? evaluateDimension(height, size[1], false) : size[1])!;
 
           if (fit === 'contain') {
-            let fitW = boxW / w;
-            let fitH = boxH / h;
-            let scale = Math.min(fitW, fitH);
+            const fitW = boxW / w;
+            const fitH = boxH / h;
+            const scale = Math.min(fitW, fitH);
             w *= scale;
             h *= scale;
           }
           else if (fit === 'cover') {
-            let fitW = boxW / w;
-            let fitH = boxH / h;
-            let scale = Math.max(fitW, fitH);
+            const fitW = boxW / w;
+            const fitH = boxH / h;
+            const scale = Math.max(fitW, fitH);
             w *= scale;
             h *= scale;
           }
 
           const [alignX, alignY] = parseAnchorXY(align);
-          let left   = getAlignmentAnchor(alignX) * (boxW - w);
-          let top    = getAlignmentAnchor(alignY) * (boxH - h);
-          let right  = boxW - (left + w);
-          let bottom = boxH - (top + h);
+          const left   = getAlignmentAnchor(alignX) * (boxW - w);
+          const top    = getAlignmentAnchor(alignY) * (boxH - h);
+          const right  = boxW - (left + w);
+          const bottom = boxH - (top + h);
 
           uv = [
             -left / w,
@@ -211,6 +214,7 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
       return yeet({
         count: 1,
         archetype: schemaToArchetype(UI_SCHEMA, attributes),
+        zIndex,
 
         attributes,
         bounds: layout,
@@ -229,6 +233,7 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
     radius,
     border,
 
+    zIndex,
     clip,
     mask,
     transform,

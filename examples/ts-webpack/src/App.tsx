@@ -65,9 +65,9 @@ export const App: LC = hot(() => {
                             </Inline>
 
                             <ImageTexture
-                              url="/textures/test.png"
+                              url="/test.png"
                               colorSpace="srgb"
-                            >{(texture: TextureSource) =>
+                            >{(texture: TextureSource | null) =>
                                 <Flex align="center" width="100%" height={150}>
                                   <Block
                                     fill="#3090ff" 
@@ -75,13 +75,11 @@ export const App: LC = hot(() => {
                                     height={150}
                                     margin={20}
                                     texture={texture}
-                                    image={{
-                                      fit: 'scale'
-                                    }}
+                                    image={{fit: scale}}
                                   />
                                 </Flex>
-                              }
                             }</ImageTexture>
+
                           </Flex>
                         </Flex>
 

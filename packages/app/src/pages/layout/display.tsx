@@ -107,7 +107,7 @@ export const LayoutDisplayPage: LC = () => {
                       url="/textures/test.png"
                       colorSpace="srgb"
                     >{
-                      (texture: TextureSource) =>
+                      (texture: TextureSource | null) =>
                         <Flex align="center" width="100%" height={300}>
                           <Block
                             fill="#3090ff" 
@@ -118,7 +118,6 @@ export const LayoutDisplayPage: LC = () => {
                             image={FIT_SCALE}
                           />
                         </Flex>
-                      }
                     }</ImageTexture>
 
                     <Block margin={[0, 40, 0, 0]} height={2} fill={WHITE} />

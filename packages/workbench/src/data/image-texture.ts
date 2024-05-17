@@ -7,7 +7,7 @@ import { ImageLoader } from './image-loader';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useSuspenseContext } from '../providers/suspense-provider';
-import { useRenderProp } from '../hooks/useRenderProp';
+import { useRenderProp, getRenderFunc } from '../hooks/useRenderProp';
 
 export type ImageTextureProps = {
   /** URL to image */
@@ -39,13 +39,13 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
     format,
     colorSpace = 'srgb',
     mip = true,
-    render,
   } = props;
 
   const suspense = useSuspenseContext();
   const fetch = use(ImageLoader, {url, format, colorSpace});
 
   return gather(fetch, ([resource]: any[]) => {
+    const render = getRenderFunc(props);
     if (!resource) return suspense ? suspend() : render ? render(null) : yeet(null);
 
     const source = useMemo(() => {

@@ -57,7 +57,8 @@
   ],
   "scripts": {
     "build+ci": "yarn run build && yarn run ci-test",
-    "build": "yarn wsrun --stages run build && yarn run docs",
+    "build": "yarn wsrun --stages run build && yarn run docs && yarn run build-examples",
+    "build-examples": "ts-node ./scripts/example-json-version.ts",
     "build-app": "ts-node node_modules/.bin/webpack build; ./scripts/copy-app-to-docs.sh",
     "clear": "rm -rf packages/glyph/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js",
     "ci-test": "CI=true yarn run jest && yarn run test:import && yarn run test:vite-react",

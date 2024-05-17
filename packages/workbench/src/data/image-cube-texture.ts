@@ -7,7 +7,7 @@ import { makeDynamicTexture, uploadDataTexture, uploadExternalTexture, updateMip
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useSuspenseContext } from '../providers/suspense-provider';
-import { useRenderProp } from '../hooks/useRenderProp';
+import { useRenderProp, getRenderFunc } from '../hooks/useRenderProp';
 
 import { ImageLoader } from './image-loader';
 
@@ -41,7 +41,6 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
     format,
     colorSpace = 'srgb',
     mip = true,
-    render,
   } = props;
 
   const suspense = useSuspenseContext();
@@ -51,6 +50,7 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
   );
 
   return gather(fetch, (resources: any[]) => {
+    const render = getRenderFunc(props);
     if (resources.filter(x => !!x).length !== 6) return suspense ? suspend() : render ? render(null) : yeet(null);
 
     const source = useMemo(() => {

@@ -1,4 +1,3 @@
-inL
 import type { DomainOptions } from '../types';
 import { seq } from '@use-gpu/core';
 

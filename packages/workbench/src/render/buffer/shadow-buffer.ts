@@ -1,6 +1,7 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 
 import { yeet, memo } from '@use-gpu/live';
+import { makeDepthStencilState } from '@use-gpu/core';
 
 import { useRenderContext } from '../../providers/render-provider';
 

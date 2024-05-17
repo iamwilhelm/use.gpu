@@ -3,6 +3,7 @@ import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { useContext, useMemo, useNoContext, useNoMemo } from '@use-gpu/live';
+import { chainTo } from '@use-gpu/shader/wgsl';
 
 import { RenderContext } from '../providers/render-provider';
 import { getSource } from '../hooks/useSource';

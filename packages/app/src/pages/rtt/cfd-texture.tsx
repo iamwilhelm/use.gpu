@@ -207,6 +207,6 @@ const DebugField = ({field, gain}: {field: TextureTarget, gain?: number}) => {
   const textureSource = useLambdaSource(boundShader, field);
 
   return (
-    <Element width={field.size[0] / 2 / dpi} height={field.size[1] / 2 / dpi} image={{texture: textureSource, fit: 'scale'}} />
+    <Element width={field.size[0] / 2 / dpi} height={field.size[1] / 2 / dpi} image={{fit: 'scale'}} texture={textureSource} />
   );
 };

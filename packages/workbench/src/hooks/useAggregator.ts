@@ -70,8 +70,6 @@ export const makeAggregator = (
   DEBUG && console.log('useAggregator', {initialItems, aggregate, allocInstances, allocVertices, allocIndices});
 
   return (items: AggregateItem[], count: number, indexed: number, instanced: number, offsets: number[]) => {
-    itemCount = items.length;
-
     updateAggregateFromSchema(schema, aggregate, items, count, indexed, instanced, offsets);
     uploadAggregateFromSchema(device, schema, aggregate);
 

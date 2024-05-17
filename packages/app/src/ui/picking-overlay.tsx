@@ -52,7 +52,8 @@ export const PickingOverlay: LC = () => {
             <Block
               width={textureSource.size[0] * scale}
               height={textureSource.size[1] * scale}
-              image={{texture: textureSource, fit: 'scale'}}
+              texture={textureSource}
+              image={{fit: 'scale'}}
               fill={[0, 0, 0, 1]}
             />
             <Inline align="center" margin={[0, 5]}><Text color={[1, 1, 1, 1]} size={18}>GPU Picking Buffer</Text></Inline>

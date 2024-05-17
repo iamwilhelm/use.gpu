@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VirtualDraw } from '../../pass/types';
 
-import { yeet, useMemo } from '@use-gpu/live';
+import { yeet, useMemo, useOne } from '@use-gpu/live';
 import { patch } from '@use-gpu/state';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 

@@ -114,7 +114,6 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
           const uvs = useRawSource(data.uvs, 'vec4<f32>');
 
           return use(RawLabels, {
-            count,
             indices,
             rectangles,
             layouts,

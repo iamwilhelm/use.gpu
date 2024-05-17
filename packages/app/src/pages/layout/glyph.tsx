@@ -497,10 +497,9 @@ const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFra
   return (
     <RawTexture data={texture} render={(texture) =>
       <Block margin={margin} width={width} height={height} fill={[0.0, 0.0, 0.0, 1.0]} image={{
-        texture,
         fit: 'contain',
         repeat: 'none',
-      }}>
+      }} texture={texture}>
         <Embed width="100%" height="100%">
           <Embedded>
             <Axis axis="x" width={5} color='#808080' end={false} />

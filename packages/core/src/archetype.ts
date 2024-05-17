@@ -282,12 +282,12 @@ export const schemaToAggregate = (
   allocIndices: number = 0,
 ): CPUAggregate => {
   const byRef: string[] = [];
-  const byInstance: string[] = [];
   const byUnwelded: string[] = [];
   const bySelf: [string, number][] = [];
-
-  let byVertex: string[] = [];
   const byIndex: string[] = [];
+
+  let byInstance: string[] = [];
+  let byVertex: string[] = [];
 
   const aggregateBuffers: Record<string, any> = {};
   const refBuffers: Record<string, any> = {};

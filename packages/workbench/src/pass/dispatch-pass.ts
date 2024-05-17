@@ -1,7 +1,6 @@
 import type { LC, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
 
 import { yeet, memo } from '@use-gpu/live';
-import { useInspectable } from '../hooks/useInspectable'
 import { QueueReconciler } from '../reconcilers';
 
 const {quote} = QueueReconciler;
@@ -24,20 +23,12 @@ export const DispatchPass: LC<DispatchPassProps> = memo((props: PropsWithChildre
     calls,
   } = props;
 
-  const inspect = useInspectable();
-
   const dispatches = toArray(calls['dispatch'] as ArrowFunction[]);
 
   const run = () => {
     if (dispatches.length) {
       for (const f of dispatches) f();
     }
-
-    inspect({
-      render: {
-        dispatchCount: ds,
-      },
-    });
 
     return null;
   };

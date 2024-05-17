@@ -4,8 +4,8 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { FontMetrics, GlyphMetrics } from '@use-gpu/glyph';
 import type { Alignment } from '../types';
 
-import { fence, provide, memo, yeet, useContext, useNoContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
-import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/glyph';
+import { fence, provide, memo, yeet, useContext, useNoContext, useFiber, useMemo, makeContext, incrementVersion } from '@use-gpu/live';
+import { glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/glyph';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping, updateMipTextureChain } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
 
@@ -120,7 +120,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       if (cache) return cache;
 
       // Measure glyph and get image
-      let glyph = rustText.measureGlyph(font, id, scale);
+      const glyph = rustText.measureGlyph(font, id, scale);
       return mapGlyph(key, glyph);
     };
 
@@ -130,12 +130,8 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       const {image, width: w, height: h, outlineBounds: ob, rgba} = glyph;
       if (image && w && h && ob) {
 
-        let width: number;
-        let height: number;
-        let data: Uint8Array;
-
         // Convert to SDF
-        ({data, width, height} = (rgba ? rgbaToSDF : glyphToSDF)(image, w, h, pad, radius, undefined, subpixel, solidify, preprocess, postprocess));
+        const {data, width, height} = (rgba ? rgbaToSDF : glyphToSDF)(image, w, h, pad, radius, undefined, subpixel, solidify, preprocess, postprocess);
         glyph.outlineBounds = padRectangle(ob, pad);
         glyph.image = data;
 
@@ -191,8 +187,6 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       getTexture,
     };
   }, [rustText, atlas, source]);
-
-  const {yeeted} = useFiber();
 
   return rustText ? (
     op(
@@ -336,14 +330,14 @@ export const emitGlyphSpans = (
   const scale = getScale(size);
 
   let x = left + lead;
-  let y = top;
+  const y = top;
   let sx = snap ? Math.round(x) : x;
 
   spans.iterate((_a, trim, hard, index) => {
     glyphs.iterate((fontIndex: number, id: number, isWhiteSpace: number, kerning: number) => {
       const {glyph, mapping} = getGlyph(font[fontIndex], id, size);
       const {image, layoutBounds, outlineBounds, rgba, scale: glyphScale} = glyph;
-      const [ll, lt, lr, lb] = layoutBounds;
+      const [,, lr] = layoutBounds;
 
       const r = rgba ? -1 : 1;
       const s = scale * glyphScale;
@@ -391,7 +385,6 @@ export const emitGlyphSpans = (
 
 const makeBoundsTracker = () => {
   const rects: Rectangle[] = [];
-  const log: Rectangle[][] = [];
 
   const joinRectangles = (a: Rectangle, b: Rectangle): Rectangle => {
     const [al, at, ar, ab] = a;

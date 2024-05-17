@@ -1,6 +1,5 @@
 import { SyntaxNode, TreeCursor, Tree } from '@lezer/common';
 import {
-  AnnotatedTypeRef,
   AttributeRef,
   AttributesRef,
   CompressedNode,
@@ -26,7 +25,7 @@ import {
 import * as T from './grammar/wgsl.terms';
 import { WGSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
-import { getChildNodes, hasErrorNode, formatAST, formatASTNode, makeASTEmitter, makeASTDecompressor } from '../util/tree';
+import { getChildNodes, makeASTEmitter, makeASTDecompressor } from '../util/tree';
 import { getTypeName, getAttributeName, getAttributeArgs } from './type';
 import uniq from 'lodash/uniq';
 
@@ -73,7 +72,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
   const getNodes = (node: SyntaxNode, min?: number) => {
     const nodes = getChildNodes(node);
-    for (const n of nodes) if (node.type.isError) throwError('error', node);
+    for (const n of nodes) if (n.type.isError) throwError('error', n);
     if (min != null && nodes.length < min) throwError(`not enough tokens (${min})`, node);
     return nodes;
   }
@@ -250,6 +249,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const typeName = getTypeName(type);
     if (!WGSL_NATIVE_TYPES.has(typeName)) {
       if (!identifiers) identifiers = [];
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       identifiers!.push(typeName);
     }
 
@@ -259,7 +259,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   const getConstant = (node: SyntaxNode): VariableRef => {
     const nodes = getNodes(node, 2);
 
-    const [a, b, c,, d] = nodes;
+    const [a,, c,, d] = nodes;
     const hasAttributes = a.type.id === T.AttributeList;
     const attr = hasAttributes ? getAttributes(a) : undefined;
 
@@ -271,6 +271,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const typeName = getTypeName(type);
     if (!WGSL_NATIVE_TYPES.has(typeName)) {
       if (!identifiers) identifiers = [];
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       identifiers!.push(typeName);
     }
 
@@ -313,7 +314,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const inferred: InferRef[] = [];
     let index = -1;
 
-    const {name, type, parameters} = func;
+    const {parameters} = func;
     if (typeof func.type !== 'string') {
       const attribute = findAttribute(func.type.attr, 'infer');
       if (attribute != null) {
@@ -437,7 +438,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       let module: string;
       let refs: ImportRef[];
 
-      let verb = getText(a);
+      const verb = getText(a);
       if (verb === 'import') {
         if (b.type.id === T.String) {
           refs = [];
@@ -450,7 +451,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       }
       else if (verb === 'use') {
         module = parseString(getText(b));
-        refs = !!c ? getNodes(c).map(getImport) : [];
+        refs = c ? getNodes(c).map(getImport) : [];
       }
       else continue;
 
@@ -499,8 +500,8 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const types = exported.filter(d => d.alias || d.struct).map(t => t.symbol);
 
     const scope = new Set(symbols ?? []);
-    for (let ref of declarations) {
-      const {func, variable, constant, alias, struct} = ref;
+    for (const ref of declarations) {
+      const {func, variable, constant} = ref;
       if      (func?.identifiers)     func    .identifiers = func    .identifiers.filter(s => scope.has(s));
       else if (variable?.identifiers) variable.identifiers = variable.identifiers.filter(s => scope.has(s));
       else if (constant?.identifiers) constant.identifiers = constant.identifiers.filter(s => scope.has(s));
@@ -552,8 +553,9 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     }
 
     const getAll = (ss: string[], accum: Set<number> = new Set()): Set<number> => {
-      for (let symbol of ss) {
-        let s = lookup.get(symbol)!;
+      for (const symbol of ss) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const s = lookup.get(symbol)!;
         if (!accum.has(s)) {
           accum.add(s);
           const deps = graph.get(symbol);
@@ -631,6 +633,7 @@ export const rewriteUsingAST = (
     if (type.name === 'Optional') {
       if (!optionals || !optionals.has(arg)) {
         skip(from, to);
+        // eslint-disable-next-line no-empty
         while (cursor.lastChild()) {};
       }
     }
@@ -640,11 +643,13 @@ export const rewriteUsingAST = (
 
       if (shaken) {
         skip(from, to);
+        // eslint-disable-next-line no-empty
         while (cursor.lastChild()) {};
       }
     }
 
     else if (type.name === 'PrivateIdentifier') {
+      // eslint-disable-next-line no-empty
       while (cursor.lastChild()) {};
     }
 
@@ -663,6 +668,7 @@ export const rewriteUsingAST = (
       if (shaken) {
         // Tree shake entire declaration
         skip(from, to);
+        // eslint-disable-next-line no-empty
         while (cursor.lastChild()) {};
       }
       else {
@@ -674,10 +680,12 @@ export const rewriteUsingAST = (
         const t = code.slice(sub.from, sub.to);
         if (t.match('@infer')) {
           skip(from, to);
+          // eslint-disable-next-line no-empty
           while (cursor.lastChild()) {};
         }
         else if (t.match('@link')) {
           if (t.match('@optional')) {
+            // eslint-disable-next-line no-empty
             while (sub.lastChild()) {};
             sub.next();
             sub.next();
@@ -686,11 +694,13 @@ export const rewriteUsingAST = (
             const arg = code.slice(sub.from, sub.to);
             if (!optionals || !optionals.has(arg)) {
               skip(from, to);
+              // eslint-disable-next-line no-empty
               while (cursor.lastChild()) {};
             }
           }
           else {
             skip(from, to);
+            // eslint-disable-next-line no-empty
             while (cursor.lastChild()) {};
           }
         }
@@ -702,6 +712,7 @@ export const rewriteUsingAST = (
       if (PRIVATE_ATTRIBUTES.has(name)) {
         const {from, to} = cursor;
         skip(from, to);
+        // eslint-disable-next-line no-empty
         while (cursor.lastChild()) {};
       }
       else {
@@ -714,6 +725,7 @@ export const rewriteUsingAST = (
     else if (type.name === 'ImportDeclaration' || type.name == 'EnableDirective') {
       const {from, to} = cursor;
       skip(from, to);
+      // eslint-disable-next-line no-empty
       while (cursor.lastChild()) {};
     }
   } while (cursor.next());
@@ -749,6 +761,7 @@ export const compressAST = (
 
     // Preserve private identifiers
     if (type.name === 'PrivateIdentifier') {
+      // eslint-disable-next-line no-empty
       while (cursor.lastChild()) {};
     }
 
@@ -767,10 +780,12 @@ export const compressAST = (
       const t = code.slice(sub.from, sub.to);
       if (t.match('@infer')) {
         skip(from, to);
+        // eslint-disable-next-line no-empty
         while (cursor.lastChild()) {};
       }
       else if (t.match('@link')) {
         if (t.match('@optional')) {
+          // eslint-disable-next-line no-empty
           while (sub.lastChild()) {};
           sub.next();
           sub.next();
@@ -781,6 +796,7 @@ export const compressAST = (
         }
         else {
           skip(from, to);
+          // eslint-disable-next-line no-empty
           while (cursor.lastChild()) {};
         }
       }
@@ -793,6 +809,7 @@ export const compressAST = (
       const name = code.slice(from, to);
       if (PRIVATE_ATTRIBUTES.has(name)) {
         skip(from, to);
+        // eslint-disable-next-line no-empty
         while (cursor.lastChild()) {};
       }
       else {
@@ -804,6 +821,7 @@ export const compressAST = (
     else if (type.name === 'ImportDeclaration' || type.name == 'EnableDirective') {
       const {from, to} = cursor;
       skip(from, to);
+      // eslint-disable-next-line no-empty
       while (cursor.lastChild()) {};
     }
   } while (cursor.next());

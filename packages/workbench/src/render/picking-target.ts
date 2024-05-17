@@ -1,5 +1,5 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { TypedArray, UniformAttribute, TextureSource, OffscreenTarget } from '@use-gpu/core';
+import type { TypedArray, TextureSource, OffscreenTarget } from '@use-gpu/core';
 
 import {
   PICKING_FORMAT,
@@ -11,9 +11,9 @@ import { DeviceContext } from '../providers/device-provider';
 import { RenderContext } from '../providers/render-provider';
 import { PickingContext } from '../providers/picking-provider';
 import {
-  memo, use, provide, yeet, makeContext,
-  useMemo, useOne, useNoOne, useResource,
-  useContext, useNoContext, incrementVersion,
+  provide, yeet,
+  useMemo, useOne,
+  useContext, incrementVersion,
 } from '@use-gpu/live';
 import {
   makeColorState,
@@ -24,15 +24,12 @@ import {
   makeDepthStencilAttachment,
   makeTextureReadbackBuffer,
   TEXTURE_ARRAY_TYPES,
-  TEXTURE_FORMAT_SIZES,
   seq,
 } from '@use-gpu/core';
 
 import { QueueReconciler } from '../reconcilers';
 
-const {reconcile, quote} = QueueReconciler;
-
-type OnPick = (index: number) => void;
+const {quote} = QueueReconciler;
 
 export type PickingProps = {
   pickingFormat?: GPUTextureFormat,
@@ -42,7 +39,6 @@ export type PickingProps = {
 }
 
 const DEBUG = false;
-const NOP = () => {};
 
 /** Global picking provider. Provides a screen-sized render target that contains object ID + item index. */
 export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChildren<PickingProps>) => {
@@ -58,7 +54,6 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
     children,
   } = props;
 
-  const {colorStates: renderColorStates} = renderContext;
   const colorStates = useMemo(() => [
     makeColorState(pickingFormat),
   ], [pickingFormat]);
@@ -67,7 +62,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
     depthStencilFormat
   );
 
-  const [pickingContext, pickingSource] = useMemo(() => {
+  const pickingContext = useMemo(() => {
     const {width: w, height: h, pixelRatio: dpi} = renderContext;
     const width = Math.round(w * resolution / dpi);
     const height = Math.round(h * resolution / dpi);
@@ -123,12 +118,13 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
     };
 
     const sampleTexture = (x: number, y: number): number[] => {
-      if (!captured) return seq(itemDims).map(i => 0);
+      if (!captured) return seq(itemDims).map(() => 0);
 
       const xs = Math.round(x * resolution / dpi);
       const ys = Math.round(y * resolution / dpi);
 
       const offset = (itemsPerRow * ys + xs) * itemDims;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const index = seq(itemDims).map(i => captured![offset + i]);
       return index;
     }
@@ -161,7 +157,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChild
       sampleTexture,
     };
 
-    return [context, pickingSource];
+    return context;
   }, [device, renderContext, colorStates, depthStencilState, resolution]);
 
   return [

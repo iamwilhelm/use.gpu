@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent } from '@use-gpu/live';
 import type { TextureSource, Lazy } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
@@ -68,7 +68,7 @@ export const FullScreen: LiveComponent<FullScreenProps> = (props: FullScreenProp
       const allArgs = [...argRefs, ...sources, ...s, ...f];
 
       const values = bindings.map(b => {
-        let k = b.name;
+        const k = b.name;
         return links[k] ? links[k] : allArgs.shift();
       });
 

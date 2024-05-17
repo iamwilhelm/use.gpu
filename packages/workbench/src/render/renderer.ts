@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
-import type { StorageSource, TextureSource, UseGPURenderContext } from '@use-gpu/core';
+import type { UseGPURenderContext } from '@use-gpu/core';
 import type { AggregatedCalls, RenderComponents, VirtualDraw } from '../pass/types';
 
 import { use, memo, unquote, provide, multiGather, extend, useMemo } from '@use-gpu/live';
@@ -70,6 +70,7 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
     const {shadow, picking} = buffers;
 
     const getRender = (mode: string, render: string | null = null) =>
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       components.modes[mode] ?? components.renders[render!]?.[mode];
 
     const getVariants = (!shadow && !picking)
@@ -106,7 +107,7 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
       const {shadow, picking} = buffers;
 
       const env = (calls.env ?? []).reduce((env: Record<string, any>, data: Record<string, any>) => {
-        for (let k in data) env[k] = data[k];
+        for (const k in data) env[k] = data[k];
         return env;
       }, {});
 

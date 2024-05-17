@@ -103,8 +103,8 @@ export const makeInlineCursor = (
   let chunkIndex = 0;
   let chunkCross = 0;
 
-  let rows: number[] = [];
-  let sizes: number[] = [];
+  const rows: number[] = [];
+  const sizes: number[] = [];
   let index = 0;
 
   const push = (

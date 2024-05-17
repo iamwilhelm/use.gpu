@@ -4,12 +4,12 @@ import { injectUseCursor, injectUseUpdateState } from './hooks';
 import { Pair, Cursor, Initial, UseState } from './types';
 export * from './types';
 
-type UseCursor<T> = <T>(
+type UseCursor<T> = (
   pair: Pair<T>,
   defaults?: T
 ) => Cursor<T>;
 
-type UseUpdateState<T> = <T>(
+type UseUpdateState<T> = (
   initialState: Initial<T>,
   useStateHook?: UseState,
 ) => Pair<T>;

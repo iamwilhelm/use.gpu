@@ -3,15 +3,14 @@ import type { StorageSource, TextureSource, UniformAttribute } from '@use-gpu/co
 import type { Light, BoundLight } from '../../light/types';
 import type { LightEnv } from '../../pass/types';
 
-import { provide, capture, yeet, makeCapture, useCallback, useCapture, useFiber, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
+import { capture, yeet, makeCapture, useCallback, useCapture, useFiber, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
 import {
-  makeIdAllocator,
   makeUniformLayout, makeLayoutData, makeLayoutFiller,
   makeStorageBuffer, uploadBuffer, uploadBufferRange,
   makeAtlas, makeTexture, seq,
 } from '@use-gpu/core';
-import { scrambleBits53, mixBits53 } from '@use-gpu/state';
-import { bindBundle, bundleToAttribute, getBundleKey } from '@use-gpu/shader/wgsl';
+import { mixBits53 } from '@use-gpu/state';
+import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../../providers/device-provider';
 import { QueueReconciler } from '../../reconcilers';
@@ -92,11 +91,12 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
   const Resume = () => {
 
     // Update light data in-place
-    for (let {id, data} of queue) {
+    for (const {id, data} of queue) {
       const {shadow} = data;
 
       if (lights.has(id)) {
         if (shadow) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const d = lights.get(id)!;
           Object.assign(d, data);
           continue;
@@ -124,7 +124,9 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
     for (const key of lights.keys()) lightKey = mixBits53(lightKey, key);
     for (const key of maps.keys()) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const {shadow} = maps.get(key)!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const {size: [w, h]} = shadow!;
       shadowKey = mixBits53(mixBits53(mixBits53(shadowKey, key), w), h);
     }
@@ -169,6 +171,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       let [atlas] = atlases;
 
       for (const key of maps.keys()) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const light = maps.get(key)!;
         const {shadow} = light;
         if (shadow) {
@@ -246,6 +249,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
       const keys = [...lights.keys()];
       const order = seq(keys.length);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const kinds = keys.map(k => lights.get(k)!.kind);
       order.sort((a, b) => (kinds[a] - kinds[b]) || (a - b));
 
@@ -258,6 +262,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
         const kind = kinds[i];
         if (!subranges.has(kind)) subranges.set(kind, [j, j + 1]);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         else subranges.get(kind)![1] = j + 1;
 
         ++j;
@@ -268,13 +273,14 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
     // Order changed lights by index
     const ids = needsRefresh ? [...lights.keys()] : [...changed.values()];
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     ids.sort((a, b) => indices.get(a)! - indices.get(b)!);
 
     // Update data sparsely while calculating upload ranges
     let ranges = [];
     let range: [number, number] | null = null;
-    let index = 0;
     for (const id of ids) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const index = indices.get(id)!;
 
       if (!range) ranges.push(range = [index, index + 1]);
@@ -291,6 +297,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
       // Don't count point lights if deferred rendering
       if (deferred && subranges.has(POINT_LIGHT)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         count[0] = subranges.get(POINT_LIGHT)![0];
       }
       else {

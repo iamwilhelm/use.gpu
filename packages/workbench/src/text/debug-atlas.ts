@@ -1,8 +1,7 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ShaderModule } from '@use-gpu/shader';
+import type { LiveComponent } from '@use-gpu/live';
 import type { Atlas, Rectangle, TextureSource, LambdaSource } from '@use-gpu/core';
 
-import { LOGGING, debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo, useLog } from '@use-gpu/live';
+import { memo, use, yeet, useMemo } from '@use-gpu/live';
 import { useShader, useLambdaSource } from '@use-gpu/workbench';
 
 import { useFontDebug } from './providers/font-provider';
@@ -36,6 +35,7 @@ export type DebugAtlasShapeProps = {
 };
 
 export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = memo((props: Partial<DebugAtlasProps> = {}) => {
+  // eslint-disable-next-line prefer-const
   let {atlas, source, size = 500, dpi = 1, compact} = props;
 
   let sdfFont;
@@ -54,12 +54,16 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = m
   const height = size * h / w;
 
   const shape = useMemo(() => ({
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     atlas: atlas!,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     source: source!,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     version: atlas!.version,
     size,
     compact,
     dpi,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   }), [atlas, source, atlas!.version, size, compact, dpi, sdfFont]);
 
   const [left, top] = useLayoutContext();
@@ -70,15 +74,6 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = m
     top,
   }), [shape, left, top]);
 }, 'DebugAtlas');
-
-const COLORS = [
-  [0, 1, 1, 1],
-  [1, 0, 1, 1],
-  [1, 1, 0, 1],
-  [0.5, 0.5, 1, 1],
-  [0.5, 1, 0.5, 1],
-  [1, .5, 0.5, 1],
-];
 
 const premultiply = wgsl`
 @optional @link fn getTexture(uv: vec2<f32>) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
@@ -100,11 +95,9 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
     compact,
   } = props;
 
-  const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate, debugUploads} = atlas as any;
-  const {id} = useFiber();
+  const {width: w, height: h, debugPlacements, debugSlots, debugValidate} = atlas as any;
 
   const yeets: UIAggregate[] = [];
-  const pos = [] as number[];
 
   const width = size;
   const height = size * h / w;
@@ -116,8 +109,6 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
 
   const border = [dpi, dpi, dpi, dpi];
   const border5 = [5*dpi, 5*dpi, 5*dpi, 5*dpi];
-
-  let ID = 0;
 
   const boundSource = useLambdaSource(useShader(premultiply, [source]), source);
 
@@ -156,10 +147,7 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
     );
   }
 
-  const fix = ([l, t, r, b]: Rectangle): Rectangle =>
-    [Math.min(l, r), Math.min(t, b), Math.max(l, r), Math.max(t, b)];
-
-  for (const [l, t, r, b, nearX, nearY, farX, farY, corner] of debugSlots()) {
+  for (const [l, t, r, b] of debugSlots()) {
     addRectangle(
       {
         rectangle: inset(fit([l, t, r, b]), 1),

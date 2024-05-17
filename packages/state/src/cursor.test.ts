@@ -1,5 +1,5 @@
 import { patch, $apply } from './patch';
-import { makeCursor, refinePair } from './cursor';
+import { makeCursor } from './cursor';
 
 describe('cursor', () => {
 
@@ -15,7 +15,7 @@ describe('cursor', () => {
       list: [2, 3, 4],
       obj: { hello: 'world' },
     };
-    const [getUpdate, updateState] = makeUpdateState();
+    const [, updateState] = makeUpdateState();
 
     const [cursor] = makeCursor([state, updateState]);
 
@@ -43,7 +43,7 @@ describe('cursor', () => {
       list: [2, 3, 4],
       obj: { hello: 'world' },
     };
-    const [getUpdate, updateState] = makeUpdateState();
+    const [, updateState] = makeUpdateState();
 
     const [cursor] = makeCursor([state, updateState]);
     expect(cursor.foo === cursor.foo).toBe(true);
@@ -80,7 +80,7 @@ describe('cursor', () => {
 
     const [cursor2, keep2] = makeCursor([state2, updateState], undefined, keep1);
 
-    const [cursor3, keep3] = makeCursor([state3, updateState], undefined, keep2);
+    const [cursor3, ] = makeCursor([state3, updateState], undefined, keep2);
 
     expect(cursor1.foo === cursor2.foo).toBe(true);
     expect(cursor1.list === cursor2.list).toBe(true);

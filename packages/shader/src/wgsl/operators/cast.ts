@@ -82,7 +82,7 @@ export const makeSwizzle = (
 
   const compact: string[] = [];
   let compat = true;
-  for (let c of out) {
+  for (const c of out) {
     const simple = !!c.match(/^[^.-]+\.[xyzw]$/);
     if (simple && compat && compact.length) {
       compact[compact.length - 1] += c.split('.')[1];

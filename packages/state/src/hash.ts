@@ -77,7 +77,7 @@ const getBooleanHash = (b: boolean) => scrambleBits53(mixBits53(HASH_KEY + 255, 
 
 const getArrayHash = (t: any[]) => {
   let h = mixBits53(HASH_KEY + 1023, 0);
-  for (let v of t) {
+  for (const v of t) {
     h = mixBits53(h, toMurmur53(v));
   }
   return scrambleBits53(h, t.length);
@@ -86,7 +86,7 @@ const getArrayHash = (t: any[]) => {
 const getObjectHash = (t: Record<string, any>) => {
   let i = 0;
   let h = mixBits53(HASH_KEY + 4095, 0);
-  for (let k in t) {
+  for (const k in t) {
     h = mixBits53(h, toMurmur53(k));
     h = mixBits53(h, toMurmur53(t[k]));
     ++i;
@@ -125,7 +125,7 @@ const getTypedArrayHash = (t: TypedArray) => {
     h = integerArrayToMurmur53(t, h);
   }
   else {
-    let n = t.length;
+    const n = t.length;
     for (let i = 0; i < n; ++i) h = mixBits53(h, getNumberHashInner(t[i]));
   }
 
@@ -139,7 +139,7 @@ const integerArrayToMurmur53 = (list: number[] | TypedArray, seed: number = 0) =
   let b = seed ^ C4;
 
   for (let i = 0; i < n; ++i) {
-    let d = list[i];
+    const d = list[i];
     let d1 = add(rot(d, 16), b);
     let d2 = add(d, a);
 
@@ -184,7 +184,7 @@ const stringToMurmur53 = (s: string, seed: number = 0) => {
   let b = seed ^ C4;
 
   for (let i = 0; i < n; ++i) {
-    let d = s.charCodeAt(i);
+    const d = s.charCodeAt(i);
     let d1 = add(rot(d, 16), b);
     let d2 = add(d, a);
 

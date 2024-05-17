@@ -1,6 +1,5 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { UseGPURenderContext, TextureSource, ColorSpace } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
 
 import { gather, use, useMemo, useOne } from '@use-gpu/live';
 import { chainTo } from '@use-gpu/shader/wgsl';
@@ -54,8 +53,6 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: PropsWithChildre
       colorSpace: 'linear',
     }),
     ([target]: UseGPURenderContext[]) => {
-      const {then} = props;
-
       const g = useShaderRef(gain);
       const defs = useOne(() => ({IS_OPAQUE: !overlay}), overlay);
 
@@ -81,6 +78,7 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: PropsWithChildre
         }),
       ], [target, filter, children]);
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return then ? [view, then(target.source!)] : view;
     },
   );

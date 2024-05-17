@@ -1,7 +1,6 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { TextureSource } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { LightKindProps } from './light';
 
 import { yeet, useMemo } from '@use-gpu/live';
 

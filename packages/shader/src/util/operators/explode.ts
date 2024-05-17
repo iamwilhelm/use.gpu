@@ -50,8 +50,8 @@ export const makeExplode = (
   if (!Array.isArray(fields)) throw new Error(`Cannot explode non-struct type '${entry}: ${fields}' of ${getBundleName(tBundle)}`);
   if (tBundle.bound?.size) throw new Error(`Cannot explode virtual '${entry}' of ${getBundleName(tBundle)}`);
 
-  let hash = getBundleHash(tBundle) ^ getBundleHash(sBundle);
-  let key = getBundleKey(tBundle) ^ getBundleKey(sBundle);
+  const hash = getBundleHash(tBundle) ^ getBundleHash(sBundle);
+  const key = getBundleKey(tBundle) ^ getBundleKey(sBundle);
 
   const symbols = fields.map(({name}) => name);
 

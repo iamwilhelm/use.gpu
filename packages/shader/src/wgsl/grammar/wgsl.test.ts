@@ -1,4 +1,3 @@
-import { Tree } from '@lezer/common';
 import { parser } from './wgsl';
 import { formatAST, formatASTNode } from '../../util/tree';
 import { addASTSerializer } from '../../test/snapshot';

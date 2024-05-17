@@ -1,5 +1,5 @@
 import { Tree } from '@lezer/common';
-import { ParsedModule, ParsedModuleCache, ShaderDefine } from './types';
+import { ParsedModule, ShaderDefine } from './types';
 
 import { makeLoadModule, makeLoadModuleWithCache } from '../util/shader';
 import { makeBundleToAttribute, makeBundleToAttributes } from '../util/bundle';
@@ -33,7 +33,7 @@ export const loadModuleWithCache = makeLoadModuleWithCache(loadModule, DEFAULT_C
 /** Make GLSL definitions */
 export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
   const out = [];
-  for (let k in defs) if (defs[k] !== false && defs[k] !== null) out.push(`#define ${k} ${defs[k]}`);
+  for (const k in defs) if (defs[k] !== false && defs[k] !== null) out.push(`#define ${k} ${defs[k]}`);
   return out.join("\n");
 }
 

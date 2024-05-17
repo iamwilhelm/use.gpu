@@ -26,7 +26,7 @@ describe("getGraphOrder", () => {
     graph.set(C, [D, A]);
 
     try {
-      const order = getGraphOrder(graph, A);
+      getGraphOrder(graph, A);
     }
     catch (e: any) {
       expect(e.message).toMatch(/Cycle detected/);

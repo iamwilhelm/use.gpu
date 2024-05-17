@@ -1,4 +1,4 @@
-import { ShaderModule, LambdaSource, UniformAttribute, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
+import { ShaderModule, LambdaSource, UniformAttribute, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
 import { formatMurmur53, toMurmur53, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash, getBundleEntry, getBundleName, toBundle, toModule } from '../util/bundle';
@@ -75,6 +75,7 @@ export const makeBindingAccessors = (
   const libs: Record<string, ShaderModule> = {};
   const modules = storages.map(({uniform, storage}) => {
     const {type: typeOut} = uniform;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const {type: typeIn} = storage!;
 
     const type = typeOut ?? typeIn;
@@ -98,6 +99,7 @@ export const makeBindingAccessors = (
   // Hash + readable representation
   const readable = symbols.join(' ');
   const signature = getBindingsKey(bindings).toString(16);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const external = lambdas.map(l => getBundleHash(l.lambda!.shader));
   const unique = `@access [${signature}] [${external}] [${readable}] [${types.join(' ')}]`;
 
@@ -124,6 +126,7 @@ export const makeBindingAccessors = (
     }
 
     for (const {uniform: {name, format: formatOut, type: typeOut, args}, storage} of storages) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const {volatile, format: formatIn, type: typeIn, readWrite} = storage!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
@@ -142,7 +145,10 @@ export const makeBindingAccessors = (
 
       if (Array.isArray(formatIn) || Array.isArray(formatOut)) throw new Error(`Cannot bind data to a type`);
 
-      if (formatIn === 'T' || formatOut === 'T') debugger;
+      if (formatIn === 'T' || formatOut === 'T') {
+        // eslint-disable-next-line no-debugger
+        debugger;
+      }
 
       if (is3to4(formatIn)) {
         const accessor = name + '3to4';
@@ -181,6 +187,7 @@ export const makeBindingAccessors = (
     }
 
     for (const {uniform: {name, format: formatOut, args}, texture} of textures) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const {volatile, layout, variant, absolute, sampler, comparison, format: formatIn, aspect} = texture!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
@@ -212,9 +219,12 @@ export const makeBindingAccessors = (
   for (const {uniform} of storages)  links[uniform.name] = bundle;
   for (const {uniform} of textures)  links[uniform.name] = bundle;
   for (const {uniform, lambda} of lambdas)   {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const needsCast = !checkLambdaType(uniform, lambda!);
     links[uniform.name] = needsCast
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       ? castTo(lambda!.shader, uniform.format as string)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       : lambda!.shader;
   }
 
@@ -341,6 +351,7 @@ export const makeTextureAccessor = (
   name: string,
   layout: string,
   variant: string = 'textureSample',
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   aspect: string = 'all',
   absolute: boolean = false,
   sampler: boolean = true,

@@ -1,6 +1,4 @@
-import { Tree } from '@lezer/common';
-
-import { defineConstants, defineEnables, loadModule, loadModuleWithCache, DEFAULT_CACHE } from './shader';
+import { defineConstants, defineEnables, loadModuleWithCache, DEFAULT_CACHE } from './shader';
 import { rewriteUsingAST } from './ast';
 import { makeLinker, makeLinkCode, makeLinkBundle, makeLinkModule } from '../util/link';
 

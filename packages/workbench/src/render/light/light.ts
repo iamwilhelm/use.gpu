@@ -1,21 +1,16 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Lazy, TextureSource } from '@use-gpu/core';
 import type { Update } from '@use-gpu/state';
-import type { VirtualDraw } from '../../pass/types';
 import type { BoundLight } from '../../light/types';
 
-import { memo, use, yeet, keyed, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
-import { resolve, uploadBuffer, BLEND_ADD } from '@use-gpu/core';
+import { memo, yeet, keyed, useMemo, useOne } from '@use-gpu/live';
+import { BLEND_ADD } from '@use-gpu/core';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 import { $delete } from '@use-gpu/state';
 
 import { drawCall } from '../../queue/draw-call';
-import { useBufferedSize } from '../../hooks/useBufferedSize';
-import { useShader } from '../../hooks/useShader';
-import { useRawSource } from '../../hooks/useRawSource';
 
-import { useDeviceContext } from '../../providers/device-provider';
 import { useRenderContext } from '../../providers/render-provider';
 import { useViewContext } from '../../providers/view-provider';
 import { usePassContext } from '../../providers/pass-provider';
@@ -164,7 +159,7 @@ const LIGHT_RENDERERS = {
 } as Record<number, LiveComponent<any>>;
 
 export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRenderProps) => {
-  let {
+  const {
     lights,
     order,
     subranges,
@@ -188,13 +183,16 @@ export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRe
   }, shadows);
 
   const out = [...subranges.keys()].map(kind => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const [start, end] = subranges.get(kind)!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const props = {lights, order, start, end, stencil, gbuffer: sources!, getLight, applyLight};
 
     const Component = LIGHT_RENDERERS[kind];
     return Component ? keyed(Component, kind, props) : null;
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   out.push(keyed(EmissiveLightRender, -1, {gbuffer: sources!, getLight}));
 
   return out;
@@ -217,13 +215,10 @@ export const useLightDraw = (
   pipeline?: Update<GPURenderPipelineDescriptor>,
   mode = 'light',
 ) => {
-  const device = useDeviceContext();
   const renderContext = useRenderContext();
 
-  const {layout: globalLayout, uniforms: viewUniforms} = useViewContext();
+  const {layout: globalLayout} = useViewContext();
   const {layout: passLayout, buffers: {gbuffer: [gbuffer]}} = usePassContext();
-
-  const {sources} = gbuffer;
 
   const vertexShader = instanceDrawVirtualLight;
   const fragmentShader = instanceFragmentLight;

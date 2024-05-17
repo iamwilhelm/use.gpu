@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent } from '@use-gpu/live';
 import type { LightKindProps } from './light';
 
 import { yeet, useMemo } from '@use-gpu/live';

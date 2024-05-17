@@ -1,7 +1,6 @@
 import { bindBundle, bindingsToLinks, resolveBindings } from './bind';
 import { loadModule } from './shader';
 import { linkBundle } from './link';
-import { formatAST } from '../util/tree';
 import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
@@ -121,18 +120,13 @@ describe("bind", () => {
     `;
     const mod = loadModule(code, 'code');
 
-    const toSnapshot = (link: any) => {
-      const { name, code, table, virtual: { uniforms, storages, textures, base }} = link;
-      return { name, code, table, uniforms, storages, textures, base };
-    }
-
     const links = bindingsToLinks(dataBindings);
     const bound = bindBundle(mod, links);
 
     const fail = () => linkBundle(bound);
     expect(fail).toThrow();
 
-    const {modules: [resolved], uniforms, bindings} = resolveBindings([bound]);
+    const {modules: [resolved]} = resolveBindings([bound]);
     const result = linkBundle(resolved);
     expect(result).toMatchSnapshot();
   });

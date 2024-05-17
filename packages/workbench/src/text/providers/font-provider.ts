@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { RustTextAPI, Font } from '@use-gpu/glyph';
 
 import { parseWeight } from '@use-gpu/parse';
-import { provide, useAwait, makeContext, useContext, useMemo, useOne, useResource } from '@use-gpu/live';
+import { provide, makeContext, useContext, useMemo, useOne, useResource } from '@use-gpu/live';
 import { makeTuples } from '@use-gpu/core';
 import { RustText, packStrings } from '@use-gpu/glyph';
 import { useForceUpdate } from '../../hooks';
@@ -78,6 +78,7 @@ export const useFontHeight = (
   const [id] = stack;
 
   return useMemo(() => {
+    // eslint-disable-next-line prefer-const
     let {ascent, descent, lineHeight: fontHeight, xHeight, emUnit} = rustText.measureFont(id, size);
 
     const lh = lineHeight ?? fontHeight;
@@ -91,7 +92,7 @@ export const useFontHeight = (
 }
 
 export const useFontDebug = () => {
-  const [version, forceUpdate] = useForceUpdate();
+  const [, forceUpdate] = useForceUpdate();
   const rustText = useFontContext();
 
   useResource((dispose) => {

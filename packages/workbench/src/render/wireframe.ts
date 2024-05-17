@@ -2,7 +2,6 @@ import type { StorageSource, Lazy } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
 import { resolve, makeDataBuffer } from '@use-gpu/core';
-import { useMemo, useNoMemo } from '@use-gpu/live';
 import { getShader } from '../hooks/useShader';
 
 import { getWireframeListVertex } from '@use-gpu/wgsl/render/wireframe/wireframe-list.wgsl';
@@ -57,7 +56,6 @@ export const getWireframeIndirect = (
   const isTriangleStrip = topology === 'triangle-strip';
 
   const N = 128;
-  const data = new Uint32Array(128);
   const buffer = makeDataBuffer(device, N * 4, GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT);
   const destination = {
     buffer,

@@ -1,7 +1,4 @@
-import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, TypeLike, FormatLike, ParameterLike, BundleSummary, RefFlags as RF } from '../types';
-
-const NO_LIBS: Record<string, any> = {};
-const NO_ARGS: any[] = [];
+import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, TypeLike, FormatLike, ParameterLike, BundleSummary } from '../types';
 
 export const getBundleKey = (bundle: ShaderModule): number => {
   return (('module' in bundle) ? bundle.key ?? bundle.module.key : bundle.key) ?? getBundleHash(bundle);
@@ -72,7 +69,7 @@ export const makeDeclarationToAttribute = (
     return {name, ...resolved, args: toArgTypes(parameters), attr};
   }
   if (d.variable || d.constant) {
-    const {type, name, parameters, attr} = d.variable ?? d.constant;
+    const {type, name, attr} = d.variable ?? d.constant;
     const resolved = resolveTypeSymbol(bundle, toTypeSymbol(type));
     return {name, ...resolved, args: null, attr};
   }
@@ -190,7 +187,6 @@ export const getBundleSummary = (bundle: ShaderModule, maxDepth: number = Infini
     key: string,
     depth: number = 0,
   ) => {
-    const module = toModule(bundle);
     const {libs, links} = bundle as ParsedBundle;
 
     out.name  = (
@@ -227,11 +223,9 @@ export const getBundleSummary = (bundle: ShaderModule, maxDepth: number = Infini
         recurse(links[k], sub, k, depth + 1);
       }
     }
-
-    return out;
   };
 
-  const out = recurse(bundle, {}, 'main', 0);
+  recurse(bundle, {}, 'main', 0);
 
   return {
     name: getBundleName(bundle),

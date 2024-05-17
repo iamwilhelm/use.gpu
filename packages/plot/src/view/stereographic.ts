@@ -1,5 +1,5 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { Axis4, Swizzle } from '../types';
+import type { Axis4 } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { combine, makeUseTrait } from '@use-gpu/traits/live';

@@ -1,8 +1,7 @@
 import { ParsedBundle, ParsedModule, ShaderModule, ShaderDefine, DataBinding, VirtualTable, SymbolTableT } from '../types';
 
-import { parseLinkAliases } from '../util/link';
-import { toHash, formatMurmur53, toMurmur53, scrambleBits53, mixBits53 } from '../util/hash';
-import { toBundle, toModule, getBundleName, getBundleHash, getBundleKey, getBundleEntry } from '../util/bundle';
+import { toMurmur53, scrambleBits53, mixBits53 } from '../util/hash';
+import { toBundle, getBundleName, getBundleHash, getBundleKey } from '../util/bundle';
 import { loadStaticModule } from '../util/shader';
 import { PREFIX_VIRTUAL, VIRTUAL_BINDINGS } from '../constants';
 
@@ -50,15 +49,14 @@ export const bindBundle = (
 
   // External hash
   let external: number = 0;
-  for (const k in links) if (links[k]) external = mixBits53(external, getBundleHash(links[k]!));
+  for (const k in links) if (links[k]) external = mixBits53(external, getBundleHash(links[k]));
 
   const defs = defines ? toMurmur53(defines) : 0;
-  const code = `@closure [${getBundleName(bundle)}]`;
   const rehash = scrambleBits53(mixBits53(hash, mixBits53(external, defs)));
 
   // External key
   external = 0;
-  for (const k in links) if (links[k]) external = mixBits53(external, getBundleKey(links[k]!));
+  for (const k in links) if (links[k]) external = mixBits53(external, getBundleKey(links[k]));
   const rekey = scrambleBits53(mixBits53(mixBits53(hash, key), mixBits53(external, defs)));
 
   const relinks = bundle.links ? {
@@ -70,7 +68,7 @@ export const bindBundle = (
     ...defines,
   } : defines ?? bundle.defines ?? undefined;
 
-  let rebound = new Set<ParsedModule>();
+  const rebound = new Set<ParsedModule>();
   mergeBindings(rebound, bundle);
 
   const {module: {table: {linkable}}} = bundle;
@@ -82,7 +80,7 @@ export const bindBundle = (
     if (!link) continue;
 
     // Ensure link exists in module
-    let check = k.indexOf(':') > 0 ? k.split(':')[0] : k;
+    const check = k.indexOf(':') > 0 ? k.split(':')[0] : k;
     if (!linkable[check]) continue;
 
     mergeBindings(rebound, link);
@@ -206,8 +204,10 @@ export const makeResolveBindings = (
           m.virtual.volatileBase = volatileBase;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace!, u));
         if (storages) for (const b of storages) addBinding(b, 1, visibility);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         if (textures) for (const b of textures) addBinding(b, 1 + +!!(b.texture!.sampler && (b.uniform!.args !== null)), visibility);
       }
     };

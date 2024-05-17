@@ -1,16 +1,16 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { TextureTarget, UseGPURenderContext } from '@use-gpu/core';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { TextureTarget } from '@use-gpu/core';
 
-import { yeet, memo, provide, fence, useMemo, useOne } from '@use-gpu/live';
+import { yeet, memo, useMemo, useOne } from '@use-gpu/live';
 import {
-  makeColorAttachment, makeColorState, makeDepthTexture, makeDepthStencilAttachment, makeDepthStencilState, makeTargetTexture,
+  makeColorAttachment, makeColorState, makeTargetTexture,
 } from '@use-gpu/core';
 
 import { useDeviceContext } from '../../providers/device-provider';
 import { useRenderContext } from '../../providers/render-provider';
 import { useInspectable } from '../../hooks/useInspectable';
 
-export const GBuffer: LC = memo((props: PropsWithChildren<object>) => {
+export const GBuffer: LC = memo(() => {
   const device = useDeviceContext();
   const renderContext = useRenderContext();
 

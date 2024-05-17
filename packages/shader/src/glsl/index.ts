@@ -162,6 +162,7 @@ export const GLSLLinker = {
   castTo,
   chainTo,
   diffBy,
+  explode,
   swizzleTo,
   structType,
 

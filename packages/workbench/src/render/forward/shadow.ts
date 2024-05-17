@@ -1,10 +1,9 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VirtualDraw } from '../../pass/types';
 
-import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
-import { resolve } from '@use-gpu/core';
-import { patch, $apply } from '@use-gpu/state';
-import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
+import { yeet, useMemo } from '@use-gpu/live';
+import { patch } from '@use-gpu/state';
+import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { drawCall } from '../../queue/draw-call';
 
@@ -23,7 +22,7 @@ import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 export type ShadowRenderProps = VirtualDraw;
 
 export const ShadowRender: LiveComponent<ShadowRenderProps> = (props: ShadowRenderProps) => {
-  let {
+  const {
     links: {
       getVertex,
       getFragment,

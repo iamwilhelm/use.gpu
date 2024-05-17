@@ -1,11 +1,9 @@
 import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, RefFlags as RF } from '../../types';
 import { loadVirtualModule } from '../shader';
 import { formatMurmur53, toMurmur53 } from '../hash';
-import { toBundle, toModule, getBundleHash, getBundleKey } from '../bundle';
+import { toBundle, getBundleHash, getBundleKey } from '../bundle';
 import { formatFormat } from '../format';
 import { mergeBindings } from '../bind';
-
-const NO_SYMBOLS = [] as string[];
 
 export type BundleToAttribute = (
   bundle: ShaderModule,
@@ -39,7 +37,7 @@ export const makeDiffBy = (
   size: null | ShaderModule | (null | ShaderModule)[],
 ): ParsedBundle => {
   const bundle = toBundle(source);
-  const {name, format, type, args} = bundleToAttribute(bundle);
+  const {format, type, args} = bundleToAttribute(bundle);
 
   const entry = 'diff';
 

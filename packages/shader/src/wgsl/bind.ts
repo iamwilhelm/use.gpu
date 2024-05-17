@@ -1,14 +1,11 @@
 import { ShaderModule, ShaderDefine, LambdaSource, StorageSource, TextureSource, DataBinding } from './types';
 
 import { toModule } from '../util/bundle';
-import { defineConstants } from './shader';
 import { makeBindingAccessors, makeUniformBlock } from './gen';
-import { makeResolveBindings, namespaceBinding, getBindingArgument } from '../util/bind';
+import { makeResolveBindings, getBindingArgument } from '../util/bind';
 import { VIRTUAL_BINDGROUP } from './constants';
 
 export { bindBundle, bindModule } from '../util/bind';
-
-const NO_SYMBOLS = [] as any[];
 
 const getVirtualBindGroup = (
   defines?: Record<string, ShaderDefine>
@@ -138,6 +135,7 @@ export const extractBindings = (stages: MaybeModule[][], pass: string) => {
 
     for (const bundle of stage) if (bundle) {
       const module = toModule(bundle);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const list = byModule.get(module)!;
       for (const binding of list) binding.visibility = binding.visibility | visibility;
     }

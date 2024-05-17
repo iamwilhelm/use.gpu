@@ -1,4 +1,4 @@
-import { Tree, SyntaxNode } from '@lezer/common';
+import { Tree } from '@lezer/common';
 import LRU from 'lru-cache';
 
 type ColorSpace = any;

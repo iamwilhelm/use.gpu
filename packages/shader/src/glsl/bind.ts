@@ -1,13 +1,10 @@
 import { ShaderModule, LambdaSource, StorageSource, TextureSource, DataBinding } from './types';
 
-import { defineConstants } from './shader';
 import { makeBindingAccessors, makeUniformBlock } from './gen';
-import { makeResolveBindings, namespaceBinding } from '../util/bind';
+import { makeResolveBindings } from '../util/bind';
 import { VIRTUAL_BINDGROUP, VOLATILE_BINDGROUP } from './constants';
 
 export { bindBundle, bindModule } from '../util/bind';
-
-const NO_SYMBOLS = [] as any[];
 
 const getVirtualBindGroup = () => VIRTUAL_BINDGROUP;
 

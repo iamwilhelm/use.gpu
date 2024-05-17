@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VirtualDraw } from '../../pass/types';
 
-import { memo, use, fragment, yeet, useContext, useMemo, useOne } from '@use-gpu/live';
+import { yeet, useMemo, useOne } from '@use-gpu/live';
 import { patch } from '@use-gpu/state';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
@@ -20,7 +20,7 @@ import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';
 export type DebugRenderProps = VirtualDraw;
 
 export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderProps) => {
-  let {
+  const {
     vertexCount: vC = 0,
     instanceCount: iC = 0,
     indirect,
@@ -63,12 +63,14 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
         getVertex,
         wireframeCommand,
         wireframeIndirect,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       } = getWireframeIndirect(device, gV!, indirect, topology));
     } else  {
       ({
         getVertex,
         vertexCount,
         instanceCount,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       } = getWireframe(gV!, vC, iC, topology));
     }
 

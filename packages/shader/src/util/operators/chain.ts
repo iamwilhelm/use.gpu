@@ -5,8 +5,6 @@ import { toBundle, getBundleHash, getBundleKey } from '../bundle';
 import { formatFormat } from '../format';
 import { mergeBindings } from '../bind';
 
-const NO_SYMBOLS = [] as string[];
-
 export type BundleToAttribute = (
   bundle: ShaderModule,
 ) => UniformAttribute;

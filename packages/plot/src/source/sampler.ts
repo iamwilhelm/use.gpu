@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataBounds, ElementType, TensorArray, VectorLike, Emit, Emitter, UniformType } from '@use-gpu/core';
+import type { ElementType, TensorArray, VectorLike, Emit, Emitter, UniformType } from '@use-gpu/core';
 
 import { provide, yeet, deprecated, memo, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
@@ -233,10 +233,10 @@ export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>>
       let [minZ, maxZ] = range[2];
       // eslint-disable-next-line prefer-const
       let [minW, maxW] = range[3];
-      let stepX = (maxX - minX) / (size[0] - 1 + cx);
-      let stepY = (maxY - minY) / (size[1] - 1 + cy);
-      let stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
-      let stepW = (maxW - minW) / (size[3] - 1 + cw);
+      const stepX = (maxX - minX) / (size[0] - 1 + cx);
+      const stepY = (maxY - minY) / (size[1] - 1 + cy);
+      const stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
+      const stepW = (maxW - minW) / (size[3] - 1 + cw);
       const alignX = origin ? (minX - origin[0]) % stepX : 0;
       const alignY = origin ? (minY - origin[1]) % stepY : 0;
       const alignZ = origin ? (minZ - origin[2]) % stepZ : 0;

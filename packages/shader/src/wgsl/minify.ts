@@ -1,7 +1,6 @@
 import { makeASTParser } from './ast';
 import { parser } from './grammar/wgsl';
 import { parser as commentParser } from './highlight/wgsl';
-import { WGSL_NATIVE_TYPES } from './constants';
 
 export const removeComments = (code: string) => {
   let out = '';
@@ -44,6 +43,7 @@ export const renameLocals = (code: string) => {
   };
 
   const shorten = (name: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (map.has(name)) return map.get(name)!;
 
     let letter = name.slice(0, 1);
@@ -108,7 +108,7 @@ export const renameLocals = (code: string) => {
         if (scopes == 0) {
           map.clear();
           taken.clear();
-          if (symbols) for (let s of symbols) taken.add(s);
+          if (symbols) for (const s of symbols) taken.add(s);
         }
       }
     },

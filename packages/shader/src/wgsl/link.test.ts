@@ -1,7 +1,6 @@
 import { WGSLModules } from './wgsl.test.data';
 import { linkCode, linkModule } from './link';
 import { loadModule, wgsl } from './shader';
-import { formatAST } from '../util/tree';
 import { addASTSerializer } from '../test/snapshot';
 import mapValues from 'lodash/mapValues';
 
@@ -131,7 +130,7 @@ describe("link", () => {
     }
     `
 
-    for (let compressed of [false, true]) {
+    for (const compressed of [false, true]) {
       const modMain = loadModule(main, 'main', undefined, compressed);
       const modSub = loadModule(sub, 'sub', undefined, compressed);
 
@@ -162,7 +161,7 @@ describe("link", () => {
     }
     `
 
-    for (let compressed of [false, true]) {
+    for (const compressed of [false, true]) {
       const modMain = loadModule(main, 'main', undefined, compressed);
       const modSub = loadModule(sub, 'sub', undefined, compressed);
 

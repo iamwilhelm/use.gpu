@@ -1,7 +1,8 @@
-import { Cursor, Pair, Update, UpdateKey } from './types';
+import { Cursor, Pair, Update } from './types';
 import { $set } from './patch';
 
 export type CursorEntry<T> = [Cursor<T> | null, CursorMap<T>];
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type CursorMap<T> = Map<string | symbol, CursorEntry<any>>;
 
 const NO_ENTRY = [null, null];
@@ -26,7 +27,7 @@ export const makeCursor = <T>(
 
   const cursor = (
     new Proxy(fn, {
-      get(target, prop, receiver) {
+      get(target, prop) {
         const [cursor, keep] = map.get(prop) ?? NO_ENTRY;
         if (cursor) return cursor;
 
@@ -43,6 +44,7 @@ export const makeCursor = <T>(
     if (pair[0]) for (const k of keep.keys()) {
       const [newValue] = refinePair(pair, k as any, d);
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const entry = keep.get(k)!;
       const [cursor, m] = entry;
       if (cursor) {
@@ -72,9 +74,9 @@ export const refinePair = <T, K extends keyof T>(
   key: K,
   defaults?: Record<K, any>,
 ): Pair<T[K]> => {
-  let [value, updater] = pair;
+  const [value, updater] = pair;
 
-  let d = defaults != null ? defaults[key]       : undefined;
+  const d = defaults != null ? defaults[key]       : undefined;
   let v = value    != null ? (value as any)[key] : undefined;
   let u;
 

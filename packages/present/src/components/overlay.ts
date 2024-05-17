@@ -54,7 +54,7 @@ export const Overlay: LC<OverlayProps> = (props: PropsWithChildren<OverlayProps>
           })
         ),
         (slides: SlideInfo[]) => {
-          const {resolved, length} = resolveSlides(slides);
+          const {resolved} = resolveSlides(slides);
           return yeet({
             id,
             order,

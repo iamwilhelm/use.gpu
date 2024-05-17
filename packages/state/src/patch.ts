@@ -159,7 +159,7 @@ const merge = <T>(a: T, b: Merge<T>): T => {
   if (b === undefined) return a;
 
   if (typeof b === 'object') {
-    let update: Record<string, any> = b;
+    const update: Record<string, any> = b;
     if (typeof a !== 'object' || a == null) a = {} as any;
 
     if (Array.isArray(a)) {
@@ -167,7 +167,7 @@ const merge = <T>(a: T, b: Merge<T>): T => {
       const n = a.length;
 
       for (let i = 0; i < n; ++i) {
-        if (update.hasOwnProperty(i)) {
+        if (Object.hasOwn(update, i)) {
           const v = patch(a[i], update[i.toString()]);
           if (v !== undefined) out.push(v);
         }
@@ -185,8 +185,8 @@ const merge = <T>(a: T, b: Merge<T>): T => {
       let obj: Record<string, any> = a as any;
 
       const out = {} as Record<string, any>;
-      for (let k in obj) {
-        if (update.hasOwnProperty(k)) {
+      for (const k in obj) {
+        if (Object.hasOwn(update, k)) {
           const v = patch(obj[k], update[k]);
           if (v !== undefined) out[k] = v;
         }
@@ -194,7 +194,7 @@ const merge = <T>(a: T, b: Merge<T>): T => {
           out[k] = obj[k];
         }
       }
-      for (let k in update) if (!obj.hasOwnProperty(k)) {
+      for (const k in update) if (!Object.hasOwn(obj, k)) {
         const v = patch(undefined, update[k]);
         if (v !== undefined) out[k] = v;
       }
@@ -245,9 +245,9 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
 
     if (Array.isArray(a) || isTypedArray(a)) {
       let aa: any[] = a as any;
-      for (let k in update) {
+      for (const k in update) {
         let i = +k;
-        if (aa.hasOwnProperty(i)) {
+        if (Object.hasOwn(aa, i)) {
           out[i] = revise(aa[i], update[k]);
         }
         else {
@@ -258,13 +258,13 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
     else {
       let aa: Record<string, any> = a as any;
 
-      for (let k in aa) {
-        if (update.hasOwnProperty(k)) {
+      for (const k in aa) {
+        if (Object.hasOwn(update, k)) {
           out[k] = revise(aa[k], update[k]);
         }
       }
 
-      for (let k in update) if (!aa.hasOwnProperty(k)) {
+      for (const k in update) if (!Object.hasOwn(aa, k)) {
         out[k] = $DELETE;
       }
     }
@@ -298,7 +298,7 @@ export const diff = <T>(a: T, b: T): Update<T> => {
     let aa: Record<string, any> = a as any;
 
     const out = {} as Record<string, any>;
-    for (let k in aa) {
+    for (const k in aa) {
       if (bb.hasOwnProperty(k)) {
         const v = diff(aa[k], bb[k]);
         if (v !== undefined) out[k] = v;
@@ -307,7 +307,7 @@ export const diff = <T>(a: T, b: T): Update<T> => {
         out[k] = $DELETE;
       }
     }
-    for (let k in bb) if (!aa.hasOwnProperty(k)) {
+    for (const k in bb) if (!aa.hasOwnProperty(k)) {
       const v = bb[k];
       out[k] = v && typeof v === 'object' && !Array.isArray(v) ? $set(v) : v;
     }
@@ -340,7 +340,7 @@ export const getUpdateKeys = <T>(update: T): string[] => {
       if (Array.isArray(b) || isTypedArray(b)) {
         return keys.push(path ?? '');
       }
-      for (let k in bb) {
+      for (const k in bb) {
         recurse(bb[k], path != null ? path + '.' + k : k);
       }
     }

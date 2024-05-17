@@ -1,18 +1,12 @@
-import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../../types';
+import { ParsedBundle, UniformAttribute, RefFlags as RF } from '../../types';
 import { loadVirtualModule } from '../shader';
-import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
-import { toBundle, getBundleHash, getBundleKey } from '../bundle';
+import { toMurmur53 } from '../hash';
 import { flattenFormat } from '../format';
 
 export type MakeStructDefinition = (
   name: string,
   fields: UniformAttribute[],
 ) => string;
-
-const makeDeclarations = (name: string, type: any, parameters: any) => [{
-  func: {name, type, parameters},
-  flags: RF.Exported,
-}] as any[];
 
 export const makeStructType = (
   makeStructDefinition: MakeStructDefinition,

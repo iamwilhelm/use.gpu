@@ -74,7 +74,7 @@ export const loadVirtualModule = <T extends SymbolTableT = any>(
   code?: string,
   key?: number,
 ) => {
-  let symbols = initTable.symbols ?? EMPTY_LIST;
+  const symbols = initTable.symbols ?? EMPTY_LIST;
 
   code = code ?? `@virtual [${symbols.join(' ')}]`;
   hash = hash ?? toMurmur53(code);
@@ -94,6 +94,7 @@ export const loadVirtualModule = <T extends SymbolTableT = any>(
 // Is the same instance as the original (key = old key/hash), so it merges with copies of itself.
 // But is structurally different (hash = new entry), so differences in links are reflected in the shader hash.
 export const bindEntryPoint = <T extends ParsedBundle | ParsedModule>(bundle: T, entry?: string): T => {
+  // eslint-disable-next-line prefer-const
   let {key, hash, module, table} = bundle as any;
 
   table = table ?? module?.table;

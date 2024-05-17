@@ -1,6 +1,6 @@
 import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
 import type { UseGPURenderContext } from '@use-gpu/core';
-import type { LightEnv, RenderComponents, VirtualDraw } from '../pass/types';
+import type { LightEnv, RenderComponents } from '../pass/types';
 
 import { use, yeet, memo, useMemo, useOne } from '@use-gpu/live';
 import { extractBindings } from '@use-gpu/shader/wgsl';
@@ -61,8 +61,6 @@ const getComponents = ({modes = {}, renders = {}}: Partial<RenderComponents>): R
     }
   }
 };
-
-const HOVERED_VARIANT = 'debug';
 
 export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWithChildren<DeferredRendererProps>) => {
   const {

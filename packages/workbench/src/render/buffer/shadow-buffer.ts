@@ -1,6 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 
-import { makeDepthStencilState } from '@use-gpu/core';
 import { yeet, memo } from '@use-gpu/live';
 
 import { useDeviceContext } from '../../providers/device-provider';
@@ -28,7 +27,7 @@ export const ShadowBuffer: LC<ShadowBufferProps> = memo((props: PropsWithChildre
     colorInput: 'native',
     colorStates: [],
     colorAttachments: [],
-    depthStencilState: makeDepthStencilState(SHADOW_FORMAT),
+    depthStencilState: makeDepthStencilState(format),
     swap: () => {},
   };
 

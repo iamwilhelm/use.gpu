@@ -1,7 +1,7 @@
-import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction, PropsWithChildren } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { OffscreenTarget, ColorSpace, TextureSource, TextureTarget } from '@use-gpu/core';
 
-import { use, provide, gather, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
+import { provide, fence, yeet, useContext, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
@@ -141,9 +141,12 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
     const swap = () => {
       if (!history) return;
       const {current: index} = counter;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const n = bufferViews!.length;
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const texture = bufferTextures![index];
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const view = bufferViews![index];
 
       if (resolveTexture) colorAttachments[0].resolveTarget = view;
@@ -154,7 +157,9 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
 
       for (let i = 0; i < history; i++) {
         const j = (index + n - i - 1) % n;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         sources![i].texture = bufferTextures![j];
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         sources![i].view = bufferViews![j];
       }
 

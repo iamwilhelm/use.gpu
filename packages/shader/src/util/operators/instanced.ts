@@ -58,7 +58,6 @@ export const makeInstanceWith = (
   const rebound = new Set<ParsedModule>();
   if (iBundle) mergeBindings(rebound, iBundle);
 
-  const keys = Object.keys(values);
   for (const k in values) {
     const value = (values as any)[k];
     const vBundle = toBundle(value);

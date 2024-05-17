@@ -26,7 +26,9 @@ export const makeDiffAccessor = (
   const symbols = args.map((t, i) => `${arg(i)}`);
 
   return `${type} ${name}(${symbols.map((s, i) => `${args[i]} ${s}`).join(', ')}) {
-  ${symbols.map((s, i) => offsets[i] != null ? `${args[i]} size${i} = ${sizers[i]!}();` : '').join('\n  ')}
+`+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+`  ${symbols.map((s, i) => offsets[i] != null ? `${args[i]} size${i} = ${sizers[i]!}();` : '').join('\n  ')}
   ${symbols.map((s, i) => offsets[i] != null ? `${args[i]} d${s} = max(${literal(0, isFloat(args[i]))}, min(size${i}, ${s} + ${literal(offsets[i] ?? 0, isFloat(args[i]))}));` : '').join('\n  ')}
   ${type} v1 = ${accessor}(${symbols.join(', ')});
   ${type} v2 = ${accessor}(${symbols.map((s, i) => offsets[i] != null ? 'd' + s : s).join(', ')});

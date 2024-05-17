@@ -7,7 +7,7 @@ export const shouldEqual = (spec: Record<string, MemoCompare>) => {
 
   return (a: any, b: any) => {
     for (const k in spec) if (!spec[k](a[k], b[k])) return false;
-    for (const k in b) if (!custom.has(k) && !a.hasOwnProperty(k)) return false;
+    for (const k in b) if (!custom.has(k) && !Object.hasOwn(a, k)) return false;
     for (const k in a) if (!custom.has(k) && a[k] !== b[k]) return false;
     return true;
   };
@@ -52,7 +52,7 @@ const compareArray = (a: any[], b: any[], same?: MemoCompare) => {
 };
 
 const compareObject = (a: Props, b: Props, same?: MemoCompare) => {
-  for (const k in b) if (!a.hasOwnProperty(k)) return false;
+  for (const k in b) if (!Object.hasOwn(a, k)) return false;
   if (same) for (const k in a) if (!same(a[k], b[k])) return false;
   else for (const k in a) if (a[k] !== b[k]) return false;
   return true;

@@ -1,26 +1,13 @@
-import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction, PropsWithChildren } from '@use-gpu/live';
-import type { UseGPURenderContext, ColorSpace, TextureTarget } from '@use-gpu/core';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { UseGPURenderContext, TextureTarget } from '@use-gpu/core';
 
-import { use, provide, yeet, useCallback, useMemo, useOne, incrementVersion } from '@use-gpu/live';
+import { provide, yeet, useMemo, incrementVersion } from '@use-gpu/live';
 import { RenderContext, useRenderContext, useNoRenderContext } from '../providers/render-provider';
 import { QueueReconciler } from '../reconcilers';
 
 import { getRenderFunc } from '../hooks/useRenderProp';
 
-import {
-  makeColorState,
-  makeColorAttachment,
-  makeTargetTexture,
-  makeDepthTexture,
-  makeDepthStencilState,
-  makeDepthStencilAttachment,
-  BLEND_PREMULTIPLY,
-  seq,
-} from '@use-gpu/core';
-
 const {quote} = QueueReconciler;
-
-const NO_SAMPLER: Partial<GPUSamplerDescriptor> = {};
 
 export type RenderToTextureProps = {
   target?: UseGPURenderContext,

@@ -1,7 +1,7 @@
-import type { LiveComponent, LiveNode, PropsWithChildren } from '@use-gpu/live';
-import { makeContext, memo, provide, use, useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
+import { makeContext, memo, provide, use, useContext, useMemo, useResource, useState } from '@use-gpu/live';
 import { Routes } from './routes';
-import { QueryParams, Route, RouterState, RouterLink, RouterAPI } from './types';
+import { QueryParams, Route, RouterState, RouterAPI } from './types';
 
 export const RouterContext = makeContext<RouterAPI>(undefined, 'RouterContext');
 
@@ -68,7 +68,7 @@ export const makeRelativeURL = (base: string, path: string, query?: QueryParams 
   }
   if (query) {
     let i = 0;
-    for (let k in query) {
+    for (const k in query) {
       const vs = query[k];
       path = path + (i++ ? '?' : '&') + encodeURIComponent(k) + '=' + encodeURIComponent(vs);
     }
@@ -86,7 +86,7 @@ export const makeBrowserHistory = (base: string = '', hash?: boolean) => {
   // Initialize from #!/ in URL for static SPA.
   const hasHash = location.hash.match(/^#!\//);
   if (hasHash || hash) {
-    let [path, query] = (hasHash && location.hash.slice(2).split('?')) || ['/', ''];
+    const [path, query] = (hasHash && location.hash.slice(2).split('?')) || ['/', ''];
     history.replaceState({path, query}, document.title, makeRelativeURL(base, path, query, hash));
   }
 
@@ -94,7 +94,7 @@ export const makeBrowserHistory = (base: string = '', hash?: boolean) => {
     window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
-  let self = {
+  const self = {
     resource: (callback: any) => {
       const handlePopState = (e?: PopStateEvent) => callback(e);
       window.addEventListener('popstate', handlePopState);
@@ -115,6 +115,7 @@ export const makeBrowserHistory = (base: string = '', hash?: boolean) => {
 
       if (search.length) {
         const params = new URLSearchParams(search);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         for (const k of (params as any).keys()) out[k] = params.get(k)!;
       }
       return out;

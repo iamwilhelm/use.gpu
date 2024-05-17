@@ -29,6 +29,7 @@ export const makeTranspile = (
   const module = loadModule(input, name);
 
   // Emit module data (without declarations, which is repeated in externals/exports)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {code, hash, table: {declarations, ...table}, tree, shake} = module;
   const def = `const t = ${stringify(table)}; const data = {
   "name": ${stringify(name)},
@@ -36,7 +37,9 @@ export const makeTranspile = (
   "hash": ${stringify(hash)},
   "table": t,
   "shake": ${stringify(shake)},
-  "tree": decompressAST(${stringify(compressAST(code, tree!, table.symbols))}, t.symbols),
+`+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+`  "tree": decompressAST(${stringify(compressAST(code, tree!, table.symbols))}, t.symbols),
 };
 `;
 

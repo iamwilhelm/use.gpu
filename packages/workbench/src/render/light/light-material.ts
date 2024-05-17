@@ -3,7 +3,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { LightEnv } from '../../pass/types';
 import type { UseLight } from './light-data';
 
-import { use, yeet, provide, fence, useMemo, useOne } from '@use-gpu/live';
+import { use, provide, useMemo } from '@use-gpu/live';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { LightContext } from '../../providers/light-provider';

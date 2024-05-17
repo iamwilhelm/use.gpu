@@ -1,4 +1,4 @@
-import { ShaderModule, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
+import { ShaderModule, DataBinding } from './types';
 
 import { formatMurmur53, toMurmur53, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash } from '../util/bundle';
@@ -44,6 +44,7 @@ export const makeBindingAccessors = (
   // Hash + readable representation
   const readable = symbols.join(' ');
   const signature = getBindingsKey(bindings).toString(16);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const external = lambdas.map(l => getBundleHash(l.lambda!.shader));
   const unique = `@access [${signature}] [${external}] [${readable}] [${types.join(' ')}]`;
 
@@ -67,7 +68,8 @@ export const makeBindingAccessors = (
       program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, formatOut, name, args));
     }
 
-    for (const {uniform: {name, format: formatOut, args}, storage} of storages) {
+    for (const {uniform: {name, format: formatOut}, storage} of storages) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const {volatile, format: formatIn} = storage!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
@@ -81,7 +83,8 @@ export const makeBindingAccessors = (
       program.push(makeStorageAccessor(namespace, set, base, formatOut, formatIn, name));
     }
 
-    for (const {uniform: {name, format: formatOut, args}, texture} of textures) {
+    for (const {uniform: {name, format: formatOut}, texture} of textures) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const {volatile, layout, variant, absolute, format: formatIn} = texture!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
@@ -108,6 +111,7 @@ export const makeBindingAccessors = (
   for (const binding of constants) links[binding.uniform.name] = virtual;
   for (const binding of storages)  links[binding.uniform.name] = virtual;
   for (const binding of textures)  links[binding.uniform.name] = virtual;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   for (const lambda  of lambdas)   links[lambda.uniform.name]  = lambda.lambda!.shader;
 
   return links;
@@ -153,6 +157,7 @@ export const makeStorageAccessor = (
   type: string,
   format: string,
   name: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   args: string[] = INT_ARG,
 ) => (
 `layout (std430, set = ${set}, binding = ${binding}) readonly buffer ${ns}${name}Type {
@@ -175,6 +180,7 @@ export const makeTextureAccessor = (
   layout: string,
   variant: string = 'sampler2D',
   absolute: boolean = false,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   args: string[] = UV_ARG,
 ) => (
 `layout (set = ${set}, binding = ${binding}) uniform ${layout} ${ns}${name}Texture;

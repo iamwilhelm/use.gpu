@@ -6,7 +6,6 @@ const makeComposeTransform = () => {
   const q = quat.create();
   const p = vec3.create();
   const s = vec3.create();
-  const t = mat4.create();
 
   const qs = quat.create();
 

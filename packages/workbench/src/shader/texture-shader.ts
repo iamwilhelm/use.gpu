@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TextureSource, LambdaSource, Lazy } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { yeet, useMemo, useHooks } from '@use-gpu/live';
+import { useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useShaderRefs } from '../hooks/useShaderRef';
@@ -41,7 +41,6 @@ export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
     source,
     sources = NO_SOURCES,
     args = NO_SOURCES,
-    render,
   } = props;
 
   const argRefs = useShaderRefs(...args);
@@ -59,7 +58,7 @@ export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
     const allArgs = [...argRefs, ...sources, ...s];
 
     const values = bindings.map(b => {
-      let k = b.name;
+      const k = b.name;
       return links[k] ? links[k] : allArgs.shift();
     });
 

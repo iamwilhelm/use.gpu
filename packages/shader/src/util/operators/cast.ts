@@ -4,8 +4,6 @@ import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleHash, getBundleKey } from '../bundle';
 import { mergeBindings } from '../bind';
 
-const NO_SYMBOLS = [] as string[];
-
 export type CastTo = {
   basis: string,
   signs?: string,

@@ -1,8 +1,7 @@
-import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
-import type { UseGPURenderContext } from '@use-gpu/core';
-import type { LightEnv, RenderComponents, VirtualDraw, AggregatedCalls } from '../pass/types';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { RenderComponents, VirtualDraw, AggregatedCalls } from '../pass/types';
 
-import { use, yeet, provide, unquote, multiGather, memo, useCallback, useMemo } from '@use-gpu/live';
+import { use, provide, unquote, multiGather, memo, useCallback, useMemo } from '@use-gpu/live';
 
 import { PassContext, VariantContext } from '../providers/pass-provider';
 import { PassReconciler } from '../reconcilers';
@@ -23,10 +22,6 @@ export type FullScreenRendererProps = {
 };
 
 const NO_ENV: Record<string, any> = {};
-
-const PASSES = [
-  use(ColorPass, {}),
-];
 
 const COMPONENTS = {
   modes: {

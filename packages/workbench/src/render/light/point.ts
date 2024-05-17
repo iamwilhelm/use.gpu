@@ -1,11 +1,8 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ShaderModule } from '@use-gpu/shader';
+import type { LiveComponent } from '@use-gpu/live';
 import type { LightKindProps } from './light';
-import type { BoundLight } from '../../light/types';
 
 import { use, yeet, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
 import { alignSizeTo, uploadBuffer } from '@use-gpu/core';
-import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { useBufferedSize } from '../../hooks/useBufferedSize';
 import { useShader } from '../../hooks/useShader';
@@ -92,11 +89,15 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
     let insideCount = 0;
 
     for (let i = start; i < end; ++i) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const light = lights.get(order[i])!;
       const {position, intensity, cutoff} = light;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const radius = Math.sqrt(intensity! * 3.1415 / (cutoff || 1)) * getScale;
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       if (cull(position!, radius)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         vec3.sub(v3, position! as vec3, viewPosition as vec3);
 
         instances[instanceCount++] = i;

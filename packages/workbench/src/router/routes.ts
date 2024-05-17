@@ -1,5 +1,5 @@
-import type { LiveFiber, LiveComponent, LiveNode, LiveElement, Task } from '@use-gpu/live';
-import { memo, morph, use, provide, makeContext, useContext, useOne, useMemo } from '@use-gpu/live';
+import type { LiveComponent, LiveNode } from '@use-gpu/live';
+import { memo, morph, use, provide, makeContext, useContext, useMemo } from '@use-gpu/live';
 import { RouterContext } from './router';
 import { Route } from './types';
 
@@ -42,8 +42,6 @@ const Outlet = () => {
   const context = useContext(RouteContext);
   return context.routes ? use(Routes, context) : null;
 }
-
-const USE_OUTLET = use(Outlet);
 
 export const Routes: LiveComponent<RoutesProps> = memo((props: RoutesProps) => {
   const {

@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataBounds, ElementType, TensorArray, VectorLike, Emitter, UniformType } from '@use-gpu/core';
+import type { ElementType, TensorArray, VectorLike, Emitter, UniformType } from '@use-gpu/core';
 
 import { provide, yeet, memo, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {

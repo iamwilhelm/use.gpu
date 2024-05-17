@@ -1,4 +1,4 @@
-// eslint-disable @typescript-eslint/no-unused-vars
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { LiveComponent } from '@use-gpu/live';
 import type { TraitProps } from '@use-gpu/traits';
 
@@ -65,6 +65,7 @@ export const InnerFace: LiveComponent<FaceProps> = (props) => {
   const attributes = schemaToEmitters(schema, parsed as any);
   const archetype = schemaToArchetype(schema, attributes, flags, refs, sources);
 
+  // eslint-disable-next-line no-debugger
   if (Number.isNaN(count)) debugger;
   if (!count || !positions) return;
 

@@ -38,6 +38,7 @@ export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
 }
 
 /** Make GLSL enable definitions */
+// eslint-disable-next-line no-irregular-whitespace
 export const defineEnables = (enabled: string[]) => enabled.map(e => `#extension ${e}​ : enable`).join('\n');
 
 /** Convert a bundle with a defined entry point to a definition for that attribute or type. */

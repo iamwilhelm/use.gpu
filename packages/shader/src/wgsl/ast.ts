@@ -25,7 +25,7 @@ import {
 import * as T from './grammar/wgsl.terms';
 import { WGSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
-import { getChildNodes, makeASTEmitter, makeASTDecompressor } from '../util/tree';
+import { getChildNodes, formatAST, makeASTEmitter, makeASTDecompressor } from '../util/tree';
 import { getTypeName, getAttributeName, getAttributeArgs } from './type';
 import uniq from 'lodash/uniq';
 

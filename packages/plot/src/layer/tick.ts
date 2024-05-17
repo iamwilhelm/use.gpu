@@ -1,4 +1,4 @@
-// eslint-disable @typescript-eslint/no-unused-vars
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { LiveComponent } from '@use-gpu/live';
 import type { TensorArray, VectorLike, UniformAttribute } from '@use-gpu/core';
 import type { TraitProps } from '@use-gpu/traits';

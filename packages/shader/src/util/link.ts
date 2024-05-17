@@ -208,9 +208,8 @@ export const makeLinker = (
     // Replace imported function prototype names with target
     if (externals) for (const {flags, func, variable, struct} of externals) if (func ?? variable ?? struct) {
       const {name, inferred} = func ?? variable ?? struct;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const key = importMap?.get?.(name);
-      const ns = namespaces.get(key as string);
+      const ns = namespaces.get(key as number);
 
       const resolved = aliasMap?.get(name) ?? name;
       if ((ns === undefined) && (flags & RF.Optional)) {

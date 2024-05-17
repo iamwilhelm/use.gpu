@@ -49,14 +49,16 @@ export const bindBundle = (
 
   // External hash
   let external: number = 0;
-  for (const k in links) if (links[k]) external = mixBits53(external, getBundleHash(links[k]));
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  for (const k in links) if (links[k]) external = mixBits53(external, getBundleHash(links[k]!));
 
   const defs = defines ? toMurmur53(defines) : 0;
   const rehash = scrambleBits53(mixBits53(hash, mixBits53(external, defs)));
 
   // External key
   external = 0;
-  for (const k in links) if (links[k]) external = mixBits53(external, getBundleKey(links[k]));
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  for (const k in links) if (links[k]) external = mixBits53(external, getBundleKey(links[k]!));
   const rekey = scrambleBits53(mixBits53(mixBits53(hash, key), mixBits53(external, defs)));
 
   const relinks = bundle.links ? {

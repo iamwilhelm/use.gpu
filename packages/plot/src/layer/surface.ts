@@ -1,4 +1,4 @@
-// eslint-disable @typescript-eslint/no-unused-vars
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { TensorArray } from '@use-gpu/core';

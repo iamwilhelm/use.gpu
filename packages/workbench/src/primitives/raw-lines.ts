@@ -40,7 +40,6 @@ export type RawLinesProps = {
   size?: number,
 
   positions?: ShaderSource,
-  indices?: ShaderSource,
 
   segments?: ShaderSource,
   uvs?: ShaderSource,
@@ -110,9 +109,6 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const z = useShaderRef(props.zBias, props.zBiases);
   const t = useShaderRef(props.trim, props.trims);
   const e = useShaderRef(props.size, props.sizes);
-
-  // TODO
-  const i = useShaderRef(null, props.indices);
 
   const auto = useOne(() => props.segment != null ? getShader(getLineSegment, [props.segment]) : null, props.segment);
 

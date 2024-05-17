@@ -1,4 +1,4 @@
-// eslint-disable @typescript-eslint/no-unused-vars
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { LiveComponent } from '@use-gpu/live';
 import type { TraitProps } from '@use-gpu/traits/live';
 
@@ -57,6 +57,8 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
 
   const dims = toCPUDims(getUniformDims(schema.positions.format));
   const count = positions ? (attributes.positions?.length / dims) || 0 : 1;
+
+  // eslint-disable-next-line no-debugger
   if (Number.isNaN(count)) debugger;
   if (!count || !(position || positions)) return;
 

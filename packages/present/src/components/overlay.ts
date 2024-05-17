@@ -1,12 +1,11 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { DeepPartial, UniformAttribute } from '@use-gpu/core';
 import type { UIAggregate } from '@use-gpu/layout';
 import type { TraitProps } from '@use-gpu/traits';
 import type { ParsedEffect, SlideInfo } from '../types';
 
-import { fragment, unquote, gather, yeet, use, wrap, provide, useFiber, useMemo, useOne, useRef } from '@use-gpu/live';
+import { unquote, gather, yeet, use, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { useLayoutContext } from '@use-gpu/workbench';
-import { Layout, Transform } from '@use-gpu/layout';
+import { Transform } from '@use-gpu/layout';
 
 import { PresentReconciler } from '../reconcilers';
 import { merge, resolveSlides } from '../lib/slides';
@@ -56,7 +55,6 @@ export const Overlay: LC<OverlayProps> = (props: PropsWithChildren<OverlayProps>
         ),
         (slides: SlideInfo[]) => {
           const {resolved, length} = resolveSlides(slides);
-          const s = length + 1;
           return yeet({
             id,
             order,

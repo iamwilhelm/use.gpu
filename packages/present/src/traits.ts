@@ -5,11 +5,9 @@ import type {
   SlideEffect,
 } from './types';
 
-import { useOne } from '@use-gpu/live';
 import {
   makeUseTrait,
   makeParseTrait,
-  useProp,
   optional,
   trait,
 } from '@use-gpu/traits/live';
@@ -19,7 +17,6 @@ import {
   parseNumber,
 } from '@use-gpu/parse';
 
-import { vec4 } from 'gl-matrix';
 import mapValues from 'lodash/mapValues';
 
 export const SLIDE_EFFECTS: SlideEffect[] = ['none', 'fade', 'wipe', 'move'];

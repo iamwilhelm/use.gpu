@@ -1,18 +1,17 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VectorLike } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { XYZW } from '@use-gpu/core';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { makeUseTrait, optional, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { parseBoolean, parseIntegerPositive, parseAxis, parseVec4 } from '@use-gpu/parse';
-import { yeet, memo, use, fragment, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
+import { memo, use, fragment, useOne, useMemo } from '@use-gpu/live';
 import {
   useShader, useNoShader,
-  useViewContext, useRawSource,
-  useShaderRef, useNoShaderRef,
+  useRawSource,
+  useShaderRef,
   useTransformContext, useNoTransformContext,
-  Data, LineLayer,
+  LineLayer,
 } from '@use-gpu/workbench';
 
 import { useRangeContext } from '../providers/range-provider';
@@ -31,7 +30,6 @@ import {
   LineTrait,
   ROPTrait,
   ScaleTrait,
-  ZIndexTrait,
 } from '../traits';
 
 const Traits = combine(

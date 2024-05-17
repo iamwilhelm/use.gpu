@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import { provide, useOne, useMemo } from '@use-gpu/live';
+import { provide, useMemo } from '@use-gpu/live';
 import { TileContext } from './tile-provider';
 
 export type MapTileProviderProps = {

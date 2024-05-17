@@ -1,10 +1,9 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { Axis4, Swizzle } from '../types';
+import type { Axis4 } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
-import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
-import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
-import { use, provide, useContext, useDouble, useOne, useMemo } from '@use-gpu/live';
+import { combine, makeUseTrait } from '@use-gpu/traits/live';
+import { provide, useDouble, useOne, useMemo } from '@use-gpu/live';
 import { swizzleTo, chainTo } from '@use-gpu/shader/wgsl';
 import {
   MatrixContext, TransformContext, QueueReconciler,
@@ -61,7 +60,7 @@ export const Polar: LiveComponent<PolarProps> = (props: PropsWithChildren<PolarP
     const inv = invertBasis(a);
     const sx = s ? s[inv.indexOf('x')] : 1;
     const sy = s ? s[inv.indexOf('y')] : 1;
-    const sz = s ? s[inv.indexOf('z')] : 1;
+    // const sz = s ? s[inv.indexOf('z')] : 1;
 
     // Epsilon for differential transport
     const epsilon = (Math.abs(dx) + Math.abs(dy) + Math.abs(dz)) / 3000;

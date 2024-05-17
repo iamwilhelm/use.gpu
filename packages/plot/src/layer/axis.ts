@@ -1,9 +1,8 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VectorLike } from '@use-gpu/core';
 import type { TraitProps } from '@use-gpu/traits/live';
 
-import { makeUseTrait, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
-import { memo, use, useOne, useMemo } from '@use-gpu/live';
+import { makeUseTrait, combine, trait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
+import { memo, use, useMemo } from '@use-gpu/live';
 import {
   useShader, useShaderRef,
   LineLayer, ArrowLayer, useArrowSegmentsSource,
@@ -21,7 +20,6 @@ import {
   LoopTrait,
   ColorTrait,
   ROPTrait,
-  ZIndexTrait,
 } from '../traits';
 import { getAxisPosition } from '@use-gpu/wgsl/plot/axis.wgsl';
 

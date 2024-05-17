@@ -1,11 +1,11 @@
 import type {
-  Initial, Setter, Reducer, DoubleState, Key, Task, ArrowFunction,
+  Initial, Setter, Reducer, DoubleState, Task, ArrowFunction,
   LiveFunction, LiveFiber, LiveContext, LiveCapture,
-  DeferredCall, HostInterface, Ref, RefObject, MutableRefObject,
+  Ref, RefObject, MutableRefObject,
 } from './types';
 import { Hook } from './types';
 
-import { bind, bustFiberMemo, getArgCount } from './fiber';
+import { bustFiberMemo, getArgCount } from './fiber';
 import { getCurrentFiber } from './current';
 import { isSameDependencies, incrementVersion } from './util';
 import { formatNode } from './debug';
@@ -20,11 +20,14 @@ const HOOK_NAMES = ['useState', 'useMemo', 'useOne', 'useCallback', 'useResource
 export const reserveState = (slots: number) => slots * STATE_SLOTS;
 
 export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hook) => {
+  // eslint-disable-next-line prefer-const
   let {state, pointer} = fiber;
   if (!state) state = fiber.state = [];
   fiber.pointer += STATE_SLOTS;
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const marker = state![pointer];
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (marker === undefined) state![pointer] = hookType;
   else if (marker !== hookType) throw new Error(`Hooks were not called in the same order as last render in ${formatNode(fiber)}.\nExpected '${HOOK_NAMES[marker]}', got '${HOOK_NAMES[hookType] ?? 'unknown'}'`);
 
@@ -32,10 +35,10 @@ export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hoo
 }
 
 export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
-  let {state, pointer} = fiber;
+  const {state, pointer} = fiber;
   if (!state) return;
 
-  let n = state.length;
+  const n = state.length;
   if (n) while (fiber.pointer < n) {
     const i = fiber.pointer;
     const type = state[i];
@@ -79,7 +82,9 @@ export const useNoHook = (hookType: Hook) => () => {
 
   const i = pushState(fiber, hookType);
   const {state} = fiber;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   state![i] = undefined;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   state![i + 1] = undefined;
 };
 
@@ -106,7 +111,9 @@ export const memoArgs = <F extends ArrowFunction>(
     const ref = useRef(args);
 
     if (fiber.version === fiber.memo) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       if (customMemo && !customMemo(ref.current, args)) fiber.version = incrementVersion(fiber.version!);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       else if (ref.current !== args && !isSameDependencies(ref.current, args)) fiber.version = incrementVersion(fiber.version!);
     }
 
@@ -145,6 +152,7 @@ export const memoProps = <F extends ArrowFunction>(
       const ref = useRef(props);
 
       if (fiber.version === fiber.memo) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         if (!customMemo(ref.current, props)) fiber.version = incrementVersion(fiber.version!);
       }
       ref.current = props;
@@ -166,6 +174,7 @@ export const memoProps = <F extends ArrowFunction>(
 
       if (fiber.version === fiber.memo) {
         if (!isSameDependencies(deps, saved)) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           fiber.version = incrementVersion(fiber.version!);
         }
       }
@@ -202,18 +211,22 @@ export const useState = <T>(
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.STATE);
-  let {state, host, yeeted} = fiber;
+  const {state, host} = fiber;
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   let value    = state![i];
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   let setValue = state![i + 1];
 
   if (setValue === undefined) {
     value = (initialState instanceof Function) ? initialState() : initialState;  // <- Step through here
     setValue = host
       ? (value: Reducer<T>) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           if (state![i - 1] !== Hook.STATE) return;
 
           const apply = () => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const prev = state![i];
 
             let next: any;
@@ -221,6 +234,7 @@ export const useState = <T>(
             else next = value;
 
             if (prev !== next) {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               state![i] = next;
               bustFiberMemo(fiber);
               return true;
@@ -230,16 +244,20 @@ export const useState = <T>(
 
           if (fiber === getCurrentFiber()) {
             if (apply()) {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               host!.visit(fiber);
             }
           }
           else {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             host!.schedule(fiber, apply);
           }
         }
       : NOP;
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i] = value;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i + 1] = setValue;
   }
 
@@ -256,15 +274,19 @@ export const useMemo = <T>(
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.MEMO);
-  let {state} = fiber;
+  const {state} = fiber;
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   let value = state![i];
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const deps = state![i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
     value = initialState(); // <- Step through here
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i] = value;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i + 1] = dependencies;
   }
 
@@ -281,15 +303,19 @@ export const useOne = <T>(
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.ONE);
-  let {state} = fiber;
+  const {state} = fiber;
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   let value = state![i];
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const dep = state![i + 1];
 
   if (dep !== dependency) {
     value = initialState();  // <- Step through here
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i] = value;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i + 1] = dependency;
   }
 
@@ -306,15 +332,19 @@ export const useCallback = <T extends Function>(
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.CALLBACK);
-  let {state} = fiber;
+  const {state} = fiber;
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   let value = state![i];
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const deps = state![i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
     value = initialValue;
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i] = value;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i + 1] = dependencies;
   }
 
@@ -328,12 +358,16 @@ export const useVersion = <T>(nextValue: T) => {
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.VERSION);
-  let {state, yeeted} = fiber;
+  const {state} = fiber;
 
-  let value   = state![i];
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const value = state![i];
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   let version = state![i + 1] || 0;
   if (value !== nextValue) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i] = nextValue;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i + 1] = version = incrementVersion(state![i + 1]);
   }
 
@@ -350,15 +384,18 @@ export const useResource = <R>(
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.RESOURCE);
-  let {state, host} = fiber;
+  const {state, host} = fiber;
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   let {tag} = state![i] ?? NO_RESOURCE;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const deps = state![i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
 
     if (!tag) {
       tag = makeResourceTag();
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       state![i] = {tag, value: null};
 
       if (host) host.track(fiber, tag);
@@ -367,13 +404,16 @@ export const useResource = <R>(
       tag(null);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i + 1] = dependencies;
 
     const value = callback(tag); // <- Step through here
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i].value = value;
     return value;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return state![i].value as R;
 }
 
@@ -384,15 +424,18 @@ export const useNoResource = () => {
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.RESOURCE);
-  let {state, host} = fiber;
+  const {state, host} = fiber;
 
-  let {tag} = state![i] ?? NO_RESOURCE;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const {tag} = state![i] ?? NO_RESOURCE;
   if (tag) {
     tag(null);
     if (host) host.untrack(fiber, tag);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   state![i] = undefined;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   state![i + 1] = undefined;
 }
 
@@ -413,14 +456,19 @@ export const useContext = <C>(
     if (initialValue === undefined) {
       throw new Error(`Required context '${displayName}' was used without being provided in ${formatNode(fiber)}.`);
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i] = false;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i + 1] = context;
     return initialValue;
   }
 
   if (host) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (!state![i]) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       state![i] = true;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       state![i + 1] = context;
       host.track(fiber, () => host.undepend(fiber, root));
     }
@@ -448,8 +496,11 @@ export const useCapture = <C>(
   if (!root) throw new Error(`Capture '${context.displayName}' was used without being provided in ${formatNode(fiber)}.`);
 
   if (host) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (!state![i]) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       state![i] = true;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       state![i + 1] = context;
       host.track(fiber, () => {
         registry.delete(fiber);
@@ -476,15 +527,19 @@ export const useNoContext = <C>(
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.CONTEXT);
-  const {state, host, context: {values, roots}} = fiber;
+  const {state, host, context: {roots}} = fiber;
   if (!context) throw new Error(`Context is undefined in ${formatNode(fiber)}.`);
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const root = roots.get(context)! as number;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (state![i]) {
     if (host) host.undepend(fiber, root);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i] = false;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   state![i + 1] = undefined;
 }
 
@@ -500,15 +555,19 @@ export const useNoCapture = <C>(
   const {state, host, context: {values, roots}} = fiber;
   if (!context) throw new Error(`Capture is undefined in ${formatNode(fiber)}.`);
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const root = roots.get(context)! as LiveFiber<any>;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (state![i] && root) {
     const registry = values.get(context).current;
     registry.delete(fiber);
 
     if (host) host.undepend(root, fiber.id);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state![i] = false;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   state![i + 1] = undefined;
 }
 
@@ -524,6 +583,7 @@ export const useHooks = <T>(
   const i = pushState(fiber, Hook.HOOKS);
   const {state} = fiber;
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const scope = state![i];
 
   const {pointer} = fiber;
@@ -536,12 +596,14 @@ export const useHooks = <T>(
       return initialState();  // <- Step through here
     }
     finally {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       state![i] = fiber.state;
       fiber.pointer = pointer + STATE_SLOTS;
       fiber.state = state;
     }
   }, dependencies as any);
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   state![i + 1] = undefined;
 
   return value as unknown as T;
@@ -562,6 +624,7 @@ export const useNoHooks = () => {
       discardState(fiber);
     }
     finally {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       state![i] = undefined;
       fiber.pointer = pointer + STATE_SLOTS;
       fiber.state = state;
@@ -605,7 +668,7 @@ const makeDouble = <T>(make: () => T): DoubleState<T> => {
   const back: [T, T] = [ref.back, ref.front];
 
   const get = () => {
-    let f = ref.flip;
+    const f = ref.flip;
     return f ? front : back;
   };
 
@@ -630,7 +693,7 @@ export const useAwait = <T, E = Error>(
   const [value, setValue] = useState<[T | undefined, E | undefined]>([(f ? undefined : null) as any, undefined]);
   const loadingRef = useRef(false);
 
-  const ref = useResource((dispose) => {
+  useResource((dispose) => {
     if (!f) return;
 
     loadingRef.current = true;

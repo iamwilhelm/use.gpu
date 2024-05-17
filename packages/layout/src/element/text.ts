@@ -7,7 +7,7 @@ import { useProp, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { parseColor, parseNumber } from '@use-gpu/parse';
 import { memo, use, yeet } from '@use-gpu/live';
 
-import { useFontFamily, useFontText, useFontHeight, LayerReconciler } from '@use-gpu/workbench';
+import { useFontFamily, useFontText, useFontHeight } from '@use-gpu/workbench';
 import { Glyphs } from '../shape/glyphs';
 import { memoInline } from '../lib/util';
 

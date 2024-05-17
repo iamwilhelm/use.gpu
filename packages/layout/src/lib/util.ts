@@ -57,6 +57,7 @@ export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
     mask: ShaderModule | null,
     transform: ShaderModule | null,
   ) => {
+    // eslint-disable-next-line no-debugger
     if (z !== z) debugger;
     if (
       lastBox && sameBox(lastBox, box) &&
@@ -66,6 +67,7 @@ export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
       lastMask === mask &&
       lastTransform === transform
     ) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return value!;
     }
     value = f(box, origin, z, clip, mask, transform);
@@ -222,7 +224,7 @@ export const makeInlineLayout = (
   let last: InlineRenderer | null = null;
   let lines: InlineLine[] = [];
 
-  let miniHash = makeMiniHash();
+  const miniHash = makeMiniHash();
   miniHash(key);
   miniHash(left);
   key = miniHash(top);

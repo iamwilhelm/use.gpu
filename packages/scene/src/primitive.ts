@@ -1,11 +1,7 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { DataBounds } from '@use-gpu/core';
 
-import { memo, provide, useCallback, useOne } from '@use-gpu/live';
-import { MatrixContext, TransformContext, QueueReconciler, useMatrixContext, useCombinedMatrixTransform } from '@use-gpu/workbench';
-
-import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
-import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
+import { memo, provide } from '@use-gpu/live';
+import { TransformContext, QueueReconciler, useCombinedMatrixTransform } from '@use-gpu/workbench';
 
 const {signal} = QueueReconciler;
 

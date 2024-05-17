@@ -1,11 +1,12 @@
+// eslint-disable @typescript-eslint/no-unused-vars
 import type { LiveComponent } from '@use-gpu/live';
 import type { TensorArray, VectorLike, UniformAttribute } from '@use-gpu/core';
 import type { TraitProps } from '@use-gpu/traits';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { makeUseTrait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
+import { makeUseTrait, useProp } from '@use-gpu/traits/live';
 import { parseNumber, parseVec4, parseIntegerPositive } from '@use-gpu/parse';
-import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, useCallback, useOne, useMemo } from '@use-gpu/live';
 import { adjustSchema } from '@use-gpu/core';
 import { diffBy } from '@use-gpu/shader/wgsl';
 import { Data, TickLayer, TICK_SCHEMA, useSource } from '@use-gpu/workbench';
@@ -96,10 +97,11 @@ export const Tick: LiveComponent<TickProps> = (props) => {
         zBias: z,
         id,
         lookup,
+        base,
         ...sources,
         ...extra,
         ...flags,
-      }), [color, tangent, width, depth, z, id, lookup, sources, extra, props]);
+      }), [color, tangent, width, depth, z, id, lookup, base, sources, extra, props]);
     }
   });
 };

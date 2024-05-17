@@ -1,8 +1,7 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { GPUGeometry } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader';
 
-import { memo, use, wrap, useOne } from '@use-gpu/live';
+import { memo, use, wrap } from '@use-gpu/live';
 
 import { FaceLayer } from '@use-gpu/workbench';
 

@@ -120,7 +120,6 @@ export const paintIntoDistanceField = (
   cutoff: number,
 ) => {
   const wp = w + pad * 2;
-  const hp = h + pad * 2;
 
   const getData = (x: number, y: number) => (data[y * w + x] ?? 0) / 255;
 
@@ -403,7 +402,6 @@ export const relaxSubpixelOffsets = (
   pad: number,
 ) => {
   const wp = w + pad * 2;
-  const hp = h + pad * 2;
 
   const {xo, yo, xi, yi} = stage;
 
@@ -564,7 +562,6 @@ export const paintIntoAlpha = (
   pad: number,
 ) => {
   const wp = w + pad * 2;
-  const hp = h + pad * 2;
 
   let i = 0;
   let o = (pad + pad * wp) * 4;

@@ -287,7 +287,7 @@ export const schemaToAggregate = (
   const bySelf: [string, number][] = [];
 
   let byVertex: string[] = [];
-  let byIndex: string[] = [];
+  const byIndex: string[] = [];
 
   const aggregateBuffers: Record<string, any> = {};
   const refBuffers: Record<string, any> = {};

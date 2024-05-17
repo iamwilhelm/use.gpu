@@ -2,7 +2,7 @@ import type { XY, XYZW } from '@use-gpu/core';
 import type { LayoutElement, LayoutRenderer, LayoutPicker, Direction, FitInto, AutoXY, Alignment, Anchor } from '../types';
 
 import { makeFlexCursor } from './cursor';
-import { isHorizontal, getAlignmentAnchor, getAlignmentSpacing } from './util';
+import { isHorizontal, getAlignmentSpacing } from './util';
 
 export const getFlexMinMax = (
   els: LayoutElement[],

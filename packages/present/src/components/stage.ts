@@ -21,7 +21,7 @@ export type StageProps = {
 
 // Presentation view renderer
 export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>) => {
-  const {step, api, backgroundColor, children} = props;
+  const {api, backgroundColor, children} = props;
 
   // Render keyed layers for entering and exiting
   const renderLayer = (
@@ -56,7 +56,6 @@ export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>)
       const floats  = layers.filter(({id}) => !api.isThread(id));
 
       const threadIds = threads.map(({id}) => id);
-      const floatIds  = floats.map(({id}) => id);
 
       // Get entering slide (only one at a time)
       const entering = threadIds.filter((id) => api.isVisible(id))[0] ?? null;

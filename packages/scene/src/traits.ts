@@ -1,4 +1,4 @@
-import type { TypedArray, VectorLike } from '@use-gpu/core';
+import type { VectorLike } from '@use-gpu/core';
 import { useMemo } from '@use-gpu/live';
 import { optional, trait, makeUseTrait } from '@use-gpu/traits/live';
 import {

@@ -4,7 +4,6 @@ import {
   PROVIDE,
   makeContext, makeCapture, makeReconciler,
 } from './builtin';
-import { renderFiber } from './fiber';
 import { memoArgs, useState, useContext, useCapture } from './hooks';
 import { renderSync } from './tree';
 import { formatTree } from './debug';
@@ -66,6 +65,7 @@ it("detaches a subfiber", () => {
   expect(result.f).toBe(Root);
 
   expect(result.mount).toBeTruthy();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   expect(result.mount!.next).toBeTruthy();
 
   expect(keepSubFiber).toBeTruthy();
@@ -102,6 +102,7 @@ it("renders implicit keys with nulls", () => {
     ];
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Node = (x?: number) => {
     rendered.node++;
   };
@@ -163,6 +164,7 @@ it("reacts on the root (setter form)", () => {
     return keyed(Node, Math.random());
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Node = (x?: number) => {
     rendered.node++;
   };
@@ -212,6 +214,7 @@ it("reacts on the root (reducer form)", () => {
     return keyed(Node, Math.random());
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Node = (x?: number) => {
     rendered.node++;
   };
@@ -264,6 +267,7 @@ it("reacts and remounts on the root", () => {
     ];
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Node = (x?: number) => {
     rendered.node++;
   };
@@ -350,6 +354,7 @@ it("reacts and remounts a sub tree", () => {
     ];
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Node = (x?: number) => {
     rendered.node++;
     return;
@@ -422,6 +427,7 @@ it("coalesces updates", () => {
     return keyed(Node, Math.random());
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Node = (x?: number) => {
     rendered.node++;
 
@@ -484,6 +490,7 @@ it("updates with memo in the way", () => {
     return keyed(Node, Math.random());
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Node = (x?: number) => {
     rendered.node++;
 
@@ -494,6 +501,7 @@ it("updates with memo in the way", () => {
   const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   expect(result.mount).toBeTruthy();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   expect(result.mount!.mount).toBeTruthy();
   if (!result.host) return;
   if (!result.mount) return;
@@ -564,6 +572,7 @@ it("updates context with memo in the way", () => {
   const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   expect(result.mount).toBeTruthy();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   expect(result.mount!.mount).toBeTruthy();
   if (!result.host) return;
   if (!result.mount) return;
@@ -618,7 +627,7 @@ it("does not update context if value is the same", () => {
   const Root = () => {
     rendered.root++;
 
-    const [value, setValue] = useState(0);
+    const [, setValue] = useState(0);
     setTrigger(() => setValue(1));
 
     return provide(context, 0, memoChild);
@@ -641,6 +650,7 @@ it("does not update context if value is the same", () => {
   const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   expect(result.mount).toBeTruthy();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   expect(result.mount!.mount).toBeTruthy();
   if (!result.host) return;
   if (!result.mount) return;
@@ -878,7 +888,7 @@ it("render reordering", () => {
 
   const Node = ({id}) => {
     rendered.node++;
-    const value = useContext(context);
+    useContext(context);
     rendered.ids.push(id);
   };
 

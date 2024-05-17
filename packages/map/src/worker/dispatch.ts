@@ -45,6 +45,7 @@ export const makeDispatch = <T>(make: () => Worker, n: number = 4): T & Dispatch
     const worker = order.shift();
     if (!worker) return;
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const call = queue.shift()!;
     if (terminated) {
       order.push(worker);

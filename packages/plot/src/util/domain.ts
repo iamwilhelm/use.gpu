@@ -1,3 +1,4 @@
+inL
 import type { DomainOptions } from '../types';
 import { seq } from '@use-gpu/core';
 
@@ -95,6 +96,6 @@ export const logarithmic = (
   const minL = Math.log(min) / Math.log(base);
   const maxL = Math.log(min) / Math.log(base);
 
-  let ticks = linear(min, max, props);
+  const ticks = linear(minL, maxL, props);
   return ticks.map(x => Math.pow(base, x));
 }

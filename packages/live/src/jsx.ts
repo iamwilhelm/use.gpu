@@ -1,10 +1,9 @@
-import { formatNodeName } from './debug';
 import {
   capture, fence, gather, multiGather, mapReduce, morph, provide, yeet, quoteTo, unquote, reconcileTo, suspend, signalTo,
   CAPTURE, FENCE, GATHER, MULTI_GATHER, MAP_REDUCE, MORPH, PROVIDE, YEET, FRAGMENT, QUOTE, UNQUOTE, RECONCILE, SUSPEND, SIGNAL,
 } from './builtin';
 import { getCurrentFiberBy } from './current';
-import { DeferredCall, ArrowFunction, RawLiveComponent, LiveElement, ReactElementInterop } from './types';
+import { RawLiveComponent } from './types';
 
 const NO_PROPS: any = {};
 
@@ -83,10 +82,11 @@ export const createElement = <F extends RawLiveComponent<any>>(type: F | string,
       case UNQUOTE:
         return unquote(toChildren(props?.children ?? children), props?.key);
 
-      case MORPH:
+      case MORPH: {
         const c = props?.children ?? children;
         if (c.length === 1) return morph(c[0]);
         return c.map(morph);
+      }
 
       default:
         throw new Error("Builtin `${formatNodeName({f: type})}` unsupported in JSX. Use raw function syntax instead.");

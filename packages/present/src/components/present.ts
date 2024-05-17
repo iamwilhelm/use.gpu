@@ -1,16 +1,9 @@
-import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { ColorLike, Rectangle, XYZW } from '@use-gpu/core';
-import type { ParsedEffect, SlideInfo, SlideEase, ResolvedSlide } from '../types';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { ColorLike } from '@use-gpu/core';
+import type { SlideInfo, ResolvedSlide } from '../types';
 
 import { clamp } from '@use-gpu/core';
-import { gather, provide, use, keyed, useMemo, useOne, useRef, useState } from '@use-gpu/live';
-import {
-  useTimeContext,
-  LoopContext,
-  SDFFontProvider,
-  Pass, RawFullScreen, RenderTarget,
-} from '@use-gpu/workbench';
-import { UI, UILayers } from '@use-gpu/layout';
+import { gather, provide, use, useMemo, useOne, useRef, useState } from '@use-gpu/live';
 import { parseColor } from '@use-gpu/parse';
 import { useProp } from '@use-gpu/traits/live';
 

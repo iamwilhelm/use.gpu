@@ -52,7 +52,6 @@ export const getInlineMinMax = (
   let allMinMain = 0;
   let allMaxMain = 0;
 
-  let i = 0;
   let caretMain = 0;
   let caretCross = 0;
 

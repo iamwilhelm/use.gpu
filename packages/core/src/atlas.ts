@@ -135,7 +135,7 @@ export const makeAtlas = (
     let h = 0;
 
     for (const k of map.keys()) {
-      // eslint-disable-next-line prefer-const @typescript-eslint/no-non-null-assertion
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [,, r, b] = map.get(k)!;
       w = Math.max(r, w);
       h = Math.max(b, h);
@@ -320,7 +320,7 @@ export const makeAtlas = (
     for (const s of add) addSlot(s);
   };
 
-  // eslint-disable-next-line prefer-const @typescript-eslint/no-non-null-assertion
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const debugPlacements = () => Array.from(map.keys()).map(k => map.get(k)!);
   const debugSlots = () => Array.from(slots.values()).map(s => s);
 
@@ -389,7 +389,6 @@ export const uploadAtlasMapping = (
 }
 
 const intersectRange = (minA: number, maxA: number, minB: number, maxB: number) => !(minA >= maxB || minB >= maxA);
-const intersectRangeEnds = (minA: number, maxA: number, minB: number, maxB: number) => !(minA > maxB || minB > maxA);
 const containsRange = (minA: number, maxA: number, minB: number, maxB: number) => (minA <= minB && maxA >= maxB);
 
 type RectLike = Rectangle | Slot;

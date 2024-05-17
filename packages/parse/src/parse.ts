@@ -2,8 +2,7 @@ import type {
   ArrowFunction, TypedArray, TensorArray, TypedArrayConstructor,
   Blending, VectorLike, ArrayLike, ColorLike, ColorLikes, Side, VectorLikes,
 } from '@use-gpu/core';
-import type { Parser, Join, Placement, PointShape, Domain } from './types';
-import { seq } from '@use-gpu/core';
+import type { Parser, Join, PointShape, Domain } from './types';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
 import { toScalarArray, toVectorArray, toMultiVectorArray, toMultiScalarArray, toMultiMultiVectorArray } from './flatten';
 
@@ -14,11 +13,9 @@ const NO_QUAT = quat.create();
 const NO_MAT4 = mat4.create();
 
 const NO_POSITION = vec4.fromValues(0, 0, 0, 1);
-const NO_SCALE = vec3.fromValues(1, 1, 1);
 
 const GRAY = vec4.fromValues(0.5, 0.5, 0.5, 1);
 
-const NO_VECTOR: number[] = [];
 const NO_STRINGS: string[] = [];
 
 const NO_RANGE = vec2.fromValues(-1, 1);
@@ -75,10 +72,12 @@ export const makeParseEnum = <T>(
 };
 
 export const makeParseMap = <T>(map: Record<string, T>, def: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return (s?: string) => map[s as any] ?? map[def]!;
 };
 
 export const makeParseMapOrValue = <T>(map: Record<string, T>, def: string): ((s?: string | T) => T) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return (s?: string | T) => map[s as any] ?? (s as any as T) ?? map[def]!;
 };
 
@@ -169,7 +168,6 @@ export const makeParseMultiMultiVectorArray = <T extends TypedArrayConstructor>(
 };
 
 export const makeParseBasis = (defaults: string | number[], min: number = defaults.length) => {
-  const parseLetters = (s: string) => s.split('').map(letter => AXIS_NUMBERS[letter]);
   const defs = typeof defaults === 'string' ? defaults : defaults.map(i => AXIS_LETTERS[i]).join('');
 
   const getOrder = (basis: number[]): string => {
@@ -256,6 +254,7 @@ export const parseColorOpacity = (color?: ColorLike, opacity: number = 1): vec4 
   const def = GRAY;
 
   const c = color as any;
+  // eslint-disable-next-line no-empty
   if (c == null) {}
   else if (typeof c === 'string') {
     if (c[0] === '#') {

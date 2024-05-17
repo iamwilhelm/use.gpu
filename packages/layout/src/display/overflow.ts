@@ -145,7 +145,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
-      const sizing = getBlockMinMax(els, NO_FIXED, [0, 0, 0, 0] direction);
+      const sizing = getBlockMinMax(els, NO_FIXED, [0, 0, 0, 0], direction);
       const [{margin, fit: fitBlock}, ...scrollBars] = els;
       const [ml, mt] = margin;
 

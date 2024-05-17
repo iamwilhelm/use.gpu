@@ -1,5 +1,4 @@
-import type { ArchetypeSchema, AggregateItem, AggregateValue, ColorLike, FieldArray, TypedArray, VectorEmitter, VectorLike, XY, XYZW } from '@use-gpu/core';
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { ArchetypeSchema, AggregateItem, ColorLike, FieldArray, TypedArray, VectorEmitter, VectorLike, XY, XYZW } from '@use-gpu/core';
 import type { SegmentDecorator } from '@use-gpu/workbench';
 import type { MVTStyleSheet, MVTStyleProperties } from '../types';
 import type { VectorTile } from 'mapbox-vector-tile';
@@ -9,8 +8,6 @@ import {
   allocateSchema,
   schemaToEmitters,
   emitAttributes,
-  schemaToAggregate,
-  updateAggregateFromSchema,
 
   copyRecursiveNumberArray,
   toCPUDims,
@@ -19,7 +16,6 @@ import {
 import { toChunkCounts } from '@use-gpu/parse';
 
 import { cutPolygons, clipTileEdges } from './tesselate';
-import earcut from 'earcut';
 
 import { getLineSegments, getFaceSegmentsConcave, POINT_SCHEMA, LINE_SCHEMA, FACE_SCHEMA } from '@use-gpu/workbench';
 
@@ -235,7 +231,7 @@ export const getMVTShapes = (
 
   for (const k in layers) {
     const layer = layers[k];
-    const {length, extent, name} = layer;
+    const {length, name} = layer;
 
     //console.log("layer", name, layer, length)
 
@@ -353,7 +349,7 @@ const aggregateMVTShape = (
   }
 
   // Get emitters for data + segment data
-  const [mergedSchema, emitted, count, indexed, sparse] = decorateMVTSegments(
+  const [, emitted, count, indexed] = decorateMVTSegments(
     fields.positions,
     {...attributes, slices: slices as any},
     schema,

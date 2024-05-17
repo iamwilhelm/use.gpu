@@ -1,7 +1,7 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Rectangle } from '@use-gpu/core';
-import type { LayoutElement, Margin, Direction, AlignmentLike, GapLike, Anchor, FitInto } from '../types';
+import type { LayoutElement, Direction, AlignmentLike, GapLike, Anchor, FitInto } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { useProp, shouldEqual, sameShallow } from '@use-gpu/traits/live';
@@ -33,7 +33,6 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
   const {
     wrap = false,
     snap = true,
-    children,
   } = props;
 
   const { width, height, aspect, zIndex } = useElementTrait(props);

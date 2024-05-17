@@ -1,7 +1,7 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { XY, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, Alignment, Baseline, MarginLike } from '../types';
+import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, Alignment, Baseline } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { useProp } from '@use-gpu/traits/live';

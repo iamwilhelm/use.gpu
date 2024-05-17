@@ -58,7 +58,6 @@ export const cutPolygonWith = (
   if (cut.length === 0) return null;
 
   const holes = whole;
-  const areas = holes.map(getRingArea);
 
   const out = assembleCutRingWith(cut, getTangent).map(r => [r]);
   for (const h of holes) {
@@ -103,7 +102,6 @@ export const cutRingWith = (
 
     const f = va != vb ? getZeroLevel(va, vb) : 0;
 
-    let p: XY | null;
     if (f > 0 && f < 1) {
       // If cut is in middle of edge
       const p = [
@@ -195,8 +193,6 @@ export const assembleCutRingWith = (
     const min = Math.min(a, b);
     const max = Math.max(a, b);
 
-    const area = getRingArea(seg);
-
     if (!paths.length) {
       paths.push({path: seg, min, max});
     }
@@ -222,10 +218,6 @@ export const assembleCutRingWith = (
 export const clipTileEdges = (polygons: XY[][][], minX: number, minY: number, maxX: number, maxY: number) => {
   const lines = [];
   const rings = [];
-
-  let section = null;
-  let cut = false;
-  let edge = false;
 
   for (const polygon of polygons) {
     for (const ring of polygon) {
@@ -255,7 +247,7 @@ export const clipTileEdges = (polygons: XY[][][], minX: number, minY: number, ma
 export const getRingArea = (ring: XY[]): number => {
   let area = 0;
 
-  let n = ring.length;
+  const n = ring.length;
   for (let i = 0; i < n; ++i) {
     const a = ring[i];
     const b = ring[i + 1] || ring[i + 1 - n];
@@ -274,7 +266,7 @@ export const pointInPolygon = (
   if (!rings.length) return false;
   if (!pointInRing(rings[0], point)) return false;
 
-  let n = rings.length;
+  const n = rings.length;
   for (let i = 1; i < n; ++i) {
     if (pointInRing(rings[i], point)) return false;
   }
@@ -286,7 +278,7 @@ export const pointInRing = (
   point: XY,
 ) => {
   const [x, y] = point;
-  let n = ring.length;
+  const n = ring.length;
 
   let winding = 0;
   for (let i = 0; i < n; ++i) {

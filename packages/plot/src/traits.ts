@@ -1,4 +1,4 @@
-import type { ArchetypeSchema, ColorLike, ColorLikes, Ragged, TypedArray, UniformType, VectorLike, VectorLikes } from '@use-gpu/core';
+import type { ArchetypeSchema, Ragged, TypedArray, UniformType, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { Parser } from '@use-gpu/traits';
 
@@ -17,14 +17,12 @@ import {
   parseColorArray,
   parseColorArrayLike,
   parseColorMultiArray,
-  parseVec4,
   parseVec4Array,
   parseScalarArray,
   parseScalarArrayLike,
   parseMultiScalarArray,
   parsePosition,
   parsePositionArray,
-  parsePositionMultiArray,
   parsePositionMultiMultiArray,
   parseRotation,
   parseQuaternion,
@@ -39,7 +37,6 @@ import {
   parseRanges,
   parseAxes,
   parseAxis,
-  parseIntegerPositive,
   parseDomain,
   parsePointShape,
   toChunkCounts,
@@ -49,11 +46,6 @@ import { seq, isShaderBinding, toCPUDims, getUniformDims, formatToArchetype } fr
 import { getArrowSegments, getFaceSegments, getFaceSegmentsConcave, getLineSegments } from '@use-gpu/workbench';
 
 import { useDataContext } from './providers/data-provider';
-
-import { vec4 } from 'gl-matrix';
-
-const EMPTY: any[] = [];
-const WHITE = [1, 1, 1, 1];
 
 const bindable = <A, B>(parse: (t: A) => B) => (t: A | ShaderSource) => isShaderBinding(t) ? undefined : parse(t as A);
 
@@ -341,7 +333,7 @@ export const DataTrait = (keys: string[], canonical: string = 'positions') => {
       let s = 0;
 
       for (const k in dataContext) if (match.has(k)) {
-        const {array, format, dims, size, ragged, version = 0} = dataContext[k];
+        const {array, format, size, ragged} = dataContext[k];
         if (!(props as any)[k]) {
           data[k] = array;
           formats[k] = format;
@@ -454,7 +446,7 @@ export const SegmentsTrait = combine(
         if (parsed.tensor) {
           const [segment, ...rest] = parsed.tensor;
           const count = rest.reduce((a: number, b: number) => a * b, 1);
-          return [seq(count).map(_ => segment), null];
+          return [seq(count).map(() => segment), null];
         }
         if (!pos || props.segments) return [];
         const f = (parsed.formats?.position ?? 'vec4<f32>') as UniformType;
@@ -495,13 +487,13 @@ export const FacetedTrait = combine(
         if (parsed.tensor) {
           const [segment, group, ...rest] = parsed.tensor;
           if (rest.length === 0) {
-            const chunks = seq(group).map(_ => segment);
+            const chunks = seq(group).map(() => segment);
             return [chunks, [chunks.length]];
           }
           else {
             const planes = (rest as number[]).reduce((a, b) => a * b, 1);
-            const chunks = seq(group * planes).map(_ => segment);
-            const groups = seq(planes).map(_ => group);
+            const chunks = seq(group * planes).map(() => segment);
+            const groups = seq(planes).map(() => group);
             return [chunks, groups];
           }
         }

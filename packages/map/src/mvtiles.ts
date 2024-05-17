@@ -3,18 +3,17 @@ import type { StorageSource, LambdaSource } from '@use-gpu/core';
 import type { MVTStyleSheet } from './types';
 
 import { clamp, adjustSchema } from '@use-gpu/core';
-import { gather, use, keyed, yeet, memo, useAwait, useCallback, useOne, useMemo, useResource } from '@use-gpu/live';
-import { useLayoutContext, useForceUpdate, getLineSegments, getFaceSegmentsConcave, Data, PointLayer, LineLayer, FaceLayer, POINT_SCHEMA, LINE_SCHEMA, FACE_SCHEMA } from '@use-gpu/workbench';
+import { use, keyed, memo, useAwait, useCallback, useOne, useMemo, useResource } from '@use-gpu/live';
+import { useLayoutContext, useForceUpdate, Data, PointLayer, LineLayer, FaceLayer, POINT_SCHEMA, LINE_SCHEMA, FACE_SCHEMA } from '@use-gpu/workbench';
 import { useRangeContext } from '@use-gpu/plot';
 
 import { useTileContext } from './providers/tile-provider';
 import { MVTStyleContextProps, useMVTStyleContext } from './providers/mvt-style-provider';
 
-import { MVTAggregates, getMVTShapes, aggregateMVTShapes } from './util/mvtile';
+import { MVTAggregates } from './util/mvtile';
 import LRU from 'lru-cache';
 
 import { makeDispatch, getConcurrency } from './worker/dispatch';
-import { VectorTile } from 'mapbox-vector-tile';
 
 const POS = {positions: 'vec2<f32>'};
 const SCHEMAS = {
@@ -27,7 +26,6 @@ const getKey = (x: number, y: number, zoom: number) => (zoom << 20) + (y << 10) 
 const parseKey = (v: number) => [v & 0x3FF, (v >> 10) & 0x3FF, (v >> 20) & 0x3FF];
 
 const getUpKey = (x: number, y: number, zoom: number) => getKey(x >> 1, y >> 1, zoom - 1);
-const getDownKey = (x: number, y: number, zoom: number, dx: number, dy: number) => getKey((x << 1) + dx, (y << 1) + dy, zoom - 1);
 
 //const URLS = new Set();
 
@@ -68,13 +66,13 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
     minLevel = 1,
     maxLevel = Infinity,
     detail = 1,
-    children,
   } = props;
 
-  const [version, forceUpdate] = useForceUpdate();
+  const [, forceUpdate] = useForceUpdate();
 
   const layout = useLayoutContext();
   const styles = useMVTStyleContext();
+  // eslint-disable-next-line prefer-const
   let [[minX, maxX], [minY, maxY]] = useRangeContext();
   
   const worker = useResource((dispose) => {
@@ -108,9 +106,6 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
 
   const out: LiveElement[] = [];
 
-  const w = maxIX - minIX;
-  const h = maxIY - minIY;
-
   seen.clear();
   
   if (1/minIX === 0 || 1/maxIX === 0) throw new Error("Map tile range is zero");
@@ -119,11 +114,9 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
   const gz = 1 << (zoom);
 
   for (let x = minIX; x < maxIX; x++) {
-    const edgeX = x === minIX;
     const upX = (x === minIX || x === maxIX - 1) ? 1 : 2;
 
     for (let y = minIY; y < maxIY; y++) {
-      const edgeY = y === minIY;
       const upY = (y === minIY || y === maxIY - 1) ? 1 : 2;
 
       const xx = x < 0 ? x + gz : x >= gz ? x - gz : x;

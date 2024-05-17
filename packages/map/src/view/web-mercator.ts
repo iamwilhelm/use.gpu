@@ -2,8 +2,8 @@ import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { Swizzle } from '@use-gpu/plot';
 import type { TraitProps } from '@use-gpu/traits';
 
-import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
-import { use, provide, useContext, useDouble, useOne, useMemo } from '@use-gpu/live';
+import { combine, makeUseTrait } from '@use-gpu/traits/live';
+import { use, provide, useDouble, useOne, useMemo } from '@use-gpu/live';
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext, QueueReconciler,
@@ -26,7 +26,6 @@ const {signal} = QueueReconciler;
 
 const MERCATOR_LOOP = [2, 0, 0, 0];
 const π = Math.PI;
-const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 const makeMat4 = () => mat4.create();
 
 const Traits = combine(AxesTrait, GeographicTrait, ObjectTrait);
@@ -64,10 +63,6 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props: PropsWithChi
   const [matrix, swizzle, origin, range, epsilon] = useMemo(() => {
     const matrix = swapMatrix();
 
-    // Get X/Y scale
-    const dx = (g[0][1] - g[0][0]) / 2;
-    const dy = (g[1][1] - g[1][0]) / 2;
-
     // Get 2D bounding box
     const [ox, oy] = projectMercator([long, lat]);
     const origin = [ox, oy, toRad * lat];
@@ -91,6 +86,10 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props: PropsWithChi
     swizzleMatrix(matrix, a);
 
     // Then apply transform (so these are always relative to the world basis, not the internal basis)
+    if (m) {
+      mat4.multiply(matrix, m, matrix);
+    }
+
     if (p || r || q || s) {
       composeTransform(composed, p, r, q, s);
       mat4.multiply(matrix, composed, matrix);

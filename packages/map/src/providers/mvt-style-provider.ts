@@ -1,5 +1,5 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { DeepPartial, ColorLike } from '@use-gpu/core';
+import type { DeepPartial } from '@use-gpu/core';
 import type { MVTStyleProperties } from '../types';
 
 import { patch } from '@use-gpu/state';

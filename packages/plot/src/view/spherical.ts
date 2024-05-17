@@ -2,9 +2,9 @@ import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { Swizzle } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
-import { trait, combine, makeUseTrait, useProp } from '@use-gpu/traits/live';
-import { parseAxes, parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
-import { use, provide, useContext, useDouble, useOne, useMemo } from '@use-gpu/live';
+import { combine, makeUseTrait, useProp } from '@use-gpu/traits/live';
+import { parseAxes } from '@use-gpu/parse';
+import { provide, useDouble, useOne, useMemo } from '@use-gpu/live';
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   MatrixContext, TransformContext, QueueReconciler,
@@ -14,7 +14,7 @@ import {
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
 import { recenterAxis } from '../util/axis';
-import { swizzleMatrix, invertBasis, toBasis } from '../util/swizzle';
+import { swizzleMatrix, invertBasis } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
 import { AxesTrait, ObjectTrait } from '../traits';

@@ -1,9 +1,7 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 
-import { memo, provide, useOne } from '@use-gpu/live';
+import { provide } from '@use-gpu/live';
 import { useMatrixContext, useNoMatrixContext, MatrixContext } from '@use-gpu/workbench';
-
-import { mat4 } from 'gl-matrix';
 
 export type SceneProps = {
   inherit?: boolean,

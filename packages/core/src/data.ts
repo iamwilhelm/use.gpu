@@ -235,7 +235,7 @@ export const copyRawNumberArray = (
 ) => {
   const n = count ?? ((from.length ?? 1) / dims);
 
-  let f = fromIndex;
+  const f = fromIndex;
   let t = toIndex;
 
   const nd = n * dims;
@@ -300,7 +300,7 @@ export const offsetNumberArray = (() => {
 })();
 
 export const fillNumberArray = (() => {
-  const index = (i: number) => 0;
+  const index = () => 0;
   const copyWithZeroIndex = makeCopyPipe({index});
   return (
     from: VectorLike | number,
@@ -315,7 +315,6 @@ export const fillNumberArray = (() => {
     if (typeof from === 'number') {
       const step = stride || toDims;
 
-      const f = fromIndex;
       let t = toIndex;
 
       if (toDims === 1) {

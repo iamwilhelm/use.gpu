@@ -1,11 +1,9 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { UniformAttribute } from '@use-gpu/core';
 import type { UIAggregate } from '@use-gpu/layout';
 import type { TraitProps } from '@use-gpu/traits';
 import type { SlideInfo } from '../types';
 
-import { fragment, unquote, gather, yeet, use, wrap, provide, useFiber, useMemo, useOne, useRef } from '@use-gpu/live';
-import { Layout } from '@use-gpu/layout';
+import { unquote, gather, yeet, use, useFiber, useMemo } from '@use-gpu/live';
 
 import { resolveSlides } from '../lib/slides';
 import { PresentReconciler } from '../reconcilers';

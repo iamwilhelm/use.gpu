@@ -1,12 +1,12 @@
+// eslint-disable @typescript-eslint/no-unused-vars
 import type { LiveComponent } from '@use-gpu/live';
 import type { TraitProps } from '@use-gpu/traits/live';
 
 import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { schemaToArchetype, schemaToEmitters, adjustSchema } from '@use-gpu/core';
-import { yeet, memo, keyed, useOne, useMemo } from '@use-gpu/live';
-import { vec4 } from 'gl-matrix';
+import { yeet, memo, useOne } from '@use-gpu/live';
 
-import { getLineSegments, useInspectHoverable, useTransformContext, useScissorContext, LineLayer, LINE_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
+import { useInspectHoverable, useTransformContext, useScissorContext, LINE_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
 
 import { LineTraits } from '../traits';
 

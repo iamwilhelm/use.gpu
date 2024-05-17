@@ -1,6 +1,5 @@
 import type { LiveFiber } from './types';
 import { makeFiberQueue } from './queue';
-import { compareFibers } from './util';
 
 describe("queue", () => {
 

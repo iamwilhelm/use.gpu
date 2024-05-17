@@ -80,6 +80,7 @@ export const resolveAbsoluteBox = (
   if (b != null) bottom -= evaluateDimension(b, height)!;
 
   if (w != null) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     width = evaluateDimension(w, width)!;
     if (l != null || r == null) right = left + width;
     else left = right - width;
@@ -87,6 +88,7 @@ export const resolveAbsoluteBox = (
   }
 
   if (h != null) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     height = evaluateDimension(h, height)!;
     if (t != null || b == null) bottom = top + height;
     else top = bottom - height;

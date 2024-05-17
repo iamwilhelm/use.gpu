@@ -169,7 +169,7 @@ export const InlineLayout = (
 
   let last: InlineRenderer | null = null;
   let lines: InlineLine[] = [];
-  let hash = miniHash(key || -1, miniHash(left, top));
+  const hash = miniHash(key || -1, miniHash(left, top));
 
   const out: LiveElement[] = [];
   const els: LiveElement[] = [];

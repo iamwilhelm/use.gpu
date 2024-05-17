@@ -97,12 +97,14 @@ export type LiveContext<T> = {
   capture?: false,
   reconciler?: false,
 };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type LiveCapture<T> = {
   displayName?: string,
   context?: false,
   capture?: true,
   reconciler?: false,
 };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type LiveReconciler<T> = {
   displayName?: string,
   capture?: false,

@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TensorArray } from '@use-gpu/core';
 
-import { yeet, use, provide, useMemo, useNoMemo, useOne } from '@use-gpu/live';
+import { yeet, provide, useMemo, useNoMemo, useOne } from '@use-gpu/live';
 import { makeCopyPipe, toCPUDims } from '@use-gpu/core';
 import { getRenderFunc } from '@use-gpu/workbench';
 import { parseAxes } from '@use-gpu/parse';
@@ -9,6 +9,7 @@ import { parseAxes } from '@use-gpu/parse';
 import { useDataContext, DataContext } from '../providers/data-provider';
 import { toOrder } from '../util/swizzle';
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const toModulus = (size: number[]) => size.reduce((a, b) => (a.push(a.at(-1)! * b), a), [1]);
 
 export type TransposeProps = {

@@ -1,4 +1,4 @@
-import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { TraitProps } from '@use-gpu/traits';
 import type { ParsedEffect, } from '../types';
 

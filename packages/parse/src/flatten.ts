@@ -1,4 +1,4 @@
-import type { ArchetypeSchema, Emit, TypedArrayConstructor, TensorArray, VectorLike, VectorLikes } from '@use-gpu/core';
+import type { TypedArrayConstructor, TensorArray, VectorLike, VectorLikes } from '@use-gpu/core';
 import { seq, isTypedArray, copyNumberArray, copyNestedNumberArray } from '@use-gpu/core';
 
 const NO_CHUNKS: [VectorLike, null] = [new Uint32Array(0), null];
@@ -8,11 +8,6 @@ const maybeTypedArray = (
 ) => isTypedArray(xs) ? xs : isTypedArray((xs as TensorArray).array) ? (xs as TensorArray).array : null;
 
 const maybeEmptyArray = <T extends TypedArrayConstructor>(
-  xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray,
-  ctor: T,
-) => Array.isArray(xs) && !xs.length ? new ctor(0) : null;
-
-const maybeTensorArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[] | TensorArray,
   ctor: T,
 ) => Array.isArray(xs) && !xs.length ? new ctor(0) : null;
@@ -270,12 +265,12 @@ export const sizeToChunkCounts = (size: VectorLike): [VectorLike, VectorLike | n
   if (group == null) return [[segment], null];
 
   if (rest.length === 0) {
-    const chunks = seq(group).map(_ => segment);
+    const chunks = seq(group).map(() => segment);
     return [chunks, null];
   }
 
   const planes = rest.reduce((a, b) => a * b, 1);
-  const chunks = seq(group * planes).map(_ => segment);
-  const groups = seq(planes).map(_ => group);
+  const chunks = seq(group * planes).map(() => segment);
+  const groups = seq(planes).map(() => group);
   return [chunks, groups];
 };

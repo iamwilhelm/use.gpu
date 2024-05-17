@@ -46,6 +46,7 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
   } = props;
 
   const Resume = useCallback((sources: Record<string, StorageSource>) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {matrices, normalMatrices, ...rest} = sources;
     const instance = useCallback(() => matrices.length, [matrices]);
     return use(IndexedTransform, {

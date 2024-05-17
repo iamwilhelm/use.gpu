@@ -1,11 +1,9 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { DataBounds, ElementType, TensorArray, VectorLike, Emit, Emitter, UniformType } from '@use-gpu/core';
 
-import { provide, yeet, deprecated, memo, useOne, useMemo, useNoMemo, useRef } from '@use-gpu/live';
+import { provide, yeet, deprecated, memo, useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   seq, makeTensorArray, emitMultiArray, makeNumberWriter, makeNumberSplitter, updateTensor,
-  getBoundingBox, toDataBounds,
-  toCPUDims, toGPUDims,
 } from '@use-gpu/core';
 import { parseAxis, parseVec4 } from '@use-gpu/parse';
 import { optional, useProp, shouldEqual, sameShallow } from '@use-gpu/traits/live';
@@ -62,8 +60,6 @@ export type SamplerProps<S extends string | string[]> = {
   children?: LiveElement | ((S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement)),
 };
 
-const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
-
 /** Up-to-4D array of a WGSL type. Samples a given `expr` on the given `range`. */
 export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>> = memo(<S extends string | string[]>(props: SamplerProps<S>) => {
   const {
@@ -105,7 +101,7 @@ export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>>
   const f = format as UniformType;
   const tensors = useMemo(
     () => split
-      ? seq(items).map(i => makeTensorArray(f, alloc))
+      ? seq(items).map(() => makeTensorArray(f, alloc))
       : [makeTensorArray(f, items * alloc)],
     [f, alloc, items]
   );
@@ -121,9 +117,10 @@ export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>>
     let sampled: Emitter<any>;
     if (n === 1) {
       const c = +!!(centered === true || (centered as any)[0]);
+      // eslint-disable-next-line prefer-const
       let [min, max] = range[0];
-      let step = (max - min) / (size[0] - 1 + c);
-      let align = origin ? (min - origin[0]) % step : 0;
+      const step = (max - min) / (size[0] - 1 + c);
+      const align = origin ? (min - origin[0]) % step : 0;
       if (c) min += step / 2;
       min -= step * border + align;
 
@@ -140,12 +137,14 @@ export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>>
       const cx = +!!(centered === true || (centered as any)[0]);
       const cy = +!!(centered === true || (centered as any)[1]);
 
+      // eslint-disable-next-line prefer-const
       let [minX, maxX] = range[0];
+      // eslint-disable-next-line prefer-const
       let [minY, maxY] = range[1];
-      let stepX = (maxX - minX) / (size[0] - 1 + cx);
-      let stepY = (maxY - minY) / (size[1] - 1 + cy);
-      let alignX = origin ? (minX - origin[0]) % stepX : 0;
-      let alignY = origin ? (minY - origin[1]) % stepY : 0;
+      const stepX = (maxX - minX) / (size[0] - 1 + cx);
+      const stepY = (maxY - minY) / (size[1] - 1 + cy);
+      const alignX = origin ? (minX - origin[0]) % stepX : 0;
+      const alignY = origin ? (minY - origin[1]) % stepY : 0;
       if (cx) minX += stepX / 2;
       if (cy) minY += stepY / 2;
       minX -= stepX * border + alignX;
@@ -177,18 +176,24 @@ export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>>
       const cy = +!!(centered === true || (centered as any)[1]);
       const cz = +!!(centered === true || (centered as any)[2]);
 
+      // eslint-disable-next-line prefer-const
       let [minX, maxX] = range[0];
+      // eslint-disable-next-line prefer-const
       let [minY, maxY] = range[1];
+      // eslint-disable-next-line prefer-const
       let [minZ, maxZ] = range[2];
-      let stepX = (maxX - minX) / (size[0] - 1 + cx);
-      let stepY = (maxY - minY) / (size[1] - 1 + cy);
-      let stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
+      const stepX = (maxX - minX) / (size[0] - 1 + cx);
+      const stepY = (maxY - minY) / (size[1] - 1 + cy);
+      const stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
+      const alignX = origin ? (minX - origin[0]) % stepX : 0;
+      const alignY = origin ? (minY - origin[1]) % stepY : 0;
+      const alignZ = origin ? (minZ - origin[2]) % stepZ : 0;
       if (cx) minX += stepX / 2;
       if (cy) minY += stepY / 2;
       if (cz) minZ += stepZ / 2;
-      minX -= stepX * border;
-      minY -= stepY * border;
-      minZ -= stepZ * border;
+      minX -= stepX * border + alignX;
+      minY -= stepY * border + alignY;
+      minZ -= stepZ * border + alignZ;
 
       if (index) {
         sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
@@ -220,22 +225,30 @@ export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>>
       const cz = +!!(centered === true || (centered as any)[2]);
       const cw = +!!(centered === true || (centered as any)[3]);
 
+      // eslint-disable-next-line prefer-const
       let [minX, maxX] = range[0];
+      // eslint-disable-next-line prefer-const
       let [minY, maxY] = range[1];
+      // eslint-disable-next-line prefer-const
       let [minZ, maxZ] = range[2];
+      // eslint-disable-next-line prefer-const
       let [minW, maxW] = range[3];
       let stepX = (maxX - minX) / (size[0] - 1 + cx);
       let stepY = (maxY - minY) / (size[1] - 1 + cy);
       let stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
       let stepW = (maxW - minW) / (size[3] - 1 + cw);
+      const alignX = origin ? (minX - origin[0]) % stepX : 0;
+      const alignY = origin ? (minY - origin[1]) % stepY : 0;
+      const alignZ = origin ? (minZ - origin[2]) % stepZ : 0;
+      const alignW = origin ? (minW - origin[3]) % stepW : 0;
       if (cx) minX += stepX / 2;
       if (cy) minY += stepY / 2;
       if (cz) minZ += stepZ / 2;
       if (cw) minW += stepW / 2;
-      minX -= stepX * border;
-      minY -= stepY * border;
-      minZ -= stepZ * border;
-      minW -= stepW * border;
+      minX -= stepX * border + alignX;
+      minY -= stepY * border + alignY;
+      minZ -= stepZ * border + alignZ;
+      minW -= stepW * border + alignW;
 
       if (index) {
         sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
@@ -276,6 +289,7 @@ export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>>
     const [tensor] = tensors;
 
     emit?.reset();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const emitted = sampled ? emitMultiArray(sampled, emit, count, padded, clock!) : 0;
 
     const l = !sparse ? length : emitted;

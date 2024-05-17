@@ -1,12 +1,5 @@
-import { useOne } from '@use-gpu/live';
-import {
-  parseNumber,
-} from '@use-gpu/parse';
-import {
-  optional, trait, makeUseTrait,
-} from '@use-gpu/traits/live';
-
-import { vec4 } from 'gl-matrix';
+import { parseNumber } from '@use-gpu/parse';
+import { trait, makeUseTrait } from '@use-gpu/traits/live';
 
 export const GeographicTrait = trait({
   long: parseNumber,

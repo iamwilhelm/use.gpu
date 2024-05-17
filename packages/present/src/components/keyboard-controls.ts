@@ -8,7 +8,7 @@ export type KeyboardControlsProps = {
   _unused?: null,
 };
 
-export const KeyboardControls: LC<KeyboardControlsProps> = (props: KeyboardControlsProps) => {
+export const KeyboardControls: LC<KeyboardControlsProps> = () => {
   const {keyboard} = useContext(KeyboardContext);
   const api = usePresentContext();
 

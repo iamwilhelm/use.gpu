@@ -1,5 +1,4 @@
-import type { VectorLike, ColorLike, Blending } from '@use-gpu/core';
-import type { Placement, Domain, Join, PointShape } from '@use-gpu/parse';
+import type { ColorLike } from '@use-gpu/core';
 
 export type MVTStyleSheet = Record<string, MVTStyleProperties>;
 

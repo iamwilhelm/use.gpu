@@ -17,7 +17,6 @@ import {
   useBufferedSize, getRenderFunc,
 } from '@use-gpu/workbench';
 
-import { useRangeContext, useNoRangeContext } from '../providers/range-provider';
 import { useDataContext, DataContext } from '../providers/data-provider';
 import zipObject from 'lodash/zipObject';
 
@@ -51,8 +50,6 @@ export type TensorProps<S extends string | string[]> = {
   children?: LiveElement | (S extends any[] ? (data: Record<ElementType<S>, TensorArray>) => LiveElement : (data: TensorArray) => LiveElement),
 };
 
-const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
-
 /** Sample up-to-4D array of a WGSL type. Reads input `data` or samples a given `expr`. */
 export const Tensor: LiveComponent<TensorProps<unknown & (string | string[])>> = memo(<S extends string | string[]>(props: TensorProps<S>) => {
   const {
@@ -79,7 +76,7 @@ export const Tensor: LiveComponent<TensorProps<unknown & (string | string[])>> =
   const f = format as UniformType;
   const tensors = useMemo(
     () => split
-      ? seq(items).map(i => makeTensorArray(f, alloc))
+      ? seq(items).map(() => makeTensorArray(f, alloc))
       : [makeTensorArray(f, items * alloc)],
     [f, alloc, items]
   );
@@ -95,12 +92,13 @@ export const Tensor: LiveComponent<TensorProps<unknown & (string | string[])>> =
     const d = toCPUDims(dims);
 
     let emitted = 0;
-    const emit = split ? makeNumberSplitter(arrays, dims) : makeNumberWriter(array, dims);
+    const emit = split ? makeNumberSplitter(arrays, d) : makeNumberWriter(array, d);
     if (data) {
-      const expr = makeNumberReader(data, dims);
+      const expr = makeNumberReader(data, d);
       emitted = emitArray(expr, emit, count);
     }
     else if (expr) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       emitted = emitMultiArray(expr, emit, count, size, clock!);
     }
 

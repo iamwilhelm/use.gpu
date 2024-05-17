@@ -11,8 +11,8 @@ const SWIZZLES = [
 ];
 
 export const makeSwizzleMatrix = (swizzle: string) => {
-  let values = [];
-  let n = swizzle.length;
+  const values = [];
+  const n = swizzle.length;
   for (let i = 0; i < n; ++i) {
     const c = swizzle[i];
     if (c === 'x') values.push(1, 0, 0, 0);

@@ -4,9 +4,8 @@ import type { TensorArray } from '@use-gpu/core';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { memo, use, useOne } from '@use-gpu/live';
-import { makeUseTrait, combine, trait, optional, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
+import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { adjustSchema } from '@use-gpu/core';
-import { makeParseEnum, parseNumber, parseScalarArray, parseVec4Array } from '@use-gpu/parse';
 import { useInspectHoverable, Data, DualContourLayer, DUAL_CONTOUR_SCHEMA } from '@use-gpu/workbench';
 
 import { useRangeContext, useNoRangeContext } from '../providers/range-provider';

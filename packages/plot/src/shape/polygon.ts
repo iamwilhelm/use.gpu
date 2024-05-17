@@ -3,7 +3,7 @@ import type { ColorLike, ColorLikes, VectorLike, VectorLikes } from '@use-gpu/co
 import type { TraitProps } from '@use-gpu/traits';
 
 import { combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
-import { memo, use, useOne, useMemo } from '@use-gpu/live';
+import { memo, use } from '@use-gpu/live';
 
 import { InnerFace, FaceProps } from './face';
 import { InnerLine, LineProps } from './line';
@@ -47,4 +47,7 @@ export const Polygon: LiveComponent<PolygonProps> = memo((props) => {
     fill ?? fills ? use(InnerFace, {...props, color: fill, colors: fills, concave: true}) : null,
     stroke ?? strokes ? use(InnerLine, {...props, color: stroke, colors: strokes, loop: true, width, widths, zBias}) : null,
   ];
-}, 'Polygon');
+}, shouldEqual({
+  fill: sameShallow(),
+  stroke: sameShallow(),
+}), 'Polygon');

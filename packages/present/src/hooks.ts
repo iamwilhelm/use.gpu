@@ -50,6 +50,7 @@ export const usePresentTransition = (
     useOne(() => {
       const fx = isEnter ? enter : exit;
       const {type, direction} = fx;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const index = SLIDE_EFFECTS.indexOf(type!) || 0;
 
       e.current = index;
@@ -100,7 +101,7 @@ export const makeUseTransition = (
       if (value != null) {
         let boost = 0;
         let from = value;
-        let to = target;
+        const to = target;
 
         // Sample ongoing transition to determine velocity boost
         const {current: time} = timeRef;
@@ -123,6 +124,7 @@ export const makeUseTransition = (
     const {current: time} = timeRef;
     const {current: sampler} = samplerRef;
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (time != null) timeRef.current! += delta / 1000;
     if (time == null || sampler == null) return valueRef.current ?? -1;
 
@@ -148,11 +150,11 @@ const makeSampler = (
 ) => (
   time: number,
 ) => {
-  let t = clamp((time - delay) / duration, 0, 1);
+  const t = clamp((time - delay) / duration, 0, 1);
 
   let f = lerp(from, to, t);
   if (boost) {
-    let i = clamp(time / duration, 0, 1);
+    const i = clamp(time / duration, 0, 1);
     f += boost * duration * i * (1 - i) * (1 - i);
   }
 

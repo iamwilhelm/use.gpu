@@ -1,9 +1,8 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { TensorArray } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
 import type { TraitProps } from '@use-gpu/traits';
 
-import { makeUseTrait, optional, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
+import { makeUseTrait, combine, trait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { parseVec4 } from '@use-gpu/parse';
 import { memo, yeet, provide, useMemo, useNoMemo } from '@use-gpu/live';
 import { toTensorArray, fillNumberArray } from '@use-gpu/core';
@@ -13,9 +12,6 @@ import { useDataContext, DataContext } from '../providers/data-provider';
 import { useRangeContext } from '../providers/range-provider';
 
 import { logarithmic, linear } from '../util/domain';
-import { vec4 } from 'gl-matrix';
-
-import { getScalePosition } from '@use-gpu/wgsl/plot/scale.wgsl';
 
 import {
   ScaleTrait,

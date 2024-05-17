@@ -59,25 +59,25 @@ export const makeDependencyTracker = () => {
       let list = precedents.get(fiber);
       if (!list) precedents.set(fiber, list = new Set());
 
-      let exist = list.has(root);
+      const exist = list.has(root);
       if (!exist) list.add(root);
     }
 
     let list = dependencies.get(root);
     if (!list) dependencies.set(root, list = new Set());
 
-    let exist = list.has(fiber);
+    const exist = list.has(fiber);
     if (!exist) list.add(fiber);
     return !exist;
   }
 
   const undepend = (fiber: LiveFiber<any>, root: number) => {
     {
-      let list = precedents.get(fiber);
+      const list = precedents.get(fiber);
       if (list) list.delete(root);
     }
 
-    let list = dependencies.get(root);
+    const list = dependencies.get(root);
     if (list) {
       list.delete(fiber);
       if (list.size === 0) dependencies.delete(root);
@@ -109,7 +109,7 @@ export const makeDisposalTracker = () => {
   }
 
   const untrack = (fiber: LiveFiber<any>, t: Task) => {
-    let list = disposal.get(fiber);
+    const list = disposal.get(fiber);
     if (!list) return;
 
     const i = list.indexOf(t);

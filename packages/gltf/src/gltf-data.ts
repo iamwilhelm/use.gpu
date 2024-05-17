@@ -212,7 +212,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
             byteLength,
           };
         },
-        ({buffer}, index) => gpuBuffers[buffer],
+        ({buffer}) => gpuBuffers[buffer],
         [bufferViews]);
 
       // Convert accessors to storage sources

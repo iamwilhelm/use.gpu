@@ -1,9 +1,9 @@
-import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester, compareFibers, isSubNode } from './util';
+import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, compareFibers, isSubNode } from './util';
 
 it("schedules actions", () => {
-  let run = {a: 0, b: 0} as Record<string, number>;
+  const run = {a: 0, b: 0} as Record<string, number>;
 
-  let fiber = {} as any;
+  const fiber = {} as any;
 
   let flushed = 0;
   let captured = 0;
@@ -42,9 +42,9 @@ it("schedules actions", () => {
 })
 
 it("tracks disposal actions", () => {
-  let run = {a: 0, b: 0} as Record<string, number>;
+  const run = {a: 0, b: 0} as Record<string, number>;
 
-  let fiber = {} as any;
+  const fiber = {} as any;
 
   const trash = makeDisposalTracker();
   trash.track(fiber, () => run.a++);
@@ -63,15 +63,15 @@ it("tracks disposal actions", () => {
 });
 
 it("tracks dependencies", () => {
-  let root = {} as any;
-  let fiber1 = {} as any;
-  let fiber2 = {} as any;
+  const root = {} as any;
+  const fiber1 = {} as any;
+  const fiber2 = {} as any;
 
   const dependency = makeDependencyTracker();
   dependency.depend(fiber1, root.id);
   dependency.depend(fiber2, root.id);
 
-  let visit = new Set(dependency.traceDown(root));
+  const visit = new Set(dependency.traceDown(root));
   expect(visit.size).toBe(2);
   expect(visit.has(fiber1)).toBe(true);
   expect(visit.has(fiber2)).toBe(true);

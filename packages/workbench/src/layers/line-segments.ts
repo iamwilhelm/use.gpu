@@ -32,7 +32,7 @@ export const getLineSegments = ({
 };
 
 export const useLineSegmentsSource = ({
-  chunks, groups, loops, starts, ends,
+  chunks, groups, loops,
 }: {
   chunks: VectorLike,
   groups?: VectorLike | null,
@@ -40,7 +40,7 @@ export const useLineSegmentsSource = ({
 }) => {
   const {count, segments, slices} = useMemo(
     () =>getLineSegments({chunks, groups, loops}),
-    [chunks, groups, loops, starts, ends]
+    [chunks, groups, loops]
   );
 
   // Bind as shader storage

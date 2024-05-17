@@ -1,6 +1,6 @@
 use '@use-gpu/wgsl/use/view'::{ getViewPosition };
 
-@link fn transformPosition(p: vec4<f32>) -> vec4<f32> {};
+@optional @link fn transformPosition(p: vec4<f32>) -> vec4<f32> { return p; };
 
 @export fn getGridAutoState(base: vec4<f32>, shift: vec4<f32>) -> bool {
   let v = getViewPosition().xyz;

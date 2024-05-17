@@ -74,7 +74,7 @@ export const makeAtlas = (
     const ch = Math.ceil(h / snap) * snap;
 
     // If no next slot, expand and retry
-    const slot = getNextAvailable(cw, ch, true);
+    const slot = getNextAvailable(cw, ch);
     if (!slot) {
       expand();
       return place(key, w, h);

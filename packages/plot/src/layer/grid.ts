@@ -4,7 +4,7 @@ import type { XYZW } from '@use-gpu/core';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { makeUseTrait, optional, combine, trait, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
-import { parseBoolean, parseIntegerPositive, parseAxis, parseVec4 } from '@use-gpu/parse';
+import { parseBoolean, parseIntegerPositive, parseAxis, parsePosition } from '@use-gpu/parse';
 import { memo, use, fragment, useOne, useMemo } from '@use-gpu/live';
 import {
   useShader, useNoShader,
@@ -38,7 +38,7 @@ const Traits = combine(
   LineTrait,
   ROPTrait,
   trait({
-    origin: parseVec4,
+    origin: parsePosition,
     auto: optional(parseBoolean),
   }),
 );
@@ -83,6 +83,7 @@ export const Grid: LiveComponent<GridProps> = memo((props) => {
 
     const r = range?.[index] ?? parentRange[main];
     const r2 = range?.[other] ?? parentRange[cross];
+    console.log({main, cross, r, r2})
 
     const newValues = useMemo(() => {
       const f = (options.mode === 'log') ? logarithmic : linear;

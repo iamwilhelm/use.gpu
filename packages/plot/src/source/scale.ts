@@ -3,7 +3,7 @@ import type { TensorArray } from '@use-gpu/core';
 import type { TraitProps } from '@use-gpu/traits';
 
 import { makeUseTrait, combine, trait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
-import { parseVec4 } from '@use-gpu/parse';
+import { parsePosition } from '@use-gpu/parse';
 import { memo, yeet, provide, useMemo, useNoMemo } from '@use-gpu/live';
 import { toTensorArray, fillNumberArray } from '@use-gpu/core';
 import { getRenderFunc } from '@use-gpu/workbench';
@@ -22,7 +22,7 @@ const Traits = combine(
   ScaleTrait,
   AxisTrait,
   trait({
-    origin: parseVec4,
+    origin: parsePosition,
   }),
 );
 

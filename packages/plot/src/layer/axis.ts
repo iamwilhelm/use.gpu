@@ -7,7 +7,7 @@ import {
   useShader, useShaderRef,
   LineLayer, ArrowLayer, useArrowSegmentsSource,
 } from '@use-gpu/workbench';
-import { parseVec4, parseIntegerPositive } from '@use-gpu/parse';
+import { parsePosition, parseIntegerPositive } from '@use-gpu/parse';
 
 import { useRangeContext } from '../providers/range-provider';
 import { vec4 } from 'gl-matrix';
@@ -32,7 +32,7 @@ const Traits = combine(
   ColorTrait,
   ROPTrait,
   trait({
-    origin: parseVec4,
+    origin: parsePosition,
     detail: parseIntegerPositive,
   })
 );

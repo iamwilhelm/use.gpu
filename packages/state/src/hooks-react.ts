@@ -4,12 +4,12 @@ import { injectUseCursor, injectUseUpdateState } from './hooks';
 import { Pair, Cursor, Initial, UseState } from './types';
 export * from './types';
 
-type UseCursor<T> = (
+type UseCursor = <T>(
   pair: Pair<T>,
   defaults?: T
 ) => Cursor<T>;
 
-type UseUpdateState<T> = (
+type UseUpdateState = <T>(
   initialState: Initial<T>,
   useStateHook?: UseState,
 ) => Pair<T>;
@@ -24,7 +24,7 @@ If `defaults` are supplied, the cursor will merge them in.
 When the first update is made, it will dispatch a `$set` operation first
 to permanently insert them, and allow a clean patch to be made.
 */
-export const useCursor: UseCursor<unknown> = injectUseCursor(useMemo, useRef);
+export const useCursor: UseCursor = injectUseCursor(useMemo, useRef);
 
 /**
 `useState` with an `updateState` instead of a `setState`. Uses `patch` to apply updates.
@@ -37,4 +37,4 @@ When combined with `@{useCursor}`, this allows for zero-hassle state management.
 
 Compose this hook with other `useState` variants using `useStateHook`, e.g. the classic `useLocalStorage` that saves to browser local storage.
 */
-export const useUpdateState: UseUpdateState<unknown> = injectUseUpdateState(useCallback, useMemo, useState);
+export const useUpdateState: UseUpdateState = injectUseUpdateState(useCallback, useMemo, useState);

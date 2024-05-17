@@ -161,10 +161,13 @@ export const detach = <F extends ArrowFunction>(
 export const fragment = (
   calls: LiveNode<any>,
   key?: Key,
-): DeferredCall<() => void> => {
-  if (key !== null) return {f: FRAGMENT, args: calls, key};
+): LiveElement => {
+  if (key !== null) {
+    if (Array.isArray(calls)) return {f: FRAGMENT, args: calls, key};
+    return calls != null ? {f: FRAGMENT, args: [calls], key} : null;
+  }
   if (Array.isArray(calls)) return calls as any;
-  return [calls] as any;
+  return calls != null ? [calls] as any : null;
 }
 
 /** Wrap a fragment in a debug node to mark it. */
@@ -291,14 +294,14 @@ export const deprecated = <F extends ArrowFunction>(
   }) as any;
 };
 
-export interface MakeContext<T> {
-  (initialValue: T, displayName?: string): LiveContext<T>;
-  (initialValue: undefined, displayName?: string): LiveContext<T>;
-  (initialValue: null, displayName?: string): LiveContext<T | null>;
+export interface MakeContext {
+  <T>(initialValue: T, displayName?: string): LiveContext<T>;
+  <T>(initialValue: undefined, displayName?: string): LiveContext<T>;
+  <T>(initialValue: null, displayName?: string): LiveContext<T | null>;
 };
 
 /** Make Live context for holding shared value for child nodes (defaulted, required or optional). */
-export const makeContext: MakeContext<unknown> = <T>(initialValue?: T | null, displayName?: string) => ({
+export const makeContext: MakeContext = <T>(initialValue?: T | null, displayName?: string) => ({
   initialValue,
   displayName,
   context: true,

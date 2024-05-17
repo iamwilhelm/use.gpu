@@ -1,6 +1,6 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike, Lazy, UniformAttribute, DataBounds } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader';
+import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
 

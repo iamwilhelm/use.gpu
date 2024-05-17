@@ -20,7 +20,7 @@ import {
 import * as T from './grammar/glsl.terms';
 import { GLSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
-import { getChildNodes, makeASTEmitter, makeASTDecompressor } from '../util/tree';
+import { getChildNodes, formatAST, makeASTEmitter, makeASTDecompressor } from '../util/tree';
 import uniq from 'lodash/uniq';
 
 const IGNORE_IDENTIFIERS = new Set(['location', 'set', 'binding']);

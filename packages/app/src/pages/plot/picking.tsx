@@ -25,6 +25,8 @@ const circleY = (a: number, r: number) => Math.sin(a * Math.PI * 2) * r;
 
 const N = 32;
 
+const GRID = { divide: 16, base: 2, end: true };
+
 const roundPolygons = seq(20).map(i => {
   const n = Math.max(3, randomInt(5, 16) - randomInt(0, 5));
   const r = randomFloat(0.15, 0.5);
@@ -73,8 +75,8 @@ export const PlotPickingPage: LC = () => {
       <Pass picking>
 
         <Plot>
-          <Grid axes="zx" width={2} color="#ffffff40" range={[[-5, 5], [0, 1], [-5, 5]]} />
-
+          <Grid axes="zx" width={3} color="#ffffff40" range={[[-5, 5], [-5, 5]]} origin={[0, -3, 0]} />
+          
           <Pick
             onMouseOver={(mouse, index) => console.log('Round shape #' + index, mouse)}
           >{

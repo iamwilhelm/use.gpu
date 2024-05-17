@@ -27,7 +27,8 @@ export const makeStorageBinding = (
   set: number = 0,
 ): GPUBindGroup => {
   const sources = [] as StorageSource[];
-  for (const k in links) if (links[k]) sources.push(links[k]);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  for (const k in links) if (links[k]) sources.push(links[k]!);
 
   const entries = makeStorageEntries(sources);
   const bindGroup = device.createBindGroup({

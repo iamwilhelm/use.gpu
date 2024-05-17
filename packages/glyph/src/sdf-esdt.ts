@@ -29,22 +29,22 @@ export const glyphToESDT = (
     const sdfToDebugView = makeSDFToDebugView(wp, hp, np, radius, cutoff);
     debug(sdfToDebugView(xo, yo, xi, yi, outer, inner));
 
-    esdt(outer, xo, yo, wp, hp, f, z, b, t, v, 1, 1);
+    esdt(outer, xo, yo, wp, hp, f, z, b, t, v, 1);
     debug(sdfToDebugView(xo, yo, null, null, outer, null));
-    esdt(outer, xo, yo, wp, hp, f, z, b, t, v, 1, 2);
+    esdt(outer, xo, yo, wp, hp, f, z, b, t, v, 2);
     debug(sdfToDebugView(xo, yo, null, null, outer, null));
 
-    esdt(inner, xi, yi, wp, hp, f, z, b, t, v, -1, 1);
+    esdt(inner, xi, yi, wp, hp, f, z, b, t, v, 1);
     debug(sdfToDebugView(null, null, xi, yi, null, inner));
-    esdt(inner, xi, yi, wp, hp, f, z, b, t, v, -1, 2);
+    esdt(inner, xi, yi, wp, hp, f, z, b, t, v, 2);
     debug(sdfToDebugView(null, null, xi, yi, null, inner));
 
     if (postprocess) relaxSubpixelOffsets(stage, data, w, h, pad);
     debug(sdfToDebugView(xo, yo, xi, yi, outer, inner));
   }
   else {
-    esdt(outer, xo, yo, wp, hp, f, z, b, t, v,  1);
-    esdt(inner, xi, yi, wp, hp, f, z, b, t, v, -1);
+    esdt(outer, xo, yo, wp, hp, f, z, b, t, v);
+    esdt(inner, xi, yi, wp, hp, f, z, b, t, v);
     if (postprocess) relaxSubpixelOffsets(stage, data, w, h, pad);
   }
 
@@ -56,7 +56,7 @@ export const glyphToESDT = (
     alpha[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
   }
 
-  if (!preprocess) paintIntoDistanceField(alpha, data, w, h, pad, radius, cutoff, !color);
+  if (!preprocess) paintIntoDistanceField(alpha, data, w, h, pad, radius, cutoff);
 
   if (color) {
     const out = new Uint8Array(np * 4);
@@ -589,11 +589,10 @@ export const esdt = (
   b: Float32Array,
   t: Float32Array,
   v: Uint16Array,
-  sign: number = 1,
   half: number = 0,
 ) => {
-  if (half !== 1) for (let x = 0; x < w; ++x) esdt1d(mask, ys, xs, x, w, h, f, z, b, t, v, sign);
-  if (half !== 2) for (let y = 0; y < h; ++y) esdt1d(mask, xs, ys, y * w, 1, w, f, z, b, t, v, sign);
+  if (half !== 1) for (let x = 0; x < w; ++x) esdt1d(mask, ys, xs, x, w, h, f, z, b, t, v);
+  if (half !== 2) for (let y = 0; y < h; ++y) esdt1d(mask, xs, ys, y * w, 1, w, f, z, b, t, v);
 }
 
 // 1D subpixel distance transform

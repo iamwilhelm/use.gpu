@@ -13,7 +13,7 @@ const makePipelineCache = (options: Record<string, any> = {}) => new LRU<string,
   ...options,
 });
 
-const SHADER_LOG: LRU<string, any> | null = null;
+let SHADER_LOG: LRU<string, any> | null = null;
 
 const CACHE = new WeakMap<any, LRU<string, any>>();
 const PENDING = new WeakMap<any, Map<string, any>>();
@@ -49,7 +49,7 @@ export const useComputePipeline = (
           code: shader.code,
         },
       };
-      if (SHADER_LOG) SHADER_LOG.set(key, log);
+      if (SHADER_LOG != null) SHADER_LOG.set(key, log);
     }
 
     // Make new pipeline
@@ -96,7 +96,7 @@ export const useComputePipelineAsync = (
       return cached;
     }
 
-    if (SHADER_LOG) {
+    if (SHADER_LOG != null) {
       SHADER_LOG.set(key, {
         compute: {
           hash: shader.hash,

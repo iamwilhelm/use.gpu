@@ -299,7 +299,7 @@ export const emitGlyphSpans = (
 
   font: number[],
   spans: Tuples<3>,
-  glyphs: Tuples<2>,
+  glyphs: Tuples<4>,
   breaks: Uint32Array,
 
   start: number,

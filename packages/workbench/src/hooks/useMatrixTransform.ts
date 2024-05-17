@@ -44,6 +44,7 @@ export const useNoCombinedMatrix = () => {
 
 export const useMatrixTransform = (
   matrix?: mat4 | null,
+  bounds?: TransformBounds | null,
 ): [
   TransformContextProps,
   MatrixRefs,
@@ -67,7 +68,7 @@ export const useMatrixTransform = (
     const differential = getShader(getMatrixDifferential, [boundMatrix, refs.normalMatrix]);
 
     const key = getBundleKey(transform) ^ getBundleKey(differential);
-    return [{key, transform, differential}, refs];
+    return [{key, transform, differential, bounds}, refs];
   });
 };
 

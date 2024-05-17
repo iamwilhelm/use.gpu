@@ -117,9 +117,9 @@ const makePartitioner = () => {
 
     const i = last.get(key);
     const n = layers.length;
-    const layer = layers[i];
+    const layer = i != null ? layers[i] : null;
 
-    if (i != null) {
+    if (layer != null && i != null) {
       let blocked = !bounds;
       if (bounds) {
         for (let j = i + 1; j < n; ++j) {

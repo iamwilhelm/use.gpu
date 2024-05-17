@@ -111,7 +111,7 @@ export type LayoutElement = {
 };
 
 export type InlineElement = {
-  spans: Tuples<4>,
+  spans: Tuples<3>,
   height: FontMetrics,
   margin?: Margin,
   inline?: Baseline,

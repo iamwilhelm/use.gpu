@@ -1,7 +1,7 @@
 import type { LC } from '@use-gpu/live';
 
 import React from '@use-gpu/live';
-import { LayoutControls } from '../../ui/layout-controls';
+import { TextureSource } from '@use-gpu/core';
 
 import {
   LinearRGB, Pass, FlatCamera, PanControls, ImageTexture,
@@ -11,6 +11,7 @@ import {
   UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
 } from '@use-gpu/layout';
 
+import { LayoutControls } from '../../ui/layout-controls';
 import { InfoBox } from '../../ui/info-box';
 
 const BLACK_SHADE = [0, 0, 0, .9];
@@ -20,6 +21,8 @@ const WHITE = [1, 1, 1, 1];
 
 const MARGIN_LEFT = [24, 0, 0, 0];
 const MARGIN_TOP = [0, 24, 0, 0];
+
+const FIT_SCALE = {fit: 'scale'};
 
 export const LayoutDisplayPage: LC = () => {
 
@@ -103,7 +106,8 @@ export const LayoutDisplayPage: LC = () => {
                     <ImageTexture
                       url="/textures/test.png"
                       colorSpace="srgb"
-                      render={(texture) =>
+                    >{
+                      (texture: TextureSource) =>
                         <Flex align="center" width="100%" height={300}>
                           <Block
                             fill="#3090ff" 
@@ -111,13 +115,11 @@ export const LayoutDisplayPage: LC = () => {
                             height={300}
                             margin={20}
                             texture={texture}
-                            image={{
-                              fit: 'scale'
-                            }}
+                            image={FIT_SCALE}
                           />
                         </Flex>
                       }
-                    />
+                    }</ImageTexture>
 
                     <Block margin={[0, 40, 0, 0]} height={2} fill={WHITE} />
 

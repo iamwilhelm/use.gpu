@@ -77,7 +77,7 @@ const makeComposeTransform = () => {
     else vec3.set(s, 1, 1, 1);
 
     mat4.fromRotationTranslationScale(transform, q, p, s);
-    if (matrix != null) mat4.multiply(transform, matrix, transform);
+    if (matrix != null) mat4.multiply(transform, matrix as mat4, transform);
 
     return transform;
   }

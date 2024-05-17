@@ -1,6 +1,7 @@
 import React, { LC, hot, useFiber } from '@use-gpu/live';
 
 import { HTML } from '@use-gpu/react';
+import { TextureSource } from '@use-gpu/core';
 import { AutoCanvas, WebGPU } from '@use-gpu/webgpu';
 import { DebugProvider, FontLoader, PanControls, Flat, Pass } from '@use-gpu/workbench';
 import { UI, Layout, Flex, Block, Inline, Text } from '@use-gpu/layout';
@@ -62,12 +63,25 @@ export const App: LC = hot(() => {
                             <Inline align="center">
                               <Text weight="black" size={16} color="#ffffff" opacity={0.5}>Zoom Me</Text>
                             </Inline>
-                            <Inline align="center">
-                              <Text weight="black" lineHeight={2} size={1} color="#ffffff" opacity={0.5}>Zoom Me</Text>
-                            </Inline>
-                            <Inline align="center" snap={false}>
-                              <Text weight="black" lineHeight={1} size={1/16} color="#ffffff" opacity={0.5}>Zoom Me</Text>
-                            </Inline>
+
+                            <ImageTexture
+                              url="/textures/test.png"
+                              colorSpace="srgb"
+                            >{(texture: TextureSource) =>
+                                <Flex align="center" width="100%" height={150}>
+                                  <Block
+                                    fill="#3090ff" 
+                                    width={150}
+                                    height={150}
+                                    margin={20}
+                                    texture={texture}
+                                    image={{
+                                      fit: 'scale'
+                                    }}
+                                  />
+                                </Flex>
+                              }
+                            }</ImageTexture>
                           </Flex>
                         </Flex>
 

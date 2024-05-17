@@ -1,12 +1,9 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { PickingUniforms } from '@use-gpu/core';
 
-import { memo, provide, makeContext, useContext, useMemo, useOne, useResource, useState, incrementVersion } from '@use-gpu/live';
+import { memo, provide, makeContext, useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { makeIdAllocator } from '@use-gpu/core';
 import { PickingContext } from '../providers/picking-provider';
 import { RenderContext } from '../providers/render-provider';
-
-const CAPTURE_EVENT = {capture: true};
 
 export const EventContext = makeContext<EventContextProps>(undefined, 'EventContext');
 export const MouseContext = makeContext<MouseContextProps>(undefined, 'MouseContext');
@@ -115,12 +112,6 @@ export type KeyboardEventState = {
   stop: () => void,
 };
 
-const toButtons = (buttons: number) => ({
-  left: !!(buttons & 1),
-  middle: !!(buttons & 3),
-  right: !!(buttons & 2),
-});
-
 const makeClickTracker = () => ({
   buttons: { left: false, middle: false, right: false },
   pressed: { left: false, middle: false, right: false },
@@ -197,7 +188,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((props: Eve
 
       const tracker = useOne(makeClickTracker);
       const {pressed, presses, clicks, buttons: lastButtons} = tracker;
-      const {buttons, button} = mouse;
+      const {buttons} = mouse;
 
       const index    = targetIndex;
       const captured = captureId === id;
@@ -248,9 +239,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((props: Eve
 
   const keyboardContext = useMemo(() => ({
     keyboard,
-    useKeyboard: (id: number | null = null): KeyboardEventState => {
-      const ref = useOne(() => ({keyboard}));
-
+    useKeyboard: (): KeyboardEventState => {
       return {keyboard: keyboard as any, stop: stopKeyboard};
     },
   }), [keyboard, targetId, captureId]);

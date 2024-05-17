@@ -153,7 +153,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
       const {
         clientX, clientY,
         deltaMode, deltaX, deltaY,
-        detail, axis, HORIZONTAL_AXIS,
+        detail, axis,
         wheelDelta, wheelDeltaX, wheelDeltaY,
       } = (e as any);
 
@@ -190,7 +190,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
       const x = clientX - left;
       const y = clientY - top;
 
-      setWheel((state) => ({
+      setWheel(() => ({
         x,
         y,
         moveX,
@@ -255,6 +255,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
       const {button, buttons, clientX, clientY} = e;
       if (e.target) try {
         (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        // eslint-disable-next-line no-empty
       } catch (e) {}
 
       onButtons(buttons, button);

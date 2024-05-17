@@ -13,8 +13,6 @@ import { useDerivedState } from '../hooks/useDerivedState';
 import { getRenderFunc } from '../hooks/useRenderProp';
 import { mat4, vec3 } from 'gl-matrix';
 
-const CAPTURE_EVENT = {capture: true};
-
 const π = Math.PI;
 
 export type FPSControlsProps = {
@@ -59,14 +57,14 @@ export const FPSControls: LiveComponent<FPSControlsProps> = (props) => {
 
   const { mouse } = useMouse();
   const { keyboard } = useKeyboard();
-  const { hasLock, beginLock, endLock } = useMouseLock();
+  const { hasLock, beginLock } = useMouseLock();
 
   const size = Math.min(Math.abs(layout[2] - layout[0]), Math.abs(layout[3] - layout[1]));
 
   const lastTimeRef = useRef(0);
 
   useOne(() => {
-    const { x, y, moveX, moveY, buttons, stopped } = mouse;
+    const { moveX, moveY, buttons, stopped } = mouse;
     if (!active || stopped) return;
 
     if (!hasLock) {

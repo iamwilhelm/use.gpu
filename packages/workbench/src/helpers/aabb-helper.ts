@@ -2,16 +2,13 @@ import type { LC } from '@use-gpu/live';
 import type { TypedArray } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { memo, use, provide, useOne, useMemo } from '@use-gpu/live';
+import { memo, use, provide, useMemo } from '@use-gpu/live';
 import { LineLayer } from '../layers/line-layer';
 import { GeometryData } from '../data/geometry-data';
 import { makeAABBGeometry } from '../primitives/geometry/aabb';
 import { TransformContext } from '../providers/transform-provider';
-import { useShader } from '../hooks/useShader';
 import { useCombinedMatrixTransform } from '../hooks/useCombinedTransform';
-import { useShaderRef } from '../hooks/useShaderRef';
 
-import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { mat4 } from 'gl-matrix';
 
 type AABBHelperProps = {
@@ -24,7 +21,6 @@ type AABBHelperProps = {
 };
 
 const EMPTY: any = [];
-const MATRIX = mat4.create();
 
 export const AABBHelper: LC<AABBHelperProps> = memo((props: AABBHelperProps) => {
   const {

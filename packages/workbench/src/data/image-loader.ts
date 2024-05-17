@@ -1,9 +1,8 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ColorSpace, DataTexture, TypedArray } from '@use-gpu/core';
+import type { ColorSpace, DataTexture } from '@use-gpu/core';
 
-import { use, yeet, gather, memo, useCallback, useMemo } from '@use-gpu/live';
+import { use, useCallback } from '@use-gpu/live';
 import { patch } from '@use-gpu/state';
-import { Await } from '../queue/await';
 import { Fetch } from './fetch';
 
 import { parseHDR } from '../codec/hdr';
@@ -50,11 +49,13 @@ export const ImageLoader: LiveComponent<ImageLoaderProps> = (props) => {
   const then = useCallback(async (response: Response) => {
     if (!response) return null;
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const mime = response.headers.get('content-type') ?? MIME_TYPES[format!] ?? 'bin';
 
     const resolveFormat = (format: GPUTextureFormat) => {
       let cs = colorSpace;
 
+      // eslint-disable-next-line no-debugger
       if (!format.match) debugger;
       if (colorSpace === 'srgb' && format?.match(/^(rgba|bgra)8unorm$/)) {
         format += '-srgb';
@@ -64,7 +65,6 @@ export const ImageLoader: LiveComponent<ImageLoaderProps> = (props) => {
       return {format, colorSpace: cs};
     };
 
-    let resource;
     if (format === 'hdr' || mime === 'image/vnd.radiance') {
       const arrayBuffer = await response.arrayBuffer();
       try {

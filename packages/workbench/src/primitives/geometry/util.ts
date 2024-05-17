@@ -29,9 +29,9 @@ export const forMeshTriangles = (() => {
     const dims = Math.floor((UNIFORM_ARRAY_DIMS as any)[formats.positions]) || 1;
     const n = count ?? indices?.length ?? (positions?.length || 0) / dims;
     for (let i = 0, j = 0; i < n; i += 3, j++) {
-      let a = getVertex(v1, i);
-      let b = getVertex(v2, i + 1);
-      let c = getVertex(v3, i + 2);
+      const a = getVertex(v1, i);
+      const b = getVertex(v2, i + 1);
+      const c = getVertex(v3, i + 2);
       callback(v1, v2, v3, j, a, b, c);
     }
   }

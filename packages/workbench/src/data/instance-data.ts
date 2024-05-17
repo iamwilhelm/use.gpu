@@ -1,20 +1,18 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataSchema, StructAggregateBuffer, TypedArray, StorageSource, LambdaSource, UniformType } from '@use-gpu/core';
+import type { DataSchema, StructAggregateBuffer, TypedArray, StorageSource, UniformType } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
-import { capture, yeet, useCapture, useNoCapture, useMemo, useOne, useRef, useResource, useNoResource, incrementVersion, makeCapture } from '@use-gpu/live';
+import { capture, useCapture, useMemo, useOne, useRef, useResource, incrementVersion, makeCapture } from '@use-gpu/live';
 import {
   makeIdAllocator,
-  makeGPUArray, copyNumberArray,
+  copyNumberArray,
   
   normalizeSchema,
   makeArrayAggregateBuffer,
   makeStructAggregateBuffer,
   makeStructAggregateFields,
-  uploadStorage,
-  getBoundingBox, toDataBounds,
   isUniformArrayType,
 
-  makeStorageBuffer, uploadBuffer, uploadBufferRange, UNIFORM_ARRAY_DIMS,
+  uploadBuffer, uploadBufferRange,
   toCPUDims, toGPUDims,
 } from '@use-gpu/core';
 
@@ -22,19 +20,11 @@ import { useDeviceContext } from '../providers/device-provider';
 import { QueueReconciler } from '../reconcilers';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getRenderFunc } from '../hooks/useRenderProp';
-import { getStructAggregate } from '../hooks/useStructSources';
 import { getInstancedAggregate } from '../hooks/useInstancedSources';
 
 const {signal} = QueueReconciler;
 
 type Queued = {instances: number[], datas: Record<string, any>[]};
-type FieldBuffer = {
-  buffer: GPUBuffer,
-  array: TypedArray,
-  source: StorageSource,
-  dims: number,
-  accessor: string,
-};
 
 export type UseInstance = () => (data: Record<string, any>) => void;
 
@@ -135,11 +125,11 @@ export const InstanceData: LiveComponent<InstanceDataProps<'u16' | 'u32' | undef
       return [aggregateBuffer, indexBuffer, fields, sources];
     }, [device, uniforms, alloc]);
 
-    let needsRefresh = prevBufferRef.current !== aggregateBuffer;
+    const needsRefresh = prevBufferRef.current !== aggregateBuffer;
     prevBufferRef.current = aggregateBuffer;
 
     // Update data sparsely while calculating upload ranges
-    let ranges = [];
+    const ranges = [];
     let range = null;
     const {instances, datas} = queue;
     const n = instances.length;

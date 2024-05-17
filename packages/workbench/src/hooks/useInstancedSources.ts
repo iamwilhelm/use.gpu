@@ -3,7 +3,6 @@ import type { StorageSource, LambdaSource, UniformAttribute, StructAggregateBuff
 import { useMemo } from '@use-gpu/live';
 import { chainTo, instanceWith, bindEntryPoint } from '@use-gpu/shader/wgsl';
 import { ShaderModule, ShaderSource } from '@use-gpu/shader';
-import { getShader } from './useShader';
 import { getSource } from './useSource';
 import { getStructAggregate } from './useStructSources';
 import { getLambdaSource } from './useLambdaSource';

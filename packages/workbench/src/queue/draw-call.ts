@@ -1,10 +1,9 @@
-import type { LiveComponent, ArrowFunction, Ref } from '@use-gpu/live';
-import type { DataBounds, TypedArray, StorageSource, RenderPassMode, Lazy, UniformLayout, UniformAttribute, UseGPURenderContext, VolatileAllocation } from '@use-gpu/core';
-import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
+import type { ArrowFunction, Ref } from '@use-gpu/live';
+import type { DataBounds, StorageSource, RenderPassMode, Lazy, UniformAttribute, UseGPURenderContext, VolatileAllocation } from '@use-gpu/core';
+import type { ParsedModule } from '@use-gpu/shader';
 import type { Update } from '@use-gpu/state';
-import type { Culler } from '../pass/types';
 
-import { yeet, memo, useMemo, useNoMemo, useOne, useNoOne, useState, SUSPEND } from '@use-gpu/live';
+import { yeet, useMemo, useNoMemo, useOne, useNoOne, SUSPEND } from '@use-gpu/live';
 import { patch, $apply } from '@use-gpu/state';
 import {
   makeMultiUniforms, makeBoundUniforms, makeVolatileUniforms,
@@ -19,11 +18,8 @@ import { useSuspenseContext } from '../providers/suspense-provider';
 
 import { useLinkedShader } from '../hooks/useLinkedShader';
 import { usePipelineLayout, useNoPipelineLayout } from '../hooks/usePipelineLayout';
-import { useRenderPipelineAsync, useNoRenderPipelineAsync, setShaderLog, getShaderLog } from '../hooks/useRenderPipeline';
+import { useRenderPipelineAsync, useNoRenderPipelineAsync } from '../hooks/useRenderPipeline';
 import { useInspectable } from '../hooks/useInspectable'
-
-import keyBy from 'lodash/keyBy';
-import mapValues from 'lodash/mapValues';
 
 export type DrawCallProps = {
   pipeline?: Update<GPURenderPipelineDescriptor>,
@@ -136,6 +132,7 @@ export const drawCall = (props: DrawCallProps) => {
   : useNoPipelineLayout();
 
   // Rendering pipeline
+  // eslint-disable-next-line prefer-const
   let [pipeline, isStale] = useRenderPipelineAsync(
     device,
     renderContext,

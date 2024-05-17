@@ -1,16 +1,10 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type {
-  TypedArray, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformType,
-  VertexData, RenderPassMode,
-} from '@use-gpu/core';
+import type { TypedArray, Lazy } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { RawLines, RawLinesFlags } from '../primitives/raw-lines';
 
-import { PipelineOptions } from '../hooks/usePipelineOptions';
-
-import { use, memo, provide, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, memo, provide, useCallback, useOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 import { TransformContextProps, TransformContext, useTransformContext, DEFAULT_TRANSFORM } from '../providers/transform-provider';
 import { useShader } from '../hooks/useShader';
@@ -83,8 +77,6 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
 
     ...rest
   } = props;
-
-  const key = useFiber().id;
 
   const p = useShaderRef(position, positions);
   const o = useShaderRef(offset, offsets);

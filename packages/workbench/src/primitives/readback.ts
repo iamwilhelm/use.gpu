@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, TypedArray, UniformType } from '@use-gpu/core';
 
-import { use, memo, yeet, useMemo, useOne, useRef, useResource } from '@use-gpu/live';
+import { memo, yeet, useOne, useResource } from '@use-gpu/live';
 import { getUniformArraySize, getUniformArrayType } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';

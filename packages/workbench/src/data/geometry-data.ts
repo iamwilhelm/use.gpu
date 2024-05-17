@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { CPUGeometry, GPUGeometry, StorageSource, LambdaSource } from '@use-gpu/core';
 
-import { use, yeet, useMemo } from '@use-gpu/live';
+import { use, useMemo } from '@use-gpu/live';
 import mapValues from 'lodash/mapValues';
 import { useRenderProp } from '../hooks/useRenderProp';
 

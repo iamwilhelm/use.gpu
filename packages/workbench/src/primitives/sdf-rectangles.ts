@@ -5,8 +5,7 @@ import type { TransformContextProps } from '@use-gpu/workbench';
 
 import { useDraw } from '../hooks/useDraw';
 
-import { use, memo, useCallback, useMemo, useOne, useFiber } from '@use-gpu/live';
-import { resolve } from '@use-gpu/core';
+import { memo, useMemo, useOne } from '@use-gpu/live';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useShader } from '../hooks/useShader';
@@ -56,7 +55,6 @@ export type SDFRectanglesProps = {
 
 export const SDFRectangles: LiveComponent<SDFRectanglesProps> = memo((props: SDFRectanglesProps) => {
   const {
-    id = 0,
     count = 1,
     mode = 'transparent',
     alphaToCoverage = false,

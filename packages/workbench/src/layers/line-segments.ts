@@ -1,7 +1,6 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { StorageSource, TypedArray, VectorLike } from '@use-gpu/core';
+import type { TypedArray, VectorLike } from '@use-gpu/core';
 
-import { memo, yeet, useMemo } from '@use-gpu/live';
+import { useMemo } from '@use-gpu/live';
 import { accumulateChunks, generateChunkSegments, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 import { LINE_SEGMENTS_SCHEMA } from './schemas';
@@ -15,13 +14,11 @@ export type LineSegmentsData = {
 
 /** Make index data for line segments data */
 export const getLineSegments = ({
-  chunks, groups, loops, starts, ends,
+  chunks, groups, loops,
 }: {
   chunks: VectorLike,
   groups?: VectorLike | null,
   loops?: boolean[] | boolean | null,
-  starts?: boolean[] | boolean | null,
-  ends?: boolean[] | boolean | null,
 }) => {
   const count = accumulateChunks(chunks, loops);
 
@@ -40,11 +37,9 @@ export const useLineSegmentsSource = ({
   chunks: VectorLike,
   groups?: VectorLike | null,
   loops?: boolean[] | boolean | null,
-  starts?: boolean[] | boolean | null,
-  ends?: boolean[] | boolean | null,
 }) => {
   const {count, segments, slices} = useMemo(
-    () =>getLineSegments({chunks, groups, loops, starts, ends}),
+    () =>getLineSegments({chunks, groups, loops}),
     [chunks, groups, loops, starts, ends]
   );
 

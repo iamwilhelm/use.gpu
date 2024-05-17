@@ -1,7 +1,7 @@
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Light } from '../light/types';
 
-import { useContext, useMemo, useOne, makeContext, makeCapture } from '@use-gpu/live';
+import { useContext, useOne, makeContext } from '@use-gpu/live';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';

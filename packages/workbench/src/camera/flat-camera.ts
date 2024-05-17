@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent } from '@use-gpu/live';
 import type { ViewUniforms, Rectangle } from '@use-gpu/core';
 
 import { use, provide, deprecated, useContext, useOne, useMemo, incrementVersion } from '@use-gpu/live';
@@ -49,7 +49,7 @@ export const FlatCamera: LiveComponent<FlatCameraProps> = (props) => {
 
   usePerFrame();
 
-  const [layout, matrix, ratio, w, h] = useMemo(() => {
+  const [layout, matrix, ratio] = useMemo(() => {
     const unit = scale != null ? height / pixelRatio / scale : 1;
     const ratio = unit * pixelRatio;
 
@@ -73,7 +73,7 @@ export const FlatCamera: LiveComponent<FlatCameraProps> = (props) => {
 
     const layout = [left, top, right, bottom] as Rectangle;
     const matrix = makeOrthogonalMatrix(left, right, bottom, top, near, far);
-    return [layout, matrix, ratio, w, h];
+    return [layout, matrix, ratio];
   }, [scale, width, height, pixelRatio]);
 
   const uniforms = useOne(() => ({

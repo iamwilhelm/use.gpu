@@ -1,16 +1,11 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type {
-  VectorLike, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformType,
-  VertexData, LambdaSource, DataBounds,
-} from '@use-gpu/core';
-import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
+import type { VectorLike, Lazy, UniformAttribute, DataBounds } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
 
-import { use, memo, useCallback, useOne, useMemo, useNoCallback } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, chainTo } from '@use-gpu/shader/wgsl';
-import { resolve } from '@use-gpu/core';
+import { memo, useCallback, useMemo, useNoCallback } from '@use-gpu/live';
+import { chainTo } from '@use-gpu/shader/wgsl';
 
 import { useMaterialContext } from '../providers/material-provider';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
@@ -55,8 +50,6 @@ export type RawQuadsProps = {
   count?: Lazy<number>,
 } & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
-const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
-
 export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps) => {
   const {
     alphaToCoverage,
@@ -69,7 +62,6 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     instances,
     transform,
 
-    id = 0,
     count = null,
   } = props;
 
@@ -90,6 +82,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     bounds = useCallback(() => getBounds((props.positions! as any).bounds), [props.positions, getBounds]);
   }
   else {
@@ -134,7 +127,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   return useDraw({
     vertexCount,
-    instanceCount,
+    instanceCount: totalCount,
     bounds,
 
     links,

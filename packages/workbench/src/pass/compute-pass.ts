@@ -1,4 +1,4 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { ComputeToPass, CommandToBuffer, ComputeCounter } from './types';
 
 import { yeet, memo } from '@use-gpu/live';

@@ -218,7 +218,7 @@ export const useLightDraw = (
   const renderContext = useRenderContext();
 
   const {layout: globalLayout} = useViewContext();
-  const {layout: passLayout, buffers: {gbuffer: [gbuffer]}} = usePassContext();
+  const {layout: passLayout} = usePassContext();
 
   const vertexShader = instanceDrawVirtualLight;
   const fragmentShader = instanceFragmentLight;

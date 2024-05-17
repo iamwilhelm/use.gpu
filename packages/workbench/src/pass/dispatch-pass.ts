@@ -1,6 +1,6 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
+import type { LC, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
 
-import { use, yeet, memo, useContext, useMemo } from '@use-gpu/live';
+import { yeet, memo } from '@use-gpu/live';
 import { useInspectable } from '../hooks/useInspectable'
 import { QueueReconciler } from '../reconcilers';
 
@@ -30,8 +30,6 @@ export const DispatchPass: LC<DispatchPassProps> = memo((props: PropsWithChildre
 
   const run = () => {
     let ds = 0;
-
-    const countDispatch = (d: number) => { ds += d; };
 
     if (dispatches.length) {
       for (const f of dispatches) f();

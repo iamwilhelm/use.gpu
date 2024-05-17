@@ -5,7 +5,6 @@ import type { PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { RawFaces } from '../primitives/raw-faces';
 
-import { patch } from '@use-gpu/state';
 import { use, memo, useMemo, useOne } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';
@@ -39,12 +38,13 @@ export type SurfaceLayerProps = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const [SIZE_BINDING] = bundleToAttributes(getSurfaceIndex);
-const POSITION_BINDING = bundleToAttributes(getSurfaceIndex);
 
 /** Draws 2D surfaces across the X and Y data dimension. */
 export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: SurfaceLayerProps) => {
   const {
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     position,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     positions,
     color,
     colors,
@@ -94,6 +94,9 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     normals,
     uvs,
     sts,
+
+    zBias,
+    zBiases,
 
     shaded,
     side,

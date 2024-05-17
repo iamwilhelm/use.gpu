@@ -1,9 +1,9 @@
-import type { LiveFiber, LiveComponent, LiveElement, Task, PropsWithChildren } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ColorSpace, TextureSource, TextureTarget } from '@use-gpu/core';
 
 import { seq } from '@use-gpu/core';
-import { use, provide, gather, yeet, fence, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
-import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
+import { provide, yeet, fence, useContext, useMemo } from '@use-gpu/live';
+import { PRESENTATION_FORMAT, COLOR_SPACE } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 import { ComputeContext } from '../providers/compute-provider';
@@ -87,7 +87,7 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
 
   const targetTexture = bufferTexture;
 
-  const [source, sources] = useMemo(() => {
+  const source = useMemo(() => {
     const view = targetTexture.createView();
     const size = [width, height] as [number, number];
     const volatile = history ? history + 1 : 0;
@@ -101,9 +101,12 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
       if (!history) return;
 
       const {current: index} = counter;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const n = bufferViews!.length;
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const texture = bufferTextures![index];
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const view = bufferViews![index];
 
       source.texture = texture;
@@ -111,7 +114,9 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
 
       for (let i = 0; i < history; i++) {
         const j = (index + n - i - 1) % n;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         sources![i].texture = bufferTextures![j];
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         sources![i].view = bufferViews![j];
       }
 
@@ -139,7 +144,7 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
 
     swap();
 
-    return [source, sources];
+    return source;
   }, [targetTexture, width, height, format, history, sampler]);
 
   if (!(render ?? children)) return yeet(source);

@@ -1,5 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ColorLike, VectorLike } from '@use-gpu/core';
+import type { ColorLike } from '@use-gpu/core';
 import { useProp } from '@use-gpu/traits/live';
 import { parseColor, parseNumber } from '@use-gpu/parse';
 

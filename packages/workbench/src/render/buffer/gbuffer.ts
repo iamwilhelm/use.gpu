@@ -1,4 +1,4 @@
-import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { LC } from '@use-gpu/live';
 import type { TextureTarget } from '@use-gpu/core';
 
 import { yeet, memo, useMemo, useOne } from '@use-gpu/live';

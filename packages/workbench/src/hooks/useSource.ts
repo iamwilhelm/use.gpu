@@ -1,13 +1,9 @@
 import type { UniformAttribute } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { useOne, useMemo, useNoMemo, useVersion } from '@use-gpu/live';
+import { useMemo, useNoMemo } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
-
-type Ref<T> = { current: T };
-
-const NO_SOURCES: any[] = [];
 
 // Turn a shader source/constant/lambda into a virtual shader module
 export const useSource = <T = any>(

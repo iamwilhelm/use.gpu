@@ -4,8 +4,8 @@ export const parseRGBM16 = (data: Uint8Array, width: number, height: number, fli
   const out = new Uint16Array(width * height * 4);
   const count = width * height;
 
-  let ir = flip ? 2 : 0;
-  let ib = flip ? 0 : 2;
+  const ir = flip ? 2 : 0;
+  const ib = flip ? 0 : 2;
 
   for (let i = 0, j = 0; i < count; ++i, j += 4) {
     const m = data[j + 3];

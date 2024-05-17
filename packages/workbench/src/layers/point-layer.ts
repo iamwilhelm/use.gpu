@@ -6,9 +6,8 @@ import type { PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { RawQuads } from '../primitives/raw-quads';
 
-import { patch } from '@use-gpu/state';
-import { use, memo, useMemo, useState, useResource } from '@use-gpu/live';
-import { bindBundle, bindingToModule, castTo } from '@use-gpu/shader/wgsl';
+import { use, memo, useMemo } from '@use-gpu/live';
+import { castTo } from '@use-gpu/shader/wgsl';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useShader } from '../hooks/useShader';
 import { useSource } from '../hooks/useSource';
@@ -82,7 +81,6 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
 
     ...rest
   } = props;
-  //for (const k in props) useMemo(() => console.log(`${k} changed`), [props[k]]);
 
   const s = useShaderRef(size, sizes);
   const o = useShaderRef(outline);

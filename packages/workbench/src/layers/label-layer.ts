@@ -1,21 +1,14 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { TypedArray, TextureSource, Atlas, Lazy, RenderPassMode } from '@use-gpu/core';
+import type { TypedArray, TextureSource, Atlas, Lazy } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { SDFGlyphData } from '../text/types';
 
-import { gather, use, yeet, keyed, wrap, memo, debug, fragment, provide, useFiber, useOne, useState, useResource } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
-import { useShaderRef } from '../hooks/useShaderRef';
+import { gather, use, memo, useOne } from '@use-gpu/live';
 import { useRawSource } from '../hooks/useRawSource';
 
-import { PipelineOptions } from '../hooks/usePipelineOptions';
-
 import { TransformContextProps } from '../providers/transform-provider';
-import { useFontFamily } from '../text/providers/font-provider';
 import { SDFFontProvider } from '../text/providers/sdf-font-provider';
-import { DebugAtlas } from '../text/debug-atlas';
 import { GlyphSource } from '../text/glyph-source';
-import { PanControls } from '../camera/pan-controls';
 import { RawLabels, RawLabelsFlags } from '../primitives/raw-labels';
 
 export type LabelLayerProps = RawLabelsFlags & {
@@ -86,6 +79,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
     sdfRadius,
 
     detail,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars    
     count,
     mode = 'opaque',
     id = 0,
@@ -93,7 +87,6 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
     ...rest
   } = props;
 
-  const key = useFiber().id;
   const strings = useOne(() => labels ?? (label != null ? [label] : []), labels ?? label);
 
   return (
@@ -121,6 +114,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
           const uvs = useRawSource(data.uvs, 'vec4<f32>');
 
           return use(RawLabels, {
+            count,
             indices,
             rectangles,
             layouts,

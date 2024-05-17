@@ -9,6 +9,7 @@ type LoopContextProps = {
 
 export const LoopContext = makeContext<LoopContextProps>({
   buffered: false,
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   request: () => TimeContext.initialValue!,
 }, 'LoopContext');
 

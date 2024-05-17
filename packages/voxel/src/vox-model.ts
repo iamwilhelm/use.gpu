@@ -1,8 +1,7 @@
-import type { LC, LiveElement } from '@use-gpu/live';
+import type { LC } from '@use-gpu/live';
 import type { Vox, VoxNodeTransform } from './types';
 
 import { use, memo } from '@use-gpu/live';
-import { useDeviceContext, Fetch } from '@use-gpu/workbench';
 
 import { VoxNode } from './vox-node';
 

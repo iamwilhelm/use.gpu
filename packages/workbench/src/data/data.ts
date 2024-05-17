@@ -1,15 +1,13 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ArrowFunction, FromSchema, TypedArray, StorageSource, LambdaSource, DataSchema, DataField, DataBounds, VectorLike, UniformType } from '@use-gpu/core';
 
-import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { QueueReconciler } from '../reconcilers';
 import { useAggregator } from '../hooks/useAggregator';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
-import { yeet, useOne, useMemo, useNoMemo } from '@use-gpu/live';
+import { useOne, useMemo } from '@use-gpu/live';
 import {
-  seq,
   toCPUDims,
   isUniformArrayType,
   getUniformDims,
@@ -21,16 +19,14 @@ import {
 
   normalizeSchema,
   allocateSchema,
-  schemaToArchetype,
   schemaToEmitters,
-  getAggregateSummary,
 } from '@use-gpu/core';
 import { sizeToChunkCounts, toChunkCounts, toVertexCount } from '@use-gpu/parse';
 
 const {signal} = QueueReconciler;
 const NO_TENSOR: number[] = [];
 
-type BooleanList = boolean | boolean[] | (<T>(i: number) => boolean);
+type BooleanList = boolean | boolean[] | ((i: number) => boolean);
 
 export type SegmentsInfo = {
   positions: TypedArray,
@@ -183,7 +179,7 @@ export const Data: LiveComponent<DataProps<DataSchema>> = <S extends DataSchema>
 
     // Get index offsets for chunks
     if (isIndexed) {
-      const {array, dims, depth, prop = countKey} = fields[countKey];
+      const {dims, prop = countKey} = fields[countKey];
       const dimsIn = toCPUDims(dims);
 
       let last = 0;
@@ -233,12 +229,13 @@ export const Data: LiveComponent<DataProps<DataSchema>> = <S extends DataSchema>
   ]);
 
   // Get emitters for data + segment data
-  const [mergedSchema, emitters, total, indexed, sparse] = useMemo(() => {
+  const [mergedSchema, emitters, total, indexed] = useMemo(() => {
     if (!isArray || !segments) return [schema, schemaToEmitters(schema, attributes), vertexCount, indexCount, 0];
 
     const {array, dims} = fields[countKey];
 
     const segmentData = segments({
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         chunks: chunks!,
         groups: groups,
         positions: array,
@@ -248,13 +245,13 @@ export const Data: LiveComponent<DataProps<DataSchema>> = <S extends DataSchema>
         ends,
     });
 
-    const {count: total, indexed, sparse, schema: segmentSchema, ...rest} = segmentData;
+    const {count: total, indexed, schema: segmentSchema, ...rest} = segmentData;
     for (const k in rest) if (attributes[k]) throw new Error(`Attribute name '${k}' reserved for segment data.`);
 
     const mergedSchema = {...schema, ...segmentSchema};
     const emitters = schemaToEmitters(mergedSchema, {...attributes, ...rest});
 
-    return [mergedSchema, emitters, total, indexed, sparse];
+    return [mergedSchema, emitters, total, indexed];
   }, [schema, fields, countKey, attributes, segments, chunks, groups, loops, starts, ends]);
 
   // Make aggregate chunk
@@ -299,7 +296,7 @@ const resolveSegmentFlag = (
   skip: number = 0
 ): boolean | boolean[] => {
   if (typeof flag === 'function') {
-    let flags = [];
+    const flags = [];
     for (let i = 0; i < count; ++i) flags.push((flag as ArrowFunction)(i + skip));
     return flags;
   }
@@ -326,7 +323,6 @@ const getMultiChunkCount = (
   const f = format as UniformType;
   const dims = getUniformDims(f);
 
-  let i = 0;
   const get = (accessor
     ? (i: number) => accessor(i)
     : data ? (i: number) => data[i][prop] : () => 0
@@ -361,7 +357,6 @@ const getVertexCount = (
   const f = format as UniformType;
   const dims = toCPUDims(getUniformDims(f));
 
-  let i = 0;
   const get = (accessor
     ? (i: number) => accessor(i)
     : data ? (i: number) => data[i][prop ?? key] : () => 0

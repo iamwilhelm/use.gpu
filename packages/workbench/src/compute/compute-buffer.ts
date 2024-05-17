@@ -1,15 +1,11 @@
-import type { LiveFiber, LiveComponent, LiveElement, Task, PropsWithChildren } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { StorageSource, StorageTarget, UniformType } from '@use-gpu/core';
 
 import { seq, getUniformArraySize, makeDataBuffer } from '@use-gpu/core';
-import { use, wrap, provide, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
+import { provide, fence, yeet, useContext, useMemo, incrementVersion } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
-import { FeedbackContext } from '../providers/feedback-provider';
 import { ComputeContext } from '../providers/compute-provider';
-import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
-
-const NOP = () => {};
 
 export type ComputeBufferProps = {
   width?: number,
@@ -67,7 +63,7 @@ export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props: PropsWit
 
   const targetBuffer = buffer;
 
-  const [source, sources] = useMemo(() => {
+  const source = useMemo(() => {
     const size = [width, height, depth] as [number, number, number];
     const volatile = history ? history + 1 : 0;
 
@@ -75,13 +71,17 @@ export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props: PropsWit
       if (!history) return;
 
       const {current: index} = counter;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const n = buffers!.length;
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       source.buffer = buffers![index];
 
       for (let i = history - 1; i >= 0; i--) {
         const j = (index + n - i - 1) % n;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         sources![i].buffer = buffers![j];
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         sources![i].version = i ? sources![i - 1].version : source.version;
       }
 
@@ -108,7 +108,7 @@ export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props: PropsWit
 
     swap();
 
-    return [source, sources];
+    return source;
   }, [targetBuffer, width, height, depth, format, history]);
 
   if (!(render ?? children)) return yeet(source);

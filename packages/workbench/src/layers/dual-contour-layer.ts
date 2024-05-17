@@ -1,18 +1,14 @@
-import type { LiveComponent, Ref } from '@use-gpu/live';
+import type { LiveComponent } from '@use-gpu/live';
 import type { Lazy, StorageSource, DataBounds } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/core';
 
-import { Readback } from '../primitives/readback';
-
-import { patch } from '@use-gpu/state';
-import { use, memo, yeet, debug, fragment, useCallback, useMemo, useOne, useRef, useVersion, useNoCallback, incrementVersion } from '@use-gpu/live';
+import { use, memo, useCallback, useMemo, useOne, useRef, useVersion, useNoCallback, incrementVersion } from '@use-gpu/live';
 import { resolve, uploadBuffer, toDataBounds } from '@use-gpu/core';
 import { shouldEqual, sameShallow } from '@use-gpu/traits/live';
 
-import { useShader, useNoShader } from '../hooks/useShader';
+import { useShader } from '../hooks/useShader';
 import { useCombinedTransform, useNoCombinedTransform } from '../hooks/useCombinedTransform';
-import { useComputePipeline } from '../hooks/useComputePipeline';
 import { useDataSize } from '../hooks/useDataBinding';
 import { useDerivedSource } from '../hooks/useDerivedSource';
 import { useRawSource } from '../hooks/useRawSource';
@@ -22,10 +18,8 @@ import { useDraw } from '../hooks/useDraw';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useMaterialContext } from '../providers/material-provider';
-import { TransformContextProps, useTransformContext } from '../providers/transform-provider';
+import { TransformContextProps } from '../providers/transform-provider';
 import { PassReconciler } from '../reconcilers';
-
-import { useInspectable } from '../hooks/useInspectable'
 
 import { main as scanVolume } from '@use-gpu/wgsl/contour/scan.wgsl';
 import { main as fitContourLinear } from '@use-gpu/wgsl/contour/fit-linear.wgsl';
@@ -59,12 +53,13 @@ export type DualContourLayerProps = {
   zBias?: number,
 
   method?: string,
+  /*
   loopX?: boolean,
   loopY?: boolean,
   loopZ?: boolean,
+  */
   shaded?: boolean,
   shadow?: boolean,
-  flat?: boolean,
   live?: boolean,
 
   transform?: TransformContextProps,
@@ -84,20 +79,20 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     padding = 0,
     method = 'linear',
 
-    flat = false,
     shaded = false,
     shadow = true,
     zBias = 0,
 
+    /*
     loopX = false,
     loopY = false,
     loopZ = false,
+    */
     live = false,
 
     alphaToCoverage = true,
     side = 'both',
     mode = 'opaque',
-    id = 0,
     blend,
 
     transform,
@@ -134,6 +129,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     bounds = useCallback(() => getBounds(rangeBoundsRef.current!), [getBounds]);
   }
   else {

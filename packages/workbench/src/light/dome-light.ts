@@ -1,4 +1,3 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ColorLike, VectorLike } from '@use-gpu/core';
 import { useProp } from '@use-gpu/traits/live';
 import { parseColor, parseNumber, parsePosition } from '@use-gpu/parse';
@@ -8,7 +7,7 @@ import { memo, useMemo } from '@use-gpu/live';
 import { useLightContext } from '../providers/light-provider';
 import { useMatrixContext } from '../providers/matrix-provider';
 
-import { vec3, vec4 } from 'gl-matrix';
+import { vec4 } from 'gl-matrix';
 
 import { DOME_LIGHT } from './types';
 

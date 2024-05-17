@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, LiveNode, LiveFiber, Task, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
-import { use, detach, provide, unquote, yeet, gather, useCallback, useContext, useOne, useResource, useState, tagFunction, formatNodeName, incrementVersion } from '@use-gpu/live';
+import { use, detach, provide, unquote, yeet, gather, useCallback, useContext, useOne, useResource, useState, tagFunction, incrementVersion } from '@use-gpu/live';
 
 import { useRenderContext } from '../providers/render-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
@@ -77,8 +77,8 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
 
   // Request animation frame wrapper
   // for looped component re-rendering.
-  const [request, render] = useResource((dispose) => {
-    const {time, version, loop} = ref;
+  const render = useResource((dispose) => {
+    const {time, loop} = ref;
     const fibers: LiveFiber<any>[] = [];
 
     let mounted = true;
@@ -148,14 +148,15 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       queueMicrotask(resetIfIdle);
     };
 
-    return [loop.request = request, render];
+    loop.request = request;
+    return render;
   }, [live]);
 
   useRenderContext();
   usePerFrame();
 
   const Run = useCallback(tagFunction(() => {
-    const {time, version, loop, children} = ref;
+    const {time, loop, children} = ref;
 
     let view: LiveElement = useOne(() => provide(LoopContext, ref.loop, children), children);
 
@@ -184,17 +185,6 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
         quote(yeet(ts)),
       ];
     }
-
-    const dispatch = () => {
-      const children: LiveElement = [];
-      for (const task of ts) {
-        const c = task();
-        if (c) children.push(c);
-      }
-
-      const render = children.length ? children : null;
-      return render;
-    };
 
     // In animation frame or after self-render - sync
     if (version.frame != version.rendered) {

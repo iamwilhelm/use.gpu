@@ -8,10 +8,7 @@ import { DEFAULT_LIGHT_CONTEXT } from '../providers/light-provider';
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
-import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
 import { getDefaultPBRMaterial } from '@use-gpu/wgsl/material/pbr-default.wgsl';
-
-import { SH_DIFFUSE, SH_SPECULAR } from '@use-gpu/wgsl/material/env/park.wgsl';
 
 import { getLitFragment } from '@use-gpu/wgsl/instance/fragment/lit.wgsl';
 import { getMaterialSurface } from '@use-gpu/wgsl/instance/surface/material.wgsl';

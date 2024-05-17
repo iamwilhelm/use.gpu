@@ -1,23 +1,17 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type {
-  VectorLike, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformType,
-  VertexData, DataBounds,
-} from '@use-gpu/core';
-import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
+import type { VectorLike, Lazy, UniformAttribute, DataBounds } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
 
-import { use, yeet, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
-import { resolve } from '@use-gpu/core';
+import { memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
 
 import { useMaterialContext } from '../providers/material-provider';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { TransformContextProps } from '../providers/transform-provider';
 
 import { useApplyTransform } from '../hooks/useApplyTransform';
-import { getShader, useShader, useNoShader } from '../hooks/useShader';
+import { getShader, useShader } from '../hooks/useShader';
 import { useSource } from '../hooks/useSource';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
@@ -65,9 +59,6 @@ export type RawLinesProps = {
   count?: Lazy<number>,
 } & PickingSource & RawLinesFlags;
 
-const ZERO = [0, 0, 0, 1];
-const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
-
 const LINE_JOIN_SIZE = {
   'bevel': 1,
   'miter': 2,
@@ -93,11 +84,11 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     transform,
 
     count = null,
-    depth = 0,
     join,
   } = props;
 
   // Customize line shader
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const j = (join! in LINE_JOIN_SIZE) ? join! : 'bevel';
 
   const style = LINE_JOIN_STYLE[j];
@@ -128,6 +119,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     bounds = useCallback(() => getBounds((props.positions! as any).bounds), [props.positions, getBounds]);
   }
   else {

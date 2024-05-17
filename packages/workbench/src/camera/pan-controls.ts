@@ -1,14 +1,13 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
 import { lerp } from '@use-gpu/core';
-import { use, useCallback, useContext, useMemo, useOne, useRef, useResource, useState, useHooks } from '@use-gpu/live';
+import { use, useCallback, useContext, useMemo, useOne, useRef, useState, useHooks } from '@use-gpu/live';
 import { useMouse, useWheel, useKeyboard } from '../providers/event-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { LayoutContext } from '../providers/layout-provider';
 import { getRenderFunc } from '../hooks/useRenderProp';
 
-const π = Math.PI;
 const SOFT_LERP = 0.35;
 const EASE_LERP = 0.05;
 const SNAP_WAIT = 66;
@@ -67,8 +66,11 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     version,
   } = props;
 
+  // eslint-disable-next-line prefer-const
   let [x, setX]       = useState<number>(initialX);
+  // eslint-disable-next-line prefer-const
   let [y, setY]       = useState<number>(initialY);
+  // eslint-disable-next-line prefer-const
   let [zoom, setZoom] = useState<number>(initialZoom);
 
   let originX = 0;
@@ -121,7 +123,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   }, version ?? initialZoom);
 
   const clampX = useCallback((x: number, zoom: number, factor: number = 0) => {
-    let xx = x;
+    const xx = x;
 
     const [minXZ, maxXZ] = adjustRange(minX, maxX, zoom, w);
     if (minXZ != null) x = -Math.max(minXZ, -x);
@@ -131,7 +133,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   }, [minX, maxX, w]);
 
   const clampY = useCallback((y: number, zoom: number, factor: number = 0) => {
-    let yy = y;
+    const yy = y;
 
     const [minYZ, maxYZ] = adjustRange(minY, maxY, zoom, h);
     if (minYZ != null) y = -Math.max(minYZ, -y);
@@ -141,9 +143,11 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   }, [minY, maxY, h]);
 
   const clampZ = useCallback((z: number, factor: number = 0) => {
-    let zz = z;
+    const zz = z;
+
     if (minZoom != null) z = Math.max(minZoom, z);
     if (maxZoom != null) z = Math.min(maxZoom, z);
+
     return factor ? lerp(zz, z, factor) : z;
   }, [minZoom, maxZoom]);
 
@@ -238,7 +242,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
           const xx = (mx / z) - px;
           return limitX(xx, z);
         });
-        setY(xy=> {
+        setY(y => {
           const py = (my / zoom) - y;
           const yy = (my / z) - py;
           return limitY(yy, z);

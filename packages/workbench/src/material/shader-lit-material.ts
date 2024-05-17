@@ -1,15 +1,11 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { ColorLike, XYZW } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
-import { provide, yeet, useMemo, useOne } from '@use-gpu/live';
+import { provide, yeet, useMemo } from '@use-gpu/live';
 
 import { useLightContext } from '../providers/light-provider';
 import { MaterialContext } from '../providers/material-provider';
 import { QueueReconciler } from '../reconcilers';
-import { useShader, useNoShader } from '../hooks/useShader';
-import { useNativeColorTexture } from '../hooks/useNativeColor';
-import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getLitFragment } from '@use-gpu/wgsl/instance/fragment/lit.wgsl';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';

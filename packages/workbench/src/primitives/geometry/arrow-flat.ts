@@ -1,7 +1,4 @@
 import type { CPUGeometry } from '@use-gpu/core';
-import { makeVertexAttributeLayout } from '@use-gpu/core';
-
-const τ = Math.PI * 2;
 
 export const makeArrowFlatGeometry = (
   width: number = 2.5

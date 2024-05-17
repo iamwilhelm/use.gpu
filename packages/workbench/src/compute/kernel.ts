@@ -1,8 +1,8 @@
-import type { LiveComponent, LiveElement, Ref } from '@use-gpu/live';
+import type { LiveComponent } from '@use-gpu/live';
 import type { StorageSource, Lazy, VectorLike } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
-import { yeet, useMemo, useNoMemo, useOne, useRef } from '@use-gpu/live';
+import { yeet, useMemo, useNoMemo, useRef } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 import { bundleToAttribute, getBundleEntry } from '@use-gpu/shader/wgsl';
 import { getShader } from '../hooks/useShader';
@@ -10,13 +10,9 @@ import { getDerivedSource } from '../hooks/useDerivedSource';
 import { useShaderRefs } from '../hooks/useShaderRef';
 
 import { useComputeContext } from '../providers/compute-provider';
-import { useFeedbackContext, useNoFeedbackContext } from '../providers/feedback-provider';
-import { RenderContext } from '../providers/render-provider';
 import { PassReconciler } from '../reconcilers';
 
 import { dispatch } from '../queue/dispatch';
-
-const {quote} = PassReconciler;
 
 export type KernelProps = {
   shader: ShaderModule,
@@ -62,14 +58,6 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     const workgroupSize = workgroupArgs.split(',').map(s => parseInt(s) || 1);
 
     const dataSize = () => resolve(size) ?? targets[0]?.size;
-    const dispatchSize = () => {
-      const [w, h, d] = dataSize();
-      return [
-        Math.ceil(w / (workgroupSize[0] || 1)),
-        Math.ceil(h / (workgroupSize[1] || 1)),
-        Math.ceil(d / (workgroupSize[2] || 1)),
-      ];
-    };
 
     const f = history ? targets.flatMap(
       t => (

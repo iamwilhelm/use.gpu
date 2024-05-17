@@ -1,8 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ShaderSource } from '@use-gpu/shader';
-import type { GPUGeometry, DataSchema, DataField, StorageSource, LambdaSource, CPUGeometry, TypedArray } from '@use-gpu/core';
+import type { GPUGeometry, DataSchema, StorageSource, LambdaSource, CPUGeometry, TypedArray } from '@use-gpu/core';
 
-import { keyed, yeet, gather, useMemo, useOne, useHooks } from '@use-gpu/live';
+import { keyed, yeet, gather, useMemo, useOne } from '@use-gpu/live';
 import { formatToArchetype } from '@use-gpu/core';
 import mapValues from 'lodash/mapValues';
 import groupBy from 'lodash/groupBy';
@@ -31,7 +30,7 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
   const archetypes = Object.keys(partitions);
 
   const schemas: Record<number, DataSchema> = useMemo(() =>
-    mapValues(partitions, ([item]: CPUGeometry[], archetype: number) =>
+    mapValues(partitions, ([item]: CPUGeometry[]) =>
       mapValues(item.attributes, (_, k) => ({
         format: `array<${item.formats[k]}>`,
         index: k === 'indices',
@@ -45,7 +44,7 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
   const items: Record<number, Record<string, TypedArray>[]> = useMemo(() =>
     mapValues(
       partitions,
-      (items: CPUGeometry[], archetype: number): Record<string, TypedArray>[] =>
+      (items: CPUGeometry[]): Record<string, TypedArray>[] =>
         items.map(i => i.attributes)
     ) as any,
     [data, schemas]
@@ -56,7 +55,7 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
     if (!data.length) return null;
 
     const schema = (schemas as any)[archetype as any];
-    const {topology, attributes, formats, unwelded} = data[0];
+    const {topology, unwelded} = data[0];
 
     return keyed(Data, archetype, {
       data: (items as any)[archetype as any],

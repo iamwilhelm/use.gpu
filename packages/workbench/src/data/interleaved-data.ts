@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TypedArray, LambdaSource, UniformType, VectorLike, DataSchema, DataBounds } from '@use-gpu/core';
+import type { LambdaSource, UniformType, VectorLike, DataSchema, DataBounds } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
@@ -7,14 +7,13 @@ import { QueueReconciler } from '../reconcilers';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useRenderProp } from '../hooks/useRenderProp';
 import { useStructSources } from '../hooks/useStructSources';
-import { yeet, extend, gather, useOne, useMemo, useNoMemo, incrementVersion } from '@use-gpu/live';
+import { useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import {
   makePackedLayout,
   normalizeSchema,
   makeStructAggregateBuffer,
   makeStructAggregateFields,
   uploadStorage,
-  getBoundingBox, toDataBounds,
   isUniformArrayType,
 } from '@use-gpu/core';
 
@@ -32,9 +31,6 @@ export type InterleavedDataProps = {
   render?: (sources: Record<string, LambdaSource>) => LiveElement,
   children?: (sources: Record<string, LambdaSource>) => LiveElement,
 };
-
-const NO_FIELDS = [] as [UniformType, string][];
-const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Use a flat, packed array with interleaved fields `T` without any struct alignment/padding. */
 export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
@@ -67,7 +63,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
   // Gather data layout/length
   const [packedLayout, dataCount, dataStride, bytesPerElement] = useMemo(() => {
 
-    const {length, byteLength, BYTES_PER_ELEMENT} = typedArray;
+    const {byteLength, BYTES_PER_ELEMENT} = typedArray;
     const layout = makePackedLayout(uniforms);
 
     const dataCount = byteLength / layout.length;
@@ -90,7 +86,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
   // Refresh and upload data
   const refresh = () => {
     if (!typedArray) return;
-    const {buffer, raw, source, layout, keys} = aggregateBuffer;
+    const {raw, source} = aggregateBuffer;
     const {attributes} = packedLayout;
 
     let f = 0;
@@ -100,7 +96,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
       let src = attributes[f].offset / bytesPerElement;
       let dst = base;
       for (let i = 0; i < dataCount; ++i) {
-        let p = src;
+        const p = src;
         for (let j = 0; j < dims; ++j) array[dst + j] = typedArray[p + j];
         dst += stride;
         src += dataStride;

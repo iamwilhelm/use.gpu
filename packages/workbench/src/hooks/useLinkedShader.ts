@@ -1,18 +1,15 @@
 import type { ShaderModuleDescriptor } from '@use-gpu/core';
-import type { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader';
+import type { ParsedBundle, ShaderDefine } from '@use-gpu/shader';
 
-import { toHash } from '@use-gpu/state';
 import { resolveBindings, linkBundle, getBundleHash, getBundleKey, getBundleLabel } from '@use-gpu/shader/wgsl';
 import { formatMurmur53, mixBits53, toMurmur53 } from '@use-gpu/state';
 import { makeShaderModuleDescriptor, makeBindGroupLayoutEntries, makeUniformLayoutEntry } from '@use-gpu/core';
-import { useFiber, useMemo, useOne } from '@use-gpu/live';
+import { useMemo, useOne } from '@use-gpu/live';
 import { useForceUpdate } from './useForceUpdate';
 import { useInspectable } from './useInspectable';
 import LRU from 'lru-cache';
 
 const NO_LIBS = {} as Record<string, any>;
-
-type RenderShader = [ShaderModuleDescriptor, ShaderModuleDescriptor];
 
 const VERSION_CACHE = new LRU<string, number>();
 const MODULE_CACHE = new LRU<string, any>();
@@ -22,7 +19,6 @@ export const useLinkedShader = (
   stages: (ParsedBundle | null | undefined)[],
   defines: Record<string, ShaderDefine> | null | undefined,
 ) => {
-  const fiber = useFiber();
   const inspect = useInspectable();
 
   // Live shader editing (persistent within mount only)

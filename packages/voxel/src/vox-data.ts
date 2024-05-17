@@ -2,7 +2,7 @@ import type { LC, LiveElement } from '@use-gpu/live';
 import type { XY, TextureSource } from '@use-gpu/core';
 import type { Vox, VoxShape } from './types';
 
-import { gather, use, yeet, useMemo, useHooks } from '@use-gpu/live';
+import { gather, use, useMemo } from '@use-gpu/live';
 import { makeTexture, uploadDataTexture } from '@use-gpu/core';
 import { useDeviceContext, useRenderProp, useRawSource, Fetch } from '@use-gpu/workbench';
 
@@ -16,18 +16,11 @@ export type VoxDataProps = {
   children?: (vox: Vox) => LiveElement,
 };
 
-const resolveURL = (base: string, url: string) => new URL(url, base).href;
-
 export const VoxData: LC<VoxDataProps> = (props) => {
   const {
     data,
     url,
-    render,
-    children,
   } = props;
-
-  // Relative URL base for .vox
-  const base = props.base ?? new URL(url ?? ".", location.href).href;
 
   // Resume after loading .vox
   const Resume = ([data]: (ArrayBuffer | null)[]) => {
@@ -120,7 +113,7 @@ export const VoxData: LC<VoxDataProps> = (props) => {
   };
 
   // Load .vox or use inline data
-  if (props.data) return use(Resume, [props.data]);
+  if (data) return use(Resume, [data]);
   else return gather(use(Fetch, {
     url,
     type: 'arrayBuffer',

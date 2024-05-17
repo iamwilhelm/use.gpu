@@ -1,5 +1,4 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { UseGPURenderContext, ColorSpace } from '@use-gpu/core';
 
 import { useTimeContext } from '@use-gpu/workbench';
 import { memo, useOne, useResource } from '@use-gpu/live';

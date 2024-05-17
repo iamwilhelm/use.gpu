@@ -1,7 +1,7 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { Culler, LightEnv, Renderable } from './types';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { LightEnv, Renderable } from './types';
 
-import { use, yeet, memo, gather, useMemo, useOne } from '@use-gpu/live';
+import { yeet, memo, useMemo, useOne } from '@use-gpu/live';
 
 import { useRenderContext } from '../providers/render-provider';
 import { useDeviceContext } from '../providers/device-provider';
@@ -10,7 +10,6 @@ import { usePassContext } from '../providers/pass-provider';
 import { QueueReconciler } from '../reconcilers';
 
 import { useInspectable } from '../hooks/useInspectable'
-import { useDepthBlit } from './depth-blit';
 
 import { getRenderPassDescriptor, drawToPass } from './util';
 
@@ -112,6 +111,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
 
     commandEncoder.copyTextureToTexture(
       {texture: depthTexture},
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       {texture: gbuffer.sources![4].texture},
       [width, height, 1]
     );

@@ -1,7 +1,7 @@
-import type { ColorSpace, TextureSource } from '@use-gpu/core';
+import type { ColorSpace } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
-import { bindingToModule, bundleToAttribute, chainTo } from '@use-gpu/shader/wgsl';
+import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { useContext, useMemo, useNoContext, useNoMemo } from '@use-gpu/live';
 
 import { RenderContext } from '../providers/render-provider';

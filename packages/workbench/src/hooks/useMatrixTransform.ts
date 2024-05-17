@@ -1,9 +1,8 @@
-import type { DataBounds, StorageSource, LambdaSource, TextureSource, TypedArray, UniformAttribute } from '@use-gpu/core';
-import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
-import type { RefObject } from '@use-gpu/live';
+import type { DataBounds } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 import type { TransformContextProps, TransformBounds, MatrixRefs } from '../providers/transform-provider';
 
-import { useCallback, useDouble, useMemo, useOne, useVersion, useNoCallback, useNoDouble, useNoMemo, useNoOne, useNoVersion } from '@use-gpu/live';
+import { useCallback, useDouble, useMemo, useOne, useVersion, useNoCallback, useNoDouble, useNoOne, useNoVersion } from '@use-gpu/live';
 import { bundleToAttribute, getBundleKey } from '@use-gpu/shader/wgsl';
 import { useMatrixContext, useNoMatrixContext } from '../providers/matrix-provider';
 import { getShader } from './useShader';
@@ -17,12 +16,10 @@ import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl'
 const NO_MATRIX = mat4.create();
 const MATRIX_BINDING = bundleToAttribute(getCartesianPosition, 'getTransformMatrix');
 
-const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u32'] } as UniformAttribute;
 const makeMat4 = () => mat4.create();
 
 export const useCombinedMatrix = (
   matrix?: mat4 | null,
-  bounds?: TransformBounds | null,
 ): mat4 | null => {
   const parent = useMatrixContext();
   const version = useVersion(parent) + useVersion(matrix);
@@ -47,7 +44,6 @@ export const useNoCombinedMatrix = () => {
 
 export const useMatrixTransform = (
   matrix?: mat4 | null,
-  bounds?: TransformBounds | null,
 ): [
   TransformContextProps,
   MatrixRefs,
@@ -60,6 +56,7 @@ export const useMatrixTransform = (
   useOne(() => {
     const m = matrix ?? NO_MATRIX;
     refs.matrix.current = m;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     mat3.normalFromMat4(refs.normalMatrix.current!, m);
   }, matrix);
 
@@ -100,7 +97,6 @@ export const useNoMatrixTransformSources = () => {
 
 export const useMatrixBounds = (
   matrix: mat4,
-  bounds?: TransformBounds | null,
 ): TransformBounds | null => {
   const refs = useOne(() => ({
     bounds: { center: vec3.create(), radius: 0, min: vec3.create(), max: vec3.create() } as DataBounds,

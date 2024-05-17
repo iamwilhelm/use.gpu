@@ -48,6 +48,7 @@ export const useCombinedEpsilonTransform = (
     const t = transform as ShaderModule;
     const k = getBundleKey(t);
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const chained = chainTransform({key: k, transform}, parent)!;
     const differential = getShader(getEpsilonDifferential, [chained.transform, epsilon]);
 
@@ -73,6 +74,7 @@ export const useCombinedMatrixTransform = (
 
   const context = useMemo(() => {
     const prev = parent.nonlinear ?? parent;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const chained = chainTransform(props, prev)!;
     return {...chained, nonlinear: prev, matrix: refs};
   }, [props, parent]);

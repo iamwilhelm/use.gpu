@@ -4,8 +4,8 @@ import type { ShaderModule } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
 
-import { use, yeet, memo, useOne, useNoOne, useRef } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
+import { memo, useOne, useNoOne, useRef } from '@use-gpu/live';
+import { getBundleKey } from '@use-gpu/shader/wgsl';
 
 import { useShader } from '../hooks/useShader';
 import { usePickingShader } from '../providers/picking-provider';
@@ -24,8 +24,6 @@ export type RawFullScreenProps = {
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   id?: number,
 } & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'blend'>;
-
-const ZERO = [0, 0, 0, 1];
 
 export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: RawFullScreenProps) => {
   const {
@@ -48,12 +46,12 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
     getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
 
   const renderContext = initial ? useRenderContext() : useNoRenderContext();
-  let first = useRef(true);
-  initial ? useOne(() => { first.current = true; }, renderContext) : useNoOne();
+  const firstRef = useRef(true);
+  initial ? useOne(() => { firstRef.current = true; }, renderContext) : useNoOne();
 
   const shouldDispatch = initial ? () => {
-    if (!first.current) return false;
-    first.current = false;
+    if (!firstRef.current) return false;
+    firstRef.current = false;
   } : undefined;
 
   const [pipeline, defines] = usePipelineOptions({

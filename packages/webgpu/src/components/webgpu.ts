@@ -1,7 +1,6 @@
-import React from 'react';
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 
-import { provide, wrap, useAwait, useOne, useResource } from '@use-gpu/live';
+import { provide, wrap, useAwait, useResource } from '@use-gpu/live';
 import { Queue, DeviceContext } from '@use-gpu/workbench';
 
 import { mountGPUDevice } from '../web';

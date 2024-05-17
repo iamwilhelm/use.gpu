@@ -1,8 +1,8 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter, Time, DataBounds } from '@use-gpu/core';
+import type { StorageSource, LambdaSource, TypedArray, UniformType, Emitter, DataBounds } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { provide, yeet, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, useHooks, incrementVersion } from '@use-gpu/live';
+import { useMemo, useNoMemo, useOne, useNoOne, useContext, incrementVersion } from '@use-gpu/live';
 import {
   makeGPUArray, copyNumberArray, emitArray, makeNumberWriter,
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
@@ -70,7 +70,6 @@ export const RawData: LiveComponent<RawDataProps<unknown & boolean>> = <I extend
 
   const items = Math.max(1, Math.round(props.items || 0));
   const count = (props.length ?? (data?.length || 0));
-  const length = items * count;
   const alloc = useBufferedSize(count);
 
   // Make data buffer
@@ -122,7 +121,8 @@ export const RawData: LiveComponent<RawDataProps<unknown & boolean>> = <I extend
 
     if (data) copyNumberArray(data, array, toCPUDims(dims), toGPUDims(dims));
     if (expr) {
-      emitArray(expr, makeNumberWriter(array, dims), count, clock!);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      emitted = emitArray(expr, makeNumberWriter(array, dims), count, clock!);
     }
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
@@ -134,9 +134,13 @@ export const RawData: LiveComponent<RawDataProps<unknown & boolean>> = <I extend
 
     const {bounds} = source;
     const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     bounds!.center = center;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     bounds!.radius = radius;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     bounds!.min = min;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     bounds!.max = max;
 
     if (sources) {

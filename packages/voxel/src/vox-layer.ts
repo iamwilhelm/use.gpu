@@ -1,10 +1,10 @@
-import type { LC, LiveElement, Ref } from '@use-gpu/live';
+import type { LC, Ref } from '@use-gpu/live';
 import type { GPUGeometry, TextureSource, StorageSource, LambdaSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { PipelineOptions } from '@use-gpu/workbench';
 
-import { seq, clamp } from '@use-gpu/core';
-import { gather, use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
+import { seq } from '@use-gpu/core';
+import { gather, use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import {
   useMatrixContext,
   useShader, useNoShader, useLambdaSource, useDebugContext, useShaderRef,
@@ -417,7 +417,6 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
         const {inverseViewMatrix, viewMatrix, viewPosition, viewNearFar} = uniforms;
         const {current: iVM} = inverseViewMatrix;
         const {current: viewP} = viewPosition;
-        const {current: viewM} = viewMatrix;
         const {current: viewNF} = viewNearFar;
 
         const offset = vec3.fromValues(iVM[8], iVM[9], iVM[10]);

@@ -1,7 +1,6 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { StorageSource, VectorLike, TypedArray } from '@use-gpu/core';
+import type { VectorLike, TypedArray } from '@use-gpu/core';
 
-import { memo, yeet, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
+import { useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { accumulateChunks, generateChunkFaces, generateConcaveIndices, alignSizeTo } from '@use-gpu/core';
 import { useRawSource, useNoRawSource } from '../hooks/useRawSource';
 import { FACE_SEGMENTS_SCHEMA } from './schemas';
@@ -54,8 +53,7 @@ export const useFaceSegmentsSource = (
 
   // Bind as shader storage
   const s = useRawSource(segments, 'i16');
-
-  return {count, segments};
+  return {count, segments: s};
 };
 
 export const useFaceSegmentsConcaveSource = (
@@ -71,7 +69,7 @@ export const useFaceSegmentsConcaveSource = (
   i.length = indexed;
   i.size[0] = indexed;
 
-  return {count, indexed, indices};
+  return {count, indexed, indices: i};
 };
 
 export const useNoFaceSegments = useNoOne;

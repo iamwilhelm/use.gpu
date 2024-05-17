@@ -22,7 +22,7 @@ import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 export type DeferredShadedRenderProps = VirtualDraw;
 
 export const DeferredShadedRender: LiveComponent<DeferredShadedRenderProps> = (props: DeferredShadedRenderProps) => {
-  let {
+  const {
     links: {
       getVertex,
       getSurface,

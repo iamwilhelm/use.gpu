@@ -182,7 +182,7 @@ const merge = <T>(a: T, b: Merge<T>): T => {
       throw new Error("Can't patch typed array with merge");
     }
     else {
-      let obj: Record<string, any> = a as any;
+      const obj: Record<string, any> = a as any;
 
       const out = {} as Record<string, any>;
       for (const k in obj) {
@@ -238,13 +238,13 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
   if (Array.isArray(b) || isTypedArray(b) || b === null) return $maybeSet(a) as any;
 
   if (typeof b === 'object') {
-    let update: Record<string, any> = b as any;
+    const update: Record<string, any> = b as any;
     if (typeof a !== 'object' || a == null) return $maybeSet(a as T);
 
     const out = {} as Record<string, any>;
 
     if (Array.isArray(a) || isTypedArray(a)) {
-      let aa: any[] = a as any;
+      const aa: any[] = a as any;
       for (const k in update) {
         let i = +k;
         if (Object.hasOwn(aa, i)) {
@@ -256,7 +256,7 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
       }
     }
     else {
-      let aa: Record<string, any> = a as any;
+      const aa: Record<string, any> = a as any;
 
       for (const k in aa) {
         if (Object.hasOwn(update, k)) {
@@ -291,15 +291,15 @@ export const diff = <T>(a: T, b: T): Update<T> => {
   if (b === undefined) return $DELETE;
 
   if (typeof b === 'object') {
-    let bb: Record<string, any> = b;
+    const bb: Record<string, any> = b;
     if (typeof a !== 'object' || a == null) return $maybeSet(b as T);
     if (Array.isArray(a) || isTypedArray(a)) return $maybeSet(b as T);
 
-    let aa: Record<string, any> = a as any;
+    const aa: Record<string, any> = a as any;
 
     const out = {} as Record<string, any>;
     for (const k in aa) {
-      if (bb.hasOwnProperty(k)) {
+      if (Object.hasOwn(bb, k)) {
         const v = diff(aa[k], bb[k]);
         if (v !== undefined) out[k] = v;
       }
@@ -307,7 +307,7 @@ export const diff = <T>(a: T, b: T): Update<T> => {
         out[k] = $DELETE;
       }
     }
-    for (const k in bb) if (!aa.hasOwnProperty(k)) {
+    for (const k in bb) if (!Object.hasOwn(aa, k)) {
       const v = bb[k];
       out[k] = v && typeof v === 'object' && !Array.isArray(v) ? $set(v) : v;
     }
@@ -336,7 +336,7 @@ export const getUpdateKeys = <T>(update: T): string[] => {
 
   const pick = (b: Update<T>, path: string | null) => {
     if (b && typeof b === 'object') {
-      let bb = b as any;
+      const bb = b as any;
       if (Array.isArray(b) || isTypedArray(b)) {
         return keys.push(path ?? '');
       }

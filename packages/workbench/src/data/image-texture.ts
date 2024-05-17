@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { XY, ColorSpace, TextureSource } from '@use-gpu/core';
 
-import { use, yeet, gather, memo, suspend, useMemo, useHooks } from '@use-gpu/live';
+import { use, yeet, gather, suspend, useMemo } from '@use-gpu/live';
 import { makeDynamicTexture, uploadDataTexture, uploadExternalTexture, updateMipTextureChain } from '@use-gpu/core';
 import { ImageLoader } from './image-loader';
 
@@ -9,15 +9,11 @@ import { useDeviceContext } from '../providers/device-provider';
 import { useSuspenseContext } from '../providers/suspense-provider';
 import { useRenderProp } from '../hooks/useRenderProp';
 
-import { getEquiToCubeSample } from '@use-gpu/wgsl/render/sample/equi-to-cube.wgsl';
-
 export type ImageTextureProps = {
   /** URL to image */
   url: string,
   /** Type hint */
   format?: string,
-  /** Premultiply alpha */
-  premultiply?: boolean,
   /** Color space to tag texture as. Does not convert input data. */
   colorSpace?: ColorSpace,
   /** MIPs */
@@ -41,7 +37,6 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
     url,
     sampler,
     format,
-    premultiply,
     colorSpace = 'srgb',
     mip = true,
     render,

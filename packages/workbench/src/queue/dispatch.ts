@@ -1,9 +1,7 @@
-import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
-import type { TypedArray, StorageSource, DeepPartial, Lazy, VectorLike } from '@use-gpu/core';
-import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
-import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
-
-import uniq from 'lodash/uniq';
+import type { ArrowFunction } from '@use-gpu/live';
+import type { StorageSource, Lazy, VectorLike } from '@use-gpu/core';
+import type { ParsedModule } from '@use-gpu/shader';
+import { yeet, useMemo, useOne, SUSPEND } from '@use-gpu/live';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useSuspenseContext } from '../providers/suspense-provider';
@@ -16,9 +14,6 @@ import {
 import { useLinkedShader } from '../hooks/useLinkedShader';
 import { useComputePipelineAsync } from '../hooks/useComputePipeline';
 import { useInspectable } from '../hooks/useInspectable'
-
-import keyBy from 'lodash/keyBy';
-import mapValues from 'lodash/mapValues';
 
 export type DispatchProps = {
   size?: Lazy<number[] | VectorLike>,
@@ -104,7 +99,7 @@ export const dispatch = (props: DispatchProps) => {
 
   let dispatchVersion: number | null = null;
 
-  let compute = (passEncoder: GPUComputePassEncoder, countDispatch: (d: number, s: number) => void) => {
+  const compute = (passEncoder: GPUComputePassEncoder, countDispatch: (d: number, s: number) => void) => {
     onDispatch && onDispatch();
 
     const s = resolve(size ?? NO_SIZE);
@@ -114,13 +109,13 @@ export const dispatch = (props: DispatchProps) => {
     let sy = s[1] || 1;
     let sz = s[2] || 1;
 
-    let n = sx * sy * sz;
+    const n = sx * sy * sz;
     if (m) {
       sx = Math.ceil(sx / m[0]);
       sy = Math.ceil(sy / (m[1] || 1));
       sz = Math.ceil(sz / (m[2] || 1));
     }
-    let d = sx * sy * sz;
+    const d = sx * sy * sz;
 
     inspected.render.samples = m ? n : 0;
     inspected.render.dispatches = d;

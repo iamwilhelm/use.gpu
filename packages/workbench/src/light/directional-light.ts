@@ -1,4 +1,4 @@
-import type { LC, LiveElement } from '@use-gpu/live';
+import type { LC } from '@use-gpu/live';
 import type { ColorLike, VectorLike } from '@use-gpu/core';
 import type { ShadowMapLike } from './types';
 
@@ -55,7 +55,7 @@ export const DirectionalLight: LC<DirectionalLightProps> = memo((props: Directio
   const {shadowMap} = props;
   const parent = useMatrixContext();
 
-  const [into, shadow, near, far] = useMemo(() => {
+  const [into, shadow,, far] = useMemo(() => {
     if (!shadowMap) return [null, null, 0, 0];
 
     const size  = parseVec2(shadowMap.size  ?? DEFAULT_SHADOW_MAP.size);
@@ -94,8 +94,8 @@ export const DirectionalLight: LC<DirectionalLightProps> = memo((props: Directio
   }, [position, normal, shadowMap, parent]);
 
   const light = useMemo(() => {
-    let p = vec4.clone(position as any as vec4);
-    let n = vec4.clone(normal as any as vec4);
+    const p = vec4.clone(position as any as vec4);
+    const n = vec4.clone(normal as any as vec4);
     p[3] = 1;
     n[3] = 0;
 

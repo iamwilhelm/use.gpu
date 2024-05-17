@@ -1,4 +1,4 @@
-import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { LC } from '@use-gpu/live';
 
 import { yeet, memo } from '@use-gpu/live';
 

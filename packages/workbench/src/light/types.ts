@@ -1,7 +1,3 @@
-import type { VectorLike } from '@use-gpu/core';
-import type { TypedArray } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
-
 import { mat4, vec4, vec3, vec2 } from 'gl-matrix';
 
 export const AMBIENT_LIGHT = 0;

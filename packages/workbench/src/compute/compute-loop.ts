@@ -1,7 +1,6 @@
 import type { LC, LiveElement, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
-import type { AggregatedCalls } from '../pass/types';
 
-import { use, memo, gather, unquote, multiGather, useMemo, useRef, useResource, useState } from '@use-gpu/live';
+import { use, memo, gather, unquote, useMemo, useRef, useResource, useState } from '@use-gpu/live';
 import { useDeviceContext } from '../providers/device-provider';
 import { QueueReconciler } from '../reconcilers';
 

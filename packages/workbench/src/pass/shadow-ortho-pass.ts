@@ -1,12 +1,12 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { TextureSource, ViewUniforms } from '@use-gpu/core';
-import type { LightEnv, Renderable } from '../pass';
+import type { Renderable } from '../pass';
 import type { BoundLight } from '../light/types';
 import { mat4 } from 'gl-matrix';
 
-import { use, yeet, wrap, memo, useMemo, useOne } from '@use-gpu/live';
+import { yeet, memo, useMemo, useOne } from '@use-gpu/live';
 import {
-  makeFrustumPlanes, makeGlobalUniforms, makeOrthogonalMatrix, uploadBuffer,
+  makeFrustumPlanes, makeGlobalUniforms, uploadBuffer,
   VIEW_UNIFORMS,
 } from '@use-gpu/core';
 
@@ -17,7 +17,7 @@ import { QueueReconciler } from '../reconcilers';
 import { useFrustumCuller } from '../hooks/useFrustumCuller'
 import { useInspectable } from '../hooks/useInspectable'
 
-import { SHADOW_FORMAT, SHADOW_PAGE } from '../render/light/light-data';
+import { SHADOW_PAGE } from '../render/light/light-data';
 import { drawToPass } from './util';
 
 import { useDepthBlit } from './depth-blit';
@@ -30,7 +30,6 @@ export type ShadowOrthoPassProps = {
   },
   map: BoundLight,
   descriptors: GPURenderPassDescriptor[],
-  texture: TextureSource,
 };
 
 const NO_OPS: any[] = [];
@@ -45,7 +44,6 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
     calls,
     map,
     descriptors,
-    texture,
   } = props;
 
   const inspect = useInspectable();
@@ -90,12 +88,14 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
   const {
     depth: [near, far],
     size: [width, height],
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   } = shadow!;
 
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];
   uniforms.viewSize.current = [ width, height ];
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const clear = useDepthBlit(renderContext, descriptors[shadowMap!], shadowUV!, SHADOW_PAGE);
 
   const draw = quote(yeet(() => {
@@ -104,7 +104,9 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
 
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     uniforms.viewMatrix.current = into!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     uniforms.viewPosition.current = [-normal![0], -normal![1], -normal![2], 0];
 
     const {projectionViewMatrix, projectionViewFrustum, projectionMatrix, viewMatrix} = uniforms;
@@ -118,11 +120,16 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
 
     clear(commandEncoder);
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const x = shadowUV![0] * SHADOW_PAGE;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const y = shadowUV![1] * SHADOW_PAGE;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const w = (shadowUV![2] - shadowUV![0]) * SHADOW_PAGE;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const h = (shadowUV![3] - shadowUV![1]) * SHADOW_PAGE;
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const passEncoder = commandEncoder.beginRenderPass(descriptors[shadowMap!]);
     passEncoder.setViewport(x, y, w, h, 0, 1);
     passEncoder.setScissorRect(x, y, w, h);

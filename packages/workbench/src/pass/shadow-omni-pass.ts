@@ -1,15 +1,14 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { TextureSource, ViewUniforms } from '@use-gpu/core';
-import type { LightEnv, Renderable } from '../pass';
+import type { Renderable } from '../pass';
 import type { BoundLight } from '../light/types';
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 
-import { use, yeet, wrap, memo, useMemo, useOne } from '@use-gpu/live';
+import { yeet, memo, useMemo, useOne } from '@use-gpu/live';
 import {
-  makeDepthStencilAttachments, makeFrustumPlanes, makeGlobalUniforms, makeOrthogonalMatrix, makeTexture, uploadBuffer,
+  makeDepthStencilAttachments, makeFrustumPlanes, makeGlobalUniforms, makeTexture, uploadBuffer,
   VIEW_UNIFORMS,
 } from '@use-gpu/core';
-import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { usePassContext } from '../providers/pass-provider';
@@ -90,7 +89,6 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
     calls,
     map,
     descriptors: shadowMapDescriptors,
-    texture: shadowMapTexture,
   } = props;
 
   const inspect = useInspectable();
@@ -134,6 +132,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
   const {
     depth, depth: [near, far],
     size, size: [width, height],
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   } = shadow!;
 
   const [cubeTexture, cubeSource, cubeDescriptors] = useMemo(() => {
@@ -185,6 +184,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
   const scaleRef = useShaderRef([width / (width - border * 2), height / (height - border * 2)]);
 
   const getSample = useShader(getCubeToOmniSample, [cubeSource, scaleRef]);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const blit = useDepthBlit(renderContext, shadowMapDescriptors[shadowMap!], shadowUV!, SHADOW_PAGE, getSample);
 
   return quote(yeet(() => {
@@ -194,6 +194,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
     const {position, into} = map;
 
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     uniforms.viewPosition.current = position!;
 
     const {
@@ -206,6 +207,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
     } = uniforms;
 
     for (let i = 0; i < 6; ++i) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       mat4.multiply(viewMatrix.current, VIEW_MATRICES[i], into!);
       projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);
       projectionViewFrustum.current = makeFrustumPlanes(projectionViewMatrix.current);

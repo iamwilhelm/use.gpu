@@ -1,4 +1,3 @@
-import type { ShaderModule } from '@use-gpu/shader';
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 import { mat4 } from 'gl-matrix';
 

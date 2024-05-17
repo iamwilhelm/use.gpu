@@ -14,7 +14,7 @@ export const useDerivedState = <T>(
   const v = useVersion(newInitial) + version;
   useOne(() => {
     setValue(newInitial);
-  }, newInitial);
+  }, v);
 
   return [value, setValue];
 };

@@ -1,9 +1,9 @@
-import type { LiveComponent, LiveElement, DeferredCall, PropsWithChildren, RefObject } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { TypedArray, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { Keyframe } from './types';
 
 import { clamp, lerp } from '@use-gpu/core';
-import { use, extend, mutate, fence, useCallback, useDouble, useMemo, useOne } from '@use-gpu/live';
+import { extend, mutate, fence, useCallback, useDouble, useMemo, useOne } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { getRenderFunc } from '../hooks/useRenderProp';
@@ -98,7 +98,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
     }
     
     const time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
-    const [t, max] = getLoopedTime(time, length, rest, repeat, mirror);
+    const [t, max] = getLoopedTime(time, length, rest, loop ? repeat : 0, mirror);
 
     const values = swapValues();
     for (let k in values) evaluateKeyframe(values, k, script[k], t, ease);
@@ -116,7 +116,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
     }
 
     return null;
-  }, [script, swapValues, swapElements, render, children]);
+  }, [script, swapValues, swapElements, delay, rest, length, speed, loop, mirror, repeat, ease, render, children]);
 
   // Fence so that only continuation runs repeatedly
   return fence(null, Run);

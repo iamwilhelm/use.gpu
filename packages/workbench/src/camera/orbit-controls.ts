@@ -3,15 +3,13 @@ import type { VectorLike } from '@use-gpu/core';
 
 import { useProp } from '@use-gpu/traits/live';
 import { parseVec3 } from '@use-gpu/parse';
-import { useContext, useOne, useResource, useState, useHooks } from '@use-gpu/live';
+import { useContext, useOne, useHooks } from '@use-gpu/live';
 import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { KeyboardContext, MouseContext, WheelContext } from '../providers/event-provider';
 import { LayoutContext } from '../providers/layout-provider';
 import { useDerivedState } from '../hooks/useDerivedState';
 import { getRenderFunc } from '../hooks/useRenderProp';
 import { mat4, vec3 } from 'gl-matrix';
-
-const CAPTURE_EVENT = {capture: true};
 
 const π = Math.PI;
 const maybeClamp = (x: number, a?: number, b?: number) => {
@@ -99,7 +97,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   }
 
   useOne(() => {
-    const { x, y, moveX, moveY, buttons, stopped } = mouse;
+    const { moveX, moveY, buttons, stopped } = mouse;
     if (!active || stopped) return;
 
     const speedX = bearingSpeed / size;

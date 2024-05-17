@@ -41,6 +41,7 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
 
   const run = useMemo(() => {
     const f = async () => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const response = await fetch((url ?? request)!, options);
       if (type != null && typeof response[type] === 'function') return (response[type] as any)();
       return response;

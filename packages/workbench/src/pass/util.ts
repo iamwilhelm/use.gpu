@@ -45,7 +45,7 @@ export const getDrawOrder = (cull: Culler, calls: Renderable[], sign: number = 1
   const order: number[] = [];
   const depths: (number | boolean)[] = [];
 
-  for (const {draw, bounds} of calls) {
+  for (const {bounds} of calls) {
     let depth: number | boolean;
     if (bounds) {
       const {center, radius} = resolve(bounds);

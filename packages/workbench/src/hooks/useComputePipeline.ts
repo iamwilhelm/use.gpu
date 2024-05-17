@@ -6,9 +6,6 @@ import LRU from 'lru-cache';
 
 const DEBUG = false;
 
-const NO_DEPS = [] as any[];
-const NO_LIBS = {} as Record<string, any>;
-
 type ComputeShader = ShaderModuleDescriptor;
 
 const makePipelineCache = (options: Record<string, any> = {}) => new LRU<string, any>({
@@ -16,7 +13,7 @@ const makePipelineCache = (options: Record<string, any> = {}) => new LRU<string,
   ...options,
 });
 
-let SHADER_LOG: LRU<string, any> | null = null;
+const SHADER_LOG: LRU<string, any> | null = null;
 
 const CACHE = new WeakMap<any, LRU<string, any>>();
 const PENDING = new WeakMap<any, Map<string, any>>();
@@ -92,6 +89,7 @@ export const useComputePipelineAsync = (
     // Cache by shader structural hash
     const key = shader.hash.toString();
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const cached = cache!.get(key);
     if (cached) {
       DEBUG && console.log('async compute pipeline cache hit', key)
@@ -119,7 +117,9 @@ export const useComputePipelineAsync = (
     DEBUG && console.log('async compute pipeline miss', key);
 
     // Mark key as pending
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (pending!.has(key)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       pending!.get(key)!.then((pipeline: GPUComputePipeline) => resolve(pipeline));
       return null;
     }
@@ -133,11 +133,14 @@ export const useComputePipelineAsync = (
     promise.then((pipeline: GPUComputePipeline) => {
       DEBUG && console.log('async compute pipeline resolved', key);
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       cache!.set(key, pipeline);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       pending!.delete(key);
 
       return resolve(pipeline);
     });
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     pending!.set(key, promise);
 
     return null;

@@ -3,13 +3,11 @@ import type { TextureSource, TextureTarget } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { memo, gather, yeet, use, useMemo, useOne, useHooks, useNoHooks } from '@use-gpu/live';
-import { makeAtlas, makeDataBuffer, clamp, seq, lerp } from '@use-gpu/core';
-import { useDeviceContext } from '../providers/device-provider';
+import { makeAtlas, clamp, lerp } from '@use-gpu/core';
 import { DebugAtlas } from '../text/debug-atlas';
 import { Queue } from '../queue/queue';
 import { Dispatch } from '../queue/dispatch';
 import { Compute } from '../compute/compute';
-import { Readback } from '../primitives/readback';
 import { TextureBuffer } from '../compute/texture-buffer';
 import { useShader, getShader } from '../hooks/useShader';
 import { useDerivedSource, getDerivedSource } from '../hooks/useDerivedSource';
@@ -92,7 +90,6 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
   if (!texture) return useHooks(() => render ? render(null, null) : yeet(null), [render]);
   useNoHooks();
 
-  const device = useDeviceContext();
   const inspect = useInspectable();
 
   // Calculate parameters and atlas mappings
@@ -134,7 +131,6 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
     sizes.push(DIFFUSE_MIP);
 
     // Allocate in atlas
-    const area = sizes.reduce((a, b) => a + b*b, 0);
     const w = Math.max(sizes[0], FIRST_MIP);
     const h = Math.max(sizes[0], FIRST_MIP) + Math.max(sizes[1], sizes[mips] + sizes[mips + 1]);
     const atlas = makeAtlas(w, h, w*2);
@@ -178,7 +174,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
       const [diffuseSHBuffer, allocate] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
       allocate(16);
 
-      const textureRead = useDerivedSource(textureDump, {readWrite: false});
+      //const textureRead = useDerivedSource(textureDump, {readWrite: false});
       const shCoefficients = useDerivedSource(diffuseSHBuffer, {readWrite: false});
 
       const targetIn = useDerivedSource(target, {
@@ -187,6 +183,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
       });
 
       const scratchOut = scratch;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const scratchIn = useDerivedSource(scratch.history![0], {
         variant: 'textureSampleLevel',
         absolute: true,
@@ -242,6 +239,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = memo((props: Prefil
             onDispatch: scratch.swap,
           });
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const makeDiffuseDispatch = (i: number, j: number) => [
           use(Dispatch, {
             shader: getShader(pmremDiffuseSH, [

@@ -1,13 +1,8 @@
-import type { XYZ } from '@use-gpu/core';
-
 import { toFloat16 } from '@use-gpu/core';
-import zipObject from 'lodash/zipObject';
 
 // Based on:
 // http://www.graphics.cornell.edu/~bjw/rgbe/rgbe.c
 const HDR_MAGIC = 0x3F23;
-
-const tail = <T>(list: T[]): T => list[list.length - 1];
 
 type Pointer = {offset: number};
 
@@ -89,18 +84,16 @@ const readPixelsRLE = (view: DataView, ptr: Pointer, width: number, height: numb
     if (a !== 2 || b !== 2 || (c & 0x80)) throw new Error("HDR RLE data missing");
     if (((c << 8) | d) != width) throw new Error("HDR scanline length mismatch");
 
-    let base = ptr.offset;
     for (let i = 0; i < 4; ++i) {
-      let end = (y + 1) * width * 4 + i;
+      const end = (y + 1) * width * 4 + i;
       let o = y * width * 4 + i;
       while (o < end) {
-        let count = getUint8(view, ptr);
+        const count = getUint8(view, ptr);
         if (count > 128) {
-          let value = getUint8(view, ptr);
+          const value = getUint8(view, ptr);
           let repeat = count - 128;
           if (repeat > (end - o) / 4) throw new Error("HDR scanline repeat mismatch");
 
-          let j = 0;
           while (repeat--) { out[o] = value; o += 4; }
         }
         else {
@@ -145,7 +138,7 @@ export const getUint16 = (view: DataView, ptr: Pointer): number => {
 };
 
 export const getLine = (view: DataView, ptr: Pointer): string => {
-  let chars = [];
+  const chars = [];
   for (let i = 0; i < 256; ++i) {
     const c = getUint8(view, ptr);
     if (!c || c === 10) break;

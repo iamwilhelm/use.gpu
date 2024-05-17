@@ -2,7 +2,6 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 
 import { yeet, memo } from '@use-gpu/live';
 
-import { useDeviceContext } from '../../providers/device-provider';
 import { useRenderContext } from '../../providers/render-provider';
 
 import { SHADOW_FORMAT } from '../light/light-data';

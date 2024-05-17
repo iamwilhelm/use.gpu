@@ -1,14 +1,8 @@
 import type { TypedArray, UseGPURenderContext } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { Renderable } from './types';
 
-import { useCallback, useOne, useRef, SUSPEND } from '@use-gpu/live';
+import { useCallback, useOne } from '@use-gpu/live';
 import { bindBundle } from '@use-gpu/shader/wgsl';
-
-import { useDeviceContext } from '../providers/device-provider';
-import { usePassContext } from '../providers/pass-provider';
-
-import { SHADOW_PAGE } from '../render/light/light-data';
 
 import { getFullScreenVertex } from '@use-gpu/wgsl/instance/vertex/full-screen.wgsl';
 import instanceDrawVirtualDepth from '@use-gpu/wgsl/render/vertex/virtual-depth.wgsl';
@@ -32,7 +26,6 @@ export const useDepthBlit = (
 
   getSample: ShaderModule | null = null,
 ) => {
-  const device = useDeviceContext();
 
   const [vertex, fragment] = useOne(() => {
     const vertexShader = bindBundle(instanceDrawVirtualDepth, {getVertex: getFullScreenVertex});

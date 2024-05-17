@@ -1,6 +1,4 @@
-import type { LiveElement } from '@use-gpu/live';
-import type { ArchetypeSchema, AggregateItem, AggregateValue, ArrayAggregateBuffer } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader';
+import type { ArchetypeSchema, AggregateItem, ArrayAggregateBuffer } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useMemo, useOne } from '@use-gpu/live';
@@ -52,7 +50,7 @@ export const makeAggregator = (
   const cpuAggregate = schemaToAggregate(schema, attributes, refs, allocInstances, allocVertices, allocIndices);
   const aggregate = toGPUAggregate(device, cpuAggregate);
 
-  const {aggregateBuffers, refBuffers, byRefs, byInstances, byVertices, byIndices, bySelfs} = aggregate;
+  const {aggregateBuffers, byRefs, byInstances, byVertices, byIndices, bySelfs} = aggregate;
   const instances = aggregateBuffers.instances as ArrayAggregateBuffer;
 
   const refSources  = byRefs && getInstancedAggregate(byRefs, instances?.source);
@@ -65,7 +63,6 @@ export const makeAggregator = (
     ...bySelfs?.sources,
   };
 
-  let itemCount = initialItems.length;
   const uploadRefs = byRefs ? () => {
     uploadAggregateFromSchemaRefs(device, schema, aggregate);
   } : null;

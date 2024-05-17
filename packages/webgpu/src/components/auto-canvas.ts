@@ -48,17 +48,17 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   } = props;
 
   let {canvas} = props;
-  if (!canvas && props.selector) {
+  if (!canvas && selector != null) {
     canvas = useResource((dispose) => {
-      const [c, d] = makeOrAdoptCanvas(props.selector!);
+      const [c, d] = makeOrAdoptCanvas(selector!);
       dispose(d);
       return c;
-    }, [props.selector]);
+    }, [selector]);
   }
   else {
     useNoResource();
   }
-  if (!canvas) throw new Error(`Cannot find canvas '${props.selector ?? props.canvas}'`);
+  if (!canvas) throw new Error(`Cannot find canvas '${selector ?? props.canvas}'`);
 
   let view = children;
   if (events) view = (

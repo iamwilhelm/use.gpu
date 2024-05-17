@@ -1,8 +1,8 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { XY, ColorSpace, TextureSource } from '@use-gpu/core';
+import type { TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { use, yeet, useMemo, useHooks } from '@use-gpu/live';
+import { yeet, useMemo, useHooks } from '@use-gpu/live';
 import { getShader } from '../hooks/useShader';
 import { getDerivedSource } from '../hooks/useDerivedSource';
 

@@ -1,25 +1,19 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type {
-  VectorLike, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformType,
-  VertexData, DataBounds,
-} from '@use-gpu/core';
+import type { VectorLike, Lazy, UniformAttribute DataBounds } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
 
-import { use, yeet, memo, useCallback, useOne, useMemo, useNoMemo, useNoCallback } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
-import { resolve } from '@use-gpu/core';
+import { memo, useCallback, useOne, useMemo, useNoCallback } from '@use-gpu/live';
+import { getBundleKey } from '@use-gpu/shader/wgsl';
 
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { TransformContextProps } from '../providers/transform-provider';
 
-import { RawData } from '../data/raw-data';
 import { useRawSource } from '../hooks/useRawSource';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useShader, useNoShader } from '../hooks/useShader';
+import { useShader } from '../hooks/useShader';
 import { useSource } from '../hooks/useSource';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
@@ -67,8 +61,6 @@ export type RawArrowsProps = {
   count?: number,
 } & PickingSource & RawArrowsFlags;
 
-const ZERO = [0, 0, 0, 1];
-
 export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsProps) => {
   const {
     alphaToCoverage,
@@ -84,7 +76,6 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     flat = false,
     detail = 12,
     count = null,
-    id = 0,
   } = props;
 
   const det = Math.max(4, detail);
@@ -106,12 +97,12 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const z = useShaderRef(props.zBias, props.zBiases);
 
   const g = useRawSource(geometry.attributes.positions, 'vec4<f32>');
-  const l = useShaderRef(null, props.instances);
 
   const {positions, scissor, bounds: getBounds} = useApplyTransform(p, transform);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     bounds = useCallback(() => getBounds((props.positions! as any).bounds), [props.positions, getBounds]);
   }
   else {

@@ -1,8 +1,6 @@
-import type { LiveFiber, LC, PropsWithChildren, LiveElement, ArrowFunction, DeferredCall } from '@use-gpu/live';
+import type { LC, PropsWithChildren, LiveElement, ArrowFunction } from '@use-gpu/live';
 
-import {
-  gather, yeet, unquote, makeReconciler,
-} from '@use-gpu/live';
+import { gather, unquote } from '@use-gpu/live';
 import { QueueReconciler } from '../reconcilers';
 
 const {reconcile, quote, signal} = QueueReconciler;

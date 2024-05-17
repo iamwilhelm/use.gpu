@@ -1,12 +1,12 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/core';
-import { ViewUniforms, UniformAttribute } from '@use-gpu/core';
+import { ViewUniforms } from '@use-gpu/core';
 
 import { useProp } from '@use-gpu/traits/live';
 import { parsePosition } from '@use-gpu/parse';
 import { provide, use, useContext, useOne, incrementVersion } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition, makeFrustumPlanes } from '@use-gpu/core';
-import { FrameContext, usePerFrame } from '../providers/frame-provider';
+import { FrameContext } from '../providers/frame-provider';
 import { LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
@@ -40,8 +40,6 @@ export type OrbitCameraProps = {
   scale?: number | null,
 };
 
-let t = 0;
-
 export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   const {
     width,
@@ -51,7 +49,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
 
   const layout = useContext(LayoutContext);
 
-  let {
+  const {
     phi    = DEFAULT_ORBIT_CAMERA.phi,
     theta  = DEFAULT_ORBIT_CAMERA.theta,
     radius = DEFAULT_ORBIT_CAMERA.radius,

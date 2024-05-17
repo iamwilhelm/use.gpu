@@ -1,4 +1,4 @@
-import type { DataBounds, StorageSource, LambdaSource, TextureSource, TypedArray, UniformAttribute } from '@use-gpu/core';
+import type { StorageSource, LambdaSource, TextureSource, TypedArray, UniformAttribute } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import type { TransformBounds } from '../providers/transform-provider';
 import type { Ref } from '@use-gpu/live';
@@ -9,8 +9,7 @@ import { getSource } from '../hooks/useSource';
 import { useTransformContext, useNoTransformContext, TransformContextProps } from '../providers/transform-provider';
 import { useScissorContext, useNoScissorContext } from '../providers/scissor-provider';
 
-import { chainTransform } from './useCombinedTransform';
-import { useMatrixBounds, useNoMatrixBounds, useMatrixTransform, useNoMatrixTransform } from './useMatrixTransform';
+import { useNoMatrixBounds, useNoMatrixTransform } from './useMatrixTransform';
 
 import { mat3 } from 'gl-matrix';
 
@@ -63,8 +62,5 @@ export const useNoApplyTransform = () => {
   useNoVersion();
   useNoVersion();
   useNoVersion();
-  useNoVersion();
-  useNoMatrixBounds();
-  useNoMatrixTransform();
   useNoOne();
 };

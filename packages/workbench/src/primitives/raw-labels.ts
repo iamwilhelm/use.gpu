@@ -4,7 +4,7 @@ import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
 
-import { use, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
+import { memo, useCallback, useMemo, useNoCallback } from '@use-gpu/live';
 
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
@@ -75,7 +75,6 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     depthTest,
     depthWrite,
     blend,
-    id = 0,
     count = null,
 
     instance,
@@ -108,6 +107,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
     bounds = useCallback(() => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return getBounds((props.positions! as any).bounds);
     }, [props.positions, getBounds]);
   }
@@ -149,7 +149,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
 
   return useDraw({
     vertexCount,
-    instanceCount,
+    instanceCount: totalCount,
     bounds,
 
     links,

@@ -1,13 +1,11 @@
 import type { LiveComponent, LiveFunction, LiveElement, DeferredCall } from '@use-gpu/live';
-import type { UniformType, TypedArray, StorageSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { LayerAggregator, LayerAggregate, LayerAggregates } from './types';
 
-import { use, keyed, fragment, yeet, provide, multiGather, unquote, extend, useMemo, useOne } from '@use-gpu/live';
+import { use, keyed, yeet, provide, multiGather, unquote, useMemo, useOne } from '@use-gpu/live';
 import { mixBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 
-import { DeviceContext } from '../providers/device-provider';
 import { TransformContext } from '../providers/transform-provider';
 import { MaterialContext } from '../providers/material-provider';
 import { ScissorContext } from '../providers/scissor-provider';
@@ -70,7 +68,7 @@ const Resume = (
     const layerAggregator = AGGREGATORS[type];
     if (!layerAggregator) continue;
 
-    for (let item of items) if (item) {
+    for (const item of items) if (item) {
       partitioner.push(item, type);
     }
   }
@@ -95,6 +93,7 @@ const Aggregate: LiveFunction<any> = (
   const {count, sources, uploadRefs} = useAggregator(item.schema ?? schema, items);
 
   return useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {matrices, normalMatrices, ...rest} = sources as Record<string, any>;
     const props = {count, ...rest, ...extra, ...flags};
 

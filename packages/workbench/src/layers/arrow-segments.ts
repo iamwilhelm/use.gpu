@@ -1,7 +1,6 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { StorageSource, TypedArray, VectorLike } from '@use-gpu/core';
+import type { TypedArray, VectorLike } from '@use-gpu/core';
 
-import { memo, yeet, useMemo } from '@use-gpu/live';
+import { useMemo } from '@use-gpu/live';
 import { accumulateChunks, generateChunkSegments, generateChunkAnchors, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 import { ARROW_SEGMENTS_SCHEMA } from './schemas';
@@ -72,6 +71,7 @@ export const useArrowSegmentsSource = (
   return {
     count,
     sparse,
+    slices,
     segments: s,
     anchors: a,
     trims: t,

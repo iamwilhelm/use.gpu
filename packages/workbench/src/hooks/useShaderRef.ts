@@ -5,9 +5,9 @@ import type { Lazy } from '@use-gpu/core';
 import { useOne, useNoOne } from '@use-gpu/live';
 
 interface UseShaderRef<T> {
-  <T>(value: T): Ref<NonNullable<T>>;
-  <T>(value?: T): Ref<NonNullable<T>> | null;
-  <T>(value: T, source?: ShaderSource): Ref<NonNullable<T>> | ShaderSource | null;
+  (value: T): Ref<NonNullable<T>>;
+  (value?: T): Ref<NonNullable<T>> | null;
+  (value: T, source?: ShaderSource): Ref<NonNullable<T>> | ShaderSource | null;
 };
 
 export const useShaderRef: UseShaderRef<unknown> = (<T>(

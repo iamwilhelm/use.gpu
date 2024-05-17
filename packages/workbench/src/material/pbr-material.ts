@@ -1,8 +1,8 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ColorLike, VectorLike, Lazy, XYZW } from '@use-gpu/core';
-import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
+import type { ShaderSource } from '@use-gpu/shader';
 
-import { provide, yeet, useMemo, useOne } from '@use-gpu/live';
+import { useMemo } from '@use-gpu/live';
 import { useProp } from '@use-gpu/traits/live';
 import { parseColor } from '@use-gpu/parse';
 
@@ -65,10 +65,10 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
 
   const t = useNativeColorTexture(albedoMap);
 
-  let am  = useShaderRef(null, t);
-  let em  = useShaderRef(null, emissiveMap);
-  let om  = useShaderRef(null, occlusionMap);
-  let mrm = useShaderRef(null, metalnessRoughnessMap);
+  const am  = useShaderRef(null, t);
+  const em  = useShaderRef(null, emissiveMap);
+  const om  = useShaderRef(null, occlusionMap);
+  const mrm = useShaderRef(null, metalnessRoughnessMap);
 
   const defines = useMemo(() => ({
     HAS_ALBEDO_MAP: !!albedoMap,

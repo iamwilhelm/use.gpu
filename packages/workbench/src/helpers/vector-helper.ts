@@ -1,5 +1,5 @@
 import type { LC } from '@use-gpu/live';
-import type { StorageSource, TypedArray } from '@use-gpu/core';
+import type { TypedArray } from '@use-gpu/core';
 
 import { memo, use, useMemo } from '@use-gpu/live';
 import { useRawSource } from '../hooks/useRawSource';

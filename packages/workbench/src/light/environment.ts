@@ -9,6 +9,7 @@ import { EnvironmentContext } from '../providers/environment-provider';
 import { MaterialContext, useMaterialContext } from '../providers/material-provider';
 
 import { getShader, useShader, useNoShader } from '../hooks/useShader';
+import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getDefaultEnvironment } from '@use-gpu/wgsl/material/lights-default-env.wgsl';
 import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
@@ -43,24 +44,20 @@ export type EnvironmentProps = {
   gain?: number,
 };
 
-const SAMPLE_ENVIRONMENT: UniformAttribute = {
-  name: 'sampleEnvironment',
-  args: ['vec3<f32>', 'f32', 'vec3<f32>', 'vec3<f32>'],
-  format: 'vec4<f32>',
-};
-
 export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<EnvironmentProps>) => {
-  const {map, preset, gain, children} = props;
+  const {map, preset, gain = 1, children} = props;
 
   const environment = map || !((preset as any) in PRESETS)
     ? (useNoShader(), map ?? null)
     : useShader(getDefaultEnvironment, [...PRESETS[preset as any] ?? PRESETS.park]);
 
+  const g = useShaderRef(gain);
+
   const parent = useMaterialContext();
   const context = useMemo(() => {
     return patch(parent, {
       shaded: {
-        applyEnvironment: $set(getShader(applyPBREnvironment, [environment]) as ShaderModule | null | undefined),
+        applyEnvironment: $set(getShader(applyPBREnvironment, [environment, g]) as ShaderModule | null | undefined),
       },
     });
   }, [environment, parent])

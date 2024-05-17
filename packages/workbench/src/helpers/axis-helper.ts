@@ -1,5 +1,4 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { StorageSource } from '@use-gpu/core';
 import { memo, use, useOne } from '@use-gpu/live';
 
 import { useArrowSegmentsSource } from '../layers/arrow-segments';

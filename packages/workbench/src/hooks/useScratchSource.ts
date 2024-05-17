@@ -1,9 +1,7 @@
-import type { LambdaSource, StorageSource, UniformType } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
-import type { ArrowFunction, Task } from '@use-gpu/live';
+import type { StorageSource, UniformType } from '@use-gpu/core';
 
-import { useMemo, useOne, incrementVersion } from '@use-gpu/live';
-import { resolve, makeDataBuffer, getUniformArraySize, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
+import { useMemo, incrementVersion } from '@use-gpu/live';
+import { makeDataBuffer, getUniformArraySize, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
 
 import { adjustSize } from './useBufferedSize';
 import { useDeviceContext } from '../providers/device-provider';

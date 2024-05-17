@@ -1,11 +1,11 @@
 import type { LiveElement, LC, PropsWithChildren } from '@use-gpu/live';
-import type { TypedArray, StorageSource, Emit, Time } from '@use-gpu/core';
-import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
+import type { TypedArray, StorageSource, Emit } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { QueueReconciler } from '../reconcilers';
 
-import { yeet, useMemo, useNoMemo, useOne, useHooks } from '@use-gpu/live';
+import { useMemo, useNoMemo, useOne } from '@use-gpu/live';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { incrementVersion } from '@use-gpu/live';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
@@ -58,12 +58,12 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
   if (!type || typeof type === 'string') throw new Error("<StructData> type must be a WGSL shader type");
 
   // Make struct uniform layout
-  const [bindings, layout] = useOne(() => {
+  const layout = useOne(() => {
     const bindings = bundleToAttribute(type);
     if (!Array.isArray(bindings.format)) throw new Error(`<StructData> type '${bindings.name}' is not a struct type`);
 
     const layout = makeUniformLayout(bindings.format);
-    return [bindings, layout];
+    return layout;
   }, type);
 
   // Get size
@@ -106,6 +106,7 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
       let field = 0;
       const emit = (...args: any[]) => filler.setValue(emitted, field++, args);
       for (let i = 0; i < count; ++i) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         expr(emit, i, count, clock!);
 
         if (field) {

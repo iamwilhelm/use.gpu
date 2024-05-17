@@ -4,7 +4,7 @@ import {
   ArrowFunction,
   TraitDefinition, Trait, TraitCombinator,
   InputTypes, OutputTypes, Defaulted,
-  UseHooks, UseMemo, UseOne, UseProp, UseTrait,
+  UseHooks, UseTrait,
 } from './types';
 
 const makeObject = () => ({});

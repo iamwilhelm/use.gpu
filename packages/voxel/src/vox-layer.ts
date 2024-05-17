@@ -414,7 +414,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
         const sy = size[1] / 2;
         const sz = (size[2] || 1) / 2;
 
-        const {inverseViewMatrix, viewMatrix, viewPosition, viewNearFar} = uniforms;
+        const {inverseViewMatrix, viewPosition, viewNearFar} = uniforms;
         const {current: iVM} = inverseViewMatrix;
         const {current: viewP} = viewPosition;
         const {current: viewNF} = viewNearFar;

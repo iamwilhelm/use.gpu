@@ -50,8 +50,6 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = m
   if (!atlas) return;
 
   const {width: w, height: h} = atlas;
-  const width = size;
-  const height = size * h / w;
 
   const shape = useMemo(() => ({
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -160,7 +158,7 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
     );
   }
 
-  for (const [l, t, r, b, nearX, nearY, farX, farY, corner] of debugSlots()) {
+  for (const [l, t, r, b, nearX, nearY, farX, farY] of debugSlots()) {
     if (l + farX !== r || t + farY !== b)
     addRectangle(
       {

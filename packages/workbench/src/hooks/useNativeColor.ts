@@ -46,7 +46,7 @@ export const getNativeColor = (colorInput?: ColorSpace | null, colorOutput?: Col
   if (colorInput === colorOutput) return null;
   if (colorInput === 'native') return null;
 
-  let chain: ShaderModule[] = [];
+  const chain: ShaderModule[] = [];
 
   if (colorInput  === 'srgb') chain.push(toLinear4);
   if (colorOutput === 'srgb') chain.push(toGamma4);

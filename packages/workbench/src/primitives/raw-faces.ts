@@ -1,14 +1,10 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type {
-  VectorLike, ViewUniforms, DeepPartial, Lazy,
-  UniformPipe, UniformAttribute, UniformType,
-  VertexData, DataBounds, GPUGeometry,
-} from '@use-gpu/core';
+import type { VectorLike, Lazy, UniformAttribute, DataBounds, GPUGeometry } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { useDraw } from '../hooks/useDraw';
 
-import { use, yeet, memo, useCallback, useMemo, useOne, useNoOne, useNoCallback } from '@use-gpu/live';
+import { memo, useCallback, useMemo, useNoCallback } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 
 import { useMaterialContext } from '../providers/material-provider';
@@ -16,7 +12,7 @@ import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { useScissorContext } from '../providers/scissor-provider';
 import { TransformContextProps } from '../providers/transform-provider';
 
-import { useShader, useNoShader } from '../hooks/useShader';
+import { useShader } from '../hooks/useShader';
 import { useSource } from '../hooks/useSource';
 import { useCombinedTransform, useNoCombinedTransform } from '../hooks/useCombinedTransform';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
@@ -73,9 +69,6 @@ export type RawFacesProps = {
   onDispatch?: (u: Record<string, any>) => void,
 } & PickingSource & RawFacesFlags;
 
-const ZERO = [0, 0, 0, 1];
-const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
-
 export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps) => {
   const {
     flat = false,
@@ -91,8 +84,6 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     depthWrite,
     blend,
 
-    instance,
-    instances,
     transform,
 
     mesh,
@@ -143,6 +134,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (attr.positions as any)?.bounds) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     bounds = useCallback(() => getBounds((attr.positions! as any).bounds), [attr.positions, getBounds]);
   }
   else {

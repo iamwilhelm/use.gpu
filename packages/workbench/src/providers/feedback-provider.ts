@@ -1,4 +1,3 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TextureSource } from '@use-gpu/core';
 
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';

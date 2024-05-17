@@ -3,7 +3,7 @@ import type { VectorLike } from '@use-gpu/core';
 
 import { useProp } from '@use-gpu/traits/live';
 import { parseVec3 } from '@use-gpu/parse';
-import { useContext, useHooks, useOne, useRef, useResource, useState } from '@use-gpu/live';
+import { useContext, useHooks, useOne, useRef, useState } from '@use-gpu/live';
 import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useKeyboard, useMouse, useMouseLock } from '../providers/event-provider';

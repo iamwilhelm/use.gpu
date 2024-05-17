@@ -1,6 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
-import type { UniformAttribute } from '@use-gpu/core';
 
 import { patch, $set } from '@use-gpu/state';
 import { provide, useMemo } from '@use-gpu/live';

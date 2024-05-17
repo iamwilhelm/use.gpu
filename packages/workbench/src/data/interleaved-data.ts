@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { LambdaSource, UniformType, VectorLike, DataSchema, DataBounds } from '@use-gpu/core';
+import type { LambdaSource, UniformType, VectorLike, DataSchema } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';

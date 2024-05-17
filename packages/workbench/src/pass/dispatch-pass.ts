@@ -29,8 +29,6 @@ export const DispatchPass: LC<DispatchPassProps> = memo((props: PropsWithChildre
   const dispatches = toArray(calls['dispatch'] as ArrowFunction[]);
 
   const run = () => {
-    let ds = 0;
-
     if (dispatches.length) {
       for (const f of dispatches) f();
     }

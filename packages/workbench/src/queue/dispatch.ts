@@ -1,6 +1,5 @@
 import type { ArrowFunction } from '@use-gpu/live';
 import type { StorageSource, Lazy, VectorLike } from '@use-gpu/core';
-import type { ParsedModule } from '@use-gpu/shader';
 import { yeet, useMemo, useOne, SUSPEND } from '@use-gpu/live';
 
 import { useDeviceContext } from '../providers/device-provider';

@@ -5,7 +5,6 @@ import { keyed, memo, useMemo } from '@use-gpu/live';
 import { makeDepthStencilAttachments } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
-import { QueueReconciler } from '../reconcilers';
 
 import { useInspectable } from '../hooks/useInspectable'
 
@@ -22,8 +21,6 @@ export type ShadowPassProps = {
     shadow?: Renderable[],
   },
 };
-
-const NO_OPS: any[] = [];
 
 const SHADOW_TYPES = {
   ortho: ShadowOrthoPass,

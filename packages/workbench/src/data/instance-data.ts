@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { DataSchema, StructAggregateBuffer, TypedArray, StorageSource, UniformType } from '@use-gpu/core';
+import type { DataSchema, StructAggregateBuffer, StorageSource, UniformType } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import { capture, useCapture, useMemo, useOne, useRef, useResource, incrementVersion, makeCapture } from '@use-gpu/live';
 import {

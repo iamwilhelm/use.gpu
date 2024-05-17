@@ -1,4 +1,4 @@
-import type { LC, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Renderable } from '../pass';
 
 import { yeet, memo, useMemo } from '@use-gpu/live';

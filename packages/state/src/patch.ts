@@ -246,7 +246,7 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
     if (Array.isArray(a) || isTypedArray(a)) {
       const aa: any[] = a as any;
       for (const k in update) {
-        let i = +k;
+        const i = +k;
         if (Object.hasOwn(aa, i)) {
           out[i] = revise(aa[i], update[k]);
         }

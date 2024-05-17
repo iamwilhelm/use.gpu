@@ -111,6 +111,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const t = useShaderRef(props.trim, props.trims);
   const e = useShaderRef(props.size, props.sizes);
 
+  // TODO
   const i = useShaderRef(null, props.indices);
 
   const auto = useOne(() => props.segment != null ? getShader(getLineSegment, [props.segment]) : null, props.segment);

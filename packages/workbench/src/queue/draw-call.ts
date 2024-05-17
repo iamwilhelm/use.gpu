@@ -1,6 +1,5 @@
 import type { ArrowFunction, Ref } from '@use-gpu/live';
 import type { DataBounds, StorageSource, RenderPassMode, Lazy, UniformAttribute, UseGPURenderContext, VolatileAllocation } from '@use-gpu/core';
-import type { ParsedModule } from '@use-gpu/shader';
 import type { Update } from '@use-gpu/state';
 
 import { yeet, useMemo, useNoMemo, useOne, useNoOne, SUSPEND } from '@use-gpu/live';

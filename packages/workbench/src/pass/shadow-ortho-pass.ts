@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { TextureSource, ViewUniforms } from '@use-gpu/core';
+import type { ViewUniforms } from '@use-gpu/core';
 import type { Renderable } from '../pass';
 import type { BoundLight } from '../light/types';
 import { mat4 } from 'gl-matrix';

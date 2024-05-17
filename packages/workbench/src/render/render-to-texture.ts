@@ -27,6 +27,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props: Prop
   if (!source) throw new Error("No render target provided or in use");
 
   const trigger = useMemo(() => quote(yeet(() => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     source!.version = incrementVersion(source!.version);
   })), [source]);
 

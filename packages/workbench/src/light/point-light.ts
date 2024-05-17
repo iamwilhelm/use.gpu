@@ -1,4 +1,4 @@
-import type { LC, LiveElement } from '@use-gpu/live';
+import type { LC } from '@use-gpu/live';
 import type { ColorLike, VectorLike } from '@use-gpu/core';
 import type { ShadowMapLike } from './types';
 

@@ -9,10 +9,6 @@ import { getSource } from '../hooks/useSource';
 import { useTransformContext, useNoTransformContext, TransformContextProps } from '../providers/transform-provider';
 import { useScissorContext, useNoScissorContext } from '../providers/scissor-provider';
 
-import { useNoMatrixBounds, useNoMatrixTransform } from './useMatrixTransform';
-
-import { mat3 } from 'gl-matrix';
-
 const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u32'] } as UniformAttribute;
 
 export const useApplyTransform = (

@@ -135,7 +135,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   } = shadow!;
 
-  const [cubeTexture, cubeSource, cubeDescriptors] = useMemo(() => {
+  const [cubeSource, cubeDescriptors] = useMemo(() => {
     const s = Math.round(Math.max(width, height) * .5);
     const texture = makeTexture(
       device,
@@ -166,7 +166,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
       version: 0,
     };
 
-    return [texture, source, descriptors];
+    return [source, descriptors];
   }, [device, size]);
 
   const projectionMatrix = useOne(() => {

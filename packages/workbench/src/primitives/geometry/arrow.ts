@@ -21,8 +21,6 @@ const makeArrowVertices = (detail: number, width: number = 2.5) => {
   //const normals = [] as number[];
   const vertices = [] as number[];
 
-  const a = Math.atan2(1, width);
-
   for (let i = 0; i <= detail; ++i) {
     {
       const a = i / detail * τ;

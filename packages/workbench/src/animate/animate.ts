@@ -79,11 +79,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
   const scalars = zipObject(Object.keys(script).filter(k => typeof script[k][0][1] === 'number'));
 
   const Run = useCallback(() => {
-    const {
-      timestamp,
-      elapsed,
-      delta,
-    } = useTimeContext();
+    const {elapsed} = useTimeContext();
 
     let {current: started} = startedRef;
     if (started < 0 || started > elapsed) started = startedRef.current = elapsed;
@@ -101,7 +97,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
     const [t, max] = getLoopedTime(time, length, rest, loop ? repeat : 0, mirror);
 
     const values = swapValues();
-    for (let k in values) evaluateKeyframe(values, k, script[k], t, ease);
+    for (const k in values) evaluateKeyframe(values, k, script[k], t, ease);
 
     // Run if not paused, not on first frame, or not past end
     if (!paused || pausedRef.current === elapsed && time < max) useAnimationFrame();
@@ -202,7 +198,7 @@ const getLoopedTime = (time: number, duration: number, rest: number, repeat: num
   const max = duration * (repeat + 1);
   let t = Math.min(max, time);
 
-  let dp = duration + rest;
+  const dp = duration + rest;
   if (mirror) {
     t = time % (dp * 2);
     if (t < dp) t = Math.min(duration, t);

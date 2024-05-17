@@ -156,7 +156,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
   usePerFrame();
 
   const Run = useCallback(tagFunction(() => {
-    const {time, loop, children} = ref;
+    const {time, children} = ref;
 
     let view: LiveElement = useOne(() => provide(LoopContext, ref.loop, children), children);
 

@@ -10,7 +10,6 @@ import { getDerivedSource } from '../hooks/useDerivedSource';
 import { useShaderRefs } from '../hooks/useShaderRef';
 
 import { useComputeContext } from '../providers/compute-provider';
-import { PassReconciler } from '../reconcilers';
 
 import { dispatch } from '../queue/dispatch';
 
@@ -75,12 +74,12 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     return [kernel, dataSize, workgroupSize];
   }, [shader, targets, source, sources, argRefs, history]);
 
-  let first = useRef(true);
-  initial ? useMemo(() => { first.current = true; }, targets) : useNoMemo();
+  const firstRef = useRef(true);
+  initial ? useMemo(() => { firstRef.current = true; }, targets) : useNoMemo();
 
   const shouldDispatch = initial ? () => {
-    if (!first.current) return false;
-    first.current = false;
+    if (!firstRef.current) return false;
+    firstRef.current = false;
   } : undefined;
 
   const onDispatch = () => {

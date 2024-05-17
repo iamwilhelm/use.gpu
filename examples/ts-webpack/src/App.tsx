@@ -58,10 +58,10 @@ export const App: LC = hot(() => {
                         <Flex width="100%" height="100%" align="center">
                           <Flex width={500} height={150} fill="#3090ff" align="center" direction="y">
                             <Inline align="center">
-                              <Text weight="black" size={48} color="#ffffff">-~ Use.GPU ~-</Text>
+                              <Text weight="black" size={48} lineHeight={64} color="#ffffff">-~ Use.GPU ~-</Text>
                             </Inline>
                             <Inline align="center">
-                              <Text weight="black" size={16} color="#ffffff" opacity={0.5}>Zoom Me</Text>
+                              <Text weight="black" size={16} lineHeight={64} color="#ffffff" opacity={0.5}>Zoom Me</Text>
                             </Inline>
 
                             <ImageTexture
@@ -75,7 +75,7 @@ export const App: LC = hot(() => {
                                     height={150}
                                     margin={20}
                                     texture={texture}
-                                    image={{fit: scale}}
+                                    image={{fit: 'scale'}}
                                   />
                                 </Flex>
                             }</ImageTexture>

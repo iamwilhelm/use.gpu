@@ -3,7 +3,7 @@ import React, { LC, hot, useFiber } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
 import { TextureSource } from '@use-gpu/core';
 import { AutoCanvas, WebGPU } from '@use-gpu/webgpu';
-import { DebugProvider, FontLoader, PanControls, Flat, Pass } from '@use-gpu/workbench';
+import { DebugProvider, FontLoader, PanControls, Flat, Pass, ImageTexture } from '@use-gpu/workbench';
 import { UI, Layout, Flex, Block, Inline, Text } from '@use-gpu/layout';
 
 import { UseInspect } from '@use-gpu/inspect';
@@ -42,55 +42,50 @@ export const App: LC = hot(() => {
         >
           <FontLoader fonts={FONTS}>
 
-            {/* 2D pan controls + view */}
-            <PanControls
-              render={(x, y, zoom) =>
-                <Flat x={x} y={y} zoom={zoom}>
+            {/* See below */}
+            <Camera>
 
-                  {/* Render pass */}
-                  <Pass>
+              {/* Render pass */}
+              <Pass>
 
-                    {/* 2D Layout */}
-                    <UI>
-                      <Layout>
+                {/* 2D Layout */}
+                <UI>
+                  <Layout>
 
-                        {/* Flex box */}
-                        <Flex width="100%" height="100%" align="center">
-                          <Flex width={500} height={150} fill="#3090ff" align="center" direction="y">
-                            <Inline align="center">
-                              <Text weight="black" size={48} lineHeight={64} color="#ffffff">-~ Use.GPU ~-</Text>
-                            </Inline>
-                            <Inline align="center">
-                              <Text weight="black" size={16} lineHeight={64} color="#ffffff" opacity={0.5}>Zoom Me</Text>
-                            </Inline>
+                    {/* Flex box */}
+                    <Flex width="100%" height="100%" align="center">
+                      <Flex width={500} height={150} fill="#3090ff" align="center" direction="y">
+                        <Inline align="center">
+                          <Text weight="black" size={48} lineHeight={64} color="#ffffff">-~ Use.GPU ~-</Text>
+                        </Inline>
+                        <Inline align="center">
+                          <Text weight="black" size={16} lineHeight={64} color="#ffffff" opacity={0.5}>Zoom Me</Text>
+                        </Inline>
 
-                            <ImageTexture
-                              url="/test.png"
-                              colorSpace="srgb"
-                            >{(texture: TextureSource | null) =>
-                                <Flex align="center" width="100%" height={150}>
-                                  <Block
-                                    fill="#3090ff" 
-                                    width={150}
-                                    height={150}
-                                    margin={20}
-                                    texture={texture}
-                                    image={{fit: 'scale'}}
-                                  />
-                                </Flex>
-                            }</ImageTexture>
+                        <ImageTexture
+                          url="/test.png"
+                          colorSpace="srgb"
+                        >{(texture: TextureSource | null) =>
+                            <Flex align="center" width="100%" height={150}>
+                              <Block
+                                fill="#3090ff" 
+                                width={150}
+                                height={150}
+                                margin={20}
+                                texture={texture}
+                                image={{fit: 'scale'}}
+                              />
+                            </Flex>
+                        }</ImageTexture>
+                      </Flex>
+                    </Flex>
 
-                          </Flex>
-                        </Flex>
+                  </Layout>
+                </UI>
 
-                      </Layout>
-                    </UI>
+              </Pass>
 
-                  </Pass>
-
-                </Flat>
-              }
-            />
+            </Camera>
 
           </FontLoader>
         </AutoCanvas>
@@ -99,5 +94,14 @@ export const App: LC = hot(() => {
     </UseInspect>
   );
 }, module);
+
+// Wrap this in its own component to avoid JSX trashing of the view
+type CameraProps = PropsWithChildren<object>;
+const Camera: LC<CameraProps> = (props: CameraProps) => (
+  /* 2D pan controls + flat view */
+  <PanControls>{
+    (x, y, zoom) => <Flat x={x} y={y} zoom={zoom}>{props.children}</Flat>
+  }</PanControls>
+);
 
 App.displayName = 'App';

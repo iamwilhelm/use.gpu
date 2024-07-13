@@ -23,6 +23,8 @@ export const ObjectTrait = trait({
   visible: true,
 });
 
+const WHITE = [1, 1, 1, 1];
+
 export const ColorTrait = (
   props: {
     color?: VectorLike | string,
@@ -32,7 +34,7 @@ export const ColorTrait = (
     color?: vec4
   },
 ) => {
-  const {color, opacity = 1} = props;
+  const {color = WHITE, opacity = 1} = props;
   const rgba = useMemo(() => parseColorOpacity(color, opacity), [color, opacity]);
   parsed.color = rgba != null ? rgba : undefined;
 };

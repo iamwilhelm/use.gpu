@@ -76,7 +76,6 @@ export default {
     publicPath: '/dist/',
     contentBase: path.join(__dirname, 'public'),
     compress: true,
-    host: '0.0.0.0',
     port: 8777,
     historyApiFallback: true,
     hot: true,

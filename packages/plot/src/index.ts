@@ -1,5 +1,6 @@
 export * from './plot';
 
+export * from './providers/data-provider';
 export * from './providers/range-provider';
 
 export * from './layer/axis';

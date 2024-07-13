@@ -297,7 +297,7 @@ export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>>
 
     if (split) {
       for (const t of tensors) updateTensor(t, l, s);
-      return zipObject(as, tensors);
+      return zipObject(as, tensors.map(t => ({...t})));
     }
 
     if (items > 1) updateTensor(tensor, l * items, [items, ...s]);
@@ -309,7 +309,7 @@ export const Sampler: LiveComponent<SamplerProps<unknown & (string | string[])>>
   let value: TensorArray | Record<string, TensorArray>;
   if (!live) {
     useNoAnimationFrame();
-    value = useMemo(refresh, [tensors, expr, centered, border, origin, range, items, ...size]);
+    value = useMemo(refresh, [tensors, expr, centered, border, origin, range, items, sparse, ...size]);
   }
   else {
     useAnimationFrame();

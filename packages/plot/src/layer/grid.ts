@@ -83,7 +83,6 @@ export const Grid: LiveComponent<GridProps> = memo((props) => {
 
     const r = range?.[index] ?? parentRange[main];
     const r2 = range?.[other] ?? parentRange[cross];
-    console.log({main, cross, r, r2})
 
     const newValues = useMemo(() => {
       const f = (options.mode === 'log') ? logarithmic : linear;

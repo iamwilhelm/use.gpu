@@ -119,7 +119,7 @@ export const Tensor: LiveComponent<TensorProps<unknown & (string | string[])>> =
   let value: TensorArray | Record<string, TensorArray>;
   if (!live) {
     useNoAnimationFrame();
-    value = useMemo(refresh, [tensors, data, expr, items, ...size]);
+    value = useMemo(refresh, [tensors, data, expr, items, sparse, ...size]);
   }
   else {
     useAnimationFrame();

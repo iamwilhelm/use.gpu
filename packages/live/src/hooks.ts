@@ -596,6 +596,8 @@ export const useHooks = <T>(
       return initialState();  // <- Step through here
     }
     finally {
+      discardState(fiber);
+
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       state![i] = fiber.state;
       fiber.pointer = pointer + STATE_SLOTS;

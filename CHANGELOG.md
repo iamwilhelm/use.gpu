@@ -1,3 +1,8 @@
+0.11.1
+- `@use-gpu/core`: fix edge case around copying zero-length data
+- `@use-gpu/plot`: fix signature of segmented shapes' positions attribute
+- `@use-gpu/plot`: fix `<Surface>` losing its size when multiple per-vertex attributes are bound
+
 0.11.0
 - `@use-gpu/*`: support `render` prop as `children`
 - `@use-gpu/core`: refactor data ingestion pipe

@@ -117,7 +117,7 @@ export const allocateSchema = (
 
   for (const k in schema) if (!predicate || predicate(k)) {
     const {format, prop = k, index, unwelded, spread} = schema[k] as DataField;
-    if (spread != null && predicate(spread)) continue;
+    if (spread != null && predicate?.(spread)) continue;
 
     const f = format as any;
 

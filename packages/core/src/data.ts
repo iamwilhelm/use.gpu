@@ -374,8 +374,9 @@ export const copyRecursiveNumberArray = (
   fromDepth: number = 0,
   toIndex: number = 0,
   w: number = 0,
-) => {
+): number => {
   if (isTypedArray(from)) fromDepth = 0;
+  if (typeof from != 'number' && from.length === 0) return 0;
 
   if (fromDepth === 0) {
     if (typeof from === 'number') {

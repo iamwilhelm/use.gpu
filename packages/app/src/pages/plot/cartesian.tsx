@@ -1,6 +1,7 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 
 import React, { use } from '@use-gpu/live';
+import { TensorArray } from '@use-gpu/core';
 
 import {
   Loop, Pass,
@@ -142,7 +143,7 @@ export const PlotCartesianPage: LC = () => {
                         emit(r, g, b, 1);
                       }}
                     >{
-                      ({positions, colors}) => (<>
+                      ({positions, colors}: Record<string, TensorArray>) => (<>
                         <Surface positions={positions} colors={colors} />
                         <Line
                           positions={positions}

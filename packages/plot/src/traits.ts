@@ -1,4 +1,4 @@
-import type { ArchetypeSchema, Ragged, TypedArray, UniformType, VectorLike, VectorLikes } from '@use-gpu/core';
+import type { ArchetypeSchema, Ragged, TensorArray, TypedArray, UniformType, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { Parser } from '@use-gpu/traits';
 
@@ -425,8 +425,8 @@ export const SegmentsTrait = combine(
   }),
   (
     props: {
-      positions?: VectorLikes | VectorLikes[],
-      segments?: VectorLikes,
+      positions?: TensorArray | VectorLikes | VectorLikes[] | ShaderSource,
+      segments?: TensorArray | VectorLikes | ShaderSource,
     },
     parsed: {
       positions?: TypedArray,
@@ -450,7 +450,7 @@ export const SegmentsTrait = combine(
         }
         if (!pos || props.segments) return [];
         const f = (parsed.formats?.position ?? 'vec4<f32>') as UniformType;
-        return toChunkCounts(pos, toCPUDims(getUniformDims(f)));
+        return toChunkCounts(pos as VectorLikes | VectorLikes[], toCPUDims(getUniformDims(f)));
       }
     );
     parsed.chunks = chunks;
@@ -465,8 +465,8 @@ export const FacetedTrait = combine(
   }),
   (
     props: {
-      positions?: VectorLikes | VectorLikes[],
-      segments?: VectorLikes,
+      positions?: TensorArray | VectorLikes | VectorLikes[] | ShaderSource,
+      segments?: TensorArray | VectorLikes | ShaderSource,
       indices?: VectorLikes,
     },
     parsed: {
@@ -499,7 +499,7 @@ export const FacetedTrait = combine(
         }
         if (!pos || props.segments || props.indices) return [];
         const f = (parsed.formats?.position ?? 'vec4<f32>') as UniformType;
-        return toChunkCounts(pos, toCPUDims(getUniformDims(f)));
+        return toChunkCounts(pos as VectorLikes | VectorLikes[], toCPUDims(getUniformDims(f)));
       }
     );
     parsed.chunks = chunks;

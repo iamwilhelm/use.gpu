@@ -5,6 +5,7 @@
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "dependencies": {
+    "@use-gpu/core": "*",
     "gl-matrix": "^3.3.0"
   },
   "scripts": {

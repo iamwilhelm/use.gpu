@@ -9,6 +9,9 @@
     "./live": "./live.ts",
     "./react": "./react.ts"
   },
+  "dependencies": {
+    "@use-gpu/live": "*"
+  },
   "scripts": {
     "build": "NPM_PACKAGE=traits ../../scripts/build-mjs-cjs.sh",
     "test": "MODULE_ENV=cjs jest --watch",

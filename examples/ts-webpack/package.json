@@ -25,16 +25,16 @@
     "webpack-dev-server": "^3.11.0",
     "react": "^18",
     "react-dom": "^18",
-    "@use-gpu/layout": "^0.11.1",
-    "@use-gpu/live": "^0.11.1",
-    "@use-gpu/react": "^0.11.1",
-    "@use-gpu/inspect": "^0.11.1",
-    "@use-gpu/inspect-gpu": "^0.11.1",
-    "@use-gpu/parse": "^0.11.1",
-    "@use-gpu/shader": "^0.11.2",
-    "@use-gpu/traits": "^0.11.1",
-    "@use-gpu/workbench": "^0.11.1",
-    "@use-gpu/webgpu": "^0.11.1",
-    "@use-gpu/wgsl-loader": "^0.11.1"
+    "@use-gpu/layout": "^0.11.3",
+    "@use-gpu/live": "^0.11.3",
+    "@use-gpu/react": "^0.11.3",
+    "@use-gpu/inspect": "^0.11.3",
+    "@use-gpu/inspect-gpu": "^0.11.3",
+    "@use-gpu/parse": "^0.11.3",
+    "@use-gpu/shader": "^0.11.3",
+    "@use-gpu/traits": "^0.11.3",
+    "@use-gpu/workbench": "^0.11.3",
+    "@use-gpu/webgpu": "^0.11.3",
+    "@use-gpu/wgsl-loader": "^0.11.3"
   }
 }

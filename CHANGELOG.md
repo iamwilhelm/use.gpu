@@ -1,3 +1,6 @@
+0.11.3
+- `@use-gpu/shader`: pin `@lezer/lr` to 1.3.4 to avoid issue with 1.4.1
+
 0.11.1
 - `@use-gpu/core`: fix edge case around copying zero-length data
 - `@use-gpu/plot`: fix signature of segmented shapes' positions attribute

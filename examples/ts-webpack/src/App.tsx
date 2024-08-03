@@ -1,9 +1,9 @@
-import React, { LC, hot, useFiber } from '@use-gpu/live';
+import React, { LC, hot, useFiber, type PropsWithChildren } from '@use-gpu/live';
 
 import { HTML } from '@use-gpu/react';
 import { TextureSource } from '@use-gpu/core';
 import { AutoCanvas, WebGPU } from '@use-gpu/webgpu';
-import { DebugProvider, FontLoader, PanControls, Flat, Pass, ImageTexture } from '@use-gpu/workbench';
+import { DebugProvider, FontLoader, PanControls, FlatCamera, Pass, ImageTexture } from '@use-gpu/workbench';
 import { UI, Layout, Flex, Block, Inline, Text } from '@use-gpu/layout';
 
 import { UseInspect } from '@use-gpu/inspect';
@@ -100,7 +100,7 @@ type CameraProps = PropsWithChildren<object>;
 const Camera: LC<CameraProps> = (props: CameraProps) => (
   /* 2D pan controls + flat view */
   <PanControls>{
-    (x, y, zoom) => <Flat x={x} y={y} zoom={zoom}>{props.children}</Flat>
+    (x, y, zoom) => <FlatCamera x={x} y={y} zoom={zoom}>{props.children}</FlatCamera>
   }</PanControls>
 );
 

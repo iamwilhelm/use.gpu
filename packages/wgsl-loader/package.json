@@ -6,7 +6,8 @@
   "license": "MIT",
   "dependencies": {
     "@use-gpu/shader": "*",
-    "require-hacker": "^3.0.1"
+    "require-hacker": "^3.0.1",
+    "schema-utils": "^3.0.0"
   },
   "exports": {
     ".": "./src/index.ts",

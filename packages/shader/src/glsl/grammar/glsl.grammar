@@ -30,7 +30,7 @@ d<term> { @specialize[@name={term}]<Identifier, term> }
 t<term> { @specialize[@name={term}]<Identifier, term> }
 r<term> { @specialize[@name={term}]<Identifier, term> }
 
-unit { externalDeclaration }
+unit { externalDeclaration* }
 externalDeclaration { FunctionDefinition | GlobalDeclaration | Preprocessor }
 
 comment { commentLine | commentOpen untilCommentClose }

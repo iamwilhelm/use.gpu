@@ -10,7 +10,9 @@
     "@use-gpu/workbench": "*",
     "@use-gpu/core": "*",
     "@use-gpu/live": "*",
-    "@use-gpu/shader": "*"
+    "@use-gpu/shader": "*",
+    "@use-gpu/wgsl": "*",
+    "gl-matrix": "^3.3.0"
   },
   "scripts": {
     "build": "NPM_PACKAGE=layout ../../scripts/build-mjs-cjs.sh",

@@ -6,8 +6,8 @@
   "license": "MIT",
   "dependencies": {
     "@use-gpu/state": "*",
-    "gl-matrix": "^3.3.0",
     "earcut": "^2.2.4",
+    "gl-matrix": "^3.3.0",
     "lodash": "^4.17.21"
   },
   "scripts": {

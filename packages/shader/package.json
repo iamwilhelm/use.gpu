@@ -10,8 +10,7 @@
     "./wgsl": "./src/wgsl/index.ts"
   },
   "dependencies": {
-    "@lezer/common": "^1.0.2",
-    "@lezer/generator": "^1.2.3",
+    "@lezer/generator": "^1.7.1",
     "@lezer/lr": "^1.4.2",
     "lodash": "^4.17.21",
     "lru-cache": "^6.0.0"

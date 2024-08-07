@@ -12,7 +12,10 @@
     "@use-gpu/core": "*",
     "@use-gpu/shader": "*",
     "@use-gpu/glyph": "*",
-    "@use-gpu/wgsl": "*"
+    "@use-gpu/wgsl": "*",
+    "gl-matrix": "^3.3.0",
+    "lodash": "^4.17.21",
+    "lru-cache": "^6.0.0"
   },
   "scripts": {
     "build": "NPM_PACKAGE=workbench ../../scripts/build-mjs-cjs.sh",

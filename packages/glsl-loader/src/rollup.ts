@@ -1,4 +1,4 @@
-import { createFilter } from 'rollup-pluginutils';
+import { createFilter } from '@rollup/pluginutils';
 import { transpileGLSL } from '@use-gpu/shader/glsl';
 import MagicString from 'magic-string';
 

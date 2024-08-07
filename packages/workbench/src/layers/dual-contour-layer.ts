@@ -176,13 +176,13 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     ]);
 
   const sourceVersion = useVersion(values) + useVersion(normals);
-  const shouldDispatch = !live ? () => (
+  const shouldDispatch = !live ? useCallback(() => (
     sourceVersion +
     ((values as StorageSource).version ?? 0) +
     ((normals as StorageSource)?.version ?? 0)
-  ) : null;
+  ), [sourceVersion, values, normals]) : null;
 
-  const edgePassSize = () => {
+  const edgePassSize = useCallback(() => {
     const s = resolve(size);
     const sx = s[0] || 1;
     const sy = s[1] || 1;
@@ -200,12 +200,12 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     else allocateNormals(d);
 
     return [sx - 1, sy - 1, sz - 1];
-  };
+  }, [size]);
 
   const device = useDeviceContext();
   const generationRef = useOne(() => ({current: 1}));
 
-  const dispatchEdgePass = () => {
+  const dispatchEdgePass = useCallback(() => {
     const {current: generation} = generationRef;
 
     // Build final draw call for geometry
@@ -229,7 +229,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     generationRef.current = incrementVersion(generationRef.current);
 
     uploadBuffer(device, indirectStorage.buffer, indirectDraw.buffer);
-  };
+  }, [device, indirectDraw, indirectStorage]);
 
   const links = useMemo(() => {
     return shaded
@@ -259,7 +259,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     IS_QUADRATIC: method === 'quadratic',
   }), [defs, method]);
 
-  const view = [
+  const dispatch = useMemo(() => (
     quote([
       use(Dispatch, {
         shader: boundScan,
@@ -274,7 +274,11 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
         indirect: indirectReadout2,
         shouldDispatch,
       }),
-    ]),
+    ])
+  ), [boundScan, edgePassSize, shouldDispatch, dispatchEdgePass, boundFit, indirectReadout2]);
+
+  const view = [
+    dispatch,
     useDraw({
       bounds,
       indirect: indirectStorage,

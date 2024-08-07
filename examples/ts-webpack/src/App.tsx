@@ -1,7 +1,7 @@
-import React, { LC, hot, useFiber, type PropsWithChildren } from '@use-gpu/live';
+import React, { type LC, hot, useFiber, type PropsWithChildren } from '@use-gpu/live';
 
 import { HTML } from '@use-gpu/react';
-import { TextureSource } from '@use-gpu/core';
+import type { TextureSource } from '@use-gpu/core';
 import { AutoCanvas, WebGPU } from '@use-gpu/webgpu';
 import { DebugProvider, FontLoader, PanControls, FlatCamera, Pass, ImageTexture } from '@use-gpu/workbench';
 import { UI, Layout, Flex, Block, Inline, Text } from '@use-gpu/layout';

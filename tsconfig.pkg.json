@@ -16,10 +16,7 @@
     "strict": true,
     "moduleResolution": "bundler",
     "baseUrl": "./",
-    "paths": {
-      "@use-gpu/wgsl/*": ["./packages/wgsl/src/*", "../../wgsl/src/*"],
-      "@use-gpu/*": ["./packages/*", "../../*"]
-    },
+    "paths": {},
     "rootDirs": [],
     "types": ["@webgpu/types", "jest"],
     "allowSyntheticDefaultImports": true,

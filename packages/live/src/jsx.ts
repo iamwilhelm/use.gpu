@@ -44,7 +44,7 @@ export const createElement = <F extends RawLiveComponent<any>>(type: F | string,
   if ((type as any)?.isLiveBuiltin) {
     switch (type as any) {
       case FRAGMENT:
-        return props?.children ?? children;
+        return fragment(props?.children ?? children, props?.key);
 
       case FENCE:
         return fence(toChildren(props?.children ?? children), props?.then, props?.fallback, props?.key);

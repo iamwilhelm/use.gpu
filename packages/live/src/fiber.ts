@@ -295,6 +295,8 @@ export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
 
       setCurrentFiberBy(by);
       call = createElement(type, props);
+      // Unwrap single element fragments
+      if (call && 'props' in call) call = reactInterop(call, fiber);
       setCurrentFiberBy(null);
     }
     else {

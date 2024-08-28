@@ -11,6 +11,7 @@ export * from './color';
 export * from './constants';
 export * from './data';
 export * from './depth';
+export * from './ease';
 export * from './float16';
 export * from './id';
 export * from './lazy';

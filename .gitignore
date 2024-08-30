@@ -9,7 +9,9 @@ tsconfig.tsbuildinfo
 test/import/node_modules
 test/import/dist
 test/import/yarn.lock
+packages/app/**/*.wgsl.d.ts
 packages/glyph/pkg
+packages/shader/bin/*
 packages/wgsl/src
 scripts/fetch-tiles.mjs
 .env.local

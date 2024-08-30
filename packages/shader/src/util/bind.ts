@@ -63,7 +63,7 @@ export const bindBundle = (
 
   const relinks = bundle.links ? {
     ...bundle.links,
-  } : {} ?? undefined;
+  } : {};
 
   const redefines = defines && bundle.defines ? {
     ...bundle.defines,

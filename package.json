@@ -44,6 +44,7 @@
     "terser-webpack-plugin": "^5.3.5",
     "ts-jest": "^27.0.0",
     "ts-node": "^10.9.1",
+    "tsup": "^8.2.4",
     "typescript": "^5.3.3",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0",
@@ -60,7 +61,7 @@
     "build": "yarn wsrun --stages run build && yarn run docs && yarn run build-examples",
     "build-examples": "ts-node ./scripts/example-json-version.ts",
     "build-app": "ts-node node_modules/.bin/webpack build; ./scripts/copy-app-to-docs.sh",
-    "clear": "rm -rf packages/glyph/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js",
+    "clear": "rm -rf packages/glyph/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js; rm -rf packages/wgsl/src",
     "ci-test": "CI=true yarn run jest && yarn run test:import && yarn run test:vite-react",
     "docs": "ts-node ./scripts/getdocs.ts",
     "publish": "./scripts/npm-publish.sh",
@@ -70,7 +71,7 @@
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
-    "postinstall": "(cd packages/wgsl; yarn run build); (cd packages/glyph; yarn run build:wasm); (cp -n .env.local.example .env.local || true)"
+    "postinstall": "(cd packages/shader; yarn run build:bin); (cd packages/wgsl; yarn run build); (cd packages/glyph; yarn run build:wasm); (cd packages/app; yarn run build:wgsl); (cp -n .env.local.example .env.local || true)"
   },
   "jest": {
     "preset": "ts-jest",

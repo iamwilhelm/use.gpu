@@ -21,7 +21,9 @@
     "@use-gpu/wgsl": "*"
   },
   "scripts": {
-    "build": "NPM_PACKAGE=app ../../scripts/build-mjs-cjs.sh",
+    "build": "yarn run build:wgsl; yarn run build:pkg",
+    "build:pkg": "NPM_PACKAGE=app ../../scripts/build-mjs-cjs.sh",
+    "build:wgsl": "../shader/bin/shader2ts.js --noEmit --typeDef src",
     "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",

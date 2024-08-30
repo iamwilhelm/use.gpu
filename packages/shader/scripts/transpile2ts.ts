@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import path from 'path';
 import fs from 'fs';
 import glob from 'glob';
@@ -9,6 +10,7 @@ import { transpileGLSL } from '@use-gpu/shader/glsl';
 const optionDefinitions = [
   { name: 'esm', alias: 'e', type: Boolean, description: 'Emit ES Module (default)' },
   { name: 'cjs', alias: 'c', type: Boolean, description: 'Emit CommonJS Module' },
+  { name: 'noEmit', alias: 'n', type: Boolean, description: "Don't emit JS/TS code" },
 
   { name: 'minify', alias: 'm', type: Boolean, description: 'Minify shader code' },
   { name: 'types', alias: 't', type: Boolean, description: 'Emit TypeScript' },
@@ -17,13 +19,14 @@ const optionDefinitions = [
   { name: 'exports', alias: 'x', type: Boolean, description: 'Emit exports.json' },
 
   { name: 'language', alias: 'l', type: String, defaultValue: 'wgsl', description: 'Language (WGSL or GLSL)' },
-  { name: 'basePath', alias: 'b', type: String, defaultValue: '.', description: 'Base path (stripped off)' },
+  { name: 'basePath', alias: 'b', type: String, defaultValue: '', description: 'Base path (stripped off)' },
   { name: 'importRoot', alias: 'r', type: String, defaultValue: '.', description: 'Import root (replaced with relative path)' },
 
   { name: 'input', type: String, multiple: true, defaultOption: true, description: 'Input path/glob' },
   { name: 'output', alias: 'o', type: String, defaultValue: '.', description: 'Output path' },
 
   { name: 'help', alias: 'h', type: Boolean, description: 'Show this screen' },
+  { name: 'verbose', alias: 'v', type: Boolean, description: 'Log verbose output' },
 ];
 
 const typeName = (t: any) => t.toString().split(/[ (]+/g)[1];
@@ -82,8 +85,8 @@ const globs = [];
 for (let i = 0; i < INPUT.length; ++i) {
   const arg = INPUT[i];
   const d = fs.statSync(arg).isDirectory();
-  if (d) globs.push({arg, pattern: arg + '/**/*.wgsl'});
-  else globs.push({arg, pattern: arg});
+  if (d) globs.push(arg + '/**/*.wgsl');
+  else globs.push(arg);
 }
 
 if (options.help) {
@@ -110,9 +113,11 @@ const writeToTarget = (target: string, data: string) => {
 };
 
 const exps: Record<string, any> = {};
-const base = BASE.split('/').length;
+const base = BASE.length ? BASE.split('/').length : 0;
 
-for (const {pattern, arg} of globs) {
+options.verbose && console.log('Glob', globs);
+
+for (const pattern of globs) {
   const files = glob.sync(pattern);
   for (const src of files) {
     const keys = src.split('/');
@@ -141,10 +146,14 @@ for (const {pattern, arg} of globs) {
     }
 
     const dst = path.join(OUTPUT, jsFile);
-    writeToTarget(dst, output);
+    if (!options.noEmit) {
+      options.verbose && console.log('Output', dst);
+      writeToTarget(dst, output);
+    }
 
     if (options.typeDef && typeDef != null) {
       const dst = path.join(OUTPUT, dtsFile);
+      options.verbose && console.log('TypeDef', dst);
       writeToTarget(dst, typeDef);
     }
 
@@ -155,6 +164,7 @@ for (const {pattern, arg} of globs) {
         includeContent: true
       }).toString();
       const dst = path.join(OUTPUT, mapFile);
+      options.verbose && console.log('SourceMap', dst);
       writeToTarget(dst, sourceMap);
     }
 

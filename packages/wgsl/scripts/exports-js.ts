@@ -35,7 +35,7 @@ try {
   PKG.exports = {};
   
   const add = (key: string, name: string) => {
-    PKG.exports[`./${key}`] = {
+    PKG.exports[key] = {
       "types": `./mjs/${name}.d.ts`,
       "import": `./mjs/${name}.js`,
       "require": `./cjs/${name}.js`,
@@ -43,7 +43,7 @@ try {
   };
 
   add('.', 'index');
-  for (const k in EXPS) add(k, k);
+  for (const k in EXPS) add(`./${k}`, k);
 
   const json = JSON.stringify(PKG, null, 2);
   fs.writeFileSync(PACKAGE_JSON, json);

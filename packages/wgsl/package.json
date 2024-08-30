@@ -31,9 +31,6 @@
   "sideEffects": false,
   "exports": {
     ".": "./src/index.ts",
-    "./app/fragment/mesh.wgsl": "./src/app/fragment/mesh.wgsl.ts",
-    "./app/vertex/mesh-pick.wgsl": "./src/app/vertex/mesh-pick.wgsl.ts",
-    "./app/vertex/mesh.wgsl": "./src/app/vertex/mesh.wgsl.ts",
     "./codec/f16.wgsl": "./src/codec/f16.wgsl.ts",
     "./codec/octahedral.wgsl": "./src/codec/octahedral.wgsl.ts",
     "./codec/rgbm.wgsl": "./src/codec/rgbm.wgsl.ts",

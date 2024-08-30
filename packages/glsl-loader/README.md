@@ -78,24 +78,10 @@ You will get the same `ParsedBundle`, but with `entry` set to the imported symbo
 
 ## Typescript
 
-To allow shader imports to type check, create a `glsl-files.d.ts` with:
+To allow shader imports to type check, use the `shader2ts` script from `@use-gpu/shader` to emit .d.ts files, e.g. in `src/`:
 
-```ts
-declare module '*.glsl' {
-  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
-  const __module: ParsedBundle;
-  export default __module;
-}
 ```
-
-To make named imports `import { x } from ...` pass the type checker, you need to generate a custom .d.ts:
-
-```sh
-npm run glsl-tsgen [--base-dir dir] [file or *.glsl]
-```
-
-```sh
-yarn run glsl-tsgen [--base-dir dir] [file or *.glsl]
+./node_modules/@use-gpu/shader/bin/shader2ts.js --lang glsl --noEmit --typeDef src
 ```
 
 ## Colofon

@@ -4,7 +4,7 @@ import path from 'path';
 const {transpileWGSL} = WGSL;
 
 export const process = (src, filename, config, options) => {
-  return transpileWGSL(src, filename, false);
+  return transpileWGSL(src, filename, false).output;
 };
 
 export default {process};

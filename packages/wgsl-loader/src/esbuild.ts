@@ -12,7 +12,12 @@ export const wgsl = (userOptions = {}) => ({
 			const source = await readFile(args.path, 'utf8');
 			const filename = relative(process.cwd(), args.path);
 
-			return { contents: transpileWGSL(source, filename, true, minify) };
+			return {
+        contents: transpileWGSL(source, filename, {
+          esModule: true,
+          minify,
+        }).output;
+      };
 		});
 	}
 });

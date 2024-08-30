@@ -11,6 +11,7 @@ import {
   bundleToAttributes,
 
   glsl, float, int, uint,
+  symbolDictionary,
 } from './shader';
 
 import {
@@ -65,7 +66,13 @@ import {
   getBundleLabel,
 } from '../util/bundle';
 
+import {
+  decompressString,
+} from '../util/tree';
+
 import { parser } from './grammar/glsl';
+
+export * from './types';
 
 export {
   loadModule,
@@ -80,6 +87,7 @@ export {
   bundleToAttributes,
 
   glsl, float, int, uint,
+  symbolDictionary,
 } from './shader';
 
 export {
@@ -133,6 +141,10 @@ export {
   getBundleKey,
   getBundleLabel,
 } from '../util/bundle';
+
+export {
+  decompressString,
+} from '../util/tree';
 
 export const GLSLLinker = {
   loadModule,
@@ -177,6 +189,9 @@ export const GLSLLinker = {
   getBundleHash,
   getBundleKey,
   getBundleLabel,
+
+  decompressString,
+  symbolDictionary,
 
   parser,
 };

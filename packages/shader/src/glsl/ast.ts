@@ -559,12 +559,15 @@ export const rewriteUsingAST = (
 
 // Compress an AST to only the info needed to do symbol replacement and tree shaking
 export const compressAST = (
-  _: string,
+  code: string,
   tree: Tree,
   symbols: string[] = [],
+  modules: ModuleRef[] = [],
 ): CompressedNode[] => {
   const out = [] as any[]
   const emit = makeASTEmitter(out, AST_OPS, symbols);
+
+  const whitelist = new Set([...symbols, ...modules.flatMap((m) => m.symbols)]);
 
   // Pass through nodes from pre-compressed tree immediately
   // @ts-ignore
@@ -582,8 +585,8 @@ export const compressAST = (
       if (cursor.node.parent?.type.name === 'Program') shake(from, to);
     }
     else if (type.name === 'Identifier') {
-      const {from, to} = cursor;
-      ident(from, to);
+      const s = code.slice(from, to);
+      if (whitelist.has(s)) ident(from, to);
     }
     else if (type.name === 'version') {
       cursor.parent();

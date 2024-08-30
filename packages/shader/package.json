@@ -9,11 +9,17 @@
     "./glsl": "./src/glsl/index.ts",
     "./wgsl": "./src/wgsl/index.ts"
   },
+  "bin": {
+    "shader2ts": "./bin/shader2ts"
+  },
   "dependencies": {
     "@lezer/generator": "^1.7.1",
     "@lezer/lr": "^1.4.2",
+    "@types/command-line-args": "^5.2.3",
+    "command-line-args": "^6.0.0",
     "lodash": "^4.17.21",
-    "lru-cache": "^6.0.0"
+    "lru-cache": "^6.0.0",
+    "magic-string": "^0.30.11"
   },
   "scripts": {
     "build": "yarn run build:grammar && yarn run build:pkg",

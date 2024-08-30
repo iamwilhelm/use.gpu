@@ -156,3 +156,18 @@ export const makeASTDecompressor = (
   } as any as Tree;
   return tree;
 }
+
+type Decompressor = {
+  (s: (string | number)[]): string[];
+  (s: string | number): string;
+};
+
+export const decompressString = (symbols: string[]): Decompressor => (s: (string | number)[] | string | number): any => {
+  if (typeof s === 'string') return s;
+  if (typeof s === 'number') return symbols[s];
+
+  return s.map(s => {
+    if (typeof s === 'string') return s;
+    if (typeof s === 'number') return symbols[s];
+  });
+};

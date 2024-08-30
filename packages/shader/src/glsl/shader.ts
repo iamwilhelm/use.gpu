@@ -54,8 +54,35 @@ const minifyCode = (code: string) => {
   return code;
 };
 
+export const symbolDictionary = {
+  A: 'at' as 'at',
+  B: 'bindings' as 'bindings',
+  E: 'exports' as 'exports',
+  F: 'func' as 'func',
+  G: 'flags' as 'flags',
+  H: 'inferred' as 'inferred',
+  I: 'identifiers' as 'identifiers',
+  J: 'imported' as 'imported',
+  K: 'imports' as 'imports',
+  L: 'linkable' as 'linkable',
+  M: 'members' as 'members',
+  N: 'name' as 'name',
+  O: 'modules' as 'modules',
+  P: 'parameters' as 'parameters',
+  Q: 'qual' as 'qual',
+  R: 'symbol' as 'symbol',
+  S: 'symbols' as 'symbols',
+  T: 'type' as 'type',
+  U: 'struct' as 'struct',
+  V: 'variable' as 'variable',
+  W: 'visibles' as 'visibles',
+  X: 'externals' as 'externals',
+  Y: 'types' as 'types',
+  Z: 'attr' as 'attr',
+};
+
 /** ES/CommonJS Transpiler */
-export const transpileGLSL = makeTranspile('glsl', 'glsl', loadModule, compressAST, minifyCode);
+export const transpileGLSL = makeTranspile('glsl', 'glsl', symbolDictionary, loadModule, compressAST, minifyCode);
 
 /** Templated literal syntax:
 

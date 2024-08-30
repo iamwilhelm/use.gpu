@@ -60,6 +60,7 @@ export default {
       },
       {
         test: /\.wgsl$/i,
+        exclude: [/node_modules/, /packages\/wgsl/],
         use: [{
           loader: path.resolve('./packages/wgsl-loader/src/index.ts'),
           options: {minify: !isDevelopment},

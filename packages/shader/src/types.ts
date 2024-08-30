@@ -1,5 +1,6 @@
 import { Tree } from '@lezer/common';
 import LRU from 'lru-cache';
+import MagicString from 'magic-string';
 
 type ColorSpace = any;
 
@@ -22,6 +23,7 @@ export type ASTParser<T extends SymbolTableT = any> = {
 export type SymbolTableT = {
   types?: string[],
   symbols?: string[],
+  modules?: {symbols: string[]}[],
   linkable?: Record<string, true>,
 };
 
@@ -182,3 +184,18 @@ export type UniformAttribute = {
 export type UniformShaderAttribute = string;
 
 export type VirtualRender = (namespace: string, rename: Map<string, string>, virtualBase?: number, volatileBase?: number) => string;
+
+export type TranspileOptions = {
+  esModule?: boolean,
+  minify?: boolean,
+  types?: boolean,
+  typeDef?: boolean,
+  sourceMap?: boolean,
+  importRoot?: string,
+};
+
+export type TranspileOutput = {
+  output: string,
+  typeDef: string | null,
+  magicString: MagicString | null,
+};

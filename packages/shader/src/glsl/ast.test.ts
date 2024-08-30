@@ -355,7 +355,7 @@ vec4 main(VertexOutput arg) { return arg.color; }
 
     const tree = parseShader(code);
     const ast = makeGuardedParser(code, tree);
-    const {symbols} = ast.getSymbolTable();
+    const {symbols, modules} = ast.getSymbolTable();
     const shake = ast.getShakeTable();
 
     expect(shake).toBeTruthy();
@@ -366,7 +366,7 @@ vec4 main(VertexOutput arg) { return arg.color; }
     const ops = resolveShakeOps(shake, keep, symbols);
 
     const tree1 = tree;
-    const tree2 = decompressAST(compressAST(code, tree1, symbols), symbols);
+    const tree2 = decompressAST(compressAST(code, tree1, symbols, modules), symbols);
 
     const code1 = rewriteUsingAST(code, tree1, new Map(), ops);
     const code2 = rewriteUsingAST(code, tree2, new Map(), ops);

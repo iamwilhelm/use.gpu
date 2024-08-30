@@ -1,6 +1,5 @@
 import { createFilter } from '@rollup/pluginutils';
 import { transpileGLSL } from '@use-gpu/shader/glsl';
-import MagicString from 'magic-string';
 
 export const glsl = (userOptions = {}) => {
   const options = Object.assign(
@@ -21,11 +20,8 @@ export const glsl = (userOptions = {}) => {
     transform(source: string, id: string) {
       if (!filter(id)) return;
 
-      const code = transpileGLSL(source, id, true);
-      const magicString = new MagicString(code);
-
-      const result = magicString.toString();
-      return { code: result, map: { mappings: '' }};
+      const code = transpileGLSL(source, id, { esModule: true, minify: true }).output;
+      return { code, map: { mappings: '' }};
     }
   };
 }

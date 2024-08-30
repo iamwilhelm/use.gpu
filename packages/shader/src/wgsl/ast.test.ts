@@ -412,7 +412,8 @@ struct VertexOutput {
     rename.set('main', 'entryPoint');
     rename.set('getValue', '_zz_getValue');
 
-    const compressed = compressAST(code, tree);
+    const symbols = ['main', 'getValue'];
+    const compressed = compressAST(code, tree, symbols);
     const decompressed = decompressAST(compressed);
     expect(compressed).toMatchSnapshot();
     expect(decompressed).toMatchSnapshot();
@@ -459,7 +460,8 @@ fn main(
     rename.set('main', 'entryPoint');
     rename.set('getVertex', '_zz_getVertex');
 
-    const compressed = compressAST(code, tree);
+    const symbols = ['T', 'getVertex', 'VertexOutput', 'main', 'SolidVertex'];
+    const compressed = compressAST(code, tree, symbols);
     const decompressed = decompressAST(compressed);
     expect(compressed).toMatchSnapshot();
     expect(decompressed).toMatchSnapshot();
@@ -501,9 +503,10 @@ fn main(
     `;
 
     const tree = parseShader(code);
-    const compressed = compressAST(code, tree);
+    const symbols = ['SolidVertex', 'getVertex', 'VertexOutput', 'main'];
+    const compressed = compressAST(code, tree, symbols);
     const decompressed = decompressAST(compressed);
-    const recompressed = compressAST(code, decompressed);
+    const recompressed = compressAST(code, decompressed, symbols);
     expect(compressed).toEqual(recompressed);
   });
 
@@ -579,7 +582,7 @@ struct VertexOutput {
 
     const tree = parseShader(code);
     const ast = makeGuardedParser(code, tree);
-    const {symbols} = ast.getSymbolTable();
+    const {symbols, modules} = ast.getSymbolTable();
     const shake = ast.getShakeTable();
 
     expect(shake).toBeTruthy();
@@ -590,7 +593,7 @@ struct VertexOutput {
     const ops = resolveShakeOps(shake, keep, symbols);
 
     const tree1 = tree;
-    const tree2 = decompressAST(compressAST(code, tree1));
+    const tree2 = decompressAST(compressAST(code, tree1, symbols, modules));
 
     const code1 = rewriteUsingAST(code, tree1, new Map(), ops);
     const code2 = rewriteUsingAST(code, tree2, new Map(), ops);

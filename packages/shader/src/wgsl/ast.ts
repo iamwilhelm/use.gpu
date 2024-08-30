@@ -741,9 +741,12 @@ export const compressAST = (
   code: string,
   tree: Tree,
   symbols: string[] = [],
+  modules: ModuleRef[] = [],
 ): CompressedNode[] => {
   const out = [] as any[]
   const emit = makeASTEmitter(out, AST_OPS, symbols);
+
+  const whitelist = new Set([...symbols, ...modules.flatMap((m) => m.symbols)]);
 
   // Pass through nodes from pre-compressed tree immediately
   // @ts-ignore
@@ -767,7 +770,8 @@ export const compressAST = (
 
     // Any identifier
     else if (type.name === 'Identifier') {
-      ident(from, to);
+      const s = code.slice(from, to);
+      if (whitelist.has(s)) ident(from, to);
     }
 
     // Top level declaration

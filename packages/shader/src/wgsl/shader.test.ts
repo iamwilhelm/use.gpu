@@ -8,8 +8,8 @@ describe('shader', () => {
     const source = WGSLModules['getQuadVertex'];
     const resourcePath = '/getQuadVertex';
 
-    const normal = transpileWGSL(source, resourcePath, true, false);
-    const minified = transpileWGSL(source, resourcePath, true, true);
+    const {output: normal} = transpileWGSL(source, resourcePath, { esModule: true, minify: false });
+    const {output: minified} = transpileWGSL(source, resourcePath, { esModule: true, minify: true });
 
     expect(normal).toMatchSnapshot();
     expect(minified).toMatchSnapshot();
@@ -20,8 +20,22 @@ describe('shader', () => {
 
     const source = WGSLModules['getQuadVertex'];
     const resourcePath = '/getQuadVertex';
-    const normal = transpileWGSL(source, resourcePath, false, false);
-    const minified = transpileWGSL(source, resourcePath, false, true);
+
+    const {output: normal} = transpileWGSL(source, resourcePath, { esModule: false, minify: false });
+    const {output: minified} = transpileWGSL(source, resourcePath, { esModule: false, minify: true });
+
+    expect(normal).toMatchSnapshot();
+    expect(minified).toMatchSnapshot();
+
+  });
+
+  it('transpiles wgsl to ES with types', () => {
+
+    const source = WGSLModules['getQuadVertex'];
+    const resourcePath = '/getQuadVertex';
+
+    const {output: normal} = transpileWGSL(source, resourcePath, { esModule: true, minify: false, types: true });
+    const {output: minified} = transpileWGSL(source, resourcePath, { esModule: true, minify: true, types: true });
 
     expect(normal).toMatchSnapshot();
     expect(minified).toMatchSnapshot();

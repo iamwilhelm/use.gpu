@@ -18,11 +18,8 @@ function wgslLoader(this: any, source: string) {
     baseDataPath: 'options'
   });
 
-  const esModule = options.esModule != null ? options.esModule : true;
-  const minify = options.minify != null ? options.minify : false;
-
   const {resourcePath} = this;
-  return transpileWGSL(source, resourcePath, esModule, minify);
+  return transpileWGSL(source, resourcePath, options).output;
 }
 
 export default wgslLoader;

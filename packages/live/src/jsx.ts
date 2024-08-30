@@ -1,5 +1,5 @@
 import {
-  capture, fence, gather, multiGather, mapReduce, morph, provide, yeet, quoteTo, unquote, reconcileTo, suspend, signalTo,
+  capture, fence, fragment, gather, multiGather, mapReduce, morph, provide, yeet, quoteTo, unquote, reconcileTo, suspend, signalTo,
   CAPTURE, FENCE, GATHER, MULTI_GATHER, MAP_REDUCE, MORPH, PROVIDE, YEET, FRAGMENT, QUOTE, UNQUOTE, RECONCILE, SUSPEND, SIGNAL,
 } from './builtin';
 import { getCurrentFiberBy } from './current';

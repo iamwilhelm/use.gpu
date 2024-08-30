@@ -35,7 +35,7 @@ const mul = Math.imul;
 
 /** Pack 2 uint32's into one uint53 / float64. B is truncated. */
 export const toUint53 = (a: number, b: number) => {
-  return a + ((b & 0x1fffff) * 0x100000000);
+  return (a >>> 0) + ((b & 0x1fffff) * 0x100000000);
 }
 
 /** Format murmur53 value as a base64 string. */

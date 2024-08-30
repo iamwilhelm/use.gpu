@@ -11,6 +11,7 @@ import {
   bundleToAttributes,
 
   wgsl, f32, i32, u32,
+  symbolDictionary,
 } from './shader';
 
 import {
@@ -22,7 +23,6 @@ import {
   resolveBindings,
   extractBindings,
 } from './bind';
-
 
 import {
   castTo,
@@ -69,7 +69,13 @@ import {
   getBundleLabel,
 } from '../util/bundle';
 
+import {
+  decompressString,
+} from '../util/tree';
+
 import { parser } from './highlight/wgsl';
+
+export * from './types';
 
 export {
   loadModule,
@@ -84,6 +90,7 @@ export {
   bundleToAttributes,
 
   wgsl, f32, i32, u32,
+  symbolDictionary,
 } from './shader';
 
 export {
@@ -140,6 +147,10 @@ export {
   getBundleKey,
   getBundleLabel,
 } from '../util/bundle';
+
+export {
+  decompressString,
+} from '../util/tree';
 
 export const WGSLLinker = {
   loadModule,
@@ -184,6 +195,9 @@ export const WGSLLinker = {
   getBundleHash,
   getBundleKey,
   getBundleLabel,
+
+  decompressString,
+  symbolDictionary,
 
   parser,
 };

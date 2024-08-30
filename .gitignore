@@ -10,6 +10,7 @@ test/import/node_modules
 test/import/dist
 test/import/yarn.lock
 packages/glyph/pkg
+packages/wgsl/src
 scripts/fetch-tiles.mjs
 .env.local
 .npmrc

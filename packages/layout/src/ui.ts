@@ -18,7 +18,7 @@ import { overlapBounds, joinBounds } from './lib/util';
 const DEBUG = false;
 
 export type UIProps = {
-  children: LiveElement,
+  children?: LiveElement,
 };
 
 export type UILayersProps = {

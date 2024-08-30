@@ -76,6 +76,6 @@ export const useNoRawSource = () => {
 };
 
 export const useRawTensorSource = (data: TensorArray, options: RawSourceOptions = NO_OPTIONS) =>
-  useRawSource(data.array, data.format, options, data.size, data.version);
+  useRawSource(data.array, data.format, options, data.size as number[], data.version);
 
 export const useNoRawTensorSource = useNoRawSource;

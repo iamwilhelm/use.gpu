@@ -7,7 +7,8 @@
     "rootDir": "..",
     "baseUrl": "src",
     "outDir": "../../build/ts",
-    "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "./tsconfig.tsbuildinfo",
+    "types": ["@webgpu/types", "jest", "node"]
   },
   "include": ["src/**/*.ts", "scripts/**/*.ts", "./*.ts"]
 }

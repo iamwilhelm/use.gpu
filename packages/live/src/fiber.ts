@@ -276,7 +276,7 @@ const BY_MAP = new WeakMap<any, number>();
 
 /** React element interop
     @hidden */
-export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
+export const reactInterop = (element: any, fiber?: LiveFiber<any>): DeferredCall<any> | DeferredCall<any>[] | null => {
   if (typeof element === 'string') throw new Error(`String "${element}" is not a valid JSX element`);
   let call = element as DeferredCall<any> | DeferredCall<any>[] | null;
   if (element && ('props' in element)) {

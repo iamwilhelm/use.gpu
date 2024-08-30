@@ -227,6 +227,7 @@ export const SDFRectangle: LiveComponent<SDFRectangleProps> = (props) => {
     return yeet(render);
   }, [
     image,
+    texture,
 
     fill,
     stroke,

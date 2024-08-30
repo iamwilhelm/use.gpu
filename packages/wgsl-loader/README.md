@@ -10,19 +10,11 @@ yarn add @use-gpu/wgsl-loader
 
 **Docs**: https://usegpu.live/docs/reference-loader-@use-gpu-wgsl-loader
 
-# Loader - WGSL (webpack / node / rollup / esbuild)
+# Loader - WGSL (webpack / rollup / esbuild)
 
-This is a webpack and node loader which enables easy use of `@use-gpu/shader`.
+This is a JS loader which enables easy use of `@use-gpu/shader`.
 
 ## Usage
-
-#### Node.js
-
-For node, the included helper will use `require-hacker` to convert all `*.wgsl` files to CommonJS:
-
-```js
-import "@use-gpu/wgsl-loader/node";
-```
 
 #### Webpack Config
 
@@ -78,7 +70,7 @@ You will get the same `ParsedBundle`, but with `entry` set to the imported symbo
 
 ## Typescript
 
-To allow shader imports to type check, use the `shader2ts` script from `@use-gpu/shader` to emit .d.ts files, e.g. in `src/`:
+To allow shader imports to type check, use the `shader2ts` script from `@use-gpu/shader` to emit .d.ts files, e.g. for `src/`:
 
 ```
 ./node_modules/@use-gpu/shader/bin/shader2ts.js --noEmit --typeDef src

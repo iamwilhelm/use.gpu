@@ -67,7 +67,7 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
     return getShader(shader, values);
   }, [shader, args.length, source, sources]);
 
-  const output = useLambdaSource(getData, data ?? source ?? NO_SOURCE);
+  const output = useLambdaSource(getData, source ?? NO_SOURCE);
 
   return useRenderProp(props, output);
 };

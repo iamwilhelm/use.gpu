@@ -7,6 +7,7 @@ import { useDeviceContext, useNoDeviceContext } from '../providers/device-provid
 import { useBufferedSize, useNoBufferedSize } from './useBufferedSize';
 
 const NO_OPTIONS: RawSourceOptions = {};
+const NO_SIZE: number[] = [];
 
 type RawSourceOptions = {
   flags?: GPUFlagsConstant,
@@ -19,6 +20,7 @@ export const useRawSource = (
   array: TypedArray,
   format: UniformType,
   options: RawSourceOptions = NO_OPTIONS,
+  size?: number[],
   version: number = 0,
 ) => {
   const {
@@ -47,7 +49,7 @@ export const useRawSource = (
     uploadBuffer(device, buffer, array.buffer);
 
     source.length = array.length / Math.floor(UNIFORM_ARRAY_DIMS[format]);
-    source.size = [source.length];
+    source.size = size ?? [source.length];
     source.version = incrementVersion(source.version);
   }
   else {
@@ -55,9 +57,9 @@ export const useRawSource = (
       uploadBuffer(device, buffer, array.buffer);
 
       source.length = array.length / Math.floor(UNIFORM_ARRAY_DIMS[format]);
-      source.size = [source.length];
+      source.size = size ?? [source.length];
       source.version = incrementVersion(source.version);
-    }, [array, buffer, version]);
+    }, [array, buffer, version, ...size ?? NO_SIZE]);
   }
 
   return source;
@@ -74,6 +76,6 @@ export const useNoRawSource = () => {
 };
 
 export const useRawTensorSource = (data: TensorArray, options: RawSourceOptions = NO_OPTIONS) =>
-  useRawSource(data.array, data.format, options, data.version);
+  useRawSource(data.array, data.format, options, data.size, data.version);
 
 export const useNoRawTensorSource = useNoRawSource;

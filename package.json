@@ -62,12 +62,11 @@
     "build-examples": "ts-node ./scripts/example-json-version.ts",
     "build-app": "ts-node node_modules/.bin/webpack build; ./scripts/copy-app-to-docs.sh",
     "clear": "rm -rf packages/glyph/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js; rm -rf packages/wgsl/src",
-    "ci-test": "CI=true yarn run jest && yarn run test:import && yarn run test:vite-react",
     "docs": "ts-node ./scripts/getdocs.ts",
     "publish": "./scripts/npm-publish.sh",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "MODULE_ENV=cjs jest --watch",
-    "test:import": "(cd test/import; yarn run test)",
+    "ci-test": "MODULE_ENV=cjs CI=true yarn run jest",
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
@@ -77,11 +76,9 @@
     "preset": "ts-jest",
     "testEnvironment": "jsdom",
     "transform": {
-      "\\.[jt]sx?$": "babel-jest",
-      "\\.(wgsl|glsl)$": "<rootDir>/test/fileTransformer.mjs"
+      "\\.[jt]sx?$": "babel-jest"
     },
     "moduleNameMapper": {
-      "^@use-gpu/wgsl/(.*)$": "<rootDir>/packages/wgsl/src/$1",
       "^@use-gpu/(.*)$": "<rootDir>/packages/$1"
     },
     "modulePaths": [
@@ -89,9 +86,6 @@
     ],
     "modulePathIgnorePatterns": [
       "<rootDir>/build"
-    ],
-    "setupFiles": [
-      "./test/setup.ts"
     ],
     "moduleFileExtensions": [
       "js",

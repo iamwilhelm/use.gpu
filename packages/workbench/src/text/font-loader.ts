@@ -18,7 +18,7 @@ export type FontSource = {
 
 export type FontLoaderProps = {
   fonts?: FontSource[],
-  children: LiveElement,
+  children?: LiveElement,
 };
 
 const NO_FONTS: FontSource[] = [];

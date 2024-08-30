@@ -12,7 +12,7 @@ export const useFontContext = () => useContext(FontContext);
 
 export type FontProviderProps = {
   fonts: Font[],
-  children: LiveElement,
+  children?: LiveElement,
 };
 
 export const FontProvider: LiveComponent<FontProviderProps> = ({fonts, children}) => {

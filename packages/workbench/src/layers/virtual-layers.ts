@@ -26,7 +26,7 @@ const DEBUG = false;
 
 export type VirtualLayersProps = {
   items?: Record<string, LayerAggregate[]>,
-  children: LiveElement,
+  children?: LiveElement,
 };
 
 const AGGREGATORS = {

@@ -44,7 +44,7 @@ export type EventProviderProps = {
   wheel: WheelState,
   keyboard: KeyboardState,
   pointerLock: PointerLockAPI,
-  children: LiveElement,
+  children?: LiveElement,
 };
 
 export type PointerLockAPI = {

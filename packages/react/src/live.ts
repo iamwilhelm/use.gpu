@@ -5,7 +5,7 @@ import { render as renderLive, unmount as unmountLive, resolveRootNode } from '@
 
 export type LiveProps = {
   /** Live child to render (must be 1) */
-  children: LiveElement,
+  children?: LiveElement,
 };
 
 /**

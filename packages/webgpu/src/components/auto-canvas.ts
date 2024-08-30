@@ -33,8 +33,8 @@ export type AutoCanvasProps = {
   /** If running in an iframe, avoid preventing default on scroll. */
   iframe?: boolean,
 
-  children: LiveElement,
-}
+  children?: LiveElement,
+};
 
 export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   const {

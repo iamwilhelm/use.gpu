@@ -14,13 +14,13 @@ import { getRenderPassDescriptor, drawToPass } from './util';
 
 const {quote} = QueueReconciler;
 
-export type PickingPassProps = {
+export type PickingPassProps = PropsWithChildren<{
   calls: {
     picking?: Renderable[],
   },
   overlay?: boolean,
   merge?: boolean,
-};
+}>;
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
@@ -29,7 +29,7 @@ const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 Draws all pickable objects as object ID / vertex ID pairs.
 */
-export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<PickingPassProps>) => {
+export const PickingPass: LC<PickingPassProps> = memo((props: PickingPassProps) => {
   const {
     overlay = false,
     merge = false,

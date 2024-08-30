@@ -12,15 +12,15 @@ import { UILayers } from '@use-gpu/layout';
 import { PresentAPI } from '../providers/present-provider';
 import { Screen } from './screen';
 
-export type StageProps = {
+export type StageProps = PropsWithChildren<{
   step: number,
   api: PresentAPI,
   backgroundColor: ColorLike,
   version: number,
-};
+}>;
 
 // Presentation view renderer
-export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>) => {
+export const Stage: LC<StageProps> = memo((props: StageProps) => {
   const {api, backgroundColor, children} = props;
 
   // Render keyed layers for entering and exiting

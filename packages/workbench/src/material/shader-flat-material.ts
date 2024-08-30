@@ -1,4 +1,4 @@
-import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { LC, LiveElement } from '@use-gpu/live';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { provide, yeet, useMemo } from '@use-gpu/live';
@@ -6,6 +6,7 @@ import { provide, yeet, useMemo } from '@use-gpu/live';
 import { MaterialContext } from '../providers/material-provider';
 import { QueueReconciler } from '../reconcilers';
 import { useShader } from '../hooks/useShader';
+import { getRenderFunc } from '../hooks/useRenderProp';
 
 import { getSolidSurface } from '@use-gpu/wgsl/instance/surface/solid.wgsl';
 import { getSolidFragment } from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
@@ -19,12 +20,12 @@ export type ShaderFlatMaterialProps = {
    */
   fragment: ShaderModule,
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
+  children?: LiveElement | ((material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement),
 };
 
-export const ShaderFlatMaterial: LC<ShaderFlatMaterialProps> = (props: PropsWithChildren<ShaderFlatMaterialProps>) => {
+export const ShaderFlatMaterial: LC<ShaderFlatMaterialProps> = (props: ShaderFlatMaterialProps) => {
   const {
     fragment,
-    render,
     children,
   } = props;
 
@@ -43,6 +44,7 @@ export const ShaderFlatMaterial: LC<ShaderFlatMaterialProps> = (props: PropsWith
     },
   }), [getSurface, getLight]);
 
+  const render = getRenderFunc(props);
   const view = render ? render(context) : children;
   return render ?? children ? provide(MaterialContext, context, [signal(), view]) : yeet(context);
 }

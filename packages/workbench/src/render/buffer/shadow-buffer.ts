@@ -7,12 +7,12 @@ import { useRenderContext } from '../../providers/render-provider';
 
 import { SHADOW_FORMAT } from '../light/light-data';
 
-export type ShadowBufferProps = {
+export type ShadowBufferProps = PropsWithChildren<{
   format?: GPUTextureFormat,
-};
+}>;
 
 // Provide render context for depth-only shadow passes
-export const ShadowBuffer: LC<ShadowBufferProps> = memo((props: PropsWithChildren<ShadowBufferProps>) => {
+export const ShadowBuffer: LC<ShadowBufferProps> = memo((props: ShadowBufferProps) => {
   const {
     format = SHADOW_FORMAT,
   } = props;

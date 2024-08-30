@@ -18,7 +18,7 @@ const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, numb
   return [pixelRatio * window.innerWidth, pixelRatio * window.innerHeight, pixelRatio];
 }
 
-export const AutoSize: LiveComponent<AutoSizeProps> = (props: PropsWithChildren<AutoSizeProps>) => {
+export const AutoSize: LiveComponent<AutoSizeProps> = (props: AutoSizeProps) => {
   const {canvas, children} = props;
 
   useResource(() => {

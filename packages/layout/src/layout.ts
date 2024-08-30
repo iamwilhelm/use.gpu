@@ -24,17 +24,17 @@ import { INSPECT_STYLE } from './lib/constants';
 
 import { mat4, vec2, vec3 } from 'gl-matrix';
 
-export type LayoutProps = {
+export type LayoutProps = PropsWithChildren<{
   width?: number,
   height?: number,
   placement?: Placement,
   inspect?: boolean,
   render?: () => LiveElement,
-};
+}>;
 
 const DEFAULT_PLACEMENT = vec2.fromValues(1, 1);
 
-export const Layout: LiveComponent<LayoutProps> = memo((props: PropsWithChildren<LayoutProps>) => {
+export const Layout: LiveComponent<LayoutProps> = memo((props: LayoutProps) => {
   const {width, height, render, children} = props;
   const placement = useProp(props.placement, parsePlacement, DEFAULT_PLACEMENT);
 

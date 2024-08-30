@@ -12,9 +12,9 @@ const {reconcile, quote, signal} = QueueReconciler;
 const START = +new Date();
 const DEBUG = false;
 
-export type LoopProps = {
+export type LoopProps = PropsWithChildren<{
   live?: boolean,
-};
+}>;
 
 export type LoopRef = {
   time: {
@@ -40,7 +40,7 @@ export type LoopRef = {
 };
 
 /** Provides `useAnimationFrame` and clock to allow for controlled looping and animation. */
-export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProps>) => {
+export const Loop: LiveComponent<LoopProps> = (props: LoopProps) => {
   const {live, children} = props;
   const parent = useContext(LoopContext);
 

@@ -28,7 +28,7 @@ export type PickState = {
   index: number,
 };
 
-export type PickProps = {
+export type PickProps = PropsWithChildren<{
   all?: boolean,
   move?: boolean,
   capture?: boolean,
@@ -40,9 +40,9 @@ export type PickProps = {
 
   render?: (state: PickState) => LiveElement,
   children?: LiveElement | ((state: PickState) => LiveElement),
-}
+}>;
 
-export const Pick: LiveComponent<PickProps> = (props: PropsWithChildren<PickProps>) => {
+export const Pick: LiveComponent<PickProps> = (props: PickProps) => {
   const {
     all,
     move,

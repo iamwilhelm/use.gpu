@@ -28,14 +28,14 @@ import { useDepthBlit } from './depth-blit';
 
 const {quote} = QueueReconciler;
 
-export type ShadowOmniPassProps = {
+export type ShadowOmniPassProps = PropsWithChildren<{
   calls: {
     shadow?: Renderable[],
   },
   map: BoundLight,
   descriptors: GPURenderPassDescriptor[],
   texture: TextureSource,
-};
+}>;
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
@@ -84,7 +84,7 @@ const VIEW_MATRICES = [
 
 Draws all shadow calls to an omnidirectional shadow map.
 */
-export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChildren<ShadowOmniPassProps>) => {
+export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: ShadowOmniPassProps) => {
   const {
     calls,
     map,

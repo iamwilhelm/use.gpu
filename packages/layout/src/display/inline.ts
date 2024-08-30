@@ -17,7 +17,7 @@ import { parseAlignment, parseBaseline, parseDirectionX } from '../parse';
 
 export type InlineProps =
   TraitProps<typeof BoxTrait> &
-{
+PropsWithChildren<{
   direction?: Direction,
 
   align?: Alignment,
@@ -25,9 +25,9 @@ export type InlineProps =
 
   wrap?: boolean,
   snap?: boolean,
-};
+}>;
 
-export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren<InlineProps>) => {
+export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
   const {
     wrap = true,
     snap = true,

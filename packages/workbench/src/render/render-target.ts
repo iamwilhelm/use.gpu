@@ -7,6 +7,7 @@ import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 
 import { useInspectable } from '../hooks/useInspectable';
+import { getRenderFunc } from '../hooks/useRenderProp';
 
 import {
   makeColorState,
@@ -37,6 +38,7 @@ export type RenderTargetProps = {
   variant?: string,
 
   render?: (rttContext: OffscreenTarget) => LiveElement,
+  children?: LiveElement | ((rttContext: OffscreenTarget) => LiveElement),
   then?: (target: TextureTarget) => LiveElement,
 };
 
@@ -44,7 +46,7 @@ export type RenderTargetProps = {
 
 Place `@{<Pass>}` directly inside, or leave empty to use yielded target with `@{<RenderToTexture>}`.
 */
-export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithChildren<RenderTargetProps>) => {
+export const RenderTarget: LiveComponent<RenderTargetProps> = (props: RenderTargetProps) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 
@@ -64,7 +66,6 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
     colorInput = COLOR_SPACE,
     variant = 'textureSample',
     absolute = false,
-    render,
     children,
     then,
   } = props;
@@ -229,6 +230,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
     },
   });
 
+  const render = getRenderFunc(props);
   if (!(render ?? children)) return yeet(rttContext);
 
   const content = render ? render(rttContext) : children;

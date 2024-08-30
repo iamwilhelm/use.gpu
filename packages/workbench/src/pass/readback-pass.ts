@@ -8,12 +8,12 @@ import { QueueReconciler } from '../reconcilers';
 
 const {quote} = QueueReconciler;
 
-export type ReadbackPassProps = {
+export type ReadbackPassProps = PropsWithChildren<{
   calls: {
     post?: CommandToBuffer[],
     readback?: ArrowFunction[],
   },
-};
+}>;
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
@@ -22,7 +22,7 @@ const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 Executes all post-compute calls and awaits promises for readback.
 */
-export const ReadbackPass: LC<ReadbackPassProps> = memo((props: PropsWithChildren<ReadbackPassProps>) => {
+export const ReadbackPass: LC<ReadbackPassProps> = memo((props: ReadbackPassProps) => {
   const {
     calls,
   } = props;

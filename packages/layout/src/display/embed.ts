@@ -17,7 +17,7 @@ const {quote} = LayerReconciler;
 
 export type EmbedProps =
   TraitProps<typeof BoxTrait> &
-{
+PropsWithChildren<{
   width?: Dimension,
   height?: Dimension,
   snap?: boolean,
@@ -30,9 +30,9 @@ export type EmbedProps =
     mask: ShaderModule | null,
     transform: ShaderModule | null,
   ) => LiveElement,
-};
+}>;
 
-export const Embed: LiveComponent<EmbedProps> = memo((props: PropsWithChildren<EmbedProps>) => {
+export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
   const {
     snap = true,
     render,

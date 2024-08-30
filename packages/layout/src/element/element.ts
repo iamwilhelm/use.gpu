@@ -19,15 +19,15 @@ const {quote} = LayerReconciler;
 export type ElementProps =
   TraitProps<typeof BoxTrait> &
   TraitProps<typeof ElementTrait> &
-{
+PropsWithChildren<{
   snap?: boolean,
   absolute?: boolean,
   under?: boolean,
-};
+}>;
 
 const TRANSPARENT: XYZW = [0, 0, 0, 0];
 
-export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<ElementProps>) => {
+export const Element: LiveComponent<ElementProps> = (props: ElementProps) => {
   const {
     snap = false,
     absolute = false,

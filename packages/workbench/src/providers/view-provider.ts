@@ -29,13 +29,13 @@ export type ViewContextProps = {
   cull: (center: vec3 | number[], radius: number) => number | boolean,
 };
 
-export type ViewProviderProps = {
+export type ViewProviderProps = PropsWithChildren<{
   defs: UniformAttribute[],
   uniforms: ViewUniforms,
   cull?: boolean,
-};
+}>;
 
-export const ViewProvider: LiveComponent<ViewProviderProps> = (props: PropsWithChildren<ViewProviderProps>) => {
+export const ViewProvider: LiveComponent<ViewProviderProps> = (props: ViewProviderProps) => {
   const {
     defs,
     uniforms,

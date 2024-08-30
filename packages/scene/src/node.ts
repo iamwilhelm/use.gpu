@@ -9,9 +9,9 @@ import { composeTransform } from './lib/compose';
 
 const makeMat4 = () => mat4.create();
 
-export type NodeProps = TraitProps<typeof ObjectTrait>;
+export type NodeProps = PropsWithChildren<TraitProps<typeof ObjectTrait>>;
 
-export const Node: LiveComponent<NodeProps> = (props: PropsWithChildren<NodeProps>) => {
+export const Node: LiveComponent<NodeProps> = (props: NodeProps) => {
   const parent = useMatrixContext();
   const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props) as any;
   const {children} = props;

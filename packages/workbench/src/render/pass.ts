@@ -11,7 +11,7 @@ import { GBuffer } from './buffer/gbuffer';
 import { PickingBuffer } from './buffer/picking-buffer';
 import { ShadowBuffer } from './buffer/shadow-buffer';
 
-export type PassProps = {
+export type PassProps = PropsWithChildren<{
   mode?: 'forward' | 'deferred' | 'fullscreen',
 
   shadows?: boolean,
@@ -19,11 +19,11 @@ export type PassProps = {
   picking?: boolean,
   overlay?: boolean,
   merge?: boolean,
-};
+}>;
 
 const NO_BUFFERS: any = {};
 
-export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) => {
+export const Pass: LC<PassProps> = memo((props: PassProps) => {
   const {
     mode = 'forward',
     lights = false,

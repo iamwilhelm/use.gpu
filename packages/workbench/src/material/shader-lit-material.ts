@@ -1,4 +1,4 @@
-import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { LC, LiveElement } from '@use-gpu/live';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { provide, yeet, useMemo } from '@use-gpu/live';
@@ -57,9 +57,10 @@ export type ShaderLitMaterialProps = {
   fn getLight(surface: SurfaceFragment) -> vec4<f32> */
   apply?: ShaderModule,
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
+  children?: LiveElement | ((material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement),
 };
 
-export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithChildren<ShaderLitMaterialProps>) => {
+export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: ShaderLitMaterialProps) => {
   const {
     depth,
     fragment,

@@ -35,7 +35,7 @@ const DEFAULT_PASSES = [
 
 const NO_BUFFERS: Record<string, UseGPURenderContext[]> = {};
 
-export type DeferredRendererProps = {
+export type DeferredRendererProps = PropsWithChildren<{
   overlay?: boolean,
   merge?: boolean,
 
@@ -43,7 +43,7 @@ export type DeferredRendererProps = {
   context?: Record<string, any>,
   passes?: LiveElement[],
   components?: RenderComponents,
-};
+}>;
 
 const getComponents = ({modes = {}, renders = {}}: Partial<RenderComponents>): RenderComponents => {
   return {
@@ -62,7 +62,7 @@ const getComponents = ({modes = {}, renders = {}}: Partial<RenderComponents>): R
   }
 };
 
-export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWithChildren<DeferredRendererProps>) => {
+export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: DeferredRendererProps) => {
   const {
     overlay = false,
     merge = false,

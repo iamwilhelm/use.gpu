@@ -6,11 +6,11 @@ import { use, memo, multiGather, useOne } from '@use-gpu/live';
 import { ComputePass } from '../pass/compute-pass';
 import { ReadbackPass } from '../pass/readback-pass';
 
-export type ComputeProps = {
+export type ComputeProps = PropsWithChildren<{
   immediate?: boolean,
-};
+}>;
 
-export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeProps>) => {
+export const Compute: LC<ComputeProps> = memo((props: ComputeProps) => {
   const {
     immediate,
     children,

@@ -18,9 +18,9 @@ const makeMat4 = () => mat4.create();
 const Traits = combine(AxesTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);
 
-export type CartesianProps = TraitProps<typeof Traits>;
+export type CartesianProps = PropsWithChildren<TraitProps<typeof Traits>>;
 
-export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildren<CartesianProps>) => {
+export const Cartesian: LiveComponent<CartesianProps> = (props: CartesianProps) => {
   const {
     children,
   } = props;

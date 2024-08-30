@@ -13,12 +13,12 @@ import { Plot } from '../plot';
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { mat4, vec3 } from 'gl-matrix';
 
-export type EmbeddedProps = {
+export type EmbeddedProps = PropsWithChildren<{
   layout?: Rectangle,
   normalize?: boolean,
-};
+}>;
 
-export const Embedded: LiveComponent<EmbeddedProps> = (props: PropsWithChildren<EmbeddedProps>) => {
+export const Embedded: LiveComponent<EmbeddedProps> = (props: EmbeddedProps) => {
   const {
     normalize,
     children,

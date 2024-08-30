@@ -46,11 +46,11 @@ export const MVTStyleContext = makeContext<MVTStyleContextProps>({
 export const useMVTStyleContext = () => useContext<MVTStyleContextProps>(MVTStyleContext);
 export const useNoMVTStyleContext = () => useNoContext(MVTStyleContext);
 
-export type MVTStylesProps = {
+export type MVTStylesProps = PropsWithChildren<{
   styles: DeepPartial<MVTStyleContextProps>,
-};
+}>;
 
-export const MVTStyles: LiveComponent<MVTStylesProps> = (props: PropsWithChildren<MVTStylesProps>) => {
+export const MVTStyles: LiveComponent<MVTStylesProps> = (props: MVTStylesProps) => {
   const {styles, children} = props;
 
   const context = useOne(() => {

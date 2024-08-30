@@ -24,13 +24,13 @@ import { useDepthBlit } from './depth-blit';
 
 const {quote} = QueueReconciler;
 
-export type ShadowOrthoPassProps = {
+export type ShadowOrthoPassProps = PropsWithChildren<{
   calls: {
     shadow?: Renderable[],
   },
   map: BoundLight,
   descriptors: GPURenderPassDescriptor[],
-};
+}>;
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
@@ -39,7 +39,7 @@ const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 Draws all shadow calls to an orthographic shadow map.
 */
-export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithChildren<ShadowOrthoPassProps>) => {
+export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: ShadowOrthoPassProps) => {
   const {
     calls,
     map,

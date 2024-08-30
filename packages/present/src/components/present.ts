@@ -16,11 +16,11 @@ import { Stage } from './stage';
 
 const {reconcile, quote} = PresentReconciler;
 
-export type PresentProps = {
+export type PresentProps = PropsWithChildren<{
   step?: number,
   onChange?: (step: number) => void,
   backgroundColor?: ColorLike,
-};
+}>;
 
 type SlideMap = Map<number, ResolvedSlide>;
 const NO_MAP: SlideMap = new Map();
@@ -32,7 +32,7 @@ type State = {
 
 const DEFAULT_BG = parseColor('#00000000');
 
-export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>) => {
+export const Present: LC<PresentProps> = (props: PresentProps) => {
   const {
     step: initialStep = 0,
     onChange,

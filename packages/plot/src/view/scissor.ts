@@ -10,13 +10,13 @@ import { getScissorLevel } from '@use-gpu/wgsl/transform/scissor.wgsl';
 
 const NO_LOOP = [0, 0, 0, 0];
 
-export type ScissorProps = {
+export type ScissorProps = PropsWithChildren<{
   loop?: boolean[] | number[],
   bias?: number,
   range?: [number, number][],
-};
+}>;
 
-export const Scissor: LC<ScissorProps> = (props: PropsWithChildren<ScissorProps>) => {
+export const Scissor: LC<ScissorProps> = (props: ScissorProps) => {
   const {loop = NO_LOOP, bias = 0.5, children} = props;
 
   const range = props.range ? (useNoRangeContext(), props.range) : useRangeContext();

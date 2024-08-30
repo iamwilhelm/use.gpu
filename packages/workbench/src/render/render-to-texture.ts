@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { UseGPURenderContext, TextureTarget } from '@use-gpu/core';
 
 import { provide, yeet, useMemo, incrementVersion } from '@use-gpu/live';
@@ -16,7 +16,7 @@ export type RenderToTextureProps = {
 };
 
 /** Render to a given off-screen target, or the current target (if inside a `@{<RenderTarget>}`). */
-export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props: PropsWithChildren<RenderToTextureProps>) => {
+export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props: RenderToTextureProps) => {
   const {
     target,
     children,

@@ -2,11 +2,11 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import { provide, useOne, useMemo } from '@use-gpu/live';
 import { TileContext } from './tile-provider';
 
-export type MapboxProviderProps = {
+export type MapboxProviderProps = PropsWithChildren<{
   accessToken?: string,
   username?: string,
   style?: string,
-};
+}>;
 
 const makeMVTSource = (
   username: string,
@@ -18,7 +18,7 @@ const makeMVTSource = (
   zoom: number,
 ) => `https://api.mapbox.com/v4/${username}.${style}/${zoom}/${x}/${y}.mvt?access_token=${accessToken}`;
 
-export const MapboxProvider: LC<MapboxProviderProps> = (props: PropsWithChildren<MapboxProviderProps>) => {
+export const MapboxProvider: LC<MapboxProviderProps> = (props: MapboxProviderProps) => {
   const {
     username = 'mapbox',
     style = 'mapbox-streets-v8',

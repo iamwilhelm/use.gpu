@@ -13,7 +13,7 @@ import zipObject from 'lodash/zipObject';
 
 const π = Math.PI;
 
-export type AnimateProps<T extends number | VectorLike | VectorLikes> = {
+export type AnimateProps<T extends number | VectorLike | VectorLikes> = PropsWithChildren<{
   loop?: boolean,
   mirror?: boolean,
   repeat?: number,
@@ -32,13 +32,13 @@ export type AnimateProps<T extends number | VectorLike | VectorLikes> = {
 
   render?: (value: any) => LiveElement,
   children?: LiveElement | ((value: any) => LiveElement),
-};
+}>;
 
 // causes typescript docgen to crash if defined as recursive
 type NestedNumberArray = any[];
 type Numberish = number | TypedArray | NestedNumberArray;
 
-export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Numberish>(props: PropsWithChildren<AnimateProps<T>>) => {
+export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Numberish>(props: AnimateProps<T>) => {
   const {
     loop = false,
     mirror = false,

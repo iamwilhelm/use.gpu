@@ -20,7 +20,7 @@ import { makePresentationContext } from '../web';
 
 //const {signal} = QueueReconciler;
 
-export type CanvasProps = {
+export type CanvasProps = PropsWithChildren<{
   canvas: HTMLCanvasElement,
 
   format?: GPUTextureFormat,
@@ -33,9 +33,9 @@ export type CanvasProps = {
   width: number,
   height: number,
   pixelRatio?: number,
-};
+}>;
 
-export const Canvas: LiveComponent<CanvasProps> = (props: PropsWithChildren<CanvasProps>) => {
+export const Canvas: LiveComponent<CanvasProps> = (props: CanvasProps) => {
   const {
     width,
     height,

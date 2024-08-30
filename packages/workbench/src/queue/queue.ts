@@ -5,14 +5,14 @@ import { QueueReconciler } from '../reconcilers';
 
 const {reconcile, quote, signal} = QueueReconciler;
 
-export type QueueProps = {
+export type QueueProps = PropsWithChildren<{
   nested?: boolean,
-};
+}>;
 
 /** Dispatch queue. Used by `<WebGPU>` to reconcile quoted drawing commands (yeeted lambdas).
 
 Also used to set up nested queues and gather immediate dispatches. */
-export const Queue: LC<QueueProps> = (props: PropsWithChildren<QueueProps>) => {
+export const Queue: LC<QueueProps> = (props: QueueProps) => {
   const {nested, children} = props;
 
   const Resume = (ts: ArrowFunction[]) => {

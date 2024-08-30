@@ -37,13 +37,13 @@ const PRESETS = {
   'field': [SH_DIFFUSE_FIELD, SH_SPECULAR_FIELD],
 } as Record<string, [ShaderModule, ShaderModule]>;
 
-export type EnvironmentProps = {
+export type EnvironmentProps = PropsWithChildren<{
   map?: ShaderSource | null,
   preset?: (keyof typeof PRESETS) | 'none',
   gain?: number,
-};
+}>;
 
-export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<EnvironmentProps>) => {
+export const Environment: LC<EnvironmentProps> = (props: EnvironmentProps) => {
   const {map, preset, gain = 1, children} = props;
 
   const environment = map || !((preset as any) in PRESETS)

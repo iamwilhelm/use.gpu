@@ -26,7 +26,7 @@ const CLIP_BINDING = {name: 'getClip', format: 'vec4<f32>' as UniformType};
 
 const SCROLLBAR = use(ScrollBar, {});
 
-export type OverflowProps = {
+export type OverflowProps = PropsWithChildren<{
   x?: OverflowMode,
   y?: OverflowMode,
 
@@ -36,9 +36,9 @@ export type OverflowProps = {
   scrollBar?: LiveElement,
 
   direction?: Direction,
-};
+}>;
 
-export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChildren<OverflowProps>) => {
+export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps) => {
   const {
     scrollX = 0,
     scrollY = 0,

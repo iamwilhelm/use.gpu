@@ -1,4 +1,4 @@
-import type { LiveComponent } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ViewUniforms, Rectangle } from '@use-gpu/core';
 
 import { use, provide, deprecated, useContext, useOne, useMemo, incrementVersion } from '@use-gpu/live';
@@ -15,7 +15,7 @@ const DEFAULT_FLAT_CAMERA = {
   focus: 1,
 };
 
-export type FlatCameraProps = {
+export type FlatCameraProps = PropsWithChildren<{
   x?: number,
   y?: number,
   zoom?: number,
@@ -26,7 +26,7 @@ export type FlatCameraProps = {
 
   near?: number,
   far?: number,
-};
+}>;
 
 export const FlatCamera: LiveComponent<FlatCameraProps> = (props) => {
   const {

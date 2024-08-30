@@ -18,7 +18,7 @@ import { BoxLayout } from '../render';
 export type FlexProps =
   TraitProps<typeof BoxTrait> &
   TraitProps<typeof ElementTrait> &
-{
+PropsWithChildren<{
   direction?: Direction,
 
   gap?: GapLike,
@@ -27,9 +27,9 @@ export type FlexProps =
 
   wrap?: boolean,
   snap?: boolean,
-};
+}>;
 
-export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<FlexProps>) => {
+export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   const {
     wrap = false,
     snap = true,

@@ -4,12 +4,12 @@ import type { Lazy } from '@use-gpu/core';
 import { multiGather, yeet, useMemo } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 
-export type IterateProps = {
+export type IterateProps = PropsWithChildren<{
   count: Lazy<number>,
-};
+}>;
 
 /** Iteration combinator for multi-gathered compute lambdas */
-export const Iterate: LiveComponent<IterateProps> = (props: PropsWithChildren<IterateProps>) => {
+export const Iterate: LiveComponent<IterateProps> = (props: IterateProps) => {
   const {
     count,
     children,

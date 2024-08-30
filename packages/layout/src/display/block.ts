@@ -18,15 +18,15 @@ import { BoxLayout } from '../render';
 export type BlockProps =
   TraitProps<typeof BoxTrait> &
   TraitProps<typeof ElementTrait> &
-{
+PropsWithChildren<{
   direction?: Direction,
 
   padding?: MarginLike,
   snap?: boolean,
   contain?: boolean,
-};
+}>;
 
-export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<BlockProps>) => {
+export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   const {
     snap = true,
   } = props;

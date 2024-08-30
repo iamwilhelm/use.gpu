@@ -32,14 +32,14 @@ export type SDFFontContextProps = {
   getTexture: () => ShaderSource,
 };
 
-export type SDFFontProviderProps = {
+export type SDFFontProviderProps = PropsWithChildren<{
   width?: number,
   height?: number,
   radius?: number,
   pad?: number,
   fence?: (c: LiveElement, then: (t: any) => LiveElement) => LiveElement,
   then?: (atlas: Atlas, source: ShaderSource, gathered: any) => LiveElement
-};
+}>;
 
 const NO_MAPPING = [0, 0, 0, 0] as Rectangle;
 
@@ -71,7 +71,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   fence: op = fence,
   children,
   then,
-}: PropsWithChildren<SDFFontProviderProps>) => {
+}: SDFFontProviderProps) => {
   pad += Math.ceil(radius * 0.75);
 
   const device = useContext(DeviceContext);

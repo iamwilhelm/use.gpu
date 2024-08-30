@@ -8,13 +8,13 @@ import { QueueReconciler } from '../reconcilers';
 
 const {quote} = QueueReconciler;
 
-export type ComputePassProps = {
+export type ComputePassProps = PropsWithChildren<{
   calls: {
     pre?: CommandToBuffer[],
     compute?: ComputeToPass[],
   },
   immediate?: boolean,
-};
+}>;
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
@@ -33,7 +33,7 @@ const computeToContext = (
 
 Executes all compute calls. Can optionally run immediately instead of per-frame.
 */
-export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<ComputePassProps>) => {
+export const ComputePass: LC<ComputePassProps> = memo((props: ComputePassProps) => {
   const {
     immediate,
     calls,

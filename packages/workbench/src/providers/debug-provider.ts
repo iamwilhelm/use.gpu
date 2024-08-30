@@ -36,9 +36,9 @@ export type DebugContextProps = {
   },
 };
 
-export type DebugProviderProps = {
+export type DebugProviderProps = PropsWithChildren<{
   debug: DeepPartial<DebugContextProps>,
-};
+}>;
 
 export const DebugContext = makeContext<DebugContextProps>(DEBUG_DEFAULTS, 'DebugContext');
 export const useDebugContext = () => useContext(DebugContext);

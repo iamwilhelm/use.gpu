@@ -47,7 +47,7 @@ export type MVTilesProps = {
   detail?: number,
 };
 
-export type MVTileProps = {
+export type MVTileProps = PropsWithChildren<{
   tiles: {
     cache: LRU<number, LiveElement[]>,
     loaded: Map<number, number>,
@@ -59,9 +59,9 @@ export type MVTileProps = {
   hide?: boolean,
   tesselate?: number,
   worker: TileWorker,
-};
+}>;
 
-export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MVTilesProps>) => {
+export const MVTiles: LiveComponent<MVTilesProps> = (props: MVTilesProps) => {
   const {
     minLevel = 1,
     maxLevel = Infinity,

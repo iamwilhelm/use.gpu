@@ -7,7 +7,7 @@ import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 import { ComputeContext } from '../providers/compute-provider';
 
-export type ComputeBufferProps = {
+export type ComputeBufferProps = PropsWithChildren<{
   width?: number,
   height?: number,
   depth?: number,
@@ -18,10 +18,10 @@ export type ComputeBufferProps = {
 
   render?: (source: StorageTarget) => LiveElement,
   then?: (source: StorageTarget) => LiveElement,
-};
+}>;
 
 /** Read-write GPU storage buffer for compute. Will perform frame-buffer flipping with N frames of history. */
-export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props: PropsWithChildren<ComputeBufferProps>) => {
+export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props: ComputeBufferProps) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 

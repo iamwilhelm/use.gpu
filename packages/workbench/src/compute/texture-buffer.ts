@@ -12,7 +12,7 @@ import { makeStorageTexture } from '@use-gpu/core';
 
 const DEFAULT_SAMPLER: Partial<GPUSamplerDescriptor> = {};
 
-export type TextureBufferProps = {
+export type TextureBufferProps = PropsWithChildren<{
   width?: number,
   height?: number,
   history?: number,
@@ -26,10 +26,10 @@ export type TextureBufferProps = {
 
   render?: (texture: TextureTarget) => LiveElement,
   then?: (texture: TextureTarget) => LiveElement,
-};
+}>;
 
 /** Read-write GPU texture buffer for compute. Will perform frame-buffer flipping with N frames of history. */
-export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWithChildren<TextureBufferProps>) => {
+export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: TextureBufferProps) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 

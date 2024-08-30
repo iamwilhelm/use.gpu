@@ -18,7 +18,7 @@ const NO_POINT4 = [0, 0, 0, 0];
 
 export type AbsoluteProps =
   TraitProps<typeof ElementTrait> &
-{
+PropsWithChildren<{
   left?: Dimension,
   top?: Dimension,
   right?: Dimension,
@@ -28,9 +28,9 @@ export type AbsoluteProps =
 
   under?: boolean,
   snap?: boolean,
-};
+}>;
 
-export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChildren<AbsoluteProps>) => {
+export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps) => {
   const {
     left: l,
     top: t,

@@ -16,11 +16,11 @@ import { CaptureLayout } from './capture-layout';
 
 const {quote} = PresentReconciler;
 
-export type OverlayProps = TraitProps<typeof SlideTrait> & TraitProps<typeof TransitionTrait>;
+export type OverlayProps = PropsWithChildren<TraitProps<typeof SlideTrait> & TraitProps<typeof TransitionTrait>>;
 
 const useTransitionTrait = makeUseTransitionTrait({ effect: { type: 'fade', duration: 0.5 } });
 
-export const Overlay: LC<OverlayProps> = (props: PropsWithChildren<OverlayProps>) => {
+export const Overlay: LC<OverlayProps> = (props: OverlayProps) => {
   const {children} = props;
   const {order, stay} = useSlideTrait(props);
   const {effect, enter, exit} = useTransitionTrait(props);

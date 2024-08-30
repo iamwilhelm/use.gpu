@@ -10,14 +10,14 @@ import { memoFit } from '../lib/util';
 
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
 
-export type TransformProps = {
+export type TransformProps = PropsWithChildren<{
   clip?: ShaderModule,
   mask?: ShaderModule,
   transform?: ShaderModule,
   inverse?: ShaderModule,
-};
+}>;
 
-export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithChildren<TransformProps>) => {
+export const Transform: LiveComponent<TransformProps> = memo((props: TransformProps) => {
   const {
     clip,
     mask,

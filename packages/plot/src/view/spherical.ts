@@ -27,13 +27,13 @@ const makeMat4 = () => mat4.create();
 const Traits = combine(AxesTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);
 
-export type SphericalProps = TraitProps<typeof Traits> & {
+export type SphericalProps = TraitProps<typeof Traits> & PropsWithChildren<{
   bend?: number,
   helix?: number,
   on?: Swizzle,
-};
+}>;
 
-export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildren<SphericalProps>) => {
+export const Spherical: LiveComponent<SphericalProps> = (props: SphericalProps) => {
   const {
     bend = 1,
     helix = 0,

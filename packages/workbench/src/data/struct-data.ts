@@ -17,7 +17,7 @@ import { useRenderProp } from '../hooks/useRenderProp';
 
 const {signal} = QueueReconciler;
 
-export type StructDataProps = {
+export type StructDataProps = PropsWithChildren<{
   /** Set/override input length */
   length?: number,
 
@@ -39,9 +39,9 @@ export type StructDataProps = {
   /** Leave empty to yeet source instead. */
   render?: (source: StorageSource) => LiveElement,
   children?: (source: StorageSource) => LiveElement,
-};
+}>;
 
-export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructDataProps>) => {
+export const StructData: LC<StructDataProps> = (props: StructDataProps) => {
   const {
     length,
     data,

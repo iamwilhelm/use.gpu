@@ -15,7 +15,7 @@ import { getRenderPassDescriptor, drawToPass } from './util';
 
 const {quote} = QueueReconciler;
 
-export type DeferredPassProps = {
+export type DeferredPassProps = PropsWithChildren<{
   env: {
     light?: LightEnv,
   },
@@ -28,7 +28,7 @@ export type DeferredPassProps = {
   },
   overlay?: boolean,
   merge?: boolean,
-};
+}>;
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
@@ -37,7 +37,7 @@ const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 Draws all opaque calls to gbuffer, then stencils lights, then draws lights, then all transparent calls, then all debug wireframes.
 */
-export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildren<DeferredPassProps>) => {
+export const DeferredPass: LC<DeferredPassProps> = memo((props: DeferredPassProps) => {
   const {
     overlay = false,
     merge = false,

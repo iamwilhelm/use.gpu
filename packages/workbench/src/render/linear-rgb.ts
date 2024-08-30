@@ -15,7 +15,7 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { gainColor } from '@use-gpu/wgsl/fragment/gain.wgsl';
 import { tonemapACES } from '@use-gpu/wgsl/fragment/aces.wgsl';
 
-export type LinearRGBProps = {
+export type LinearRGBProps = PropsWithChildren<{
   width?: number,
   height?: number,
   live?: boolean,
@@ -33,10 +33,10 @@ export type LinearRGBProps = {
   overlay?: boolean,
 
   then?: (texture: TextureSource) => LiveElement,
-};
+}>;
 
 /** Sets up a Linear RGB render target and automatically renders it to the screen as sRGB. */
-export const LinearRGB: LiveComponent<LinearRGBProps> = (props: PropsWithChildren<LinearRGBProps>) => {
+export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) => {
   const {
     tonemap = 'linear',
     gain = 1,

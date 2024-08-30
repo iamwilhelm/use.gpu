@@ -1,4 +1,4 @@
-import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { LC, LiveElement } from '@use-gpu/live';
 import type { ColorLike, XYZW } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
@@ -19,11 +19,12 @@ export type BasicMaterialProps = {
   colorMap?: ShaderSource,
 
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
+  children?: LiveElement | ((material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement),
 };
 
 const WHITE = [1, 1, 1, 1] as XYZW;
 
-export const BasicMaterial: LC<BasicMaterialProps> = (props: PropsWithChildren<BasicMaterialProps>) => {
+export const BasicMaterial: LC<BasicMaterialProps> = (props: BasicMaterialProps) => {
   const {
     //color,
     colorMap,

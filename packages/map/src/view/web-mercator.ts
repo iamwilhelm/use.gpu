@@ -31,16 +31,16 @@ const makeMat4 = () => mat4.create();
 const Traits = combine(AxesTrait, GeographicTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);
 
-export type WebMercatorProps = TraitProps<typeof Traits> & {
+export type WebMercatorProps = TraitProps<typeof Traits> & PropsWithChildren<{
   bend?: number,
   on?: Swizzle,
   centered?: boolean,
   native?: boolean,
   scissor?: boolean,
   radius?: number,
-};
+}>;
 
-export const WebMercator: LiveComponent<WebMercatorProps> = (props: PropsWithChildren<WebMercatorProps>) => {
+export const WebMercator: LiveComponent<WebMercatorProps> = (props: WebMercatorProps) => {
   const {
     on = 'xyz',
     bend = 1,

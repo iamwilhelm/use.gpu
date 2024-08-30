@@ -17,12 +17,12 @@ import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wg
 import { applyDirectionalShadow as applyDirectionalShadowWGSL } from '@use-gpu/wgsl/shadow/directional.wgsl';
 import { applyPointShadow as applyPointShadowWGSL } from '@use-gpu/wgsl/shadow/point.wgsl';
 
-export type LightMaterialProps = {
+export type LightMaterialProps = PropsWithChildren<{
   shadows?: boolean,
   then?: (light: LightEnv) => LiveElement,
-};
+}>;
 
-export const LightMaterial: LC<LightMaterialProps> = (props: PropsWithChildren<LightMaterialProps>) => {
+export const LightMaterial: LC<LightMaterialProps> = (props: LightMaterialProps) => {
   const {
     shadows,
     children,

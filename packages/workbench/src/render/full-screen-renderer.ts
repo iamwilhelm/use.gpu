@@ -16,10 +16,10 @@ import { ReadbackPass } from '../pass/readback-pass';
 
 const {reconcile, quote} = PassReconciler;
 
-export type FullScreenRendererProps = {
+export type FullScreenRendererProps = PropsWithChildren<{
   overlay?: boolean,
   merge?: boolean,
-};
+}>;
 
 const NO_ENV: Record<string, any> = {};
 
@@ -32,7 +32,7 @@ const COMPONENTS = {
   renders: {},
 } as RenderComponents;
 
-export const FullScreenRenderer: LC<FullScreenRendererProps> = memo((props: PropsWithChildren<FullScreenRendererProps>) => {
+export const FullScreenRenderer: LC<FullScreenRendererProps> = memo((props: FullScreenRendererProps) => {
   const {
     overlay = false,
     merge = false,

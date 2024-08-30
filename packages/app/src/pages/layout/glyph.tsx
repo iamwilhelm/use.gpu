@@ -485,12 +485,12 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
   );
 }, 'View');
 
-type TextureFrameProps = {
+type TextureFrameProps = PropsWithChildren<{
   texture: any,
   margin?: number,
-}
+}>;
 
-const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFrameProps>) => {
+const TextureFrame: LC<TextureFrameProps> = (props: TextureFrameProps) => {
   const {margin, texture, children} = props;
   const {size: [width, height]} = texture;
 
@@ -522,9 +522,9 @@ const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFra
 
 type LabelProps = {
   children: string | string[],
-}
+};
 
-const Label: LC<LabelProps> = (props: PropsWithChildren<LabelProps>) => (
+const Label: LC<LabelProps> = (props: LabelProps) => (
   <Block margin={MARGIN_TOP}>
     <Inline align="center">
       <Text

@@ -15,7 +15,7 @@ import { getRenderPassDescriptor, drawToPass } from './util';
 
 const {quote} = QueueReconciler;
 
-export type ColorPassProps = {
+export type ColorPassProps = PropsWithChildren<{
   env: {
     light?: LightEnv,
   },
@@ -26,7 +26,7 @@ export type ColorPassProps = {
   },
   overlay?: boolean,
   merge?: boolean,
-};
+}>;
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
@@ -35,7 +35,7 @@ const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 Draws all opaque calls, then all transparent calls, then all debug wireframes.
 */
-export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<ColorPassProps>) => {
+export const ColorPass: LC<ColorPassProps> = memo((props: ColorPassProps) => {
   const {
     overlay = false,
     merge = false,

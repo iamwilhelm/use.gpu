@@ -26,13 +26,13 @@ const makeMat4 = () => mat4.create();
 const Traits = combine(AxesTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);
 
-export type PolarProps = TraitProps<typeof Traits> & {
+export type PolarProps = TraitProps<typeof Traits> & PropsWithChildren<{
   bend?: number,
   helix?: number,
   on?: Axis4,
-};
+}>;
 
-export const Polar: LiveComponent<PolarProps> = (props: PropsWithChildren<PolarProps>) => {
+export const Polar: LiveComponent<PolarProps> = (props: PolarProps) => {
   const {
     bend = 1,
     helix = 0,

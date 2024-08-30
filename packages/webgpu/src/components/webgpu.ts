@@ -7,11 +7,11 @@ import { mountGPUDevice } from '../web';
 
 export type ErrorRenderer = (e: Error) => LiveElement;
 
-export type WebGPUProps = {
+export type WebGPUProps = PropsWithChildren<{
   fallback: LiveElement | ErrorRenderer,
-};
+}>;
 
-export const WebGPU: LC<WebGPUProps> = ({fallback, children}: PropsWithChildren<WebGPUProps>) => {
+export const WebGPU: LC<WebGPUProps> = ({fallback, children}: WebGPUProps) => {
   const [result, error] = useAwait(() => mountGPUDevice([], ["rg11b10ufloat-renderable", "depth32float-stencil8", "shader-f16"]), []);
   useResource((dispose) => {
     if (!result) return;

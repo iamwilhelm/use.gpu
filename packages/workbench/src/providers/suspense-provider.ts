@@ -8,11 +8,11 @@ export const SuspenseContext = makeContext<SuspenseContextProps>(false, 'Suspens
 export const useSuspenseContext = () => useContext(SuspenseContext);
 export const useNoSuspenseContext = () => useNoContext(SuspenseContext);
 
-type SuspenseProps = {
+type SuspenseProps = PropsWithChildren<{
   fallback?: LiveElement,
-};
+}>;
 
-export const Suspense: LiveComponent<SuspenseProps> = (props: PropsWithChildren<SuspenseProps>) => {
+export const Suspense: LiveComponent<SuspenseProps> = (props: SuspenseProps) => {
   const {fallback} = props;
 
   const lastValue = useRef<any>();

@@ -34,7 +34,7 @@ export type ScaleProps = TraitProps<typeof Traits> & {
   children?: LiveElement | ((data: {positions: TensorArray, values: TensorArray}) => LiveElement),
 };
 
-export const Scale: LiveComponent<ScaleProps> = memo((props: PropsWithChildren<ScaleProps>) => {
+export const Scale: LiveComponent<ScaleProps> = memo((props: ScaleProps) => {
 
   const {
     children,

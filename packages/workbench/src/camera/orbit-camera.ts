@@ -1,4 +1,4 @@
-import type { LiveComponent } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/core';
 import { ViewUniforms } from '@use-gpu/core';
 
@@ -25,7 +25,7 @@ const DEFAULT_ORBIT_CAMERA = {
   far: 1000,
 };
 
-export type OrbitCameraProps = {
+export type OrbitCameraProps = PropsWithChildren<{
   phi?: number,
   theta?: number,
   radius?: number,
@@ -38,7 +38,7 @@ export type OrbitCameraProps = {
 
   focus?: number,
   scale?: number | null,
-};
+}>;
 
 export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   const {

@@ -84,7 +84,7 @@ export const DebugAxesPage: LC = (props) => {
   </>);
 };
 
-const Camera: LC = ({children}: PropsWithChildren<object>) => (
+const Camera = ({children}: PropsWithChildren<object>) => (
   <OrbitControls
     radius={5}
     bearing={0.5}

@@ -1,4 +1,4 @@
-import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { LC, LiveElement } from '@use-gpu/live';
 import type { ColorLike, VectorLike, Lazy, XYZW } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
@@ -34,12 +34,13 @@ export type PBRMaterialProps = {
   normalMap?: ShaderSource,
 
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
+  children?: LiveElement | ((material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement),
 };
 
 const WHITE = [1, 1, 1, 1] as XYZW;
 const BLACK = [0, 0, 0, 0] as XYZW;
 
-export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMaterialProps>) => {
+export const PBRMaterial: LC<PBRMaterialProps> = (props: PBRMaterialProps) => {
   const {
     //albedo,
     metalness,

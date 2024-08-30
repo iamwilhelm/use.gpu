@@ -13,14 +13,14 @@ import { SHADOW_FORMAT } from '../render/light/light-data';
 import { ShadowOrthoPass } from './shadow-ortho-pass';
 import { ShadowOmniPass } from './shadow-omni-pass';
 
-export type ShadowPassProps = {
+export type ShadowPassProps = PropsWithChildren<{
   env: {
     light: LightEnv,
   },
   calls: {
     shadow?: Renderable[],
   },
-};
+}>;
 
 const SHADOW_TYPES = {
   ortho: ShadowOrthoPass,
@@ -31,7 +31,7 @@ const SHADOW_TYPES = {
 
 Draws all shadow calls to multiple shadow maps.
 */
-export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<ShadowPassProps>) => {
+export const ShadowPass: LC<ShadowPassProps> = memo((props: ShadowPassProps) => {
   const {
     calls,
     env: {light},

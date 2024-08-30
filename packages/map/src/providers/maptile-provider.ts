@@ -2,9 +2,9 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import { provide, useMemo } from '@use-gpu/live';
 import { TileContext } from './tile-provider';
 
-export type MapTileProviderProps = {
+export type MapTileProviderProps = PropsWithChildren<{
   url?: string,
-};
+}>;
 
 const makeGetMVT = (template: string) => {
   const chunks = template.split(/{(x|y|zoom)}/g);
@@ -15,7 +15,7 @@ const makeGetMVT = (template: string) => {
   };
 };
 
-export const MapTileProvider: LC<MapTileProviderProps> = (props: PropsWithChildren<MapTileProviderProps>) => {
+export const MapTileProvider: LC<MapTileProviderProps> = (props: MapTileProviderProps) => {
   const {
     url = `/tiles/{zoom}-{x}-{y}.mvt`,
     children,

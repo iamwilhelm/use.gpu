@@ -7,11 +7,9 @@ import { patch } from '@use-gpu/state';
 
 import { transformPositions, transformNormals, useMatrixContext } from '@use-gpu/workbench';
 
-export type GeometryProps = CPUGeometry & {
-  _u?: null,
-};
+export type GeometryProps = PropsWithChildren<CPUGeometry>;
 
-export const Geometry: LiveComponent<GeometryProps> = memo((props: PropsWithChildren<GeometryProps>) => {
+export const Geometry: LiveComponent<GeometryProps> = memo((props: GeometryProps) => {
   const {count, attributes, formats, children} = props;
 
   const matrix = useMatrixContext();

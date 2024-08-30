@@ -9,12 +9,12 @@ const DELTA_MULTIPLIER = [1, 4, 80];
 
 const formatKey = (key: string) => key[0].toLowerCase() + key.slice(1);
 
-export type DOMEventsProps = {
+export type DOMEventsProps = PropsWithChildren<{
   element: HTMLElement,
   autofocus?: boolean,
   capture?: boolean,
   iframe?: boolean,
-};
+}>;
 
 const toButton = (button: number) => {
   if (button === 0) return 'left';
@@ -58,7 +58,7 @@ const makeKeyboardState = () => ({
   key: null,
 } as KeyboardState);
 
-export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithChildren<DOMEventsProps>) => {
+export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: DOMEventsProps) => {
   const {element, autofocus, capture, iframe, children} = props;
 
   const captureOptions = useOne(() => ({capture: !!capture}), capture);

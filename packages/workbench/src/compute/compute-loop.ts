@@ -8,7 +8,7 @@ import { Compute } from './compute';
 
 const {reconcile, quote} = QueueReconciler;
 
-export type ComputeLoopProps = {
+export type ComputeLoopProps = PropsWithChildren<{
   /** Always run initial iteration immediately */
   initial?: boolean,
   /** Loop is running */
@@ -21,9 +21,9 @@ export type ComputeLoopProps = {
   limit?: number,
 
   then?: (count: number) => LiveElement,
-};
+}>;
 
-export const ComputeLoop: LC<ComputeLoopProps> = memo((props: PropsWithChildren<ComputeLoopProps>) => {
+export const ComputeLoop: LC<ComputeLoopProps> = memo((props: ComputeLoopProps) => {
   const {
     initial = false,
     live = false,

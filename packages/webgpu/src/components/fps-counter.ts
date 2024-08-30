@@ -1,4 +1,4 @@
-import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
+import type { LiveComponent } from '@use-gpu/live';
 
 import { useTimeContext } from '@use-gpu/workbench';
 import { memo, useOne, useResource } from '@use-gpu/live';
@@ -16,7 +16,7 @@ export type FPSCounterProps = {
   font?: number,
 };
 
-export const FPSCounter: LiveComponent<FPSCounterProps> = memo((props: PropsWithChildren<FPSCounterProps>) => {
+export const FPSCounter: LiveComponent<FPSCounterProps> = memo((props: FPSCounterProps) => {
   const {
     container,
 

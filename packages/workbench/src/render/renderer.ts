@@ -17,7 +17,7 @@ import { ShadowPass } from '../pass/shadow-pass';
 
 const {reconcile, quote} = PassReconciler;
 
-export type RendererProps = {
+export type RendererProps = PropsWithChildren<{
   entries?: GPUBindGroupLayoutEntry[],
   context?: Record<string, any>,
   overlay?: boolean,
@@ -26,13 +26,13 @@ export type RendererProps = {
   buffers: Record<string, UseGPURenderContext[]>,
   passes: LiveElement[],
   components: RenderComponents,
-};
+}>;
 
 const HOVERED_VARIANT = 'debug';
 const NO_ENTRIES: any[] = [];
 const NO_CONTEXT: Record<string, any> = {};
 
-export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<RendererProps>) => {
+export const Renderer: LC<RendererProps> = memo((props: RendererProps) => {
   const {
     entries = NO_ENTRIES,
     context: renderContext = NO_CONTEXT,

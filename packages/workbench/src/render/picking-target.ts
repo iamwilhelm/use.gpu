@@ -31,17 +31,17 @@ import { QueueReconciler } from '../reconcilers';
 
 const {quote} = QueueReconciler;
 
-export type PickingProps = {
+export type PickingProps = PropsWithChildren<{
   pickingFormat?: GPUTextureFormat,
   pickingColor?: GPUColor,
   depthStencilFormat?: GPUTextureFormat,
   resolution?: number,
-}
+}>;
 
 const DEBUG = false;
 
 /** Global picking provider. Provides a screen-sized render target that contains object ID + item index. */
-export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChildren<PickingProps>) => {
+export const PickingTarget: LiveComponent<PickingProps> = (props: PickingProps) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 

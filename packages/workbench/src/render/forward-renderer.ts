@@ -30,7 +30,7 @@ const DEFAULT_PASSES = [
 
 const NO_BUFFERS: Record<string, UseGPURenderContext[]> = {};
 
-export type ForwardRendererProps = {
+export type ForwardRendererProps = PropsWithChildren<{
   lights?: boolean,
   overlay?: boolean,
   merge?: boolean,
@@ -39,7 +39,7 @@ export type ForwardRendererProps = {
   context?: Record<string, any>,
   passes?: LiveElement[],
   components?: RenderComponents,
-};
+}>;
 
 const getComponents = ({modes = {}, renders = {}}: Partial<RenderComponents>): RenderComponents => {
   return {
@@ -58,7 +58,7 @@ const getComponents = ({modes = {}, renders = {}}: Partial<RenderComponents>): R
   }
 };
 
-export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithChildren<ForwardRendererProps>) => {
+export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: ForwardRendererProps) => {
   const {
     lights = false,
     overlay = false,

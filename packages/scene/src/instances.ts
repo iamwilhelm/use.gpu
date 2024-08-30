@@ -20,13 +20,13 @@ import { mat3, mat4 } from 'gl-matrix';
 const Traits = combine(ColorTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);
 
-export type InstancesProps = {
+export type InstancesProps = PropsWithChildren<{
   mesh: GPUGeometry,
   shaded?: boolean,
   side?: 'front' | 'back' | 'both',
   format?: 'u16' | 'u32',
   render?: (Instance: LiveComponent<InstanceProps>) => LiveElement,
-};
+}>;
 
 export type InstanceProps = TraitProps<typeof Traits>;
 
@@ -36,7 +36,7 @@ const INSTANCE_SCHEMA = {
    colors:         {format: 'vec4<f32>',   prop: 'color'},
 };
 
-export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildren<InstancesProps>) => {
+export const Instances: LiveComponent<InstancesProps> = (props: InstancesProps) => {
   const {
     mesh,
     shaded,

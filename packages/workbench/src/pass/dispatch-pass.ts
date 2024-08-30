@@ -5,11 +5,11 @@ import { QueueReconciler } from '../reconcilers';
 
 const {quote} = QueueReconciler;
 
-export type DispatchPassProps = {
+export type DispatchPassProps = PropsWithChildren<{
   calls: {
     dispatch?: ArrowFunction[],
   },
-};
+}>;
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
@@ -18,7 +18,7 @@ const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 Executes all dispatch calls.
 */
-export const DispatchPass: LC<DispatchPassProps> = memo((props: PropsWithChildren<DispatchPassProps>) => {
+export const DispatchPass: LC<DispatchPassProps> = memo((props: DispatchPassProps) => {
   const {
     calls,
   } = props;

@@ -18,9 +18,9 @@ const makeMat4 = () => mat4.create();
 const Traits = combine(AxesTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);
 
-export type TransformProps = TraitProps<typeof Traits>;
+export type TransformProps = PropsWithChildren<TraitProps<typeof Traits>>;
 
-export const Transform: LiveComponent<TransformProps> = (props: PropsWithChildren<TransformProps>) => {
+export const Transform: LiveComponent<TransformProps> = (props: TransformProps) => {
   const {
     children,
   } = props;

@@ -5,12 +5,12 @@ import { QueryParams, Route, RouterState, RouterAPI } from './types';
 
 export const RouterContext = makeContext<RouterAPI>(undefined, 'RouterContext');
 
-export type RouterProps = {
+export type RouterProps = PropsWithChildren<{
   source?: any,
   routes?: Record<string, Route>,
   base?: string,
   hash?: boolean,
-};
+}>;
 
 export const Router: LiveComponent<RouterProps> = memo(({
   source,
@@ -18,7 +18,7 @@ export const Router: LiveComponent<RouterProps> = memo(({
   base,
   hash,
   children,
-}: PropsWithChildren<RouterProps>) => {
+}: RouterProps) => {
 
   const src = useMemo(() => source ?? makeBrowserHistory(base, hash), [source ?? base, hash]);
 

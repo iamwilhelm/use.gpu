@@ -138,11 +138,11 @@ export const MaterialEnvMapPage: LC = (props) => {
   </>);
 };
 
-type CameraProps = {
+type CameraProps = PropsWithChildren<{
   active: boolean,
-};
+}>;
 
-const Camera: LC<CameraProps> = ({active, children}: PropsWithChildren<CameraProps>) => {
+const Camera: LC<CameraProps> = ({active, children}: CameraProps) => {
   return (
     <OrbitControls
       active={active}

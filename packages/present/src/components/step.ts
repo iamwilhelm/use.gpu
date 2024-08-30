@@ -10,11 +10,11 @@ import { merge } from '../lib/slides';
 import { usePresentTransition } from '../hooks';
 import { SlideTrait, TransitionTrait, useSlideTrait, makeUseTransitionTrait } from '../traits';
 
-export type StepProps = TraitProps<typeof SlideTrait> & TraitProps<typeof TransitionTrait>;
+export type StepProps = PropsWithChildren<TraitProps<typeof SlideTrait> & TraitProps<typeof TransitionTrait>>;
 
 const useTransitionTrait = makeUseTransitionTrait({ effect: { type: 'wipe', duration: 0.15 } });
 
-export const Step: LC<StepProps> = (props: PropsWithChildren<StepProps>) => {
+export const Step: LC<StepProps> = (props: StepProps) => {
   const {children} = props;
   const {order, stay} = useSlideTrait(props);
   const {effect, enter, exit} = useTransitionTrait(props);

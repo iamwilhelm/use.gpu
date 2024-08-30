@@ -71,7 +71,7 @@ it("tracks dependencies", () => {
   dependency.depend(fiber1, root.id);
   dependency.depend(fiber2, root.id);
 
-  const visit = new Set(dependency.traceDown(root));
+  let visit = new Set(dependency.traceDown(root));
   expect(visit.size).toBe(2);
   expect(visit.has(fiber1)).toBe(true);
   expect(visit.has(fiber2)).toBe(true);

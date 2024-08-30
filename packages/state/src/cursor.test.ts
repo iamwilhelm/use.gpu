@@ -15,7 +15,7 @@ describe('cursor', () => {
       list: [2, 3, 4],
       obj: { hello: 'world' },
     };
-    const [, updateState] = makeUpdateState();
+    const [getUpdate, updateState] = makeUpdateState();
 
     const [cursor] = makeCursor([state, updateState]);
 

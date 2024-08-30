@@ -16,7 +16,7 @@ export const wgsl = (userOptions = {}) => ({
         contents: transpileWGSL(source, filename, {
           esModule: true,
           minify,
-        }).output;
+        }).output
       };
 		});
 	}

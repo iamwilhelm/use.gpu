@@ -16,7 +16,7 @@ export const glsl = (userOptions = {}) => ({
         contents: transpileGLSL(source, filename, {
           esModule: true,
           minify,
-        }).output;
+        }).output
       };
 		});
 	}

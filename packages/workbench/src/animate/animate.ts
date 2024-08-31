@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TypedArray, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { Keyframe } from './types';
 
@@ -13,7 +13,7 @@ import zipObject from 'lodash/zipObject';
 
 const π = Math.PI;
 
-export type AnimateProps<T extends number | VectorLike | VectorLikes> = PropsWithChildren<{
+export type AnimateProps<T extends number | VectorLike | VectorLikes> = {
   loop?: boolean,
   mirror?: boolean,
   repeat?: number,
@@ -32,7 +32,7 @@ export type AnimateProps<T extends number | VectorLike | VectorLikes> = PropsWit
 
   render?: (value: any) => LiveElement,
   children?: LiveElement | ((value: any) => LiveElement),
-}>;
+};
 
 // causes typescript docgen to crash if defined as recursive
 type NestedNumberArray = any[];

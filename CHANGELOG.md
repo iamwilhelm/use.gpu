@@ -1,3 +1,14 @@
+0.12.0
+- `@use-gpu/*`: add `ts-vite` example
+- `@use-gpu/*`: emit .cjs / .mjs split module build to avoid node issues
+- `@use-gpu/app`: add quaternion hypersphere example
+- `@use-gpu/app`: add droste shader example
+- `@use-gpu/live`: Match React 18 style use of `PropsWithChildren` vs `LC`
+- `@use-gpu/plot`: add 4D cartesian/stereographic transform
+- `@use-gpu/shader`: refactor transpiler so it emits `.wgsl.ts` or `.wgsl.js` modules + defs
+- `@use-gpu/shader`: add shader2ts bin
+- `@use-gpu/wgsl`: ship pre-transpiled JS to avoid bundling issues
+
 0.11.3
 - `@use-gpu/shader`: pin `@lezer/lr` to 1.3.4 to avoid issue with 1.4.1
 

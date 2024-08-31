@@ -1,4 +1,4 @@
-import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { LC, LiveElement, PropsWithChildren, PropsWithMarkup } from '@use-gpu/live';
 import type { ColorLike } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
@@ -27,7 +27,11 @@ type TextProps = {
   align?: 'start' | 'center' | 'end',
 };
 
-const Title = ({align, children}: PropsWithChildren<TextProps>) => (
+const List = ({children}: PropsWithChildren<object>) => (
+  <Block padding={10} margin={[0, 40, 0, 0]}>{children}</Block>
+);
+
+const Title = ({align, children}: PropsWithMarkup<TextProps>) => (
   <Block padding={[10, 10, 10, 20]}>
     <Inline align={align}>
       <Text size={48} color="#fff" weight="bold">{children}</Text>
@@ -35,11 +39,7 @@ const Title = ({align, children}: PropsWithChildren<TextProps>) => (
   </Block>
 );
 
-const List = ({children}: PropsWithChildren<object>) => (
-  <Block padding={10} margin={[0, 40, 0, 0]}>{children}</Block>
-);
-
-const ListItem = ({align, fill, children}: PropsWithChildren<TextProps>) => (
+const ListItem = ({align, fill, children}: PropsWithMarkup<TextProps>) => (
   <Block padding={10} margin={[0, 0, 0, 10]} fill={fill}>
     <Inline align={align}>
       <Text size={24} color="#fff">{children}</Text>
@@ -47,7 +47,7 @@ const ListItem = ({align, fill, children}: PropsWithChildren<TextProps>) => (
   </Block>
 );
 
-const Bold = ({children}: PropsWithChildren<object>) => (
+const Bold = ({children}: PropsWithMarkup<object>) => (
   <Text size={24} weight="bold" color="#fff">{children}</Text>
 );
 

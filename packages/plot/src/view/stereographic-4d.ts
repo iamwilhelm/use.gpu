@@ -26,13 +26,13 @@ const makeMat4 = () => mat4.create();
 const Traits = combine(AxesTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);
 
-export type Stereographic4DProps = TraitProps<typeof Traits> & {
+export type Stereographic4DProps = TraitProps<typeof Traits> & PropsWithChildren<{
   bend?: number,
   normalize?: number | boolean,
   on?: Axis4,
-};
+}>;
 
-export const Stereographic4D: LiveComponent<Stereographic4DProps> = (props: PropsWithChildren<Stereographic4DProps>) => {
+export const Stereographic4D: LiveComponent<Stereographic4DProps> = (props: Stereographic4DProps) => {
   const {
     on = 'z',
     bend = 1,

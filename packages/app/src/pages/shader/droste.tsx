@@ -283,7 +283,7 @@ fn rottan_c(v: vec2<f32>, shift: f32, turn: i32) -> vec2<f32> {
 export const ShaderDrostePage: LC = () => {
 
   const inner = document.querySelector('#use-gpu .canvas')!;
-  const viewRef = useRef([0, 0, 1]);
+  const viewRef = useRef<[number, number, number]>([0, 0, 1]);
 
   return (<>
     <InfoBox>Render Escher-like conformal grids using a custom, fully zoomable &lt;FullScreen&gt; shader</InfoBox>

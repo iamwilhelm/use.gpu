@@ -1,4 +1,4 @@
-import type { ArchetypeSchema, Ragged, TypedArray, UniformType, VectorLike, VectorLikes } from '@use-gpu/core';
+import type { ArchetypeSchema, Ragged, TensorArray, TypedArray, UniformType, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { Parser } from '@use-gpu/traits';
 
@@ -436,7 +436,7 @@ export const SegmentsTrait = combine(
   }),
   (
     props: {
-      positions?: VectorLikes | VectorLikes[],
+      positions?: VectorLikes | VectorLikes[] | TensorArray,
       segments?: VectorLikes,
     },
     parsed: {

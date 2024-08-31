@@ -35,7 +35,7 @@ const GREEN = [32, 240, 0];
 const BLUE = [80, 160, 255];
 const COLORS = [RED, GREEN, BLUE];
 
-const geodesicQuaternionSampler = (axis: number, w: number, h: number, full: boolean) => {
+const geodesicQuaternionSampler = (axis: number, w: number, h: number, full?: boolean) => {
   const a = quat.create();
   const b = quat.create();
 
@@ -132,7 +132,7 @@ export const PlotQuaternionHyperspherePage: LC = () => {
   );
 };
 
-const Hypersphere = memo((options: HypersphereOptions) => (
+const Hypersphere = memo((options: Partial<HypersphereOptions>) => (
   <>
     { options.showX ? (
       <Tensor

@@ -29,17 +29,17 @@
     "vite-plugin-wasm": "^3.3.0"
   },
   "dependencies": {
-    "@use-gpu/inspect": "^0.11.3",
-    "@use-gpu/inspect-gpu": "^0.11.3",
-    "@use-gpu/layout": "^0.11.3",
-    "@use-gpu/live": "^0.11.3",
-    "@use-gpu/parse": "^0.11.3",
-    "@use-gpu/react": "^0.11.3",
-    "@use-gpu/shader": "^0.11.3",
-    "@use-gpu/traits": "^0.11.3",
-    "@use-gpu/webgpu": "^0.11.3",
-    "@use-gpu/wgsl-loader": "^0.11.3",
-    "@use-gpu/workbench": "^0.11.3",
+    "@use-gpu/inspect": "^0.12.0-rc",
+    "@use-gpu/inspect-gpu": "^0.12.0-rc",
+    "@use-gpu/layout": "^0.12.0-rc",
+    "@use-gpu/live": "^0.12.0-rc",
+    "@use-gpu/parse": "^0.12.0-rc",
+    "@use-gpu/react": "^0.12.0-rc",
+    "@use-gpu/shader": "^0.12.0-rc",
+    "@use-gpu/traits": "^0.12.0-rc",
+    "@use-gpu/webgpu": "^0.12.0-rc",
+    "@use-gpu/wgsl-loader": "^0.12.0-rc",
+    "@use-gpu/workbench": "^0.12.0-rc",
     "react": "^18",
     "react-dom": "^18"
   }

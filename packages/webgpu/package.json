@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/webgpu",
-  "version": "0.11.3",
+  "version": "0.12.0-rc",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "module": true,

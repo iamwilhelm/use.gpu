@@ -1,0 +1,15 @@
+{
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "tsx": true,
+      "dynamicImport": true,
+      "importMeta": true
+    },
+    "target": "es2022"
+  },
+  "module": {
+    "type": "nodenext"
+  },
+  "sourceMaps": true
+}

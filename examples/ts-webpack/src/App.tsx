@@ -12,6 +12,9 @@ import '@use-gpu/inspect/theme.css';
 
 import { makeFallback } from './Fallback';
 
+// Can import .wgsl directly as module
+import { wgslFunction } from './wgsl/test.wgsl';
+
 const FONTS = [
   {
     family: 'Lato',

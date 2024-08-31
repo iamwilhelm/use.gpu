@@ -37,7 +37,7 @@ export const HypersphereControls: LC<HypersphereControlsProps> = (props: Hypersp
 
   const [bend, setBend] = useState(1);
   const [spin, setSpin] = useState(0);
-  const [full, setFull] = useState(true);
+  const [full, setFull] = useState(false);
 
   const [animate, setAnimate] = useState(true);
   const [showX, setShowX] = useState(true);

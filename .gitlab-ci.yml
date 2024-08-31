@@ -19,13 +19,19 @@ build:
     - yarn test
     - yarn build
 
+mr:
+  stage: deploy
+  script:
+    - echo "Build succeeded"
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+
 ci:
   stage: deploy
   script:
     - echo "Build succeeded"
   rules:
     - if: $CI_COMMIT_BRANCH == "ci"
-    - if: $CI_MERGE_REQUEST_ID
 
 publish:
   stage: deploy

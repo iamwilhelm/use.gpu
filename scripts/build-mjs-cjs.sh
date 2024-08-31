@@ -18,17 +18,11 @@ rm -rf ../../build/packages/$NPM_PACKAGE
 rm -rf ../../build/ts/$NPM_PACKAGE
 rm -rf ../../build/mjs/$NPM_PACKAGE
 
-mkdir ../../build 2>/dev/null
-mkdir ../../build/ts 2>/dev/null
-mkdir ../../build/ts/$NPM_PACKAGE 2>/dev/null
-mkdir ../../build/cjs 2>/dev/null
-mkdir ../../build/cjs/$NPM_PACKAGE 2>/dev/null
-mkdir ../../build/mjs 2>/dev/null
-mkdir ../../build/mjs/$NPM_PACKAGE 2>/dev/null
-mkdir ../../build/packages 2>/dev/null
-mkdir ../../build/packages/$NPM_PACKAGE 2>/dev/null
-mkdir ../../build/packages/$NPM_PACKAGE/mjs 2>/dev/null
-mkdir ../../build/packages/$NPM_PACKAGE/cjs 2>/dev/null
+mkdir -p ../../build/ts/$NPM_PACKAGE 2>/dev/null
+mkdir -p ../../build/cjs/$NPM_PACKAGE 2>/dev/null
+mkdir -p ../../build/mjs/$NPM_PACKAGE 2>/dev/null
+mkdir -p ../../build/packages/$NPM_PACKAGE/mjs 2>/dev/null
+mkdir -p ../../build/packages/$NPM_PACKAGE/cjs 2>/dev/null
 
 MODULE_ENV=mjs babel src --out-dir ../../build/mjs/$NPM_PACKAGE/src --extensions ".ts,.tsx,.js,.jsx" --ignore "src/**/__mocks__/**/*.js" --ignore "src/**/*.test.ts" --ignore "src/**/*.d.ts" 1>/dev/null
 exit_on_error $? babel

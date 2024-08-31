@@ -29,7 +29,7 @@
     "build:grammar:glsl": "yarn run lezer-generator src/glsl/grammar/glsl.grammar -o src/glsl/grammar/glsl.js",
     "build:grammar:wgsl": "yarn run lezer-generator src/wgsl/grammar/wgsl.grammar -o src/wgsl/grammar/wgsl.js",
     "build:grammar:wgsl-highlight": "ts-node build.ts && yarn run lezer-generator src/wgsl/highlight/wgsl.grammar -o src/wgsl/highlight/wgsl.js",
-    "build:bin": "mkdir bin 2>/dev/null; pushd scripts && tsup && mv dist/transpile2ts.js ../bin/shader2ts.js && chmod +x ../bin/shader2ts.js && popd",
+    "build:bin": "mkdir bin 2>/dev/null; cd scripts && tsup && mv dist/transpile2ts.js ../bin/shader2ts.js && chmod +x ../bin/shader2ts.js && cd ..",
     "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",

@@ -30,9 +30,9 @@ const LINE_WIDTH = 3;
 const N = 256;
 const M = 16;
 
-const RED = [207, 32, 0];
-const GREEN = [32, 240, 0];
-const BLUE = [80, 160, 255];
+const RED = [207, 52, 10];
+const GREEN = [52, 207, 10];
+const BLUE = [30, 150, 255];
 const COLORS = [RED, GREEN, BLUE];
 
 const geodesicQuaternionSampler = (axis: number, w: number, h: number, full?: boolean) => {
@@ -65,7 +65,7 @@ const geodesicQuaternionSampler = (axis: number, w: number, h: number, full?: bo
     // Color by main axis, shade by W coordinate
     const c = COLORS[axis];
     const value = a[3] * .5 + .5;
-    const s = 1.15 * (value * .5 + .5) / 255;
+    const s = 1.2 * (value * .5 + .5) / 255;
 
     // Position
     emit(a[0], a[1], a[2], a[3]);

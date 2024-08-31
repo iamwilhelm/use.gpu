@@ -73,7 +73,7 @@
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
     "postinstall": "(cd packages/shader; yarn run build:bin); (cd packages/wgsl; yarn run build:ts; yarn run build:exports-ts); (cd packages/glyph; yarn run build:wasm); (cd packages/app; yarn run build:wgsl); (cp -n .env.local.example .env.local || true)",
-    "rc": "(git checkout rc && git merge master) || (git checkout master && git checkout -b rc); yarn version --prerelease --preid rc && git push gitlab rc; git checkout master"
+    "rc": "git checkout master; git checkout -B rc; yarn version --prerelease --preid rc && git push gitlab rc; git checkout master"
   },
   "jest": {
     "preset": "ts-jest",

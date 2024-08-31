@@ -71,7 +71,9 @@
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
-    "postinstall": "(cd packages/shader; yarn run build:bin); (cd packages/wgsl; yarn run build); (cd packages/glyph; yarn run build:wasm); (cd packages/app; yarn run build:wgsl); (cp -n .env.local.example .env.local || true)"
+    "postinstall": "(cd packages/shader; yarn run build:bin); (cd packages/wgsl; yarn run build); (cd packages/glyph; yarn run build:wasm); (cd packages/app; yarn run build:wgsl); (cp -n .env.local.example .env.local || true)",
+    "rc": "git checkout rc && git merge master && yarn version --prerelease --preid rc && git add package.json && git commit -m 'rc version'",
+    "deploy-rc": "git push gitlab rc"
   },
   "jest": {
     "preset": "ts-jest",

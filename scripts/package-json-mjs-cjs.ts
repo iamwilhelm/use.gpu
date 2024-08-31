@@ -19,8 +19,8 @@ for (const file of files) {
     const mjs = file.replace(/\/package\.json$/, '/mjs');
     try {
       let stat = statSync(mjs);
-      json.main = './cjs/index.js';
-      json.module = './mjs/index.js';
+      json.main = './cjs/index.cjs';
+      json.module = true;
 
       if (json.exports) {
         const convert = (value: string) => {
@@ -28,8 +28,8 @@ for (const file of files) {
 
           return {
             types: value.replace('./src/', './mjs/').replace(/\.js$/, '.d.ts'),
-            import: value.replace('./src/', './mjs/'),
-            require: value.replace('./src/', './cjs/'),
+            import: value.replace('./src/', './mjs/').replace(/\.js$/, '.mjs'),
+            require: value.replace('./src/', './cjs/').replace(/\.js$/, '.cjs'),
           };
         }
         for (let k in json.exports) {
@@ -47,12 +47,6 @@ for (const file of files) {
         writeFileSync(dts, ts);
       }
 
-      const jsRoots = glob.sync(file.replace(/\/package\.json$/, '/*.js'));
-      for (const js of jsRoots) {
-        let ts = readFileSync(js).toString();
-        ts = ts.replace(/\.\/src\//g, './cjs/');
-        writeFileSync(js, ts);
-      }
     } catch (e) {};
 
   }

@@ -3,8 +3,8 @@ import type { GPUGeometry, DataSchema, StorageSource, LambdaSource, CPUGeometry,
 
 import { keyed, yeet, gather, useMemo, useOne } from '@use-gpu/live';
 import { formatToArchetype } from '@use-gpu/core';
-import mapValues from 'lodash/mapValues';
-import groupBy from 'lodash/groupBy';
+import mapValues from 'lodash/mapValues.js';
+import groupBy from 'lodash/groupBy.js';
 import { useRenderProp } from '../hooks/useRenderProp';
 
 import { Data } from './data';

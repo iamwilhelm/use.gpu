@@ -28,8 +28,8 @@ export const makeTranspile = <T extends SymbolTableT = any>(
   const moduleType = types ? ': ParsedModule' : '';
   const bundleType = types ? ': ParsedBundle' : '';
 
-  const langImports = ['decompressAST', 'decompressString', 'symbolDictionary', 'bindEntryPoint', 'SymbolTable'];
-  if (types) langImports.push('ParsedModule', 'ParsedBundle');
+  const langImports = ['decompressAST', 'decompressString', 'symbolDictionary', 'bindEntryPoint'];
+  if (types) langImports.push('ParsedModule', 'ParsedBundle', 'SymbolTable');
 
   const rootRelative = (imported: string) => {
     if (importRoot == null) return imported;

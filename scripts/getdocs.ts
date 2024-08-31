@@ -80,7 +80,7 @@ try {
     writeFileSync(target, readFileSync(file));
   }
 
-  console.log("✅ 📄")
+  console.log("📄 ✅")
 } catch (e) {
   console.log("❌")
   console.error(e);

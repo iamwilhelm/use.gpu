@@ -22,12 +22,12 @@ import {
   ShakeOp,
   RefFlags as RF,
 } from './types';
-import * as T from './grammar/wgsl.terms';
+import * as T from './grammar/wgsl.terms.js';
 import { WGSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
 import { getChildNodes, formatAST, makeASTEmitter, makeASTDecompressor } from '../util/tree';
 import { getTypeName, getAttributeName, getAttributeArgs } from './type';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 
 const NO_STRINGS = [] as string[];
 const NO_MEMBERS = [] as StructMemberRef[];

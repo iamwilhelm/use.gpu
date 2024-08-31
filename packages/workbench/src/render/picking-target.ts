@@ -27,7 +27,7 @@ import {
   seq,
 } from '@use-gpu/core';
 
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 
 const {quote} = QueueReconciler;
 

@@ -2,7 +2,7 @@ import type { Atlas, TextureSource } from './types';
 
 import { clamp, lerp } from './tuple';
 import { makeTextureDataLayout, makeDynamicTexture, uploadTexture } from './texture';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 
 type Rectangle = [number, number, number, number];
 type XY = [number, number];

@@ -3,11 +3,12 @@
   "version": "0.11.3",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
+  "module": true,
   "license": "MIT",
   "exports": {
     ".": "./src/index.ts",
-    "./live": "./live.ts",
-    "./react": "./react.ts"
+    "./live": "./src/index-live.ts",
+    "./react": "./src/index-react.ts"
   },
   "dependencies": {
     "@use-gpu/live": "*"

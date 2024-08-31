@@ -3,6 +3,7 @@
   "version": "0.11.3",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
+  "module": true,
   "license": "MIT",
   "dependencies": {
     "@use-gpu/shader": "*",
@@ -13,9 +14,6 @@
     "./esbuild": "./src/esbuild.ts",
     "./rollup": "./src/rollup.ts",
     "./webpack": "./src/webpack.ts"
-  },
-  "bin": {
-    "wgsl-tsgen": "./bin/wgsl-tsgen"
   },
   "scripts": {
     "build": "NPM_PACKAGE=wgsl-loader ../../scripts/build-mjs-cjs.sh",

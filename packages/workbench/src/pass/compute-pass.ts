@@ -4,7 +4,7 @@ import type { ComputeToPass, CommandToBuffer, ComputeCounter } from './types';
 import { yeet, memo } from '@use-gpu/live';
 import { useDeviceContext } from '../providers/device-provider';
 import { useInspectable } from '../hooks/useInspectable'
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 
 const {quote} = QueueReconciler;
 

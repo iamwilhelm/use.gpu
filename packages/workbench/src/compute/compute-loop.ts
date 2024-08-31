@@ -2,7 +2,7 @@ import type { LC, LiveElement, PropsWithChildren, ArrowFunction } from '@use-gpu
 
 import { use, memo, gather, unquote, useMemo, useRef, useResource, useState } from '@use-gpu/live';
 import { useDeviceContext } from '../providers/device-provider';
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 
 import { Compute } from './compute';
 

@@ -4,7 +4,7 @@ import type { RenderComponents, VirtualDraw, AggregatedCalls } from '../pass/typ
 import { use, provide, unquote, multiGather, memo, useCallback, useMemo } from '@use-gpu/live';
 
 import { PassContext, VariantContext } from '../providers/pass-provider';
-import { PassReconciler } from '../reconcilers';
+import { PassReconciler } from '../reconcilers/index';
 
 import { DebugRender } from './forward/debug';
 import { SolidRender } from './forward/solid';

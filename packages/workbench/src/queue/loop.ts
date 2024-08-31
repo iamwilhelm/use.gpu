@@ -5,7 +5,7 @@ import { useRenderContext } from '../providers/render-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { TimeContext, TimeContextProps } from '../providers/time-provider';
 import { LoopContext } from '../providers/loop-provider';
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 
 const {reconcile, quote, signal} = QueueReconciler;
 

@@ -8,8 +8,8 @@ import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { getRenderFunc } from '../hooks/useRenderProp';
 
-import mapValues from 'lodash/mapValues';
-import zipObject from 'lodash/zipObject';
+import mapValues from 'lodash/mapValues.js';
+import zipObject from 'lodash/zipObject.js';
 
 const π = Math.PI;
 

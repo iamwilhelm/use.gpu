@@ -7,7 +7,7 @@ import { chainTo } from '@use-gpu/shader/wgsl';
 import { Pass } from './pass';
 import { RenderTarget } from './render-target';
 import { RenderToTexture } from './render-to-texture';
-import { RawFullScreen } from '../primitives';
+import { RawFullScreen } from '../primitives/index';
 
 import { getShader } from '../hooks/useShader';
 import { useShaderRef } from '../hooks/useShaderRef';

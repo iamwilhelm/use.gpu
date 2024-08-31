@@ -4,7 +4,7 @@ import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import { provide, yeet, useMemo } from '@use-gpu/live';
 
 import { MaterialContext } from '../providers/material-provider';
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 import { useShader } from '../hooks/useShader';
 import { getRenderFunc } from '../hooks/useRenderProp';
 

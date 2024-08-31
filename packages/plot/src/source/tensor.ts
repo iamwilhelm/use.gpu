@@ -18,7 +18,7 @@ import {
 } from '@use-gpu/workbench';
 
 import { useDataContext, DataContext } from '../providers/data-provider';
-import zipObject from 'lodash/zipObject';
+import zipObject from 'lodash/zipObject.js';
 
 export type TensorProps<S extends string | string[]> = {
   /** Input size up to [width, height, depth, layers] */

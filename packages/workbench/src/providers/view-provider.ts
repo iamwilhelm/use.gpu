@@ -5,7 +5,7 @@ import { provide, makeContext, useCallback, useContext, useNoContext, useMemo } 
 import { makeGlobalUniforms, uploadBuffer } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
 import { useFrustumCuller, useNoFrustumCuller } from '../hooks/useFrustumCuller';
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 
 import { vec3 } from 'gl-matrix';
 

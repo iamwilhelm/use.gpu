@@ -17,7 +17,7 @@ import {
   parseNumber,
 } from '@use-gpu/parse';
 
-import mapValues from 'lodash/mapValues';
+import mapValues from 'lodash/mapValues.js';
 
 export const SLIDE_EFFECTS: SlideEffect[] = ['none', 'fade', 'wipe', 'move'];
 

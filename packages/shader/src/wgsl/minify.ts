@@ -1,5 +1,5 @@
 import { makeASTParser } from './ast';
-import { parser } from './grammar/wgsl';
+import { parser } from './grammar/wgsl.js';
 import { parser as commentParser } from './highlight/wgsl';
 
 export const removeComments = (code: string) => {

@@ -17,11 +17,11 @@ import {
   ShakeOp,
   RefFlags as RF,
 } from './types';
-import * as T from './grammar/glsl.terms';
+import * as T from './grammar/glsl.terms.js';
 import { GLSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
 import { getChildNodes, formatAST, makeASTEmitter, makeASTDecompressor } from '../util/tree';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 
 const IGNORE_IDENTIFIERS = new Set(['location', 'set', 'binding']);
 const AST_OPS = ["Shake", "Skip", "Identifier"];

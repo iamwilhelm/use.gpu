@@ -5,7 +5,7 @@ import { provide, yeet, useMemo } from '@use-gpu/live';
 
 import { useLightContext } from '../providers/light-provider';
 import { MaterialContext } from '../providers/material-provider';
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 
 import { getLitFragment } from '@use-gpu/wgsl/instance/fragment/lit.wgsl';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';

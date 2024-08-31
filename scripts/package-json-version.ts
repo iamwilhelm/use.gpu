@@ -1,6 +1,6 @@
 import { statSync, readFileSync, writeFileSync } from 'fs';
 import glob from 'glob';
-import mapValues from 'lodash/mapValues';
+import mapValues from 'lodash/mapValues.js';
 
 const {version} = JSON.parse(readFileSync('../../package.json').toString());
 

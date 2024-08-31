@@ -5,7 +5,7 @@ import { VIRTUAL_BINDINGS } from '../constants';
 import { bindBundle, bindModule } from './bind';
 import { toBundle, getBundleKey } from './bundle';
 import { resolveShakeOps } from './shake';
-import mapValues from 'lodash/mapValues';
+import mapValues from 'lodash/mapValues.js';
 
 export type Linker = (
   source: ParsedBundle,

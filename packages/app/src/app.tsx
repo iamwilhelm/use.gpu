@@ -14,7 +14,7 @@ import { makePicker } from './ui/page-picker';
 
 import { FALLBACK_MESSAGE } from './fallback';
 
-import NOTO_SEQUENCES from './noto-emoji.json';
+import NOTO_SEQUENCES from './noto-emoji';
 
 // @ts-ignore
 const isDevelopment = process.env.NODE_ENV === 'development';

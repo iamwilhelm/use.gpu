@@ -4,7 +4,7 @@ import type { CommandToBuffer } from '../pass';
 import { use, yeet, memo } from '@use-gpu/live';
 import { useDeviceContext } from '../providers/device-provider';
 import { Await } from '../queue/await';
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 
 const {quote} = QueueReconciler;
 

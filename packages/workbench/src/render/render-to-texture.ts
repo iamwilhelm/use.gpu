@@ -3,7 +3,7 @@ import type { UseGPURenderContext, TextureTarget } from '@use-gpu/core';
 
 import { provide, yeet, useMemo, incrementVersion } from '@use-gpu/live';
 import { RenderContext, useRenderContext, useNoRenderContext } from '../providers/render-provider';
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 
 import { getRenderFunc } from '../hooks/useRenderProp';
 

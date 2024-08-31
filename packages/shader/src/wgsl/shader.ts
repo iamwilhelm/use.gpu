@@ -8,10 +8,10 @@ import { makeTranspile } from '../util/transpile';
 import { makeASTParser, compressAST, decompressAST } from './ast';
 import { toTypeSymbol, toTypeArgs } from './type';
 import { removeComments, removeWhiteSpace, renameLocals } from './minify';
-import { parser } from './grammar/wgsl';
+import { parser } from './grammar/wgsl.js';
 
 import LRU from 'lru-cache';
-import zip from 'lodash/zip';
+import zip from 'lodash/zip.js';
 
 export { loadStaticModule, loadVirtualModule, bindEntryPoint } from '../util/shader';
 

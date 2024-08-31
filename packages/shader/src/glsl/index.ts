@@ -196,7 +196,8 @@ export const GLSLLinker = {
   parser,
 };
 
-export { parser } from './grammar/glsl';
+export { parser } from './grammar/glsl.js';
 
+export * from './types';
 
 export default GLSLLinker;

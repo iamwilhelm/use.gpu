@@ -17,7 +17,7 @@ import {
 } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getRenderFunc } from '../hooks/useRenderProp';
 import { getInstancedAggregate } from '../hooks/useInstancedSources';

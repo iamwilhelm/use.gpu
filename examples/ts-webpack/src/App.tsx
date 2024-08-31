@@ -1,4 +1,4 @@
-import React, { type LC, hot, useFiber, type PropsWithChildren } from '@use-gpu/live';
+import React, { type LC, type PropsWithChildren, hot, useFiber } from '@use-gpu/live';
 
 import { HTML } from '@use-gpu/react';
 import type { TextureSource } from '@use-gpu/core';

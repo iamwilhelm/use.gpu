@@ -1,5 +1,5 @@
 import { ExternalTokenizer } from '@lezer/lr';
-import { untilEOL, untilCommentClose } from './wgsl.terms';
+import { untilEOL, untilCommentClose } from './wgsl.terms.js';
 
 export const untilEOLToken = new ExternalTokenizer(
   (input, stack) => {

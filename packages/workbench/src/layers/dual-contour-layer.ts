@@ -19,7 +19,7 @@ import { useDraw } from '../hooks/useDraw';
 import { useDeviceContext } from '../providers/device-provider';
 import { useMaterialContext } from '../providers/material-provider';
 import { TransformContextProps } from '../providers/transform-provider';
-import { PassReconciler } from '../reconcilers';
+import { PassReconciler } from '../reconcilers/index';
 
 import { main as scanVolume } from '@use-gpu/wgsl/contour/scan.wgsl';
 import { main as fitContourLinear } from '@use-gpu/wgsl/contour/fit-linear.wgsl';

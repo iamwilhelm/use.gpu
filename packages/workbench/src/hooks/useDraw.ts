@@ -3,7 +3,7 @@ import { use, useHooks, useNoHooks } from '@use-gpu/live';
 
 import { useInspectHoverable } from '../hooks/useInspectable';
 import { useVariantContext } from '../providers/pass-provider';
-import { PassReconciler } from '../reconcilers';
+import { PassReconciler } from '../reconcilers/index';
 
 const {quote} = PassReconciler;
 

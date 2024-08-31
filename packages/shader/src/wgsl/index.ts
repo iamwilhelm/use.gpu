@@ -204,4 +204,6 @@ export const WGSLLinker = {
 
 export { parser } from './highlight/wgsl';
 
+export * from './types';
+
 export default WGSLLinker;

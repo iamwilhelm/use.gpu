@@ -2,7 +2,7 @@ import { GLSLModules } from './glsl.test.data';
 import { linkCode, linkModule } from './link';
 import { loadModule, glsl } from './shader';
 import { addASTSerializer } from '../test/snapshot';
-import mapValues from 'lodash/mapValues';
+import mapValues from 'lodash/mapValues.js';
 
 const loadedModules = mapValues(GLSLModules, (v, k) => loadModule(v, k, k));
 

@@ -7,7 +7,7 @@ import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries } from '@us
 
 import { PassContext, VariantContext } from '../providers/pass-provider';
 import { useDeviceContext } from '../providers/device-provider';
-import { PassReconciler } from '../reconcilers';
+import { PassReconciler } from '../reconcilers/index';
 
 import { ComputePass } from '../pass/compute-pass';
 import { DispatchPass } from '../pass/dispatch-pass';

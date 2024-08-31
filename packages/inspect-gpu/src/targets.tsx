@@ -11,7 +11,7 @@ import { UI, Layout, Flex, Block, Inline, Text, Overflow, Absolute } from '@use-
 import React, { Fragment } from 'react';
 
 import { UseInspect } from '@use-gpu/inspect';
-import { inspectGPU } from '.';
+import { inspectGPU } from './index';
 
 import { decodeOctahedral } from '@use-gpu/wgsl/codec/octahedral.wgsl';
 

@@ -2,7 +2,7 @@ import { WGSLModules } from './wgsl.test.data';
 import { linkCode, linkModule } from './link';
 import { loadModule, wgsl } from './shader';
 import { addASTSerializer } from '../test/snapshot';
-import mapValues from 'lodash/mapValues';
+import mapValues from 'lodash/mapValues.js';
 
 const loadedModules = mapValues(WGSLModules, (v, k) => loadModule(v, k, k));
 

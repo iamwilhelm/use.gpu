@@ -3,7 +3,7 @@ import type { TypedArray, StorageSource, Emit } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
 import { useDeviceContext } from '../providers/device-provider';
-import { QueueReconciler } from '../reconcilers';
+import { QueueReconciler } from '../reconcilers/index';
 
 import { useMemo, useNoMemo, useOne } from '@use-gpu/live';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';

@@ -8,7 +8,7 @@ import { useRenderContext } from '../providers/render-provider';
 import { useShaderRefs } from '../hooks/useShaderRef';
 import { getDerivedSource } from '../hooks/useDerivedSource';
 import { getShader } from '../hooks/useShader';
-import { RawFullScreen } from '../primitives';
+import { RawFullScreen } from '../primitives/index';
 
 export type FullScreenProps = {
   texture?: TextureSource,

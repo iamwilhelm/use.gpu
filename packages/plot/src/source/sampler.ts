@@ -15,7 +15,7 @@ import {
 
 import { useRangeContext, useNoRangeContext } from '../providers/range-provider';
 import { useDataContext, DataContext } from '../providers/data-provider';
-import zipObject from 'lodash/zipObject';
+import zipObject from 'lodash/zipObject.js';
 
 export type SamplerProps<S extends string | string[]> = {
   /** Sample count up to [width, height, depth, layers] */

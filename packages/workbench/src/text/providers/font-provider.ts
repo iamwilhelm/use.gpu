@@ -5,7 +5,7 @@ import { parseWeight } from '@use-gpu/parse';
 import { provide, makeContext, useContext, useMemo, useOne, useResource } from '@use-gpu/live';
 import { makeTuples } from '@use-gpu/core';
 import { RustText, packStrings } from '@use-gpu/glyph';
-import { useForceUpdate } from '../../hooks';
+import { useForceUpdate } from '../../hooks/useForceUpdate';
 
 export const FontContext = makeContext<RustTextAPI>(undefined, 'FontContext');
 export const useFontContext = () => useContext(FontContext);

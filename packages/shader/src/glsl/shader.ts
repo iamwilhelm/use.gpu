@@ -9,7 +9,7 @@ import { makeASTParser, compressAST, decompressAST } from './ast';
 import { toTypeSymbol, toTypeArgs } from './type';
 import { parser } from './grammar/glsl';
 import LRU from 'lru-cache';
-import zip from 'lodash/zip';
+import zip from 'lodash/zip.js';
 
 export { loadStaticModule, loadVirtualModule, bindEntryPoint } from '../util/shader';
 

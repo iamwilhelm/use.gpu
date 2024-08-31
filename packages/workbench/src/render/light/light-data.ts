@@ -13,7 +13,7 @@ import { mixBits53 } from '@use-gpu/state';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../../providers/device-provider';
-import { QueueReconciler } from '../../reconcilers';
+import { QueueReconciler } from '../../reconcilers/index';
 import { useBufferedSize } from '../../hooks/useBufferedSize';
 
 import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';

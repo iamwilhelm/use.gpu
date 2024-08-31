@@ -6,7 +6,7 @@ import { Hook } from '@use-gpu/live';
 import React, { useState } from 'react';
 import { SplitRow, Label, Spacer } from '../layout';
 import { InspectObject } from '../inspect-object';
-import chunk from 'lodash/chunk';
+import chunk from 'lodash/chunk.js';
 
 const STATE_SLOTS = 3;
 

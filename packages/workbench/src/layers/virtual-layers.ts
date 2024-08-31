@@ -9,7 +9,7 @@ import { getBundleKey } from '@use-gpu/shader';
 import { TransformContext } from '../providers/transform-provider';
 import { MaterialContext } from '../providers/material-provider';
 import { ScissorContext } from '../providers/scissor-provider';
-import { LayerReconciler, QueueReconciler } from '../reconcilers';
+import { LayerReconciler, QueueReconciler } from '../reconcilers/index';
 
 import { useAggregator } from '../hooks/useAggregator';
 

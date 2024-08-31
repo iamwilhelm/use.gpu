@@ -1,7 +1,7 @@
-# Use.GPU TS Webpack Example
+# Use.GPU TS Vite Example
 
 ## Instructions
 
 - `yarn install`
-- `yarn start`
-- Open http://localhost:3000
+- `yarn dev`
+- Open http://localhost:8080

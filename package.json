@@ -60,7 +60,7 @@
   ],
   "scripts": {
     "build": "yarn wsrun --stages run build && yarn run docs && yarn run build-examples",
-    "build-ci": "yarn wsrun -y 3 --stages run build && yarn run docs && yarn run build-examples && yarn ci-test",
+    "build-ci": "yarn wsrun -y 4 --stages run build && yarn run docs && yarn run build-examples && yarn ci-test",
     "build-examples": "ts-node ./scripts/example-json-version.ts",
     "build-app": "ts-node node_modules/.bin/webpack build; ./scripts/copy-app-to-docs.sh",
     "clear": "rm -rf packages/glyph/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js; rm -rf packages/wgsl/src",

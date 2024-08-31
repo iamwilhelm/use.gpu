@@ -1,4 +1,4 @@
-import type { ArchetypeSchema, Ragged, TensorArray, TypedArray, UniformType, VectorLike, VectorLikes } from '@use-gpu/core';
+import type { ArchetypeSchema, Ragged, TypedArray, UniformType, VectorLike, VectorLikes } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { Parser } from '@use-gpu/traits';
 
@@ -17,6 +17,7 @@ import {
   parseColorArray,
   parseColorArrayLike,
   parseColorMultiArray,
+  parseVec4,
   parseVec4Array,
   parseScalarArray,
   parseScalarArrayLike,
@@ -163,6 +164,16 @@ export const ObjectTrait = trait(
     quaternion: optional(parseQuaternion),
     rotation:   optional(parseRotation),
     matrix:     optional(parseMatrix),
+  },
+);
+
+export const Object4DTrait = trait(
+  {
+    position:        optional(parseVec4),
+    scale:           optional(parseVec4),
+    leftQuaternion:  optional(parseQuaternion),
+    rightQuaternion: optional(parseQuaternion),
+    matrix:          optional(parseMatrix),
   },
 );
 
@@ -425,8 +436,8 @@ export const SegmentsTrait = combine(
   }),
   (
     props: {
-      positions?: TensorArray | VectorLikes | VectorLikes[] | ShaderSource,
-      segments?: TensorArray | VectorLikes | ShaderSource,
+      positions?: VectorLikes | VectorLikes[],
+      segments?: VectorLikes,
     },
     parsed: {
       positions?: TypedArray,
@@ -450,7 +461,7 @@ export const SegmentsTrait = combine(
         }
         if (!pos || props.segments) return [];
         const f = (parsed.formats?.position ?? 'vec4<f32>') as UniformType;
-        return toChunkCounts(pos as VectorLikes | VectorLikes[], toCPUDims(getUniformDims(f)));
+        return toChunkCounts(pos, toCPUDims(getUniformDims(f)));
       }
     );
     parsed.chunks = chunks;
@@ -465,8 +476,8 @@ export const FacetedTrait = combine(
   }),
   (
     props: {
-      positions?: TensorArray | VectorLikes | VectorLikes[] | ShaderSource,
-      segments?: TensorArray | VectorLikes | ShaderSource,
+      positions?: VectorLikes | VectorLikes[],
+      segments?: VectorLikes,
       indices?: VectorLikes,
     },
     parsed: {
@@ -499,7 +510,7 @@ export const FacetedTrait = combine(
         }
         if (!pos || props.segments || props.indices) return [];
         const f = (parsed.formats?.position ?? 'vec4<f32>') as UniformType;
-        return toChunkCounts(pos as VectorLikes | VectorLikes[], toCPUDims(getUniformDims(f)));
+        return toChunkCounts(pos, toCPUDims(getUniformDims(f)));
       }
     );
     parsed.chunks = chunks;

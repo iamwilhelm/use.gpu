@@ -8,8 +8,8 @@ import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { getRenderFunc } from '../hooks/useRenderProp';
 
-import mapValues from 'lodash/mapValues.js';
-import zipObject from 'lodash/zipObject.js';
+import mapValues from 'lodash/mapValues';
+import zipObject from 'lodash/zipObject';
 
 const π = Math.PI;
 
@@ -74,7 +74,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
 
   const render = getRenderFunc(props);
   const [swapValues] = useDouble(() => mapValues(script, keyframes => makeValueRef(keyframes[0][1])), Object.keys(script));
-  const [swapElements] = useDouble(() => children ? extend(children, swapValues()) : null, [children, swapValues]);
+  const [swapElements] = useDouble(() => children && !render ? extend(children, swapValues()) : null, [children, swapValues]);
 
   const scalars = zipObject(Object.keys(script).filter(k => typeof script[k][0][1] === 'number'));
 

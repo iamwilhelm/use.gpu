@@ -27,7 +27,9 @@ export * from './view/polar';
 export * from './view/scissor';
 export * from './view/spherical';
 export * from './view/stereographic';
+export * from './view/stereographic-4d';
 export * from './view/transform';
+export * from './view/transform-4d';
 
 export * from './traits';
 export * from './types';

@@ -1,5 +1,6 @@
 0.12.0
 - `@use-gpu/*`: add `ts-vite` example
+- `@use-gpu/*`: use `swc` to build .js
 - `@use-gpu/*`: emit .cjs / .mjs split module build to avoid node issues
 - `@use-gpu/app`: add quaternion hypersphere example
 - `@use-gpu/app`: add droste shader example

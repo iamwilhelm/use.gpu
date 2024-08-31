@@ -2,7 +2,7 @@
 
 exports[`shader transpiles wgsl to CJS 1`] = `
 "/* __WGSL_LOADER_GENERATED */
-const {decompressAST, decompressString, symbolDictionary, bindEntryPoint, SymbolTable} = require(\\"@use-gpu/shader/wgsl\\");
+const {decompressAST, decompressString, symbolDictionary, bindEntryPoint} = require(\\"@use-gpu/shader/wgsl\\");
 const m0 = require(\\"@use-gpu/wgsl/use/types.wgsl\\");
 const m1 = require(\\"@use-gpu/wgsl/use/view.wgsl\\");
 const m2 = require(\\"@use-gpu/wgsl/geometry/quad.wgsl\\");
@@ -32,7 +32,7 @@ exports.getQuadVertex = getSymbol(\\"getQuadVertex\\");
 
 exports[`shader transpiles wgsl to CJS 2`] = `
 "/* __WGSL_LOADER_GENERATED */
-const {decompressAST, decompressString, symbolDictionary, bindEntryPoint, SymbolTable} = require(\\"@use-gpu/shader/wgsl\\");
+const {decompressAST, decompressString, symbolDictionary, bindEntryPoint} = require(\\"@use-gpu/shader/wgsl\\");
 const m0 = require(\\"@use-gpu/wgsl/use/types.wgsl\\");
 const m1 = require(\\"@use-gpu/wgsl/use/view.wgsl\\");
 const m2 = require(\\"@use-gpu/wgsl/geometry/quad.wgsl\\");
@@ -62,7 +62,7 @@ exports.getQuadVertex = getSymbol(\\"getQuadVertex\\");
 
 exports[`shader transpiles wgsl to ES 1`] = `
 "/* __WGSL_LOADER_GENERATED */
-import {decompressAST, decompressString, symbolDictionary, bindEntryPoint, SymbolTable} from \\"@use-gpu/shader/wgsl\\";
+import {decompressAST, decompressString, symbolDictionary, bindEntryPoint} from \\"@use-gpu/shader/wgsl\\";
 import m0 from \\"@use-gpu/wgsl/use/types.wgsl\\";
 import m1 from \\"@use-gpu/wgsl/use/view.wgsl\\";
 import m2 from \\"@use-gpu/wgsl/geometry/quad.wgsl\\";
@@ -87,7 +87,7 @@ export const getQuadVertex = getSymbol(\\"getQuadVertex\\");
 
 exports[`shader transpiles wgsl to ES 2`] = `
 "/* __WGSL_LOADER_GENERATED */
-import {decompressAST, decompressString, symbolDictionary, bindEntryPoint, SymbolTable} from \\"@use-gpu/shader/wgsl\\";
+import {decompressAST, decompressString, symbolDictionary, bindEntryPoint} from \\"@use-gpu/shader/wgsl\\";
 import m0 from \\"@use-gpu/wgsl/use/types.wgsl\\";
 import m1 from \\"@use-gpu/wgsl/use/view.wgsl\\";
 import m2 from \\"@use-gpu/wgsl/geometry/quad.wgsl\\";
@@ -112,7 +112,7 @@ export const getQuadVertex = getSymbol(\\"getQuadVertex\\");
 
 exports[`shader transpiles wgsl to ES with types 1`] = `
 "/* __WGSL_LOADER_GENERATED */
-import {decompressAST, decompressString, symbolDictionary, bindEntryPoint, SymbolTable, ParsedModule, ParsedBundle} from \\"@use-gpu/shader/wgsl\\";
+import {decompressAST, decompressString, symbolDictionary, bindEntryPoint, ParsedModule, ParsedBundle, SymbolTable} from \\"@use-gpu/shader/wgsl\\";
 import m0 from \\"@use-gpu/wgsl/use/types.wgsl\\";
 import m1 from \\"@use-gpu/wgsl/use/view.wgsl\\";
 import m2 from \\"@use-gpu/wgsl/geometry/quad.wgsl\\";
@@ -137,7 +137,7 @@ export const getQuadVertex = getSymbol(\\"getQuadVertex\\");
 
 exports[`shader transpiles wgsl to ES with types 2`] = `
 "/* __WGSL_LOADER_GENERATED */
-import {decompressAST, decompressString, symbolDictionary, bindEntryPoint, SymbolTable, ParsedModule, ParsedBundle} from \\"@use-gpu/shader/wgsl\\";
+import {decompressAST, decompressString, symbolDictionary, bindEntryPoint, ParsedModule, ParsedBundle, SymbolTable} from \\"@use-gpu/shader/wgsl\\";
 import m0 from \\"@use-gpu/wgsl/use/types.wgsl\\";
 import m1 from \\"@use-gpu/wgsl/use/view.wgsl\\";
 import m2 from \\"@use-gpu/wgsl/geometry/quad.wgsl\\";

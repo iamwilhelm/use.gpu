@@ -58,8 +58,8 @@
     "last 1 firefox version"
   ],
   "scripts": {
-    "build+ci": "yarn run build && yarn run ci-test",
     "build": "yarn wsrun --stages run build && yarn run docs && yarn run build-examples",
+    "build-ci": "yarn wsrun -y 3 --stages run build && yarn run docs && yarn run build-examples && yarn ci-test",
     "build-examples": "ts-node ./scripts/example-json-version.ts",
     "build-app": "ts-node node_modules/.bin/webpack build; ./scripts/copy-app-to-docs.sh",
     "clear": "rm -rf packages/glyph/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js; rm -rf packages/wgsl/src",
@@ -67,12 +67,12 @@
     "publish": "./scripts/npm-publish.sh",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "MODULE_ENV=cjs jest --watch",
-    "ci-docker": "(cd ci; docker build . -t registry.gitlab.com/unconed/use.gpu:ci; docker push registry.gitlab.com/unconed/use.gpu:ci)",
+    "ci-docker": "(cd ci; docker build . --platform linux/amd64 -t registry.gitlab.com/unconed/use.gpu:ci; docker push registry.gitlab.com/unconed/use.gpu:ci)",
     "ci-test": "MODULE_ENV=cjs CI=true yarn run jest",
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
-    "postinstall": "(cd packages/shader; yarn run build:bin); (cd packages/wgsl; yarn run build); (cd packages/glyph; yarn run build:wasm); (cd packages/app; yarn run build:wgsl); (cp -n .env.local.example .env.local || true)",
+    "postinstall": "(cd packages/shader; yarn run build:bin); (cd packages/wgsl; yarn run build:ts; yarn run build:exports-ts); (cd packages/glyph; yarn run build:wasm); (cd packages/app; yarn run build:wgsl); (cp -n .env.local.example .env.local || true)",
     "rc": "(git checkout rc && git merge master) || (git checkout master && git checkout -b rc); yarn version --prerelease --preid rc && git push gitlab rc; git checkout master"
   },
   "jest": {

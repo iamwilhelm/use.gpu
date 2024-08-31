@@ -13,9 +13,9 @@
     "types:watch": "yarn run types -- --watch",
     "build": "yarn run build:ts; yarn run build:exports-ts; yarn run build:pkg; yarn run build:cjs; yarn run build:mjs; yarn run build:exports-js; yarn run build:ts-out",
     "build:pkg": "rm -rf ../../build/packages/wgsl 2>/dev/null; mkdir -p ../../build/packages/wgsl && cp README.md package.json ../../build/packages/wgsl",
-    "build:ts": "ts-node ../shader/scripts/transpile2ts --output ./src --basePath ./wgsl --importRoot @use-gpu/wgsl --input ./wgsl --types --exports --sourceMap",
-    "build:cjs": "ts-node ../shader/scripts/transpile2ts --output ../../build/packages/wgsl/cjs --basePath ./wgsl --importRoot @use-gpu/wgsl --input ./wgsl --minify --typeDef --cjs --sourceMap",
-    "build:mjs": "ts-node ../shader/scripts/transpile2ts --output ../../build/packages/wgsl/mjs --basePath ./wgsl --importRoot @use-gpu/wgsl --input ./wgsl --minify --typeDef --sourceMap",
+    "build:ts": "../shader/bin/shader2ts.js --output ./src --basePath ./wgsl --importRoot @use-gpu/wgsl --input ./wgsl --types --exports --sourceMap",
+    "build:cjs": "../shader/bin/shader2ts.js --output ../../build/packages/wgsl/cjs --basePath ./wgsl --importRoot @use-gpu/wgsl --input ./wgsl --minify --typeDef --cjs --sourceMap",
+    "build:mjs": "../shader/bin/shader2ts.js --output ../../build/packages/wgsl/mjs --basePath ./wgsl --importRoot @use-gpu/wgsl --input ./wgsl --minify --typeDef --sourceMap",
     "build:exports-ts": "ts-node --project ../../tsconfig.json scripts/exports-ts.ts",
     "build:exports-js": "ts-node --project ../../tsconfig.json scripts/exports-js.ts",
     "build:ts-out": "rm -rf ../../build/ts/wgsl 2>/dev/null; mkdir -p ../../build/ts/wgsl; cp -r ../../build/packages/wgsl/cjs ../../build/ts/wgsl/src"

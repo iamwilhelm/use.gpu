@@ -11,7 +11,8 @@
     "./react": "./src/index-react.ts"
   },
   "scripts": {
-    "build": "sleep 4; NPM_PACKAGE=state ../../scripts/build-mjs-cjs.sh",
+    "#build": "# Type-only dependency on live, wait for build.",
+    "build": "sleep 1; while [ ! -f ../../build/ts/live/src/index.d.ts ]; do sleep 1; done; NPM_PACKAGE=state ../../scripts/build-mjs-cjs.sh",
     "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",

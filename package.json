@@ -1,6 +1,6 @@
 {
   "name": "use.gpu",
-  "version": "0.11.4-rc.0",
+  "version": "0.11.3",
   "main": "index.js",
   "author": "Steven Wittens <steven@acko.net>",
   "module": true,
@@ -72,8 +72,7 @@
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
     "postinstall": "(cd packages/shader; yarn run build:bin); (cd packages/wgsl; yarn run build); (cd packages/glyph; yarn run build:wasm); (cd packages/app; yarn run build:wgsl); (cp -n .env.local.example .env.local || true)",
-    "rc": "git checkout rc && git merge master && yarn version --prerelease --preid rc && git add package.json && git commit -m 'rc version'",
-    "deploy-rc": "git push gitlab rc"
+    "rc": "(git checkout rc && git merge master) || (git checkout master && git checkout -b rc); yarn version --prerelease --preid rc && git push gitlab rc; git checkout master"
   },
   "jest": {
     "preset": "ts-jest",

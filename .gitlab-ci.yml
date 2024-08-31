@@ -1,0 +1,35 @@
+image: node:latest
+
+stages:
+  - build
+  - deploy
+
+stages:
+  - rc
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
+before_script:
+  - echo "@use-gpu:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
+  - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
+  - yarn install --frozen-lockfile --check-files --non-interactive
+  - yarn build
+
+build:only:
+  stage: build
+  script:
+    - echo "Build succeeded"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "ci"
+    - if: $CI_MERGE_REQUEST_ID
+
+publish:
+  stage: deploy
+  script:
+    - echo "Publishing..."
+    - ./scripts/npm-publish.sh
+  rules:
+    - if: $CI_COMMIT_BRANCH == "rc"

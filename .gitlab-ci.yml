@@ -32,7 +32,7 @@ publish:
   stage: build
   script:
     - echo "Publishing..."
-    - ./scripts/npm-publish.sh
+    - ./scripts/npm-publish-ci.sh
   rules:
     - if: $CI_COMMIT_BRANCH == "rc"
 

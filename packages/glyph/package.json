@@ -10,7 +10,7 @@
     "./sdf": "./src/sdf.ts"
   },
   "dependencies": {
-    "@use-gpu/state": "*"
+    "@use-gpu/state": "^0.12.0-rc"
   },
   "scripts": {
     "build": "yarn run build:wasm && yarn run build:js && yarn run build:pkg",

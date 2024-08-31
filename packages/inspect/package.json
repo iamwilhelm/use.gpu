@@ -16,10 +16,10 @@
   },
   "dependencies": {
     "@stitches/react": "^1.2.8",
-    "@use-gpu/core": "*",
-    "@use-gpu/live": "*",
-    "@use-gpu/react": "*",
-    "@use-gpu/state": "*",
+    "@use-gpu/core": "^0.12.0-rc",
+    "@use-gpu/live": "^0.12.0-rc",
+    "@use-gpu/react": "^0.12.0-rc",
+    "@use-gpu/state": "^0.12.0-rc",
     "lodash": "^4.17.21"
   },
   "devDependencies": {

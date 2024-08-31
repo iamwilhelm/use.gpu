@@ -6,9 +6,9 @@
   "module": true,
   "license": "MIT",
   "dependencies": {
-    "@use-gpu/core": "*",
-    "@use-gpu/live": "*",
-    "@use-gpu/workbench": "*"
+    "@use-gpu/core": "^0.12.0-rc",
+    "@use-gpu/live": "^0.12.0-rc",
+    "@use-gpu/workbench": "^0.12.0-rc"
   },
   "scripts": {
     "build": "NPM_PACKAGE=webgpu ../../scripts/build-mjs-cjs.sh",

@@ -6,13 +6,13 @@
   "module": true,
   "license": "MIT",
   "dependencies": {
-    "@use-gpu/state": "*",
-    "@use-gpu/traits": "*",
-    "@use-gpu/workbench": "*",
-    "@use-gpu/core": "*",
-    "@use-gpu/live": "*",
-    "@use-gpu/shader": "*",
-    "@use-gpu/wgsl": "*",
+    "@use-gpu/state": "^0.12.0-rc",
+    "@use-gpu/traits": "^0.12.0-rc",
+    "@use-gpu/workbench": "^0.12.0-rc",
+    "@use-gpu/core": "^0.12.0-rc",
+    "@use-gpu/live": "^0.12.0-rc",
+    "@use-gpu/shader": "^0.12.0-rc",
+    "@use-gpu/wgsl": "^0.12.0-rc",
     "gl-matrix": "^3.3.0"
   },
   "scripts": {

@@ -26,6 +26,7 @@ for (const file of files) {
 
 const targets = [
   ...glob.sync(`../../build/packages/${pkg}/package.json`),
+  './package.json',
 ];
 for (const file of targets) {
   let data = readFileSync(file).toString();
@@ -39,9 +40,6 @@ for (const file of targets) {
       }
     }
   }
-
-  delete json.scripts;
-  delete json.jest;
 
   data = JSON.stringify(json, null, 2);
   writeFileSync(file, data);

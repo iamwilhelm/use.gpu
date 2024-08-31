@@ -6,11 +6,11 @@
   "module": true,
   "license": "MIT",
   "dependencies": {
-    "@use-gpu/core": "*",
-    "@use-gpu/live": "*",
-    "@use-gpu/shader": "*",
-    "@use-gpu/workbench": "*",
-    "@use-gpu/plot": "*",
+    "@use-gpu/core": "^0.12.0-rc",
+    "@use-gpu/live": "^0.12.0-rc",
+    "@use-gpu/shader": "^0.12.0-rc",
+    "@use-gpu/workbench": "^0.12.0-rc",
+    "@use-gpu/plot": "^0.12.0-rc",
     "mapbox-vector-tile": "^0.3.0",
     "comlink": "^4.4.1"
   },

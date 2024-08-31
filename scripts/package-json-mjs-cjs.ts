@@ -20,7 +20,7 @@ for (const file of files) {
     try {
       let stat = statSync(mjs);
       json.main = './cjs/index.cjs';
-      json.module = true;
+      json.module = './mjs/index.mjs';
 
       if (json.exports) {
         const convert = (value: string) => {

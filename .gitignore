@@ -6,9 +6,7 @@ yarn-error.log
 coverage
 tsconfig.tsbuildinfo
 .DS_Store
-test/import/node_modules
-test/import/dist
-test/import/yarn.lock
+examples/ts-vite/dist/*
 packages/app/**/*.wgsl.d.ts
 packages/glyph/pkg
 packages/shader/bin/*

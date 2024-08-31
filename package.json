@@ -73,7 +73,7 @@
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
-    "postinstall": "(cd packages/shader; yarn run build:bin); (cd packages/wgsl; yarn run build:ts; yarn run build:exports-ts); (cd packages/glyph; yarn run build:wasm); (cd packages/app; yarn run build:wgsl); (cp -n .env.local.example .env.local || true)",
+    "postinstall": "(cd packages/shader; yarn run build:bin); if [ $CI = true ]; then exit; fi; (cd packages/wgsl; yarn run build:ts; yarn run build:exports-ts); (cd packages/glyph; yarn run build:wasm); (cd packages/app; yarn run build:wgsl); (cp -n .env.local.example .env.local || true)",
     "rc": "./scripts/release-candidate.sh"
   },
   "jest": {

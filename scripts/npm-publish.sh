@@ -1,6 +1,4 @@
 #!/bin/bash
-set -e
-yarn run build
 
 echo '▶︎▶︎ @use-gpu/core';
 yarn publish --ignore-scripts --access public build/packages/core

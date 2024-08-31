@@ -14,6 +14,7 @@ import { makeFallback } from './Fallback';
 
 // Can import .wgsl directly as module
 import { wgslFunction } from './wgsl/test.wgsl';
+console.log(wgslFunction);
 
 const FONTS = [
   {

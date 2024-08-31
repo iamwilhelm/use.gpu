@@ -4,9 +4,6 @@ stages:
   - build
   - deploy
 
-stages:
-  - rc
-
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:

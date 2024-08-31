@@ -12,13 +12,11 @@ export default defineConfig({
   plugins: [
     wasm(),
     topLevelAwait(),
-    //react(),
-    //eslint(),
-    /*
+    react(),
+    eslint(),
     checker({
       typescript: true,
     }),
-    */
     wgslRollup(),
   ],
   server: {
@@ -28,9 +26,7 @@ export default defineConfig({
     port: 8080,
   },
   build: {
-    commonjsOptions: {
-      transformMixedEsModules: true,
-      exclude: [ 'node_modules/lodash-es/**', 'node_modules/@types/lodash-es/**', ]
-    },
-  },
+    outDir: './dist',
+    emptyOutDir: true,
+  }
 });

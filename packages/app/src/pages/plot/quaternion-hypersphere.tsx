@@ -1,4 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { Emit } from '@use-gpu/core';
 import type { Keyframe } from '@use-gpu/workbench';
 
 import React, { use, memo } from '@use-gpu/live';
@@ -131,7 +132,7 @@ export const PlotQuaternionHyperspherePage: LC = () => {
   );
 };
 
-const Hypersphere = memo((options: Partial<HypersphereOptions>) => (
+const Hypersphere = memo((options: HypersphereOptions) => (
   <>
     { options.showX ? (
       <Tensor

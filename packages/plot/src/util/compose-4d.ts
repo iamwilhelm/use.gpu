@@ -6,7 +6,7 @@ const makeComposeTransform4D = () => {
   const s = vec4.create();
   const m = mat4.create();
 
-  const quatToMatrixL = (m: mat4, q: quat) => {
+  const quatToMatrixL = (m: mat4, q: VectorLike) => {
     const [a, b, c, d] = q;
     mat4.set(
       m,
@@ -17,7 +17,7 @@ const makeComposeTransform4D = () => {
     );
   };
 
-  const quatToMatrixR = (m: mat4, q: quat) => {
+  const quatToMatrixR = (m: mat4, q: VectorLike) => {
     const [a, b, c, d] = q;
     mat4.set(
       m,

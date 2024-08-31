@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import { extend, useContext, useMemo, useNoMemo, useOne, useResource, useNoResource, useHooks } from '@use-gpu/live';
 import { EventContext, MouseContext, MouseEventState } from '../providers/event-provider';
 import { getRenderFunc } from '../hooks/useRenderProp';
@@ -28,7 +28,7 @@ export type PickState = {
   index: number,
 };
 
-export type PickProps = PropsWithChildren<{
+export type PickProps = {
   all?: boolean,
   move?: boolean,
   capture?: boolean,
@@ -40,7 +40,7 @@ export type PickProps = PropsWithChildren<{
 
   render?: (state: PickState) => LiveElement,
   children?: LiveElement | ((state: PickState) => LiveElement),
-}>;
+};
 
 export const Pick: LiveComponent<PickProps> = (props: PickProps) => {
   const {

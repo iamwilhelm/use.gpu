@@ -6,7 +6,8 @@ export type LiveFunction<F extends Function = ArrowFunction> = F;
 export type RawLiveComponent<P> = (props: P) => LiveElement;
 
 // React/JSX types interop
-export type PropsWithChildren<P> = P & { children?: LiveNode<any> };
+export type PropsWithChildren<P> = P & { children?: LiveElement<any> };
+export type PropsWithMarkup<P> = P & { children?: LiveNode<any> };
 export type LiveComponent<P = object> = ((props: P) => any) & { displayName?: string };
 export type Component<P = object> = LiveComponent<P>;
 export type RenderProp<T extends any[]> = (...args: T) => LiveElement;

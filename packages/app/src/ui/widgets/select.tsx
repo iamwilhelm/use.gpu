@@ -14,7 +14,7 @@ type SelectProps<T> = {
 export const Select = <T,>(props: SelectProps<T>) => {
   const {options, value, onChange} = props;
   return (
-    <select value={options.findIndex(o => o.value === value)} onChange={(e) => onChange(options[e.target.value].value)}>
+    <select value={options.findIndex(o => o.value === value)} onChange={(e) => onChange(options[e.target.value as any].value)}>
       {options.map((option, i) => <option key={i.toString()} value={i.toString()}>{option.label}</option>)}
     </select>
   );

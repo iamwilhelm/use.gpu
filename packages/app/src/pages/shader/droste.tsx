@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, RefObject, PropsWithChildren } from '@use-gpu/live';
 
 import React, { useRef } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
@@ -310,10 +310,14 @@ type PanShaderViewProps = PropsWithChildren<{
 const PanShaderView = ({ref, children}: PanShaderViewProps) => (
   <PanControls centered>{
     (x, y, zoom) => {
+      const {current: view} = ref;
+      
       // Pass view parameters directly to shader
-      ref.current[0] = x * window.devicePixelRatio;
-      ref.current[1] = y * window.devicePixelRatio;
-      ref.current[2] = zoom;
+      if (view) {
+        view[0] = x * window.devicePixelRatio;
+        view[1] = y * window.devicePixelRatio;
+        view[2] = zoom;
+      }
 
       const {signal} = QueueReconciler;
       return [

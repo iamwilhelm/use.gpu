@@ -24,9 +24,9 @@ const NO_MATRIX = mat4.create();
 const Traits = combine(AxesTrait, Object4DTrait);
 const useTraits = makeUseTrait(Traits);
 
-export type Transform4DProps = TraitProps<typeof Traits>;
+export type Transform4DProps = PropsWithChildren<TraitProps<typeof Traits>>;
 
-export const Transform4D: LiveComponent<Transform4DProps> = (props: PropsWithChildren<Transform4DProps>) => {
+export const Transform4D: LiveComponent<Transform4DProps> = (props: Transform4DProps) => {
   const {
     children,
   } = props;

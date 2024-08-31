@@ -11,7 +11,7 @@ import { useFontFamily, useFontText, useFontHeight } from '@use-gpu/workbench';
 import { Glyphs } from '../shape/glyphs';
 import { memoInline } from '../lib/util';
 
-type TextElement = string | number | LiveNode;
+type TextElement = LiveNode;
 
 export type TextProps = {
   opacity?: number,

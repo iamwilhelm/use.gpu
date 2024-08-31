@@ -25,13 +25,16 @@ type DrosteState = {
   func: number,
   grid: number,
   turn: number,
+  invert: boolean,
+  separation: number,
+  symmetry: number,
   shiftX: number,
   shiftY: number,
 };
 
 type DrosteControlsProps = {
   container?: Element | null,
-  render?: (state: DrosteState) => LiveElement
+  children?: (state: DrosteState) => LiveElement
 };
 
 const GRID_OPTIONS = [

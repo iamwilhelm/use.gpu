@@ -11,7 +11,7 @@ export const Checkbox = (props: CheckboxProps) => {
   const check = (
     <input
       type="checkbox"
-      value={value}
+      checked={value}
       onChange={(e) => onChange(e.target.checked)}
     />
   );

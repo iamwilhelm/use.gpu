@@ -1,5 +1,4 @@
-image: node:latest
-
+image: "registry.gitlab.com/unconed/use.gpu:ci"
 stages:
   - build
   - deploy
@@ -13,10 +12,15 @@ before_script:
   - echo "@use-gpu:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
   - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
   - yarn install --frozen-lockfile --check-files --non-interactive
-  - yarn build
 
-build:only:
+build:
   stage: build
+  script:
+    - yarn test
+    - yarn build
+
+ci:
+  stage: deploy
   script:
     - echo "Build succeeded"
   rules:

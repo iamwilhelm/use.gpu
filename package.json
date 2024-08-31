@@ -67,6 +67,7 @@
     "publish": "./scripts/npm-publish.sh",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "MODULE_ENV=cjs jest --watch",
+    "ci-docker": "(cd ci; docker build . -t registry.gitlab.com/unconed/use.gpu:ci; docker push registry.gitlab.com/unconed/use.gpu:ci)",
     "ci-test": "MODULE_ENV=cjs CI=true yarn run jest",
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",

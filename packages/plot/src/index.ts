@@ -34,4 +34,4 @@ export * from './view/transform-4d';
 export * from './traits';
 export * from './types';
 
-export * from './util';
+export * from './util/index';

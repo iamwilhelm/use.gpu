@@ -1,43 +1,43 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`tesselate assembles U piece left 1`] = `
-Array [
+[
   3750,
 ]
 `;
 
 exports[`tesselate assembles U piece left 2`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       25,
     ],
-    Array [
+    [
       25,
       25,
     ],
-    Array [
+    [
       25,
       75,
     ],
-    Array [
+    [
       50,
       75,
     ],
-    Array [
+    [
       50,
       100,
     ],
-    Array [
+    [
       0,
       100,
     ],
-    Array [
+    [
       0,
       0,
     ],
-    Array [
+    [
       50,
       0,
     ],
@@ -46,43 +46,43 @@ Array [
 `;
 
 exports[`tesselate assembles U piece right 1`] = `
-Array [
+[
   -3750,
 ]
 `;
 
 exports[`tesselate assembles U piece right 2`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       25,
     ],
-    Array [
+    [
       75,
       25,
     ],
-    Array [
+    [
       75,
       75,
     ],
-    Array [
+    [
       50,
       75,
     ],
-    Array [
+    [
       50,
       100,
     ],
-    Array [
+    [
       100,
       100,
     ],
-    Array [
+    [
       100,
       0,
     ],
-    Array [
+    [
       50,
       0,
     ],
@@ -91,46 +91,46 @@ Array [
 `;
 
 exports[`tesselate assembles U pieces 1`] = `
-Array [
+[
   1250,
   1250,
 ]
 `;
 
 exports[`tesselate assembles U pieces 2`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       0,
     ],
-    Array [
+    [
       100,
       0,
     ],
-    Array [
+    [
       100,
       25,
     ],
-    Array [
+    [
       50,
       25,
     ],
   ],
-  Array [
-    Array [
+  [
+    [
       50,
       75,
     ],
-    Array [
+    [
       100,
       75,
     ],
-    Array [
+    [
       100,
       100,
     ],
-    Array [
+    [
       50,
       100,
     ],
@@ -139,7 +139,7 @@ Array [
 `;
 
 exports[`tesselate assembles complex piece 1`] = `
-Array [
+[
   935,
   4,
   450,
@@ -148,155 +148,155 @@ Array [
 `;
 
 exports[`tesselate assembles complex piece 2`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       95,
     ],
-    Array [
+    [
       95,
       95,
     ],
-    Array [
+    [
       95,
       5,
     ],
-    Array [
+    [
       50,
       5,
     ],
-    Array [
+    [
       50,
       4,
     ],
-    Array [
+    [
       55,
       4,
     ],
-    Array [
+    [
       55,
       1,
     ],
-    Array [
+    [
       50,
       1,
     ],
-    Array [
+    [
       50,
       0,
     ],
-    Array [
+    [
       100,
       0,
     ],
-    Array [
+    [
       100,
       100,
     ],
-    Array [
+    [
       50,
       100,
     ],
   ],
-  Array [
-    Array [
+  [
+    [
       50,
       2,
     ],
-    Array [
+    [
       54,
       2,
     ],
-    Array [
+    [
       54,
       3,
     ],
-    Array [
+    [
       50,
       3,
     ],
   ],
-  Array [
-    Array [
+  [
+    [
       50,
       70,
     ],
-    Array [
+    [
       70,
       70,
     ],
-    Array [
+    [
       70,
       30,
     ],
-    Array [
+    [
       50,
       30,
     ],
-    Array [
+    [
       50,
       25,
     ],
-    Array [
+    [
       75,
       25,
     ],
-    Array [
+    [
       75,
       75,
     ],
-    Array [
+    [
       50,
       75,
     ],
   ],
-  Array [
-    Array [
+  [
+    [
       50,
       54,
     ],
-    Array [
+    [
       55,
       54,
     ],
-    Array [
+    [
       55,
       53,
     ],
-    Array [
+    [
       50,
       53,
     ],
-    Array [
+    [
       50,
       52,
     ],
-    Array [
+    [
       55,
       52,
     ],
-    Array [
+    [
       55,
       51,
     ],
-    Array [
+    [
       50,
       51,
     ],
-    Array [
+    [
       50,
       50,
     ],
-    Array [
+    [
       60,
       50,
     ],
-    Array [
+    [
       60,
       55,
     ],
-    Array [
+    [
       50,
       55,
     ],
@@ -305,7 +305,7 @@ Array [
 `;
 
 exports[`tesselate assembles spiral piece 1`] = `
-Array [
+[
   950,
   450,
   50,
@@ -313,89 +313,89 @@ Array [
 `;
 
 exports[`tesselate assembles spiral piece 2`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       95,
     ],
-    Array [
+    [
       95,
       95,
     ],
-    Array [
+    [
       95,
       5,
     ],
-    Array [
+    [
       50,
       5,
     ],
-    Array [
+    [
       50,
       0,
     ],
-    Array [
+    [
       100,
       0,
     ],
-    Array [
+    [
       100,
       100,
     ],
-    Array [
+    [
       50,
       100,
     ],
   ],
-  Array [
-    Array [
+  [
+    [
       50,
       70,
     ],
-    Array [
+    [
       70,
       70,
     ],
-    Array [
+    [
       70,
       30,
     ],
-    Array [
+    [
       50,
       30,
     ],
-    Array [
+    [
       50,
       25,
     ],
-    Array [
+    [
       75,
       25,
     ],
-    Array [
+    [
       75,
       75,
     ],
-    Array [
+    [
       50,
       75,
     ],
   ],
-  Array [
-    Array [
+  [
+    [
       50,
       50,
     ],
-    Array [
+    [
       60,
       50,
     ],
-    Array [
+    [
       60,
       55,
     ],
-    Array [
+    [
       50,
       55,
     ],
@@ -404,46 +404,46 @@ Array [
 `;
 
 exports[`tesselate cut polygon 1`] = `
-Array [
-  Array [
+[
+  [
     729,
   ],
 ]
 `;
 
 exports[`tesselate cut polygon 2`] = `
-Array [
-  Array [
-    Array [
-      Array [
+[
+  [
+    [
+      [
         22,
         25,
       ],
-      Array [
+      [
         25,
         25,
       ],
-      Array [
+      [
         25,
         20,
       ],
-      Array [
+      [
         22,
         20,
       ],
-      Array [
+      [
         22,
         10,
       ],
-      Array [
+      [
         50,
         10,
       ],
-      Array [
+      [
         40,
         40,
       ],
-      Array [
+      [
         22,
         46,
       ],
@@ -453,8 +453,8 @@ Array [
 `;
 
 exports[`tesselate cut polygon beside hole 1`] = `
-Array [
-  Array [
+[
+  [
     1116,
     -25,
     -5,
@@ -464,76 +464,76 @@ Array [
 `;
 
 exports[`tesselate cut polygon beside hole 2`] = `
-Array [
-  Array [
-    Array [
-      Array [
+[
+  [
+    [
+      [
         12,
         10,
       ],
-      Array [
+      [
         50,
         10,
       ],
-      Array [
+      [
         40,
         40,
       ],
-      Array [
+      [
         12,
         49,
       ],
     ],
-    Array [
-      Array [
+    [
+      [
         20,
         20,
       ],
-      Array [
+      [
         20,
         25,
       ],
-      Array [
+      [
         25,
         25,
       ],
-      Array [
+      [
         25,
-        20,
-      ],
-    ],
-    Array [
-      Array [
-        18,
-        20,
-      ],
-      Array [
-        18,
-        25,
-      ],
-      Array [
-        19,
-        25,
-      ],
-      Array [
-        19,
         20,
       ],
     ],
-    Array [
-      Array [
+    [
+      [
+        18,
+        20,
+      ],
+      [
+        18,
+        25,
+      ],
+      [
+        19,
+        25,
+      ],
+      [
+        19,
+        20,
+      ],
+    ],
+    [
+      [
         16,
         20,
       ],
-      Array [
+      [
         16,
         25,
       ],
-      Array [
+      [
         17,
         25,
       ],
-      Array [
+      [
         17,
         20,
       ],
@@ -543,39 +543,39 @@ Array [
 `;
 
 exports[`tesselate cuts U 1`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       0,
     ],
-    Array [
+    [
       100,
       0,
     ],
-    Array [
+    [
       100,
       25,
     ],
-    Array [
+    [
       50,
       25,
     ],
   ],
-  Array [
-    Array [
+  [
+    [
       50,
       75,
     ],
-    Array [
+    [
       100,
       75,
     ],
-    Array [
+    [
       100,
       100,
     ],
-    Array [
+    [
       50,
       100,
     ],
@@ -584,21 +584,21 @@ Array [
 `;
 
 exports[`tesselate cuts U left with multiple vertices on edge 1`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       75,
     ],
-    Array [
+    [
       100,
       75,
     ],
-    Array [
+    [
       100,
       100,
     ],
-    Array [
+    [
       50,
       100,
     ],
@@ -607,21 +607,21 @@ Array [
 `;
 
 exports[`tesselate cuts U right with multiple vertices on edge 1`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       75,
     ],
-    Array [
+    [
       100,
       75,
     ],
-    Array [
+    [
       100,
       100,
     ],
-    Array [
+    [
       50,
       100,
     ],
@@ -630,21 +630,21 @@ Array [
 `;
 
 exports[`tesselate cuts ring left 1`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       0,
     ],
-    Array [
+    [
       100,
       0,
     ],
-    Array [
+    [
       100,
       100,
     ],
-    Array [
+    [
       50,
       100,
     ],
@@ -653,21 +653,21 @@ Array [
 `;
 
 exports[`tesselate cuts ring on vertex left 1`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       0,
     ],
-    Array [
+    [
       100,
       0,
     ],
-    Array [
+    [
       100,
       100,
     ],
-    Array [
+    [
       50,
       100,
     ],
@@ -676,21 +676,21 @@ Array [
 `;
 
 exports[`tesselate cuts ring on vertex right 1`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       100,
     ],
-    Array [
+    [
       0,
       100,
     ],
-    Array [
+    [
       0,
       0,
     ],
-    Array [
+    [
       50,
       0,
     ],
@@ -699,21 +699,21 @@ Array [
 `;
 
 exports[`tesselate cuts ring right 1`] = `
-Array [
-  Array [
-    Array [
+[
+  [
+    [
       50,
       100,
     ],
-    Array [
+    [
       0,
       100,
     ],
-    Array [
+    [
       0,
       0,
     ],
-    Array [
+    [
       50,
       0,
     ],
@@ -722,22 +722,22 @@ Array [
 `;
 
 exports[`tesselate does not insert duplicate vertices 1`] = `
-Array [
-  Array [
-    Array [
-      Array [
+[
+  [
+    [
+      [
         0,
         0,
       ],
-      Array [
+      [
         10,
         0,
       ],
-      Array [
+      [
         10,
         10,
       ],
-      Array [
+      [
         0,
         10,
       ],
@@ -747,22 +747,22 @@ Array [
 `;
 
 exports[`tesselate does not insert duplicate vertices 2`] = `
-Array [
-  Array [
-    Array [
-      Array [
+[
+  [
+    [
+      [
         0,
         0,
       ],
-      Array [
+      [
         10,
         0,
       ],
-      Array [
+      [
         10,
         10,
       ],
-      Array [
+      [
         0,
         10,
       ],

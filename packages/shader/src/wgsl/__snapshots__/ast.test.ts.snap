@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ast filters out noisy comments 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 48,
     "flags": 0,
-    "struct": Object {
+    "struct": {
       "attr": undefined,
-      "members": Array [
-        Object {
+      "members": [
+        {
           "attr": undefined,
           "name": "bar",
           "type": "u32",
@@ -18,12 +18,12 @@ Array [
     },
     "symbol": "Foo",
   },
-  Object {
+  {
     "at": 116,
     "flags": 2,
     "symbol": "x",
-    "variable": Object {
-      "attr": Array [
+    "variable": {
+      "attr": [
         "link",
       ],
       "identifiers": undefined,
@@ -33,12 +33,12 @@ Array [
       "value": undefined,
     },
   },
-  Object {
+  {
     "at": 150,
     "flags": 2,
     "symbol": "y",
-    "variable": Object {
-      "attr": Array [
+    "variable": {
+      "attr": [
         "link",
       ],
       "identifiers": undefined,
@@ -48,16 +48,16 @@ Array [
       "value": undefined,
     },
   },
-  Object {
+  {
     "at": 177,
     "flags": 0,
-    "func": Object {
+    "func": {
       "attr": undefined,
       "identifiers": undefined,
       "inferred": undefined,
       "name": "getValue",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "index",
           "type": "i32",
@@ -67,12 +67,12 @@ Array [
     },
     "symbol": "getValue",
   },
-  Object {
+  {
     "at": 226,
     "flags": 1,
-    "func": Object {
+    "func": {
       "attr": undefined,
-      "identifiers": Array [
+      "identifiers": [
         "x",
         "y",
         "getValue",
@@ -89,12 +89,12 @@ Array [
 `;
 
 exports[`ast gets geometry quad symbol table 1`] = `
-Object {
+{
   "bindings": undefined,
-  "declarations": Array [
-    Object {
+  "declarations": [
+    {
       "at": 0,
-      "constant": Object {
+      "constant": {
         "attr": undefined,
         "identifiers": undefined,
         "name": "QUAD",
@@ -109,20 +109,20 @@ Object {
       "flags": 0,
       "symbol": "QUAD",
     },
-    Object {
+    {
       "at": 137,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "QUAD",
         ],
         "inferred": undefined,
         "name": "getQuadIndex",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "vertex",
             "type": "i32",
@@ -132,20 +132,20 @@ Object {
       },
       "symbol": "getQuadIndex",
     },
-    Object {
+    {
       "at": 215,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "getQuadIndex",
         ],
         "inferred": undefined,
         "name": "getQuadUV",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "vertex",
             "type": "i32",
@@ -157,21 +157,21 @@ Object {
     },
   ],
   "enables": undefined,
-  "exports": Array [
-    Object {
+  "exports": [
+    {
       "at": 137,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "QUAD",
         ],
         "inferred": undefined,
         "name": "getQuadIndex",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "vertex",
             "type": "i32",
@@ -181,20 +181,20 @@ Object {
       },
       "symbol": "getQuadIndex",
     },
-    Object {
+    {
       "at": 215,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "getQuadIndex",
         ],
         "inferred": undefined,
         "name": "getQuadUV",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "vertex",
             "type": "i32",
@@ -209,13 +209,13 @@ Object {
   "globals": undefined,
   "linkable": undefined,
   "modules": undefined,
-  "symbols": Array [
+  "symbols": [
     "QUAD",
     "getQuadIndex",
     "getQuadUV",
   ],
   "types": undefined,
-  "visibles": Array [
+  "visibles": [
     "getQuadIndex",
     "getQuadUV",
   ],
@@ -223,10 +223,10 @@ Object {
 `;
 
 exports[`ast gets inferred type from function declaration 1`] = `
-Array [
-  Object {
-    "alias": Object {
-      "attr": Array [
+[
+  {
+    "alias": {
+      "attr": [
         "infer",
       ],
       "name": "T",
@@ -236,26 +236,26 @@ Array [
     "flags": 16,
     "symbol": "T",
   },
-  Object {
+  {
     "at": 28,
     "flags": 3,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "link",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "T",
       ],
-      "inferred": Array [
-        Object {
+      "inferred": [
+        {
           "at": -1,
           "name": "T",
         },
       ],
       "name": "main",
       "parameters": undefined,
-      "type": Object {
-        "attr": Array [
+      "type": {
+        "attr": [
           "infer(T)",
         ],
         "name": "T",
@@ -267,13 +267,13 @@ Array [
 `;
 
 exports[`ast gets linked var/const declarations 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 7,
     "flags": 2,
     "symbol": "x",
-    "variable": Object {
-      "attr": Array [
+    "variable": {
+      "attr": [
         "link",
       ],
       "identifiers": undefined,
@@ -283,12 +283,12 @@ Array [
       "value": undefined,
     },
   },
-  Object {
+  {
     "at": 31,
     "flags": 2,
     "symbol": "y",
-    "variable": Object {
-      "attr": Array [
+    "variable": {
+      "attr": [
         "link",
       ],
       "identifiers": undefined,
@@ -298,10 +298,10 @@ Array [
       "value": undefined,
     },
   },
-  Object {
+  {
     "at": 55,
-    "constant": Object {
-      "attr": Array [
+    "constant": {
+      "attr": [
         "link",
       ],
       "identifiers": undefined,
@@ -316,19 +316,19 @@ Array [
 `;
 
 exports[`ast gets quad vertex declarations 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 182,
     "flags": 2,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "link",
       ],
       "identifiers": undefined,
       "inferred": undefined,
       "name": "getPosition",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "i",
           "type": "i32",
@@ -338,18 +338,18 @@ Array [
     },
     "symbol": "getPosition",
   },
-  Object {
+  {
     "at": 228,
     "flags": 2,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "link",
       ],
       "identifiers": undefined,
       "inferred": undefined,
       "name": "getColor",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "i",
           "type": "i32",
@@ -359,18 +359,18 @@ Array [
     },
     "symbol": "getColor",
   },
-  Object {
+  {
     "at": 271,
     "flags": 2,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "link",
       ],
       "identifiers": undefined,
       "inferred": undefined,
       "name": "getSize",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "i",
           "type": "i32",
@@ -380,18 +380,18 @@ Array [
     },
     "symbol": "getSize",
   },
-  Object {
+  {
     "at": 313,
     "flags": 2,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "link",
       ],
       "identifiers": undefined,
       "inferred": undefined,
       "name": "getDepth",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "i",
           "type": "i32",
@@ -401,14 +401,14 @@ Array [
     },
     "symbol": "getDepth",
   },
-  Object {
+  {
     "at": 351,
     "flags": 1,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "export",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "SolidVertex",
         "position",
         "getPosition",
@@ -431,13 +431,13 @@ Array [
       ],
       "inferred": undefined,
       "name": "getQuadVertex",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "vertexIndex",
           "type": "i32",
         },
-        Object {
+        {
           "attr": undefined,
           "name": "instanceIndex",
           "type": "i32",
@@ -451,53 +451,53 @@ Array [
 `;
 
 exports[`ast gets quad vertex imports 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 0,
-    "imports": Array [
-      Object {
+    "imports": [
+      {
         "imported": "SolidVertex",
         "name": "SolidVertex",
       },
     ],
     "name": "@use-gpu/wgsl/use/types",
-    "symbols": Array [
+    "symbols": [
       "SolidVertex",
     ],
   },
-  Object {
+  {
     "at": 0,
-    "imports": Array [
-      Object {
+    "imports": [
+      {
         "imported": "viewUniforms",
         "name": "viewUniforms",
       },
-      Object {
+      {
         "imported": "worldToClip",
         "name": "worldToClip",
       },
-      Object {
+      {
         "imported": "getPerspectiveScale",
         "name": "getPerspectiveScale",
       },
     ],
     "name": "@use-gpu/wgsl/use/view",
-    "symbols": Array [
+    "symbols": [
       "viewUniforms",
       "worldToClip",
       "getPerspectiveScale",
     ],
   },
-  Object {
+  {
     "at": 0,
-    "imports": Array [
-      Object {
+    "imports": [
+      {
         "imported": "getQuadUV",
         "name": "getQuadUV",
       },
     ],
     "name": "@use-gpu/wgsl/geometry/quad",
-    "symbols": Array [
+    "symbols": [
       "getQuadUV",
     ],
   },
@@ -505,21 +505,21 @@ Array [
 `;
 
 exports[`ast gets quad vertex symbol table 1`] = `
-Object {
+{
   "bindings": undefined,
-  "declarations": Array [
-    Object {
+  "declarations": [
+    {
       "at": 182,
       "flags": 2,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "link",
         ],
         "identifiers": undefined,
         "inferred": undefined,
         "name": "getPosition",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "i",
             "type": "i32",
@@ -529,18 +529,18 @@ Object {
       },
       "symbol": "getPosition",
     },
-    Object {
+    {
       "at": 228,
       "flags": 2,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "link",
         ],
         "identifiers": undefined,
         "inferred": undefined,
         "name": "getColor",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "i",
             "type": "i32",
@@ -550,18 +550,18 @@ Object {
       },
       "symbol": "getColor",
     },
-    Object {
+    {
       "at": 271,
       "flags": 2,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "link",
         ],
         "identifiers": undefined,
         "inferred": undefined,
         "name": "getSize",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "i",
             "type": "i32",
@@ -571,18 +571,18 @@ Object {
       },
       "symbol": "getSize",
     },
-    Object {
+    {
       "at": 313,
       "flags": 2,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "link",
         ],
         "identifiers": undefined,
         "inferred": undefined,
         "name": "getDepth",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "i",
             "type": "i32",
@@ -592,14 +592,14 @@ Object {
       },
       "symbol": "getDepth",
     },
-    Object {
+    {
       "at": 351,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "getPosition",
           "getColor",
           "getSize",
@@ -607,13 +607,13 @@ Object {
         ],
         "inferred": undefined,
         "name": "getQuadVertex",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "vertexIndex",
             "type": "i32",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "instanceIndex",
             "type": "i32",
@@ -625,15 +625,15 @@ Object {
     },
   ],
   "enables": undefined,
-  "exports": Array [
-    Object {
+  "exports": [
+    {
       "at": 351,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "getPosition",
           "getColor",
           "getSize",
@@ -641,13 +641,13 @@ Object {
         ],
         "inferred": undefined,
         "name": "getQuadVertex",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "vertexIndex",
             "type": "i32",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "instanceIndex",
             "type": "i32",
@@ -658,19 +658,19 @@ Object {
       "symbol": "getQuadVertex",
     },
   ],
-  "externals": Array [
-    Object {
+  "externals": [
+    {
       "at": 182,
       "flags": 2,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "link",
         ],
         "identifiers": undefined,
         "inferred": undefined,
         "name": "getPosition",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "i",
             "type": "i32",
@@ -680,18 +680,18 @@ Object {
       },
       "symbol": "getPosition",
     },
-    Object {
+    {
       "at": 228,
       "flags": 2,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "link",
         ],
         "identifiers": undefined,
         "inferred": undefined,
         "name": "getColor",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "i",
             "type": "i32",
@@ -701,18 +701,18 @@ Object {
       },
       "symbol": "getColor",
     },
-    Object {
+    {
       "at": 271,
       "flags": 2,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "link",
         ],
         "identifiers": undefined,
         "inferred": undefined,
         "name": "getSize",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "i",
             "type": "i32",
@@ -722,18 +722,18 @@ Object {
       },
       "symbol": "getSize",
     },
-    Object {
+    {
       "at": 313,
       "flags": 2,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "link",
         ],
         "identifiers": undefined,
         "inferred": undefined,
         "name": "getDepth",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "i",
             "type": "i32",
@@ -745,64 +745,64 @@ Object {
     },
   ],
   "globals": undefined,
-  "linkable": Object {
+  "linkable": {
     "getColor": true,
     "getDepth": true,
     "getPosition": true,
     "getSize": true,
   },
-  "modules": Array [
-    Object {
+  "modules": [
+    {
       "at": 0,
-      "imports": Array [
-        Object {
+      "imports": [
+        {
           "imported": "SolidVertex",
           "name": "SolidVertex",
         },
       ],
       "name": "@use-gpu/wgsl/use/types",
-      "symbols": Array [
+      "symbols": [
         "SolidVertex",
       ],
     },
-    Object {
+    {
       "at": 0,
-      "imports": Array [
-        Object {
+      "imports": [
+        {
           "imported": "viewUniforms",
           "name": "viewUniforms",
         },
-        Object {
+        {
           "imported": "worldToClip",
           "name": "worldToClip",
         },
-        Object {
+        {
           "imported": "getPerspectiveScale",
           "name": "getPerspectiveScale",
         },
       ],
       "name": "@use-gpu/wgsl/use/view",
-      "symbols": Array [
+      "symbols": [
         "viewUniforms",
         "worldToClip",
         "getPerspectiveScale",
       ],
     },
-    Object {
+    {
       "at": 0,
-      "imports": Array [
-        Object {
+      "imports": [
+        {
           "imported": "getQuadUV",
           "name": "getQuadUV",
         },
       ],
       "name": "@use-gpu/wgsl/geometry/quad",
-      "symbols": Array [
+      "symbols": [
         "getQuadUV",
       ],
     },
   ],
-  "symbols": Array [
+  "symbols": [
     "getPosition",
     "getColor",
     "getSize",
@@ -810,32 +810,32 @@ Object {
     "getQuadVertex",
   ],
   "types": undefined,
-  "visibles": Array [
+  "visibles": [
     "getQuadVertex",
   ],
 }
 `;
 
 exports[`ast gets shake information for geometry/quad AST 1`] = `
-Array [
-  Array [
+[
+  [
     0,
-    Array [
+    [
       0,
       1,
       2,
     ],
   ],
-  Array [
+  [
     137,
-    Array [
+    [
       1,
       2,
     ],
   ],
-  Array [
+  [
     215,
-    Array [
+    [
       2,
     ],
   ],
@@ -843,38 +843,38 @@ Array [
 `;
 
 exports[`ast gets shake information for getQuadVertex AST 1`] = `
-Array [
-  Array [
+[
+  [
     182,
-    Array [
+    [
       0,
       4,
     ],
   ],
-  Array [
+  [
     228,
-    Array [
+    [
       1,
       4,
     ],
   ],
-  Array [
+  [
     271,
-    Array [
+    [
       2,
       4,
     ],
   ],
-  Array [
+  [
     313,
-    Array [
+    [
       3,
       4,
     ],
   ],
-  Array [
+  [
     351,
-    Array [
+    [
       4,
     ],
   ],
@@ -882,16 +882,16 @@ Array [
 `;
 
 exports[`ast gets shake information for use/types AST 1`] = `
-Array [
-  Array [
+[
+  [
     1,
-    Array [
+    [
       0,
     ],
   ],
-  Array [
+  [
     94,
-    Array [
+    [
       1,
     ],
   ],
@@ -899,40 +899,40 @@ Array [
 `;
 
 exports[`ast gets shake table 1`] = `
-Array [
-  Array [
+[
+  [
     7,
-    Array [
+    [
       0,
       3,
       4,
     ],
   ],
-  Array [
+  [
     26,
-    Array [
+    [
       1,
       3,
       4,
     ],
   ],
-  Array [
+  [
     52,
-    Array [
+    [
       2,
       4,
     ],
   ],
-  Array [
+  [
     100,
-    Array [
+    [
       3,
       4,
     ],
   ],
-  Array [
+  [
     163,
-    Array [
+    [
       4,
     ],
   ],
@@ -940,24 +940,24 @@ Array [
 `;
 
 exports[`ast gets solid fragment declarations 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 1,
     "flags": 2,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "link",
       ],
       "identifiers": undefined,
       "inferred": undefined,
       "name": "getFragment",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "color",
           "type": "vec4<f32>",
         },
-        Object {
+        {
           "attr": undefined,
           "name": "uv",
           "type": "vec2<f32>",
@@ -967,37 +967,37 @@ Array [
     },
     "symbol": "getFragment",
   },
-  Object {
+  {
     "at": 73,
     "flags": 1,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "fragment",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "outColor",
         "getFragment",
       ],
       "inferred": undefined,
       "name": "main",
-      "parameters": Array [
-        Object {
-          "attr": Array [
+      "parameters": [
+        {
+          "attr": [
             "location(0)",
           ],
           "name": "fragColor",
           "type": "vec4<f32>",
         },
-        Object {
-          "attr": Array [
+        {
+          "attr": [
             "location(1)",
           ],
           "name": "fragUV",
           "type": "vec2<f32>",
         },
       ],
-      "type": Object {
-        "attr": Array [
+      "type": {
+        "attr": [
           "location(0)",
         ],
         "name": "vec4<f32>",
@@ -1009,15 +1009,15 @@ Array [
 `;
 
 exports[`ast gets symbol table 1`] = `
-Object {
+{
   "bindings": undefined,
-  "declarations": Array [
-    Object {
+  "declarations": [
+    {
       "at": 7,
       "flags": 1,
       "symbol": "x",
-      "variable": Object {
-        "attr": Array [
+      "variable": {
+        "attr": [
           "export",
         ],
         "identifiers": undefined,
@@ -1027,11 +1027,11 @@ Object {
         "value": undefined,
       },
     },
-    Object {
+    {
       "at": 26,
       "flags": 0,
       "symbol": "y",
-      "variable": Object {
+      "variable": {
         "attr": undefined,
         "identifiers": undefined,
         "name": "y",
@@ -1040,9 +1040,9 @@ Object {
         "value": undefined,
       },
     },
-    Object {
+    {
       "at": 44,
-      "constant": Object {
+      "constant": {
         "attr": undefined,
         "identifiers": undefined,
         "name": "a",
@@ -1052,8 +1052,8 @@ Object {
       "flags": 0,
       "symbol": "a",
     },
-    Object {
-      "alias": Object {
+    {
+      "alias": {
         "attr": undefined,
         "name": "integer",
         "type": "i32",
@@ -1062,9 +1062,9 @@ Object {
       "flags": 0,
       "symbol": "integer",
     },
-    Object {
+    {
       "at": 94,
-      "constant": Object {
+      "constant": {
         "attr": undefined,
         "identifiers": undefined,
         "name": "b",
@@ -1074,21 +1074,21 @@ Object {
       "flags": 0,
       "symbol": "b",
     },
-    Object {
+    {
       "at": 125,
       "flags": 1,
-      "struct": Object {
-        "attr": Array [
+      "struct": {
+        "attr": [
           "export",
         ],
-        "members": Array [
-          Object {
+        "members": [
+          {
             "attr": undefined,
             "name": "intensity",
             "type": "f32",
           },
-          Object {
-            "attr": Array [
+          {
+            "attr": [
               "annotate",
             ],
             "name": "position",
@@ -1099,9 +1099,9 @@ Object {
       },
       "symbol": "light",
     },
-    Object {
+    {
       "at": 218,
-      "constant": Object {
+      "constant": {
         "attr": undefined,
         "identifiers": undefined,
         "name": "QUAD",
@@ -1116,11 +1116,11 @@ Object {
       "flags": 0,
       "symbol": "QUAD",
     },
-    Object {
+    {
       "at": 397,
       "flags": 6,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "optional",
           "link",
         ],
@@ -1132,11 +1132,11 @@ Object {
       },
       "symbol": "getInt",
     },
-    Object {
+    {
       "at": 442,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
         "identifiers": undefined,
@@ -1149,13 +1149,13 @@ Object {
     },
   ],
   "enables": undefined,
-  "exports": Array [
-    Object {
+  "exports": [
+    {
       "at": 7,
       "flags": 1,
       "symbol": "x",
-      "variable": Object {
-        "attr": Array [
+      "variable": {
+        "attr": [
           "export",
         ],
         "identifiers": undefined,
@@ -1165,21 +1165,21 @@ Object {
         "value": undefined,
       },
     },
-    Object {
+    {
       "at": 125,
       "flags": 1,
-      "struct": Object {
-        "attr": Array [
+      "struct": {
+        "attr": [
           "export",
         ],
-        "members": Array [
-          Object {
+        "members": [
+          {
             "attr": undefined,
             "name": "intensity",
             "type": "f32",
           },
-          Object {
-            "attr": Array [
+          {
+            "attr": [
               "annotate",
             ],
             "name": "position",
@@ -1190,11 +1190,11 @@ Object {
       },
       "symbol": "light",
     },
-    Object {
+    {
       "at": 442,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
         "identifiers": undefined,
@@ -1206,12 +1206,12 @@ Object {
       "symbol": "main",
     },
   ],
-  "externals": Array [
-    Object {
+  "externals": [
+    {
       "at": 397,
       "flags": 6,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "optional",
           "link",
         ],
@@ -1225,11 +1225,11 @@ Object {
     },
   ],
   "globals": undefined,
-  "linkable": Object {
+  "linkable": {
     "getInt": true,
   },
   "modules": undefined,
-  "symbols": Array [
+  "symbols": [
     "x",
     "y",
     "a",
@@ -1240,10 +1240,10 @@ Object {
     "getInt",
     "main",
   ],
-  "types": Array [
+  "types": [
     "light",
   ],
-  "visibles": Array [
+  "visibles": [
     "x",
     "light",
     "main",
@@ -1252,10 +1252,10 @@ Object {
 `;
 
 exports[`ast gets test declarations with array 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 0,
-    "constant": Object {
+    "constant": {
       "attr": undefined,
       "identifiers": undefined,
       "name": "QUAD",
@@ -1274,12 +1274,12 @@ Array [
 `;
 
 exports[`ast gets test empty function declaration 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 7,
     "flags": 1,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "export",
       ],
       "identifiers": undefined,
@@ -1294,43 +1294,43 @@ Array [
 `;
 
 exports[`ast gets test enables 1`] = `
-Array [
+[
   "f16",
   "f64",
 ]
 `;
 
 exports[`ast gets test function declaration 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 7,
     "flags": 0,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "fragment",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "A",
         "foo",
       ],
       "inferred": undefined,
       "name": "fragShader",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "in1",
           "type": "A",
         },
-        Object {
-          "attr": Array [
+        {
+          "attr": [
             "location(2)",
           ],
           "name": "in2",
           "type": "f32",
         },
       ],
-      "type": Object {
-        "attr": Array [
+      "type": {
+        "attr": [
           "location(0)",
         ],
         "name": "vec4<f32>",
@@ -1342,75 +1342,75 @@ Array [
 `;
 
 exports[`ast gets test imports 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 0,
-    "imports": Array [
-      Object {
+    "imports": [
+      {
         "imported": "MeshVertex",
         "name": "MeshVertex",
       },
     ],
     "name": "use/types",
-    "symbols": Array [
+    "symbols": [
       "MeshVertex",
     ],
   },
-  Object {
+  {
     "at": 0,
-    "imports": Array [
-      Object {
+    "imports": [
+      {
         "imported": "viewUniforms",
         "name": "view",
       },
-      Object {
+      {
         "imported": "worldToClip",
         "name": "worldToClip",
       },
     ],
     "name": "use/view",
-    "symbols": Array [
+    "symbols": [
       "view",
       "worldToClip",
     ],
   },
-  Object {
+  {
     "at": 0,
-    "imports": Array [
-      Object {
+    "imports": [
+      {
         "imported": "getQuadUV",
         "name": "getQuadUV",
       },
     ],
     "name": "geometry/quad",
-    "symbols": Array [
+    "symbols": [
       "getQuadUV",
     ],
   },
-  Object {
+  {
     "at": 0,
-    "imports": Array [],
+    "imports": [],
     "name": "test",
-    "symbols": Array [],
+    "symbols": [],
   },
 ]
 `;
 
 exports[`ast gets test struct declaration 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 0,
     "flags": 0,
-    "struct": Object {
+    "struct": {
       "attr": undefined,
-      "members": Array [
-        Object {
+      "members": [
+        {
           "attr": undefined,
           "name": "intensity",
           "type": "f32",
         },
-        Object {
-          "attr": Array [
+        {
+          "attr": [
             "annotate",
           ],
           "name": "position",
@@ -1425,12 +1425,12 @@ Array [
 `;
 
 exports[`ast gets test var/const declarations 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 0,
     "flags": 0,
     "symbol": "x",
-    "variable": Object {
+    "variable": {
       "attr": undefined,
       "identifiers": undefined,
       "name": "x",
@@ -1439,11 +1439,11 @@ Array [
       "value": undefined,
     },
   },
-  Object {
+  {
     "at": 18,
     "flags": 0,
     "symbol": "y",
-    "variable": Object {
+    "variable": {
       "attr": undefined,
       "identifiers": undefined,
       "name": "y",
@@ -1452,9 +1452,9 @@ Array [
       "value": undefined,
     },
   },
-  Object {
+  {
     "at": 36,
-    "constant": Object {
+    "constant": {
       "attr": undefined,
       "identifiers": undefined,
       "name": "a",
@@ -1464,8 +1464,8 @@ Array [
     "flags": 0,
     "symbol": "a",
   },
-  Object {
-    "alias": Object {
+  {
+    "alias": {
       "attr": undefined,
       "name": "integer",
       "type": "i32",
@@ -1474,9 +1474,9 @@ Array [
     "flags": 0,
     "symbol": "integer",
   },
-  Object {
+  {
     "at": 86,
-    "constant": Object {
+    "constant": {
       "attr": undefined,
       "identifiers": undefined,
       "name": "b",
@@ -1490,28 +1490,28 @@ Array [
 `;
 
 exports[`ast gets use types symbol table 1`] = `
-Object {
+{
   "bindings": undefined,
-  "declarations": Array [
-    Object {
+  "declarations": [
+    {
       "at": 1,
       "flags": 1,
-      "struct": Object {
-        "attr": Array [
+      "struct": {
+        "attr": [
           "export",
         ],
-        "members": Array [
-          Object {
+        "members": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "color",
             "type": "vec4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "uv",
             "type": "vec2<f32>",
@@ -1521,30 +1521,30 @@ Object {
       },
       "symbol": "SolidVertex",
     },
-    Object {
+    {
       "at": 94,
       "flags": 1,
-      "struct": Object {
-        "attr": Array [
+      "struct": {
+        "attr": [
           "export",
         ],
-        "members": Array [
-          Object {
+        "members": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "normal",
             "type": "vec3<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "color",
             "type": "vec4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "uv",
             "type": "vec2<f32>",
@@ -1556,26 +1556,26 @@ Object {
     },
   ],
   "enables": undefined,
-  "exports": Array [
-    Object {
+  "exports": [
+    {
       "at": 1,
       "flags": 1,
-      "struct": Object {
-        "attr": Array [
+      "struct": {
+        "attr": [
           "export",
         ],
-        "members": Array [
-          Object {
+        "members": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "color",
             "type": "vec4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "uv",
             "type": "vec2<f32>",
@@ -1585,30 +1585,30 @@ Object {
       },
       "symbol": "SolidVertex",
     },
-    Object {
+    {
       "at": 94,
       "flags": 1,
-      "struct": Object {
-        "attr": Array [
+      "struct": {
+        "attr": [
           "export",
         ],
-        "members": Array [
-          Object {
+        "members": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "normal",
             "type": "vec3<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "color",
             "type": "vec4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "uv",
             "type": "vec2<f32>",
@@ -1623,15 +1623,15 @@ Object {
   "globals": undefined,
   "linkable": undefined,
   "modules": undefined,
-  "symbols": Array [
+  "symbols": [
     "SolidVertex",
     "MeshVertex",
   ],
-  "types": Array [
+  "types": [
     "SolidVertex",
     "MeshVertex",
   ],
-  "visibles": Array [
+  "visibles": [
     "SolidVertex",
     "MeshVertex",
   ],
@@ -1639,44 +1639,44 @@ Object {
 `;
 
 exports[`ast gets use view declarations 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 0,
     "flags": 0,
-    "struct": Object {
+    "struct": {
       "attr": undefined,
-      "members": Array [
-        Object {
+      "members": [
+        {
           "attr": undefined,
           "name": "projectionMatrix",
           "type": "mat4x4<f32>",
         },
-        Object {
+        {
           "attr": undefined,
           "name": "viewMatrix",
           "type": "mat4x4<f32>",
         },
-        Object {
+        {
           "attr": undefined,
           "name": "viewPosition",
           "type": "vec4<f32>",
         },
-        Object {
+        {
           "attr": undefined,
           "name": "viewResolution",
           "type": "vec2<f32>",
         },
-        Object {
+        {
           "attr": undefined,
           "name": "viewSize",
           "type": "vec2<f32>",
         },
-        Object {
+        {
           "attr": undefined,
           "name": "viewWorldDepth",
           "type": "f32",
         },
-        Object {
+        {
           "attr": undefined,
           "name": "viewPixelRatio",
           "type": "f32",
@@ -1686,17 +1686,17 @@ Array [
     },
     "symbol": "ViewUniforms",
   },
-  Object {
+  {
     "at": 212,
     "flags": 33,
     "symbol": "viewUniforms",
-    "variable": Object {
-      "attr": Array [
+    "variable": {
+      "attr": [
         "export",
         "group(VIEW)",
         "binding(VIEW)",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "ViewUniforms",
       ],
       "name": "viewUniforms",
@@ -1705,20 +1705,20 @@ Array [
       "value": undefined,
     },
   },
-  Object {
+  {
     "at": 290,
     "flags": 1,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "export",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "viewUniforms",
       ],
       "inferred": undefined,
       "name": "worldToView",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "position",
           "type": "vec4<f32>",
@@ -1728,20 +1728,20 @@ Array [
     },
     "symbol": "worldToView",
   },
-  Object {
+  {
     "at": 397,
     "flags": 1,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "export",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "viewUniforms",
       ],
       "inferred": undefined,
       "name": "viewToClip",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "position",
           "type": "vec4<f32>",
@@ -1751,21 +1751,21 @@ Array [
     },
     "symbol": "viewToClip",
   },
-  Object {
+  {
     "at": 509,
     "flags": 1,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "export",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "viewToClip",
         "worldToView",
       ],
       "inferred": undefined,
       "name": "worldToClip",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "position",
           "type": "vec4<f32>",
@@ -1775,20 +1775,20 @@ Array [
     },
     "symbol": "worldToClip",
   },
-  Object {
+  {
     "at": 615,
     "flags": 1,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "export",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "viewUniforms",
       ],
       "inferred": undefined,
       "name": "clipToScreen3D",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "position",
           "type": "vec4<f32>",
@@ -1798,20 +1798,20 @@ Array [
     },
     "symbol": "clipToScreen3D",
   },
-  Object {
+  {
     "at": 749,
     "flags": 1,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "export",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "viewUniforms",
       ],
       "inferred": undefined,
       "name": "screenToClip3D",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "position",
           "type": "vec4<f32>",
@@ -1821,22 +1821,22 @@ Array [
     },
     "symbol": "screenToClip3D",
   },
-  Object {
+  {
     "at": 889,
     "flags": 1,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "export",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "pos",
         "viewToClip",
         "worldToView",
       ],
       "inferred": undefined,
       "name": "worldToClip3D",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "position",
           "type": "vec4<f32>",
@@ -1846,14 +1846,14 @@ Array [
     },
     "symbol": "worldToClip3D",
   },
-  Object {
+  {
     "at": 1026,
     "flags": 1,
-    "func": Object {
-      "attr": Array [
+    "func": {
+      "attr": [
         "export",
       ],
-      "identifiers": Array [
+      "identifiers": [
         "m",
         "viewUniforms",
         "worldScale",
@@ -1863,13 +1863,13 @@ Array [
       ],
       "inferred": undefined,
       "name": "getPerspectiveScale",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "w",
           "type": "f32",
         },
-        Object {
+        {
           "attr": undefined,
           "name": "f",
           "type": "f32",
@@ -1883,19 +1883,19 @@ Array [
 `;
 
 exports[`ast gets use view symbol table 1`] = `
-Object {
-  "bindings": Array [
-    Object {
+{
+  "bindings": [
+    {
       "at": 212,
       "flags": 33,
       "symbol": "viewUniforms",
-      "variable": Object {
-        "attr": Array [
+      "variable": {
+        "attr": [
           "export",
           "group(VIEW)",
           "binding(VIEW)",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "ViewUniforms",
         ],
         "name": "viewUniforms",
@@ -1905,44 +1905,44 @@ Object {
       },
     },
   ],
-  "declarations": Array [
-    Object {
+  "declarations": [
+    {
       "at": 0,
       "flags": 0,
-      "struct": Object {
+      "struct": {
         "attr": undefined,
-        "members": Array [
-          Object {
+        "members": [
+          {
             "attr": undefined,
             "name": "projectionMatrix",
             "type": "mat4x4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "viewMatrix",
             "type": "mat4x4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "viewPosition",
             "type": "vec4<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "viewResolution",
             "type": "vec2<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "viewSize",
             "type": "vec2<f32>",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "viewWorldDepth",
             "type": "f32",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "viewPixelRatio",
             "type": "f32",
@@ -1952,17 +1952,17 @@ Object {
       },
       "symbol": "ViewUniforms",
     },
-    Object {
+    {
       "at": 212,
       "flags": 33,
       "symbol": "viewUniforms",
-      "variable": Object {
-        "attr": Array [
+      "variable": {
+        "attr": [
           "export",
           "group(VIEW)",
           "binding(VIEW)",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "ViewUniforms",
         ],
         "name": "viewUniforms",
@@ -1971,20 +1971,20 @@ Object {
         "value": undefined,
       },
     },
-    Object {
+    {
       "at": 290,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewUniforms",
         ],
         "inferred": undefined,
         "name": "worldToView",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -1994,20 +1994,20 @@ Object {
       },
       "symbol": "worldToView",
     },
-    Object {
+    {
       "at": 397,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewUniforms",
         ],
         "inferred": undefined,
         "name": "viewToClip",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2017,21 +2017,21 @@ Object {
       },
       "symbol": "viewToClip",
     },
-    Object {
+    {
       "at": 509,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewToClip",
           "worldToView",
         ],
         "inferred": undefined,
         "name": "worldToClip",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2041,20 +2041,20 @@ Object {
       },
       "symbol": "worldToClip",
     },
-    Object {
+    {
       "at": 615,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewUniforms",
         ],
         "inferred": undefined,
         "name": "clipToScreen3D",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2064,20 +2064,20 @@ Object {
       },
       "symbol": "clipToScreen3D",
     },
-    Object {
+    {
       "at": 749,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewUniforms",
         ],
         "inferred": undefined,
         "name": "screenToClip3D",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2087,21 +2087,21 @@ Object {
       },
       "symbol": "screenToClip3D",
     },
-    Object {
+    {
       "at": 889,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewToClip",
           "worldToView",
         ],
         "inferred": undefined,
         "name": "worldToClip3D",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2111,25 +2111,25 @@ Object {
       },
       "symbol": "worldToClip3D",
     },
-    Object {
+    {
       "at": 1026,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewUniforms",
         ],
         "inferred": undefined,
         "name": "getPerspectiveScale",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "w",
             "type": "f32",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "f",
             "type": "f32",
@@ -2141,18 +2141,18 @@ Object {
     },
   ],
   "enables": undefined,
-  "exports": Array [
-    Object {
+  "exports": [
+    {
       "at": 212,
       "flags": 33,
       "symbol": "viewUniforms",
-      "variable": Object {
-        "attr": Array [
+      "variable": {
+        "attr": [
           "export",
           "group(VIEW)",
           "binding(VIEW)",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "ViewUniforms",
         ],
         "name": "viewUniforms",
@@ -2161,20 +2161,20 @@ Object {
         "value": undefined,
       },
     },
-    Object {
+    {
       "at": 290,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewUniforms",
         ],
         "inferred": undefined,
         "name": "worldToView",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2184,20 +2184,20 @@ Object {
       },
       "symbol": "worldToView",
     },
-    Object {
+    {
       "at": 397,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewUniforms",
         ],
         "inferred": undefined,
         "name": "viewToClip",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2207,21 +2207,21 @@ Object {
       },
       "symbol": "viewToClip",
     },
-    Object {
+    {
       "at": 509,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewToClip",
           "worldToView",
         ],
         "inferred": undefined,
         "name": "worldToClip",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2231,20 +2231,20 @@ Object {
       },
       "symbol": "worldToClip",
     },
-    Object {
+    {
       "at": 615,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewUniforms",
         ],
         "inferred": undefined,
         "name": "clipToScreen3D",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2254,20 +2254,20 @@ Object {
       },
       "symbol": "clipToScreen3D",
     },
-    Object {
+    {
       "at": 749,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewUniforms",
         ],
         "inferred": undefined,
         "name": "screenToClip3D",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2277,21 +2277,21 @@ Object {
       },
       "symbol": "screenToClip3D",
     },
-    Object {
+    {
       "at": 889,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewToClip",
           "worldToView",
         ],
         "inferred": undefined,
         "name": "worldToClip3D",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "position",
             "type": "vec4<f32>",
@@ -2301,25 +2301,25 @@ Object {
       },
       "symbol": "worldToClip3D",
     },
-    Object {
+    {
       "at": 1026,
       "flags": 1,
-      "func": Object {
-        "attr": Array [
+      "func": {
+        "attr": [
           "export",
         ],
-        "identifiers": Array [
+        "identifiers": [
           "viewUniforms",
         ],
         "inferred": undefined,
         "name": "getPerspectiveScale",
-        "parameters": Array [
-          Object {
+        "parameters": [
+          {
             "attr": undefined,
             "name": "w",
             "type": "f32",
           },
-          Object {
+          {
             "attr": undefined,
             "name": "f",
             "type": "f32",
@@ -2334,7 +2334,7 @@ Object {
   "globals": undefined,
   "linkable": undefined,
   "modules": undefined,
-  "symbols": Array [
+  "symbols": [
     "ViewUniforms",
     "viewUniforms",
     "worldToView",
@@ -2346,7 +2346,7 @@ Object {
     "getPerspectiveScale",
   ],
   "types": undefined,
-  "visibles": Array [
+  "visibles": [
     "viewUniforms",
     "worldToView",
     "viewToClip",
@@ -2371,13 +2371,13 @@ struct VertexT {
 `;
 
 exports[`ast parses comment function 1`] = `
-Array [
-  Object {
+[
+  {
     "at": 0,
     "flags": 0,
-    "func": Object {
+    "func": {
       "attr": undefined,
-      "identifiers": Array [
+      "identifiers": [
         "nextEdge",
         "atomicAdd",
         "indirectDraw",
@@ -2385,8 +2385,8 @@ Array [
       ],
       "inferred": undefined,
       "name": "appendEdge",
-      "parameters": Array [
-        Object {
+      "parameters": [
+        {
           "attr": undefined,
           "name": "id",
           "type": "u32",
@@ -2400,98 +2400,98 @@ Array [
 `;
 
 exports[`ast rewrites a lot of code using the compressed AST 1`] = `
-Array [
-  Array [
+[
+  [
     1,
     1,
     31,
   ],
-  Array [
+  [
     1,
     33,
     47,
   ],
-  Array [
+  [
     1,
     16,
     68,
   ],
-  Array [
+  [
     0,
     53,
     231,
   ],
-  Array [
+  [
     2,
     9,
     21,
   ],
-  Array [
+  [
     3,
     17,
     25,
   ],
-  Array [
+  [
     3,
     32,
     44,
   ],
-  Array [
+  [
     3,
     37,
     49,
   ],
-  Array [
+  [
     3,
     34,
     46,
   ],
-  Array [
+  [
     3,
     13,
     31,
   ],
-  Array [
+  [
     0,
     39,
     317,
   ],
-  Array [
+  [
     3,
     0,
     7,
   ],
-  Array [
+  [
     2,
     11,
     15,
   ],
-  Array [
+  [
     3,
     8,
     30,
   ],
-  Array [
+  [
     3,
     43,
     67,
   ],
-  Array [
+  [
     2,
     50,
     62,
   ],
-  Array [
+  [
     2,
     18,
     29,
   ],
-  Array [
+  [
     2,
     16,
     25,
   ],
-  Array [
+  [
     2,
     49,
     61,
@@ -2500,99 +2500,99 @@ Array [
 `;
 
 exports[`ast rewrites a lot of code using the compressed AST 2`] = `
-Object {
-  "__nodes": Array [
-    Array [
+{
+  "__nodes": [
+    [
       1,
       1,
       31,
     ],
-    Array [
+    [
       1,
       33,
       47,
     ],
-    Array [
+    [
       1,
       16,
       68,
     ],
-    Array [
+    [
       0,
       53,
       231,
     ],
-    Array [
+    [
       2,
       9,
       21,
     ],
-    Array [
+    [
       3,
       17,
       25,
     ],
-    Array [
+    [
       3,
       32,
       44,
     ],
-    Array [
+    [
       3,
       37,
       49,
     ],
-    Array [
+    [
       3,
       34,
       46,
     ],
-    Array [
+    [
       3,
       13,
       31,
     ],
-    Array [
+    [
       0,
       39,
       317,
     ],
-    Array [
+    [
       3,
       0,
       7,
     ],
-    Array [
+    [
       2,
       11,
       15,
     ],
-    Array [
+    [
       3,
       8,
       30,
     ],
-    Array [
+    [
       3,
       43,
       67,
     ],
-    Array [
+    [
       2,
       50,
       62,
     ],
-    Array [
+    [
       2,
       18,
       29,
     ],
-    Array [
+    [
       2,
       16,
       25,
     ],
-    Array [
+    [
       2,
       49,
       61,
@@ -2642,28 +2642,28 @@ exports[`ast rewrites code using the AST 1`] = `
 `;
 
 exports[`ast rewrites code using the compressed AST 1`] = `
-Array [
-  Array [
+[
+  [
     0,
     0,
     35,
   ],
-  Array [
+  [
     2,
     8,
     16,
   ],
-  Array [
+  [
     0,
     28,
     176,
   ],
-  Array [
+  [
     2,
     8,
     12,
   ],
-  Array [
+  [
     2,
     55,
     63,
@@ -2672,29 +2672,29 @@ Array [
 `;
 
 exports[`ast rewrites code using the compressed AST 2`] = `
-Object {
-  "__nodes": Array [
-    Array [
+{
+  "__nodes": [
+    [
       0,
       0,
       35,
     ],
-    Array [
+    [
       2,
       8,
       16,
     ],
-    Array [
+    [
       0,
       28,
       176,
     ],
-    Array [
+    [
       2,
       8,
       12,
     ],
-    Array [
+    [
       2,
       55,
       63,
@@ -2716,24 +2716,24 @@ exports[`ast rewrites code with inferred types using the AST 1`] = `
 `;
 
 exports[`ast shakes simple program 1`] = `
-Array [
-  Array [
+[
+  [
     0,
-    Array [
+    [
       0,
       1,
       2,
     ],
   ],
-  Array [
+  [
     22,
-    Array [
+    [
       1,
     ],
   ],
-  Array [
+  [
     64,
-    Array [
+    [
       2,
     ],
   ],
@@ -2752,17 +2752,17 @@ fn getA() -> f32 {
 `;
 
 exports[`ast shakes struct type args 1`] = `
-Array [
-  Array [
+[
+  [
     0,
-    Array [
+    [
       0,
       1,
     ],
   ],
-  Array [
+  [
     79,
-    Array [
+    [
       1,
     ],
   ],
@@ -2780,10 +2780,10 @@ struct VertexOutput {
 `;
 
 exports[`ast shakes use/view AST 1`] = `
-Array [
-  Array [
+[
+  [
     0,
-    Array [
+    [
       0,
       1,
       2,
@@ -2795,9 +2795,9 @@ Array [
       8,
     ],
   ],
-  Array [
+  [
     212,
-    Array [
+    [
       1,
       2,
       4,
@@ -2808,49 +2808,49 @@ Array [
       8,
     ],
   ],
-  Array [
+  [
     290,
-    Array [
+    [
       2,
       4,
       7,
     ],
   ],
-  Array [
+  [
     397,
-    Array [
+    [
       3,
       4,
       7,
     ],
   ],
-  Array [
+  [
     509,
-    Array [
+    [
       4,
     ],
   ],
-  Array [
+  [
     615,
-    Array [
+    [
       5,
     ],
   ],
-  Array [
+  [
     749,
-    Array [
+    [
       6,
     ],
   ],
-  Array [
+  [
     889,
-    Array [
+    [
       7,
     ],
   ],
-  Array [
+  [
     1026,
-    Array [
+    [
       8,
     ],
   ],
@@ -2887,10 +2887,10 @@ fn worldToClip(position: vec4<f32>) -> vec4<f32> {
 `;
 
 exports[`ast shakes use/view AST using compressed AST 1`] = `
-Array [
-  Array [
+[
+  [
     0,
-    Array [
+    [
       0,
       1,
       2,
@@ -2902,9 +2902,9 @@ Array [
       8,
     ],
   ],
-  Array [
+  [
     212,
-    Array [
+    [
       1,
       2,
       4,
@@ -2915,49 +2915,49 @@ Array [
       8,
     ],
   ],
-  Array [
+  [
     290,
-    Array [
+    [
       2,
       4,
       7,
     ],
   ],
-  Array [
+  [
     397,
-    Array [
+    [
       3,
       4,
       7,
     ],
   ],
-  Array [
+  [
     509,
-    Array [
+    [
       4,
     ],
   ],
-  Array [
+  [
     615,
-    Array [
+    [
       5,
     ],
   ],
-  Array [
+  [
     749,
-    Array [
+    [
       6,
     ],
   ],
-  Array [
+  [
     889,
-    Array [
+    [
       7,
     ],
   ],
-  Array [
+  [
     1026,
-    Array [
+    [
       8,
     ],
   ],

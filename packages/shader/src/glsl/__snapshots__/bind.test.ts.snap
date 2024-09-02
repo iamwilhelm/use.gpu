@@ -109,90 +109,90 @@ vec2 _VT_1_getSize(int index) {
 `;
 
 exports[`bind makes deterministic links for data bindings 1`] = `
-Object {
+{
   "base": undefined,
   "code": "@access [getColor getSize] [m2t6xjush0]",
   "name": "_VT_2znyn7",
-  "storages": Array [
-    Object {
-      "storage": Object {
-        "buffer": Object {},
+  "storages": [
+    {
+      "storage": {
+        "buffer": {},
         "format": "vec2",
         "length": 10,
-        "size": Array [
+        "size": [
           10,
         ],
         "version": 1,
       },
-      "uniform": Object {
-        "args": Array [
+      "uniform": {
+        "args": [
           "int",
         ],
         "format": "vec2",
         "name": "getSize",
-        "value": Array [
+        "value": [
           1,
           1,
         ],
       },
     },
   ],
-  "table": Object {
-    "declarations": Array [
-      Object {
+  "table": {
+    "declarations": [
+      {
         "at": 0,
         "flags": 0,
-        "func": Object {
+        "func": {
           "name": "getColor",
-          "parameters": Array [
+          "parameters": [
             "int",
           ],
-          "type": Object {
+          "type": {
             "name": "vec4",
           },
         },
-        "symbols": Array [],
+        "symbols": [],
       },
-      Object {
+      {
         "at": 0,
         "flags": 0,
-        "func": Object {
+        "func": {
           "name": "getSize",
-          "parameters": Array [
+          "parameters": [
             "int",
           ],
-          "type": Object {
+          "type": {
             "name": "vec2",
           },
         },
-        "symbols": Array [],
+        "symbols": [],
       },
     ],
-    "symbols": Array [
+    "symbols": [
       "getColor",
       "getSize",
     ],
-    "visibles": Array [
+    "visibles": [
       "getColor",
       "getSize",
     ],
   },
-  "textures": Array [],
-  "uniforms": Array [
-    Object {
-      "constant": Array [
+  "textures": [],
+  "uniforms": [
+    {
+      "constant": [
         1,
         0.5,
         1,
         1,
       ],
-      "uniform": Object {
-        "args": Array [
+      "uniform": {
+        "args": [
           "int",
         ],
         "format": "vec4",
         "name": "getColor",
-        "value": Array [
+        "value": [
           0,
           0.5,
           1,

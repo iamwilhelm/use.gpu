@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`getGraphOrder gets graph order 1`] = `
-Array [
+[
   "E",
   "D",
   "B",
@@ -11,7 +11,7 @@ Array [
 `;
 
 exports[`getGraphOrder hoists inside graph 1`] = `
-Array [
+[
   "E",
   "F",
   "D",
@@ -22,7 +22,7 @@ Array [
 `;
 
 exports[`getGraphOrder hoists leaf in graph 1`] = `
-Array [
+[
   "F",
   "E",
   "D",

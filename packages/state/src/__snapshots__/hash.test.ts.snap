@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`hash hashes values 1`] = `
-Array [
+[
   "1l2le7p47v",
   "8vthalggis",
   "uotvvk502v",

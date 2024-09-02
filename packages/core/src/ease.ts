@@ -223,7 +223,6 @@ export const catmullRomWeighted = (
   cd: number,
   power: number = 1/2,
 ) => {
-  const inv = power;
   const d1 = pow(ab, power);
   const d2 = pow(bc, power);
   const d3 = pow(cd, power);

@@ -46,7 +46,7 @@ export const cubicBezierInverse01 = (v: number, b: number, c: number) => {
   // Bezier over x=[-1..1] y=[-1..1] with symmetric basis functions
   const y = v * 2 - 1;
 
-  // Sum and difference of middle two bezier bands relative to f(x)=x
+  // Sum and difference of middle two bezier bands relative to f(x) = x
   const s = (3/4) * (b + c - 1);
   const d = (3/4) * (b - c + (1/3));
   if (abs(d) < 1e-5) {
@@ -55,12 +55,16 @@ export const cubicBezierInverse01 = (v: number, b: number, c: number) => {
   }
 
   // Construct cubic basis
+  // y = (d x^3 - s x^2 - d x + s) + x
+
+  // Deflate cubic
+  // t = x - o
+  // t^3 + pt + q = 0
   const id = 1/d;
   const s2 = s*s;
   const d2 = d*d;
   const id2 = id*id;
 
-  // Deflate cubic
   const o = (1/3) * s * id;
   const p = (d - d2 + (-1/3) * s2) * id2;
   const q = (((-2/27) * s2 + (1/3) * (d - d2) + d2) * s - y * d2) * (id2 * id);

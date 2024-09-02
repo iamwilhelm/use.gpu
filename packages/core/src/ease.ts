@@ -42,15 +42,15 @@ export const cubicBezierInverse01NR = (v: number, b: number, c: number) => {
 };
 
 // Invert monotonous cubic bezier (a=0 d=1) (analytic)
-export const cubicBezierInverse01 = (t: number, b: number, c: number) => {
-  // Bezier over t=[-1..1] with symmetric basis functions
-  const y = t * 2 - 1;
+export const cubicBezierInverse01 = (v: number, b: number, c: number) => {
+  // Bezier over x=[-1..1] y=[-1..1] with symmetric basis functions
+  const y = v * 2 - 1;
 
   // Sum and difference of middle two bezier bands relative to f(x)=x
   const s = (3/4) * (b + c - 1);
   const d = (3/4) * (b - c + (1/3));
   if (abs(d) < 1e-5) {
-    if (abs(s) < 1e-5) return t;
+    if (abs(s) < 1e-5) return v;
     return quadraticSolve(s, y) * .5 + .5;
   }
 

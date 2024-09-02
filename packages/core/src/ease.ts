@@ -49,7 +49,10 @@ export const cubicBezierInverse01 = (t: number, b: number, c: number) => {
   // Sum and difference of middle two bezier bands relative to f(x)=x
   const s = (3/4) * (b + c - 1);
   const d = (3/4) * (b - c + (1/3));
-  if (abs(d) < 1e-5) return quadraticSolve(s, y) * .5 + .5;
+  if (abs(d) < 1e-5) {
+    if (abs(s) < 1e-5) return t;
+    return quadraticSolve(s, y) * .5 + .5;
+  }
 
   // Construct cubic basis
   const id = 1/d;

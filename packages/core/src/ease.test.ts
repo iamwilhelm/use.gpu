@@ -27,9 +27,11 @@ describe('ease', () => {
 
     expect(cubicBezierInverse01(0.15625, 0, 1)).toBeCloseTo(0.25, 8);
     expect(cubicBezierInverse01(0.202496, .1, .6)).toBeCloseTo(0.32, 8);
+    expect(cubicBezierInverse01(0.4, 1/3, 2/3)).toBeCloseTo(0.4, 8);
 
     expect(cubicBezierInverse01NR(0.15625, 0, 1)).toBeCloseTo(0.25, 8);
     expect(cubicBezierInverse01NR(0.202496, .1, .6)).toBeCloseTo(0.32, 8);
+    expect(cubicBezierInverse01NR(0.4, 1/3, 2/3)).toBeCloseTo(0.4, 8);
 
     expect(bezierEase(0, .25, .25, .75, .75)).toEqual(0);
     expect(bezierEase(1, .25, .25, .75, .75)).toEqual(1);

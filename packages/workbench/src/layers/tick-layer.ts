@@ -73,7 +73,6 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
     count = 1,
     detail = 1,
     mode = 'opaque',
-    id = 0,
 
     ...rest
   } = props;
@@ -113,7 +112,6 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
 
         count: c,
         mode,
-        id,
 
         ...rest
       })

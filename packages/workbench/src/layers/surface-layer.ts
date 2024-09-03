@@ -60,7 +60,6 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
 
     size,
     mode = 'opaque',
-    id = 0,
     ...rest
   } = props;
 
@@ -102,7 +101,6 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     side,
     count: countExpr,
     mode,
-    id,
     ...rest,
   });
 }, 'SurfaceLayer');

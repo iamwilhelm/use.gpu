@@ -1,7 +1,8 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VirtualDraw } from '../../pass/types';
 
-import { yeet, useMemo } from '@use-gpu/live';
+import { yeet, useMemo, useOne } from '@use-gpu/live';
+import { patch } from '@use-gpu/state';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { drawCall } from '../../queue/draw-call';
@@ -20,6 +21,7 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
       getVertex,
       getPicking,
     },
+    pipeline: propPipeline,
     ...rest
   } = props;
 
@@ -29,6 +31,10 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
 
   const vertexShader = instanceDrawVirtualPicking;
   const fragmentShader = instanceFragmentPicking;
+
+  const pipeline = useOne(() => patch(propPipeline, {
+    multisample: { count: 1, alphaToCoverageEnabled: false },
+  }), propPipeline);
 
   // Binds links into shader
   const [v, f] = useMemo(() => {
@@ -46,6 +52,7 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
     ...rest,
     vertex: v,
     fragment: f,
+    pipeline,
     renderContext,
     globalLayout,
     mode: 'picking',

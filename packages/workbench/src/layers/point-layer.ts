@@ -77,7 +77,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     outline = 0,
     shape = 'circle',
     mode = 'opaque',
-    id = 0,
+    id,
 
     ...rest
   } = props;

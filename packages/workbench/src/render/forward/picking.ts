@@ -21,6 +21,7 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
       getVertex,
       getPicking,
     },
+    defines,
     pipeline: propPipeline,
     ...rest
   } = props;
@@ -47,11 +48,14 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getPicking]);
 
+  const defs = useOne(() => ({...defines, HAS_ALPHA_TO_COVERAGE: false}), defines);
+
   // Inline the render fiber
   const call = {
     ...rest,
     vertex: v,
     fragment: f,
+    defines: defs,
     pipeline,
     renderContext,
     globalLayout,

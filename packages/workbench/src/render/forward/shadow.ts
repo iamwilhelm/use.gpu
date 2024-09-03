@@ -58,12 +58,14 @@ export const ShadowRender: LiveComponent<ShadowRenderProps> = (props: ShadowRend
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getFragment, getDepth]);
 
+  const defs = useOne(() => ({...defines, HAS_ALPHA_TO_COVERAGE: true}), defines);
+
   // Inline the render fiber
   const call = {
     ...rest,
     vertex: v,
     fragment: f,
-    defines,
+    defines: defs,
     pipeline,
     renderContext,
     globalLayout,

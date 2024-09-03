@@ -280,7 +280,9 @@ export const deprecated = <F extends ArrowFunction>(
 
   const wrapped = (props: any) => {
     if (!warning) {
-      console.warn(`<${oldName}> is deprecated. Use <${newName ?? (f as any).displayName ?? f.name}> instead.`);
+      const unmemo = (s: string) => s.replace(/Memo\(([^\)]+)\)/g, '$1');
+
+      console.warn(`<${oldName}> is deprecated. Use <${unmemo(newName) ?? (f as any).displayName ?? f.name}> instead.`);
       warning = true;
     }
     return f(props);

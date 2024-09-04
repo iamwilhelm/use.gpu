@@ -18,7 +18,7 @@ import { decodeOctahedral } from '@use-gpu/wgsl/codec/octahedral.wgsl';
 const {signal} = QueueReconciler;
 
 const SIZE = 512;
-const HEIGHT = SIZE + 24 * 2;
+const HEIGHT = SIZE + 24 * 2 + 16;
 const IMAGE_FIT = {fit: 'contain', align: 'center', repeat: 'none'};
 
 const NO_OPS: any[] = [];
@@ -285,8 +285,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
               let texture = {...t, sampler: {}, variant: 'textureSample'} as any;
               texture = getShader(depthCubeShader, [decodeOctahedral, texture]);
               texture = getLambdaSource(texture, t);
-              texture.format = t.format;
-              texture.layout = t.layout;
+              adoptMeta(texture, t);
               out.push(makeView(texture));
             }
 
@@ -296,7 +295,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
                 texture = getShader(arrayShader, [i, texture]);
                 texture = getShader(depthShader, [() => size, texture]);
                 texture = getLambdaSource(texture, t);
-                texture.format = t.format;
+                adoptMeta(texture, t);
                 texture.layout = t.layout + ` (face ${i + 1})`;
                 out.push(makeView(texture));
               }
@@ -309,8 +308,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
               texture = getShader(arrayShader, [i, texture]);
               texture = getShader(depthShader, [() => size, texture]);
               texture = getLambdaSource(texture, t);
-              texture.format = t.format;
-              texture.layout = t.layout;
+              adoptMeta(texture, t);
               out.push(makeView(texture));
             }
           }
@@ -318,16 +316,14 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
             let texture = t as any;
             texture = getShader(depthShader, [() => size, texture]);
             texture = getLambdaSource(texture, t);
-            texture.format = t.format;
-            texture.layout = t.layout;
+            adoptMeta(texture, t);
             out.push(makeView(texture));
           }
           else {
             let texture = t as any;
             texture = getShader(depthShader, [() => size, texture]);
             texture = getLambdaSource(texture, t);
-            texture.format = t.format;
-            texture.layout = t.layout;
+            adoptMeta(texture, t);
             out.push(makeView(texture));
           }
         }
@@ -356,9 +352,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
         let texture = t as any;
         texture = getShader(stencilShader, [() => size, texture]);
         texture = getLambdaSource(texture, t);
-        texture.format = t.format;
-        texture.layout = t.layout;
-        texture.label  = t.texture?.label ?? t.view?.label;
+        adoptMeta(texture, t);
         out.push(makeView(texture));
       }
     }
@@ -373,9 +367,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
 
       let texture = getShader(pickingShader, [() => size, t]) as any;
       texture = getLambdaSource(texture, t);
-      texture.format = t.format;
-      texture.layout = t.layout;
-      texture.label  = t.texture?.label ?? t.view?.label;
+      adoptMeta(texture, t);
 
       out.push(makeView(texture));
     }
@@ -383,9 +375,15 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
   }, picking);
 
   const view: LiveElement[] = useMemo(() => [
-    ...colorViews,
     ...pickingViews,
+    ...colorViews,
   ], [colorViews, pickingViews]);
 
   return view;
 }, 'TextureViews');
+
+const adoptMeta = (texture: any, t: any) => {
+  texture.format = t.format;
+  texture.layout = t.layout;
+  texture.label  = t.texture?.label ?? t.view?.label;
+};

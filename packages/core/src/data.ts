@@ -7,6 +7,8 @@ type NumberMapper = (x: number) => number;
 
 const IDENTITY = (x: number) => x;
 
+export const getTensorLength = (size: number[]) => size.reduce((a, b) => a * b, 1);
+
 export const alignSizeTo = (n: number, align: number) => Math.ceil(n / align) * align;
 
 export const makeRawArray = (byteSize: number) => new ArrayBuffer(byteSize);

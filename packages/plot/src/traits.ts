@@ -451,7 +451,7 @@ export const SegmentsTrait = combine(
     },
   ) => {
     const [chunks, groups] = useProp(
-      props.positions ?? parsed.positions,
+      parsed.ragged ?? parsed.tensor ?? props.positions ?? parsed.positions,
       (pos) => {
         if (parsed.ragged) return parsed.ragged;
         if (parsed.tensor) {
@@ -540,7 +540,7 @@ export const LineSegmentsTrait = combine(
     if (!chunks) return;
 
     const l = (loop || loops) as any;
-    const line = useMemo(() => getLineSegments({chunks, groups, loops: l}), [chunks, l]);
+    const line = useMemo(() => getLineSegments({chunks, groups, loops: l}), [chunks, groups, l]);
     for (const k in line) (parsed as any)[k] = (line as any)[k];
   },
 );
@@ -577,7 +577,7 @@ export const ArrowSegmentsTrait = combine(
     const s = (start || starts) as any;
     const e = (end || ends) as any;
 
-    const arrow = useMemo(() => getArrowSegments({chunks, groups, loops: l, starts: s, ends: e}), [chunks, l, s, e]);
+    const arrow = useMemo(() => getArrowSegments({chunks, groups, loops: l, starts: s, ends: e}), [chunks, groups, l, s, e]);
     for (const k in arrow) (parsed as any)[k] = (arrow as any)[k];
   },
 );

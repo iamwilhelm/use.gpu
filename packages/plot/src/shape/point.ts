@@ -3,7 +3,7 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { TraitProps } from '@use-gpu/traits/live';
 
 import { makeUseTrait, shouldEqual, sameShallow } from '@use-gpu/traits/live';
-import { adjustSchema, schemaToArchetype, schemaToAttributes, toCPUDims, getUniformDims } from '@use-gpu/core';
+import { adjustSchema, schemaToArchetype, schemaToAttributes, toCPUDims, getTensorLength, getUniformDims } from '@use-gpu/core';
 import { yeet, memo, useOne } from '@use-gpu/live';
 
 import { useInspectHoverable, useTransformContext, POINT_SCHEMA, LayerReconciler } from '@use-gpu/workbench';
@@ -56,7 +56,7 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
   const archetype = schemaToArchetype(schema, attributes, flags, refs, sources);
 
   const dims = toCPUDims(getUniformDims(schema.positions.format));
-  const count = positions ? (attributes.positions?.length / dims) || 0 : 1;
+  const count = tensor ? getTensorLength(tensor) : positions ? (attributes.positions?.length / dims) || 0 : 1;
 
   // eslint-disable-next-line no-debugger
   if (Number.isNaN(count)) debugger;

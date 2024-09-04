@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
 import { lerp } from '@use-gpu/core';
-import { use, useCallback, useContext, useMemo, useOne, useRef, useState } from '@use-gpu/live';
+import { use, useCallback, useContext, useHooks, useOne, useRef, useState } from '@use-gpu/live';
 import { useMouse, useWheel, useKeyboard } from '../providers/event-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
@@ -34,8 +34,8 @@ export type PanControlsProps = {
   maxZoom?: number,
   snapZoom?: number,
 
-  render?: (x: number, y: number, zoom: number) => LiveElement,
-  children?: (x: number, y: number, zoom: number) => LiveElement,
+  render?: (x: number, y: number, zoom: number, ox: number, oy: number) => LiveElement,
+  children?: (x: number, y: number, zoom: number, ox: number, oy: number) => LiveElement,
 };
 
 const DEFAULT_ANCHOR = [0.5, 0.5];
@@ -257,17 +257,8 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const panY = centered ? y - originY * (zoom - 1) / zoom + offsetY : y;
 
   const render = getRenderFunc(props);
-  return useMemo(() => render ? use(Inner, panX, panY, zoom, x, y, render) : null, [panX, panY, zoom, x, y, render]);
+  return useHooks(() => render ? render(panX, panY, zoom, x, y) : null, [panX, panY, zoom, x, y, render]);
 };
-
-const Inner = (
-  panX: number,
-  panY: number,
-  zoom: number,
-  ox: number,
-  oy: number,
-  render: (x: number, y: number, zoom: number, ox: number, oy: number) => LiveElement,
-) => render(panX, panY, zoom, ox, oy);
 
 const adjustRange = (a: number | null, b: number | null, zoom: number, size: number) => {
   let min = a != null ? a - size * (zoom - 1) / zoom / 2 : null;

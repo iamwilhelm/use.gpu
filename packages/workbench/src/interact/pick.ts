@@ -68,6 +68,21 @@ export const Pick: LiveComponent<PickProps> = (props: PickProps) => {
   const countRef = useOne(() => ({current: 0}));
   useMemo(() => countRef.current++, [x, y]);
 
+  const handlersRef = useOne(() => ({
+    current: {
+      onMouseOver,
+      onMouseOut,
+      onMouseDown,
+      onMouseUp,
+      onMouseMove,
+    },
+  }));
+  handlersRef.current.onMouseOver = onMouseOver;
+  handlersRef.current.onMouseOut = onMouseOut;
+  handlersRef.current.onMouseDown = onMouseDown;
+  handlersRef.current.onMouseUp = onMouseUp;
+  handlersRef.current.onMouseMove = onMouseMove;
+
   if (onMouseMove) {
     useMemo(() => {
       if (hovered || captured) {
@@ -81,11 +96,15 @@ export const Pick: LiveComponent<PickProps> = (props: PickProps) => {
 
   if (onMouseOver || onMouseOut) {
     useResource((dispose) => {
-      if (hovered) {
+      if (hovered || captured) {
+        const {current: {onMouseOver}} = handlersRef;
         if (onMouseOver) onMouseOver(mouse, index);
-        if (onMouseOut) dispose(() => onMouseOut(mouse, index));
+        dispose(() => {
+          const {current: {onMouseOut}} = handlersRef;
+          if (onMouseOut) onMouseOut(mouse, index);
+        });
       }
-    }, [hovered, index]);
+    }, [hovered, captured, index]);
   }
   else {
     useNoResource();
@@ -93,35 +112,25 @@ export const Pick: LiveComponent<PickProps> = (props: PickProps) => {
 
   if (onMouseDown || onMouseUp || capture) {
     const {left, middle, right} = pressed;
+    const click = (dispose: (f: Function) => void) => {
+      const {current: {onMouseDown}} = handlersRef;
+      if (onMouseDown) onMouseDown(mouse, index);
+      if (capture) beginCapture(id);
+      dispose(() => {
+        const {current: {onMouseUp}} = handlersRef;
+        if (capture) endCapture();
+        if (onMouseUp) onMouseUp(mouseRef.current, index);
+      });
+    };
+
     useResource((dispose) => {
-      if (left) {
-        if (onMouseDown) onMouseDown(mouse, index);
-        if (capture) beginCapture(id);
-        dispose(() => {
-          if (capture) endCapture();
-          if (onMouseUp) onMouseUp(mouseRef.current, index);
-        });
-      }
+      if (left) click(dispose);
     }, [left]);
     useResource((dispose) => {
-      if (middle) {
-        if (onMouseDown) onMouseDown(mouse, index);
-        if (capture) beginCapture(id);
-        dispose(() => {
-          if (capture) endCapture();
-          if (onMouseUp) onMouseUp(mouseRef.current, index);
-        });
-      }
+      if (middle) click(dispose);
     }, [middle]);
     useResource((dispose) => {
-      if (right) {
-        if (onMouseDown) onMouseDown(mouse, index);
-        if (capture) beginCapture(id);
-        dispose(() => {
-          if (capture) endCapture();
-          if (onMouseUp) onMouseUp(mouseRef.current, index);
-        });
-      }
+      if (right) click(dispose);
     }, [right]);
   }
   else {

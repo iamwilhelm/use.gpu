@@ -194,7 +194,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((props: Eve
       const captured = captureId === id;
       const hovered  = (captureId == null || captured) && (targetId === id || id === null);
 
-      if (hovered) {
+      if (captured || hovered) {
         ref.mouse = mouse;
       }
 

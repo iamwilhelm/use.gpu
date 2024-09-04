@@ -114,7 +114,8 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PickingProps) 
 
     const swap = () => {
       updated = true;
-      pickingSource.version = incrementVersion(pickingSource.version);
+      source.version = incrementVersion(source.version);
+      depth.version = incrementVersion(depth.version);
     };
 
     const sampleTexture = (x: number, y: number): number[] => {
@@ -129,7 +130,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PickingProps) 
       return index;
     }
 
-    const pickingSource = {
+    const source = {
       texture: pickingTexture,
       sampler: null,
       layout: 'texture_2d<u32>',
@@ -139,6 +140,15 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PickingProps) 
       colorSpace: 'picking',
       version: 0,
       id: Math.floor(Math.random() * 1000),
+    } as TextureSource;
+
+    const depth = {
+      texture: depthTexture,
+      sampler: {},
+      layout: 'texture_depth_2d',
+      format: depthStencilFormat,
+      size: [width, height],
+      version: 0,
     } as TextureSource;
 
     const context = {
@@ -151,7 +161,8 @@ export const PickingTarget: LiveComponent<PickingProps> = (props: PickingProps) 
         colorAttachments,
         depthStencilAttachment,
         swap,
-        source: pickingSource,
+        source,
+        depth,
       } as OffscreenTarget,
       captureTexture,
       sampleTexture,

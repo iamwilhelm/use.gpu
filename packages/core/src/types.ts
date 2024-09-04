@@ -72,6 +72,7 @@ export type UseGPURenderContext = {
   depthStencilAttachment?: GPURenderPassDepthStencilAttachment,
 
   swap?: (view?: GPUTextureView) => void,
+  depth?: TextureTarget,
   source?: TextureTarget,
   sources?: TextureTarget[],
 };

@@ -13,6 +13,7 @@ export const PickingBuffer: LC = memo(() => {
   inspect({
     output: {
       picking: renderContext.source,
+      depth: renderContext.depth,
     },
   });
 

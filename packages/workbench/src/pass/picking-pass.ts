@@ -72,6 +72,7 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PickingPassProps) 
     inspect({
       output: {
         picking: renderContext.source,
+        depth: renderContext.depth,
       },
       render: {
         vertices: vs,

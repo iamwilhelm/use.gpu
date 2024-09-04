@@ -215,7 +215,8 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: RenderTarg
     depthStencilState,
     depthStencilAttachment,
     swap: source.swap,
-    source: source,
+    source,
+    depth,
   }), [renderContext, width, height, colorStates, colorAttachments, depthStencilState, depthStencilAttachment, source, sources]);
 
   const inspectable = useMemo(() => [

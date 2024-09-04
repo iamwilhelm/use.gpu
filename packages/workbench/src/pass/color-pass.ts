@@ -94,6 +94,7 @@ export const ColorPass: LC<ColorPassProps> = memo((props: ColorPassProps) => {
     inspect({
       output: renderContext.source ? {
         color: renderContext.source,
+        depth: renderContext.depth,
       } : undefined,
       render: {
         vertices: vs,

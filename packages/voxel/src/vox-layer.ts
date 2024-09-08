@@ -163,7 +163,7 @@ fn traceVolumeSteps(
   var axis = initialAxis;
   for (var i = 0u; i < 8u; i++) {
 
-    if (SDF_LEVEL >= 0 && mip == SDF_LEVEL) {
+    if (SDF_LEVEL >= 0 && i32(mip) == SDF_LEVEL) {
       let level = f32(1 << mip);
       let maxSteps = 64u;
 

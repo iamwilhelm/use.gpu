@@ -44,6 +44,8 @@ const τ = Math.PI * 2;
 const label = '<ShadowOmniPass>';
 const LABEL = { label };
 
+const VIEW_LABELS = ['Right', 'Left', 'Top', 'Bottom', 'Front', 'Back'];
+
 const VIEW_MATRICES = [
   mat4.fromValues(
     0, 0,-1, 0,
@@ -156,7 +158,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: ShadowOmniPa
     const attachments = makeDepthStencilAttachments(texture, SHADOW_FORMAT, 6);
 
     const descriptors = attachments.map((depthStencilAttachment, i) => ({
-      label: `<ShadowOmniPass> ${i + 1}`,
+      label: `<ShadowOmniPass> ${VIEW_LABELS[i]}`,
       colorAttachments: [],
       depthStencilAttachment,
     }));

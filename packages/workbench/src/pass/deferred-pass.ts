@@ -33,6 +33,9 @@ export type DeferredPassProps = PropsWithChildren<{
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
+const label = '<DeferredPass>';
+const LABEL = { label };
+
 /** Deferred render pass.
 
 Draws all opaque calls to gbuffer, then stencils lights, then draws lights, then all transparent calls, then all debug wireframes.
@@ -77,12 +80,14 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: DeferredPassProp
     getRenderPassDescriptor(gbuffer, {
       overlay: false,
       merge,
+      label: '<DeferredPass> GBuffer',
     }),
     [gbuffer, merge]);
 
   const stencilPassDescriptor = useMemo(() =>
     getRenderPassDescriptor(renderContext, {
       stencil: true,
+      label: '<DeferredPass> Stencil',
     }),
     [renderContext]);
 
@@ -90,6 +95,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: DeferredPassProp
     getRenderPassDescriptor(renderContext, {
       overlay,
       merge: true,
+      label: '<DeferredPass> Color',
     }),
     [renderContext, overlay]);
 
@@ -99,7 +105,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: DeferredPassProp
 
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
-    const commandEncoder = device.createCommandEncoder();
+    const commandEncoder = device.createCommandEncoder(LABEL);
     if (!overlay && !merge) renderContext.swap?.();
 
     {

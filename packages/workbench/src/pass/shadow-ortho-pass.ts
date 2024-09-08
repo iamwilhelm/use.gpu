@@ -35,6 +35,9 @@ export type ShadowOrthoPassProps = PropsWithChildren<{
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
+const label = '<ShadowOrthoPass>';
+const LABEL = { label };
+
 /** Orthographic shadow render pass.
 
 Draws all shadow calls to an orthographic shadow map.
@@ -116,7 +119,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: ShadowOrth
     pipe.fill(uniforms);
     uploadBuffer(device, buffer, pipe.data);
 
-    const commandEncoder = device.createCommandEncoder();
+    const commandEncoder = device.createCommandEncoder(LABEL);
 
     clear(commandEncoder);
 

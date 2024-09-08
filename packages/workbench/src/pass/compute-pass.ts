@@ -19,6 +19,9 @@ export type ComputePassProps = PropsWithChildren<{
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
+const label = '<ComputePass>';
+const LABEL = { label };
+
 const computeToContext = (
   commandEncoder: GPUCommandEncoder,
   calls: ComputeToPass[],
@@ -59,7 +62,7 @@ export const ComputePass: LC<ComputePassProps> = memo((props: ComputePassProps) 
     }
 
     if (computes.length) {
-      const commandEncoder = device.createCommandEncoder();
+      const commandEncoder = device.createCommandEncoder(LABEL);
       computeToContext(commandEncoder, computes, countDispatch);
 
       const command = commandEncoder.finish();

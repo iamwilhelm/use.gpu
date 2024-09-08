@@ -27,6 +27,9 @@ const SHADOW_TYPES = {
   omni: ShadowOmniPass,
 } as Record<string, LiveComponent<any>>;
 
+const label = '<ShadowPass>';
+const LABEL = { label };
+
 /** Shadow render pass.
 
 Draws all shadow calls to multiple shadow maps.
@@ -48,7 +51,8 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: ShadowPassProps) => 
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const attachments = makeDepthStencilAttachments(texture!.texture, SHADOW_FORMAT, layers || 1, 0.0, 'load');
-    const descriptors = attachments.map(depthStencilAttachment => ({
+    const descriptors = attachments.map((depthStencilAttachment, i) => ({
+      label: `<ShadowPass> ${i + 1}`,
       colorAttachments: [],
       depthStencilAttachment,
     }));

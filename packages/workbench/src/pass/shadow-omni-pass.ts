@@ -41,6 +41,9 @@ const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 const τ = Math.PI * 2;
 
+const label = '<ShadowOmniPass>';
+const LABEL = { label };
+
 const VIEW_MATRICES = [
   mat4.fromValues(
     0, 0,-1, 0,
@@ -148,10 +151,12 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: ShadowOmniPa
       1,
       '2d',
     );
+    texture.label = label;
 
     const attachments = makeDepthStencilAttachments(texture, SHADOW_FORMAT, 6);
 
-    const descriptors = attachments.map(depthStencilAttachment => ({
+    const descriptors = attachments.map((depthStencilAttachment, i) => ({
+      label: `<ShadowOmniPass> ${i + 1}`,
       colorAttachments: [],
       depthStencilAttachment,
     }));
@@ -218,7 +223,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: ShadowOmniPa
       pipe.fill(uniforms);
       uploadBuffer(device, buffer, pipe.data);
 
-      const commandEncoder = device.createCommandEncoder();
+      const commandEncoder = device.createCommandEncoder(LABEL);
       const passEncoder = commandEncoder.beginRenderPass(cubeDescriptors[i]);
       passEncoder.setBindGroup(0, bindGroup);
 

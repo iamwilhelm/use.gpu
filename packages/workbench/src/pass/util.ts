@@ -7,10 +7,11 @@ import { mat4, vec3 } from 'gl-matrix';
 
 export const getRenderPassDescriptor = (
   renderContext: UseGPURenderContext,
-  {overlay, merge, stencil}: {
+  {overlay, merge, stencil, label}: {
     overlay?: boolean,
     merge?: boolean,
     stencil?: boolean,
+    label?: string,
   }
 ) => {
   let {colorAttachments, depthStencilAttachment} = renderContext;
@@ -33,6 +34,7 @@ export const getRenderPassDescriptor = (
   }
 
   const renderPassDescriptor: GPURenderPassDescriptor = {
+    label,
     colorAttachments,
     depthStencilAttachment: depthStencilAttachment ?? undefined,
   };

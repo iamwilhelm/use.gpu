@@ -28,6 +28,9 @@ export type ColorPassProps = PropsWithChildren<{
   merge?: boolean,
 }>;
 
+const label = '<ColorPass>';
+const LABEL = { label };
+
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
@@ -66,7 +69,7 @@ export const ColorPass: LC<ColorPassProps> = memo((props: ColorPassProps) => {
   }, light);
 
   const renderPassDescriptor = useMemo(() =>
-    getRenderPassDescriptor(renderContext, {overlay, merge}),
+    getRenderPassDescriptor(renderContext, {overlay, merge, label}),
     [renderContext, overlay, merge]);
 
   return quote(yeet(() => {
@@ -75,7 +78,7 @@ export const ColorPass: LC<ColorPassProps> = memo((props: ColorPassProps) => {
 
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
-    const commandEncoder = device.createCommandEncoder();
+    const commandEncoder = device.createCommandEncoder(LABEL);
     if (!overlay && !merge) renderContext.swap?.();
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);

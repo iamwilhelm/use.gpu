@@ -25,6 +25,9 @@ export type PickingPassProps = PropsWithChildren<{
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
+const label = '<PickingPass>';
+const LABEL = { label };
+
 /** Picking render pass.
 
 Draws all pickable objects as object ID / vertex ID pairs.
@@ -47,7 +50,7 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PickingPassProps) 
   const pickings  = toArray(calls['picking'] as Renderable[]);
 
   const renderPassDescriptor = useMemo(() =>
-    getRenderPassDescriptor(renderContext, {overlay, merge}),
+    getRenderPassDescriptor(renderContext, {overlay, merge, label}),
     [renderContext, overlay, merge]);
 
   return quote(yeet(() => {
@@ -56,7 +59,7 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PickingPassProps) 
 
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
-    const commandEncoder = device.createCommandEncoder();
+    const commandEncoder = device.createCommandEncoder(LABEL);
     if (!overlay && !merge) renderContext.swap?.();
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);

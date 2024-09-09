@@ -138,7 +138,7 @@ export const PlotCartesianPage: LC = () => {
                         emit(x, v * .4 + .5, z, 1);
 
                         const r = Math.max(0.0, v*v*v);
-                        const g = Math.max(0.0, -v)*v;
+                        const g = Math.max(0.0, -v*v*v);
                         const b = .25 + .75 * Math.abs(v);
                         emit(r, g, b, 1);
                       }}

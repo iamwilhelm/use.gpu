@@ -197,7 +197,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: RenderTarg
       format: depthStencil,
       size,
       version: 0,
-    } as TextureSource : null;
+    } as TextureSource : undefined;
 
     return [source, sources, depth];
   }, [targetTexture, depthTexture, width, height, format, variant, absolute, samples, history, sampler, depthStencil]);

@@ -7,7 +7,7 @@ type NumberMapper = (x: number) => number;
 
 const IDENTITY = (x: number) => x;
 
-export const getTensorLength = (size: number[]) => size.reduce((a, b) => a * b, 1);
+export const getTensorLength = (size: VectorLike) => (size as number[]).reduce((a, b) => a * b, 1);
 
 export const alignSizeTo = (n: number, align: number) => Math.ceil(n / align) * align;
 

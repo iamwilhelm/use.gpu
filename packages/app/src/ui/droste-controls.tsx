@@ -39,11 +39,13 @@ type DrosteControlsProps = {
 
 const GRID_OPTIONS = [
   {value: 0, label: 'Logarithmic'},
-  {value: 1, label: 'Continuous'},
+  {value: 1, label: 'Logarithmic Continuous'},
+  {value: 2, label: 'Polar'},
+  {value: 3, label: 'Polar Continuous'},
 ];
 
 const FUNCTION_OPTIONS = [
-  {value: 0, label: 'Escher', invertible: true},
+  {value: 0, label: 'Escher'},
   {value: 1, label: 'Double Escher', shift: true},
   {value: 2, label: 'NPN Split', shift: true},
   {value: 3, label: 'Circle', separation: true, symmetry: true},
@@ -63,11 +65,12 @@ export const DrosteControls: LC<DrosteControlsProps> = (props: DrosteControlsPro
   const [symmetry, setSymmetry] = useState(8);
 
   const currentF = FUNCTION_OPTIONS[func];
-  const isInvertible = currentF.invertible;
   const hasShift = currentF.shift;
   const hasSeparation = currentF.separation;
   const hasSymmetry = currentF.symmetry;
-  
+
+  const isGridInvertible = grid < 2;
+
   return fragment([
     children ? children({func, grid, turn, invert, separation, symmetry, shiftX, shiftY}) : null,
     use(HTML, {
@@ -89,7 +92,7 @@ export const DrosteControls: LC<DrosteControlsProps> = (props: DrosteControlsPro
         <label>
           <Row>
             <div style={{ width: 100 }}>Invert</div>
-            <Checkbox value={invert} onChange={setInvert} />
+            <Checkbox disabled={!isGridInvertible} value={invert} onChange={setInvert} />
           </Row>
         </label>
 

@@ -80,6 +80,12 @@ fn main(uv: vec2<f32>) -> vec4<f32> {
   else if (gridType == 1) {
     rgba = zoomGrid_cd(pos, dd);
   }
+  else if (gridType == 2) {
+    rgba = logPolarGrid_cd(pos, dd);
+  }
+  else if (gridType == 3) {
+    rgba = logPolarZoomGrid_cd(pos, dd);
+  }
 
   return rgba;
 }
@@ -117,50 +123,95 @@ fn logGrid_cd(uv: vec4<f32>, ds: f32) -> vec4<f32> {
   let s1 = pow(2.0, floor(ld));
   let s2 = s1 / 4.0;
 
-  let v1 = grid(uv.xy, dd, s1, 4.0, 512.0);  
-  let v2 = grid(uv.xy, dd, s2, 6.0, 512.0);
-  let rgb = max(v1 * .35, v2);
+  let v1 = grid(uv.xy, dd, s1, 4.0, 1.0);
+  let v2 = grid(uv.xy, dd, s2, 6.0, 1.0);
+  let grey = max(v1 * .35, v2);
   
-  let a = atan2(uv.w, uv.z);
-  let c = cos(a);
-  let s = sin(a);
-  
-  return vec4<f32>(rgb, rgb, rgb, 1.0);
+  return vec4<f32>(grey, grey, grey, 1.0);
 }
 
 fn zoomGrid_cd(uv: vec4<f32>, ds: f32) -> vec4<f32> {
   let dd = ds * length(uv.zw);
-  let ld = -2.0 - log(dd) / log(4.0);
+  let ld = -2.5 - log(dd) / log(4.0);
   let fld = floor(ld);
   let dld = ld - fld;
 
   let s1 = pow(4.0, fld);
   let s2 = s1 / 4.0;
 
-  let v1 = grid(uv.xy, dd, s1, 4.0, 512.0);  
-  let v2 = grid(uv.xy, dd, s2, 6.0, 512.0);
-  let rgb1 = max(v1 * .35, v2);
+  let v1 = grid(uv.xy, dd, s1, 4.0, 1.0);
+  let v2 = grid(uv.xy, dd, s2, 6.0, 1.0);
+  let grey1 = max(v1 * .35, v2);
 
-  let v3 = grid(uv.xy, dd, s1 * 4.0, 4.0, 512.0);  
-  let v4 = grid(uv.xy, dd, s2 * 4.0, 6.0, 512.0);
-  let rgb2 = max(v3 * .35, v4);
+  let v3 = grid(uv.xy, dd, s1 * 4.0, 4.0, 1.0);
+  let v4 = grid(uv.xy, dd, s2 * 4.0, 6.0, 1.0);
+  let grey2 = max(v3 * .35, v4);
 
-  let rgb = mix(rgb1, rgb2, dld);
+  let grey = mix(grey1, grey2, dld);
   
-  let a = atan2(uv.w, uv.z);
-  let c = cos(a);
-  let s = sin(a);
-  
-  return vec4<f32>(rgb, rgb, rgb, 1.0);
+  return vec4<f32>(grey, grey, grey, 1.0);
 }
 
-fn grid(uv: vec2<f32>, dd: f32, g: f32, w: f32, s: f32) -> f32 {
+fn logPolarGrid_cd(uv: vec4<f32>, ds: f32) -> vec4<f32> {
+  let dd = ds * length(uv.zw);
+
+  let diag = length(uv.xy);
+  let ldiag = log(diag) / log(2.0);
+  let ld = 3.0 - ldiag;
+
+  let th = atan2(uv.y, uv.x);
+  let xy = vec2<f32>(ldiag, th / PI * 4.0);
+
+  let ddd = 2.0 * dd / diag;
+  let v1 = grid(xy, ddd, 4.0, 4.0, PI / 4.0);
+  let v2 = grid(xy, ddd, 1.0, 6.0, PI / 4.0);
+
+  let grey = max(v1 * .35, v2);
+  return vec4<f32>(grey, grey, grey, 1.0);
+}
+
+fn logPolarZoomGrid_cd(uv: vec4<f32>, ds: f32) -> vec4<f32> {
+  let dd = ds * length(uv.zw);
+  let diag = length(uv.xy);
+  let ddd = 2.0 * dd / diag;
+
+  let sld = -2.0 - log(ddd) / log(16.0 / PI);
+  let fld = floor(sld);
+  let dld = sld - fld;
+
+  let s1 = pow(4.0, fld);
+  let s2 = s1 / 4.0;
+
+  let ldiag = log(diag) / log(2.0);
+
+  let th = atan2(uv.y, uv.x);
+  let xy = vec2<f32>(ldiag, th / PI * 4.0);
+
+  let v1 = grid(xy, ddd, s1, 4.0, PI / 4.0);
+  let v2 = grid(xy, ddd, s2, 6.0, PI / 4.0);
+  let grey1 = max(v1 * .35, v2);
+
+  let v3 = grid(xy, ddd, s1 * 4.0, 4.0, PI / 4.0);
+  let v4 = grid(xy, ddd, s2 * 4.0, 6.0, PI / 4.0);
+  let grey2 = max(v3 * .35, v4);
+
+  let grey = mix(grey1, grey2, dld);
+  return vec4<f32>(grey, grey, grey, 1.0);
+}
+
+fn grid(uv: vec2<f32>, dd: f32, g: f32, w: f32, af: f32) -> f32 {
   let xy = (uv * g) + .5;
   let xym = (xy - floor(xy)) - .5;
   let xya = abs(xym);
-  let threshold = w * dd * g;
+
+  //let threshold = w * dd * g;
+  //let df = min(xya.x, xya.y) * 2.0;
+  //let level = .5 - (df - threshold) / dd / g / 2.0;
+
+  let threshold = w * vec2<f32>(dd, dd * af) * g;
   let df = min(xya.x, xya.y) * 2.0;
-  let level = .5 - (df - threshold) / dd / g / 2.0;
+  let dm = 2.0 * xya - threshold;
+  let level = .5 - min(dm.x, dm.y) / dd / g / 2.0;
 
   return clamp(level, 0.0, 1.0);
 }

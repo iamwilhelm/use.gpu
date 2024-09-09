@@ -173,9 +173,9 @@ fn logPolarGrid_cd(uv: vec4<f32>, ds: f32) -> vec4<f32> {
 fn logPolarZoomGrid_cd(uv: vec4<f32>, ds: f32) -> vec4<f32> {
   let dd = ds * length(uv.zw);
   let diag = length(uv.xy);
-  let ddd = 2.0 * dd / diag;
+  let ddd = PI/2.0 * dd / diag;
 
-  let sld = -2.0 - log(ddd) / log(16.0 / PI);
+  let sld = -1.8 - log(ddd) / log(16.0 / PI);
   let fld = floor(sld);
   let dld = sld - fld;
 

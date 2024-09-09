@@ -7,7 +7,7 @@ export const makeKey = (): number => ++KEY;
 
 /** Get unique key for object */
 export const getObjectKey = (v: any) => {
-  if (v && typeof v === 'object') {
+  if (v && (typeof v === 'object' || typeof v === 'function')) {
     const c = KEYS.get(v);
     if (c != null) return c;
 
